@@ -74,22 +74,22 @@
   - Write tests for unit movement validation and conflicts
   - _Requirements: 1.1, 1.3, 6.2_
 
-- [ ] 5. Implement basic resource management
-- [ ] 5.1 Create player resource tracking (trade goods, commodities)
+- [x] 5. Implement basic resource management
+- [x] 5.1 Create player resource tracking (trade goods, commodities)
   - Write tests for resource initialization and modification
   - Add resource fields to Player class
   - Implement resource validation (non-negative values, limits)
   - Write tests for resource transactions and validation
   - _Requirements: 1.3, 6.2, 6.3_
 
-- [ ] 5.2 Implement command token management
+- [x] 5.2 Implement command token management
   - Write tests for command token allocation and spending
   - Create CommandTokens class with fleet, strategy, and tactic pools
   - Implement command token validation and redistribution
   - Write tests for command token limits and constraints
   - _Requirements: 6.2, 6.3, 1.3_
 
-- [ ] 5.3 Add basic planet resource generation
+- [x] 5.3 Add basic planet resource generation
   - Write tests for planet resource collection
   - Implement planet exhaustion and refresh mechanics
   - Create resource collection actions and validation

@@ -22,8 +22,9 @@ class TestPlanet:
         """Test that planet control can be changed."""
         planet = Planet(name="Test Planet", resources=2, influence=1)
         player_id = "player1"
-        planet.set_control(player_id)
-        assert planet.controlled_by == player_id
+        new_planet = planet.set_control(player_id)
+        assert new_planet.controlled_by == player_id
+        assert planet.controlled_by is None  # Original unchanged
 
     def test_planet_has_units_list(self):
         """Test that planet has a units list for ground forces."""
@@ -36,6 +37,7 @@ class TestPlanet:
         """Test placing a ground unit on a planet."""
         planet = Planet(name="Test Planet", resources=2, influence=1)
         unit = Unit(unit_type="infantry", owner="player1")
-        planet.place_unit(unit)
-        assert unit in planet.units
-        assert len(planet.units) == 1
+        new_planet = planet.place_unit(unit)
+        assert unit in new_planet.units
+        assert len(new_planet.units) == 1
+        assert len(planet.units) == 0  # Original unchanged
