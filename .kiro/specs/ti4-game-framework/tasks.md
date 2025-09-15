@@ -30,8 +30,8 @@
   - Write tests for invalid phase transitions
   - _Requirements: 1.2, 2.3, 6.1_
 
-- [ ] 3. Implement action framework and validation
-- [ ] 3.1 Create base Action class and validation interface
+- [-] 3. Implement action framework and validation
+- [x] 3.1 Create base Action class and validation interface
   - Write tests for action validation contract
   - Implement abstract Action base class with is_legal and execute methods
   - Create ActionResult class for action outcomes
