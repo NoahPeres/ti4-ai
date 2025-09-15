@@ -151,6 +151,46 @@ class RuleViolationError(TI4Error):
         self.context = context
 ```
 
+## Code Quality and Development Standards
+
+### Mandatory Code Quality Checks
+
+**CRITICAL: All code changes MUST pass linting and formatting checks before proceeding.**
+
+#### Required Commands for Every Development Session
+Run these commands after ANY code changes:
+
+```bash
+# Format all code (REQUIRED)
+uv run ruff format src tests
+
+# Fix linting issues (REQUIRED) 
+uv run ruff check --fix src tests
+
+# Type checking (REQUIRED)
+uv run mypy src
+
+# Run all quality checks at once (RECOMMENDED)
+make check-all
+```
+
+#### Development Workflow Integration
+1. **After writing any code**: Run `make check-all` or individual commands above
+2. **Before committing**: Always run `make check-all` to ensure clean state
+3. **During TDD cycles**: Run formatting/linting after each GREEN phase
+4. **Build failures**: If builds fail, first check if linting/formatting was run
+
+#### Quality Standards
+- **Zero tolerance** for linting errors in committed code
+- **Consistent formatting** using ruff format across entire codebase
+- **Type hints required** for all public interfaces and complex functions
+- **Import organization** must follow ruff standards
+
+#### Automation
+- CI/CD pipeline will reject any code that fails quality checks
+- Pre-commit hooks should be configured to run these checks automatically
+- IDE integration recommended for real-time feedback
+
 ## Testing Strategy
 
 ### Test-Driven Development Guidelines

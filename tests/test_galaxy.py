@@ -1,6 +1,5 @@
 """Tests for galaxy structure."""
 
-import pytest
 from src.ti4.core.galaxy import Galaxy
 from src.ti4.core.hex_coordinate import HexCoordinate
 

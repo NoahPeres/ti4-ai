@@ -1,6 +1,5 @@
 """Tests for planet structure."""
 
-import pytest
 from src.ti4.core.planet import Planet
 from src.ti4.core.unit import Unit
 

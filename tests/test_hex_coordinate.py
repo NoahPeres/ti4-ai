@@ -1,6 +1,5 @@
 """Tests for hex coordinate system."""
 
-import pytest
 from src.ti4.core.hex_coordinate import HexCoordinate
 
 

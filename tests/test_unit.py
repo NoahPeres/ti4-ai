@@ -1,6 +1,5 @@
 """Tests for unit structure."""
 
-import pytest
 from src.ti4.core.unit import Unit
 
 

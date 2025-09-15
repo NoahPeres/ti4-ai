@@ -1,8 +1,7 @@
 """Tests for system structure."""
 
-import pytest
-from src.ti4.core.system import System
 from src.ti4.core.planet import Planet
+from src.ti4.core.system import System
 from src.ti4.core.unit import Unit
 
 

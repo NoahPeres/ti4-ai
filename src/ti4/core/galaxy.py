@@ -6,8 +6,8 @@ from .hex_coordinate import HexCoordinate
 class Galaxy:
     """Represents the hex-based galaxy game board."""
 
-    def __init__(self):
-        self.systems = {}
+    def __init__(self) -> None:
+        self.systems: dict[HexCoordinate, str] = {}
 
     def place_system(self, coordinate: HexCoordinate, system_id: str) -> None:
         """Place a system at the given hex coordinate."""
