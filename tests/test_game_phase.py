@@ -13,10 +13,5 @@ def test_game_phase_enum_exists():
 def test_phase_transition_logic():
     """Test that phase transition logic exists."""
     # Should have a function to validate transitions
-<<<<<<< HEAD
-    from src.ti4.core.game_phase import is_valid_transition
-
-=======
->>>>>>> 1346505907443084e976e966a542dd04bf2e4157
     # Should be able to transition from SETUP to some other phase
     assert is_valid_transition(GamePhase.SETUP, GamePhase.SETUP) is False
