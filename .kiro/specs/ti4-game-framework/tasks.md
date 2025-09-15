@@ -52,22 +52,22 @@
   - Write tests for empty legal move sets and edge cases
   - _Requirements: 2.1, 2.2, 2.4, 3.2_
 
-- [ ] 4. Implement basic galaxy and positioning system
-- [ ] 4.1 Create hex coordinate system and basic galaxy structure
+- [x] 4. Implement basic galaxy and positioning system
+- [x] 4.1 Create hex coordinate system and basic galaxy structure
   - Write tests for hex coordinate math and adjacency
   - Implement HexCoordinate class with distance and neighbor calculations
   - Create basic Galaxy class with system positioning
   - Write tests for galaxy initialization and system placement
   - _Requirements: 1.1, 6.2, 6.3_
 
-- [ ] 4.2 Implement system and planet basic structure
+- [x] 4.2 Implement system and planet basic structure
   - Write tests for system creation with planets and basic properties
   - Create System class with planets and basic attributes
   - Implement Planet class with resources, influence, and control tracking
   - Write tests for planet control changes and validation
   - _Requirements: 1.1, 1.3, 6.2_
 
-- [ ] 4.3 Add unit placement and tracking in systems
+- [x] 4.3 Add unit placement and tracking in systems
   - Write tests for unit placement and removal in systems
   - Implement unit tracking in systems and on planets
   - Create basic Unit class with type and owner
