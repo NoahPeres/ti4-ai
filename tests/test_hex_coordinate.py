@@ -10,13 +10,13 @@ class TestHexCoordinate:
         coord = HexCoordinate(q=1, r=2)
         assert coord.q == 1
         assert coord.r == 2
-    
+
     def test_distance_calculation(self):
         """Test distance calculation between two hex coordinates."""
         coord1 = HexCoordinate(q=0, r=0)
         coord2 = HexCoordinate(q=1, r=1)
         assert coord1.distance_to(coord2) == 2
-    
+
     def test_get_neighbors(self):
         """Test getting all adjacent hex coordinates."""
         coord = HexCoordinate(q=0, r=0)

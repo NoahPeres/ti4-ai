@@ -10,13 +10,13 @@ class TestGalaxy:
         """Test that a galaxy can be created."""
         galaxy = Galaxy()
         assert galaxy is not None
-    
+
     def test_galaxy_has_systems_dict(self):
         """Test that galaxy has a systems dictionary."""
         galaxy = Galaxy()
-        assert hasattr(galaxy, 'systems')
+        assert hasattr(galaxy, "systems")
         assert isinstance(galaxy.systems, dict)
-    
+
     def test_place_system_at_coordinate(self):
         """Test placing a system at a hex coordinate."""
         galaxy = Galaxy()
