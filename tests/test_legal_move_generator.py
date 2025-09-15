@@ -1,6 +1,5 @@
 """Tests for LegalMoveGenerator class."""
 
-
 from src.ti4.actions.legal_moves import LegalMoveGenerator
 from src.ti4.core.game_state import GameState
 from src.ti4.core.player import Player
