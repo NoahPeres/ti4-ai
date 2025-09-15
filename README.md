@@ -36,6 +36,8 @@ uv run mypy src
 
 ## Development
 
+This project follows strict **Test-Driven Development (TDD)** practices. See `.kiro/steering/tdd-practices.md` for detailed guidelines that all contributors must follow.
+
 ### Running Tests
 
 ```bash
@@ -45,6 +47,13 @@ uv run pytest
 ### Code Formatting
 
 ```bash
+# Format with ruff (recommended)
+uv run ruff format src tests
+
+# Format with both ruff and black
+make format
+
+# Or format with black only
 uv run black src tests
 ```
 
@@ -57,7 +66,23 @@ uv run mypy src
 ### Linting
 
 ```bash
+# Check for linting issues
 uv run ruff check src tests
+
+# Auto-fix linting issues where possible
+uv run ruff check --fix src tests
+```
+
+### Quality Checks
+
+```bash
+# Run all quality checks (recommended before committing)
+make check-all
+
+# Or run individual checks:
+make lint        # Linting with ruff
+make type-check  # Type checking with mypy
+make format      # Format code
 ```
 
 ## Project Structure
