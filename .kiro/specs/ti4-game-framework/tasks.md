@@ -8,22 +8,22 @@
   - Set up CI/CD configuration for automated testing
   - _Requirements: 5.1, 5.2, 5.4_
 
-- [ ] 2. Implement core game state foundation
-- [ ] 2.1 Create basic GameState class with validation
+- [x] 2. Implement core game state foundation
+- [x] 2.1 Create basic GameState class with validation
   - Write tests for GameState creation and immutability
   - Implement minimal GameState class as frozen dataclass
   - Add basic validation methods for state consistency
   - Write tests for state equality and hashing
   - _Requirements: 1.1, 1.3, 5.2_
 
-- [ ] 2.2 Implement player identification and basic player state
+- [x] 2.2 Implement player identification and basic player state
   - Write tests for player creation and unique identification
   - Create Player class with minimal required fields (id, faction)
   - Implement player equality and validation methods
   - Write tests for multiple players in game state
   - _Requirements: 1.1, 3.1, 4.1_
 
-- [ ] 2.3 Create game phase management system
+- [x] 2.3 Create game phase management system
   - Write tests for game phase transitions and validation
   - Implement GamePhase enum and phase transition logic
   - Create phase-specific rule validation framework
