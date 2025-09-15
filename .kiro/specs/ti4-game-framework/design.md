@@ -153,6 +153,35 @@ class RuleViolationError(TI4Error):
 
 ## Testing Strategy
 
+### Test-Driven Development Guidelines
+
+**Critical TDD Principles for Implementation:**
+
+1. **Test Focus: External Interfaces & Behaviors Only**
+   - Write tests for **non-trivial, external interfaces** and **observable behaviors**
+   - **Avoid testing**: trivial statements, internal implementation details, private methods
+   - Focus on **what the system does**, not **how it does it**
+
+2. **RED Phase: Single Failing Test**
+   - Write **ONE test at a time** that demonstrates expected behavior
+   - Implement just enough code so the test **fails on an assertion** (not syntax errors)
+   - The failure should be meaningful - showing what behavior is missing
+
+3. **GREEN Phase: Minimal Implementation**
+   - Write **barely enough** production code to make the current test pass
+   - Ensure **all previous tests still pass**
+   - **No design decisions or refactoring** during this phase
+   - Focus purely on making the assertion true
+
+4. **REFACTOR Phase: The Most Critical Step**
+   - **Add abstractions** where needed
+   - **Reduce duplication** between test and production code
+   - **Extract functionality** into helper methods
+   - **Maintain high code quality** - readability and stability
+   - This is where good design emerges
+
+5. **Development Cycle**: `RED → GREEN → REFACTOR → repeat`
+
 ### Test-Driven Development Approach
 
 #### Unit Tests
