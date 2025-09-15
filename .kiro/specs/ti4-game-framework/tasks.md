@@ -45,7 +45,7 @@
   - Write tests for validation error handling and reporting
   - _Requirements: 1.2, 1.4, 3.4, 4.4_
 
-- [ ] 3.3 Create legal move generation system
+- [x] 3.3 Create legal move generation system
   - Write tests for generating all legal actions for a player
   - Implement LegalMoveGenerator class
   - Create methods to filter actions by current game phase and player state
