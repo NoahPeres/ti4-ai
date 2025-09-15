@@ -6,8 +6,7 @@ help:
 	@echo "  dev-setup   Set up development environment with uv"
 	@echo "  test        Run tests with coverage"
 	@echo "  lint        Run linting checks"
-	@echo "  format      Format code with ruff and black"
-	@echo "  ruff-format Format code with ruff only"
+	@echo "  format      Format code with ruff"
 	@echo "  type-check  Run type checking with mypy"
 	@echo "  check-all   Run all quality checks (lint, format-check, type-check)"
 	@echo "  clean       Clean up build artifacts"
@@ -28,10 +27,6 @@ lint:
 	uv run ruff check src tests
 
 format:
-	uv run ruff format src tests
-	uv run black src tests
-
-ruff-format:
 	uv run ruff format src tests
 
 type-check:

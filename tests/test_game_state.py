@@ -51,7 +51,3 @@ def test_game_state_validation():
 
     # Basic state should be valid
     assert state.is_valid() is True
-    assert callable(state.is_valid)
-
-    # Basic state should be valid
-    assert state.is_valid() is True

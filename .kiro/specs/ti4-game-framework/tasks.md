@@ -30,22 +30,22 @@
   - Write tests for invalid phase transitions
   - _Requirements: 1.2, 2.3, 6.1_
 
-- [ ] 3. Implement action framework and validation
-- [ ] 3.1 Create base Action class and validation interface
+- [-] 3. Implement action framework and validation
+- [x] 3.1 Create base Action class and validation interface
   - Write tests for action validation contract
   - Implement abstract Action base class with is_legal and execute methods
   - Create ActionResult class for action outcomes
   - Write tests for action execution and state transitions
   - _Requirements: 1.2, 1.4, 2.1, 5.4_
 
-- [ ] 3.2 Implement action validation engine
+- [x] 3.2 Implement action validation engine
   - Write tests for multi-layered validation (syntax, precondition, rules)
   - Create ValidationEngine class with validation pipeline
   - Implement specific validation error types with detailed messages
   - Write tests for validation error handling and reporting
   - _Requirements: 1.2, 1.4, 3.4, 4.4_
 
-- [ ] 3.3 Create legal move generation system
+- [x] 3.3 Create legal move generation system
   - Write tests for generating all legal actions for a player
   - Implement LegalMoveGenerator class
   - Create methods to filter actions by current game phase and player state

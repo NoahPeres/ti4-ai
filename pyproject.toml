@@ -28,7 +28,6 @@ dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
     "hypothesis>=6.0.0",
-    "black>=23.0.0",
     "mypy>=1.0.0",
     "ruff>=0.1.0",
 ]
@@ -50,23 +49,7 @@ addopts = [
     "--cov-report=xml",
 ]
 
-[tool.black]
-line-length = 88
-target-version = ['py39']
-include = '\.pyi?$'
-extend-exclude = '''
-/(
-  # directories
-  \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | build
-  | dist
-)/
-'''
+
 
 [tool.mypy]
 python_version = "3.9"
@@ -108,7 +91,7 @@ select = [
     "UP", # pyupgrade
 ]
 ignore = [
-    "E501",  # line too long, handled by black
+    "E501",  # line too long, handled by ruff format
     "B008",  # do not perform function calls in argument defaults
     "C901",  # too complex
 ]
@@ -119,7 +102,6 @@ ignore = [
 
 [dependency-groups]
 dev = [
-    "black>=25.1.0",
     "hypothesis>=6.138.16",
     "mypy>=1.18.1",
     "pytest>=8.4.2",
