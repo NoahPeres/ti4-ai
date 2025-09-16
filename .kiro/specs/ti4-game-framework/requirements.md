@@ -48,6 +48,20 @@ The system will start with core game mechanics and incrementally build toward fu
 
 **User Story:** As a human player, I want an intuitive interface to view game state and make moves, so that I can play against AI agents or other humans effectively.
 
+### Requirement 5
+
+**User Story:** As a player executing a tactical action, I want the movement system to strictly follow TI4's two-step process, so that all movement is legal and consistent with official rules.
+
+#### Acceptance Criteria
+
+1. WHEN executing a tactical action THEN the system SHALL enforce the two-step movement process: Movement Step followed by Commit Ground Forces Step
+2. WHEN units move during the Movement Step THEN they SHALL only move to the space area of the active system, never directly between planets
+3. WHEN ground forces move from planets THEN they SHALL require transport capacity and move to the space area first
+4. WHEN committing ground forces THEN they SHALL only move from the space area to planets within the same system
+5. WHEN validating movement THEN the system SHALL perform joint validation of the entire movement plan, not piece-by-piece validation
+6. WHEN calculating technology effects THEN the system SHALL automatically apply optimal technology usage (e.g., Gravity Drive to ships that need it most)
+7. IF direct planet-to-planet movement is attempted THEN the system SHALL reject it as invalid according to TI4 rules
+
 #### Acceptance Criteria
 
 1. WHEN a human player views the game THEN the system SHALL present the game state in a clear, understandable format

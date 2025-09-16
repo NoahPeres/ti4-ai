@@ -32,7 +32,7 @@ class GameConstants:
 
     # Maximum number of players
     MAX_PLAYERS = 6
-    MIN_PLAYERS = 2
+    MIN_PLAYERS = 3  # TI4 requires at least 3 players
 
     # Strategy cards
     STRATEGY_CARD_COUNT = 8
@@ -76,3 +76,69 @@ class FactionConstants:
     HACAN = "hacan"
     XXCHA = "xxcha"
     JORD = "jord"
+
+
+class EventConstants:
+    """Event type constants for the event system."""
+
+    UNIT_MOVED = "unit_moved"
+    COMBAT_STARTED = "combat_started"
+    PHASE_CHANGED = "phase_changed"
+
+
+class PerformanceConstants:
+    """Performance and resource management constants."""
+
+    # Cache sizes
+    DEFAULT_CACHE_SIZE = 1000
+    DEFAULT_MAX_STATES = 100
+    DEFAULT_MAX_CONCURRENT_GAMES = 100
+
+    # Timeouts and delays
+    CIRCUIT_BREAKER_TIMEOUT = 60.0  # seconds
+    DEFAULT_RETRY_DELAY = 1.0  # seconds
+    OPERATION_SLEEP_DELAY = 0.01  # seconds
+    INACTIVE_GAME_THRESHOLD = 3600  # 1 hour in seconds
+    OLD_STATE_THRESHOLD = 3600  # 1 hour in seconds
+
+    # Retry and failure thresholds
+    DEFAULT_MAX_RETRIES = 3
+    DEFAULT_FAILURE_THRESHOLD = 5
+    MAX_OPERATION_HISTORY = 1000
+
+    # Thread pool settings
+    DEFAULT_MAX_WORKERS = 10
+    THREAD_NAME_PREFIX = "ti4-game"
+
+
+class ValidationConstants:
+    """Constants for validation logic."""
+
+    # Collection length checks
+    EMPTY_COLLECTION_LENGTH = 0
+    POSITIVE_NUMBER_THRESHOLD = 0
+
+
+class CircuitBreakerConstants:
+    """Constants for circuit breaker pattern."""
+
+    STATE_CLOSED = "closed"
+    STATE_OPEN = "open"
+    STATE_HALF_OPEN = "half-open"
+
+
+class GameStateConstants:
+    """Constants for game state management."""
+
+    # Default starting values
+    DEFAULT_CURRENT_PLAYER_INDEX = 0
+    DEFAULT_ROUND_NUMBER = 1
+
+    # Token counts (from TI4 rules 20.1)
+    DEFAULT_TACTIC_TOKENS = 3
+    DEFAULT_FLEET_TOKENS = 3
+    DEFAULT_STRATEGY_TOKENS = 2
+
+    # Resource starting values
+    DEFAULT_RESOURCES = 0
+    DEFAULT_INFLUENCE = 0

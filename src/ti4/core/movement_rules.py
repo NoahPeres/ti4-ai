@@ -50,21 +50,20 @@ class BasicMovementRule(MovementRule):
 
 
 class GravityDriveRule(MovementRule):
-    """Gravity Drive technology rule - allows movement through systems with ships."""
+    """Gravity Drive technology rule - increases movement by +1."""
 
     def can_move(self, context: MovementContext) -> bool:
         """Check if gravity drive allows this movement."""
-        # If player doesn't have gravity drive, this rule doesn't apply (allow movement)
-        if "gravity_drive" not in context.player_technologies:
-            return True
-
-        # Gravity drive allows moving through systems containing your ships
-        # This would need path validation through friendly systems
-        return True  # Simplified for now
+        distance = context.from_coordinate.distance_to(context.to_coordinate)
+        max_range = self.get_movement_range(context.unit, context.player_technologies)
+        return distance <= max_range
 
     def get_movement_range(self, unit: Unit, technologies: set[str]) -> int:
-        """Gravity drive doesn't change base movement range."""
-        return unit.get_movement()
+        """Gravity drive adds +1 to movement range."""
+        base_movement = unit.get_movement()
+        if "gravity_drive" in technologies:
+            return base_movement + 1
+        return base_movement
 
 
 class AnomalyRule(MovementRule):
@@ -97,9 +96,12 @@ class MovementRuleEngine:
         self.rules.append(rule)
 
     def can_move(self, context: MovementContext) -> bool:
-        """Check if movement is valid according to all rules."""
-        # All rules must allow the movement
-        return all(rule.can_move(context) for rule in self.rules)
+        """Check if movement is valid considering maximum movement range."""
+        distance = context.from_coordinate.distance_to(context.to_coordinate)
+        max_range = self.get_max_movement_range(
+            context.unit, context.player_technologies
+        )
+        return distance <= max_range
 
     def get_max_movement_range(self, unit: Unit, technologies: set[str]) -> int:
         """Get the maximum movement range considering all rules."""

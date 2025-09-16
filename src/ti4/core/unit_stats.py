@@ -1,6 +1,7 @@
 """Unit statistics system for TI4."""
 
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Any, Optional
 
 
@@ -70,6 +71,18 @@ class UnitStatsProvider:
         technologies: Optional[set[str]] = None,
     ) -> UnitStats:
         """Get unit statistics with faction and technology modifications."""
+        # Convert technologies to frozenset for hashability
+        tech_key = frozenset(technologies) if technologies else frozenset()
+        return self._get_cached_unit_stats(unit_type, faction, tech_key)
+
+    @lru_cache(maxsize=1000)
+    def _get_cached_unit_stats(
+        self,
+        unit_type: str,
+        faction: Optional[str],
+        technologies: frozenset[str],
+    ) -> UnitStats:
+        """Cached version of unit stats calculation."""
         base_stats = self.BASE_STATS.get(unit_type)
         if base_stats is None:
             raise ValueError(f"Unknown unit type: {unit_type}")
@@ -111,6 +124,8 @@ class UnitStatsProvider:
         if faction not in self._faction_modifiers:
             self._faction_modifiers[faction] = {}
         self._faction_modifiers[faction][unit_type] = stats
+        # Clear cache when modifiers change
+        self._get_cached_unit_stats.cache_clear()
 
     def register_technology_modifier(
         self, technology: str, unit_type: str, stats: UnitStats
@@ -119,3 +134,5 @@ class UnitStatsProvider:
         if technology not in self._technology_modifiers:
             self._technology_modifiers[technology] = {}
         self._technology_modifiers[technology][unit_type] = stats
+        # Clear cache when modifiers change
+        self._get_cached_unit_stats.cache_clear()

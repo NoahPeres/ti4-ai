@@ -12,7 +12,9 @@ from src.ti4.core.unit_stats import UnitStats, UnitStatsProvider
 
 
 class TestTI4Integration:
-    def debug_test_failure(self, test_name: str, expected: any, actual: any, context: dict = None):
+    def debug_test_failure(
+        self, test_name: str, expected: any, actual: any, context: dict = None
+    ):
         """Helper method to provide debugging output for failed test scenarios."""
         print(f"\n=== DEBUG INFO FOR FAILED TEST: {test_name} ===")
         print(f"Expected: {expected}")
@@ -151,26 +153,26 @@ class TestTI4Integration:
         # Create stats provider with faction modifiers
         stats_provider = UnitStatsProvider()
 
-        # Sol faction gets better fighters (only modify combat, keep other stats at 0)
+        # Sol faction gets better infantry (Spec Ops)
         stats_provider.register_faction_modifier(
-            "sol", "fighter", UnitStats(combat_value=8, movement=0, capacity=0, cost=0)
+            "sol", "infantry", UnitStats(combat_value=7, movement=0, capacity=0, cost=0)
         )
 
-        # Create Sol fighter
-        sol_fighter = Unit(
-            unit_type="fighter",
+        # Create Sol infantry (Spec Ops)
+        sol_infantry = Unit(
+            unit_type="infantry",
             owner="player1",
             faction="sol",
             stats_provider=stats_provider,
         )
 
-        # Create regular fighter
-        regular_fighter = Unit(unit_type="fighter", owner="player2")
+        # Create regular infantry
+        regular_infantry = Unit(unit_type="infantry", owner="player2")
 
         # Verify faction bonus
-        assert sol_fighter.get_combat_value() == 8  # Improved
-        assert regular_fighter.get_combat_value() == 9  # Default
+        assert sol_infantry.get_combat_value() == 7  # Improved (Spec Ops)
+        assert regular_infantry.get_combat_value() == 8  # Default
 
         # Both should have same movement and capacity
-        assert sol_fighter.get_movement() == regular_fighter.get_movement()
-        assert sol_fighter.get_capacity() == regular_fighter.get_capacity()
+        assert sol_infantry.get_movement() == regular_infantry.get_movement()
+        assert sol_infantry.get_capacity() == regular_infantry.get_capacity()

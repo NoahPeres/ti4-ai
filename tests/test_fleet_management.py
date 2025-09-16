@@ -138,24 +138,24 @@ class TestFleetCapacityValidator:
         stats_provider = UnitStatsProvider()
         stats_provider.register_faction_modifier(
             "sol",
-            "fighter",
-            UnitStats(combat_value=8),  # Sol fighters are better
+            "infantry",
+            UnitStats(combat_value=7),  # Sol infantry (Spec Ops) are better
         )
 
-        # Create Sol fighter
-        sol_fighter = Unit(
-            unit_type="fighter",
+        # Create Sol infantry (Spec Ops)
+        sol_infantry = Unit(
+            unit_type="infantry",
             owner="player1",
             faction="sol",
             stats_provider=stats_provider,
         )
 
         # Should have modified combat value
-        assert sol_fighter.get_combat_value() == 8
+        assert sol_infantry.get_combat_value() == 7
 
-        # Regular fighter should have default stats
-        regular_fighter = Unit(unit_type="fighter", owner="player2")
-        assert regular_fighter.get_combat_value() == 9  # Default value
+        # Regular infantry should have default stats
+        regular_infantry = Unit(unit_type="infantry", owner="player2")
+        assert regular_infantry.get_combat_value() == 8  # Default value
 
     def test_technology_unit_upgrades(self):
         """Test that technology upgrades affect unit stats."""

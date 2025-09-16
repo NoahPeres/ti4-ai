@@ -133,6 +133,15 @@
   - Write tests for fleet splitting and merging
   - _Requirements: 6.2, 1.2, 2.1_
 
+- [ ] 7.3 Refactor movement system to follow correct TI4 tactical action structure
+  - Implement proper two-step tactical action: Movement Step + Commit Ground Forces Step
+  - Enforce rule that ground forces cannot move directly between planets
+  - Create joint movement validation for entire movement plans
+  - Implement automatic technology effect calculation (Gravity Drive, etc.)
+  - Update MovementAction terminology to MovementCommand/MovementOperation
+  - Write comprehensive tests for correct TI4 movement rules
+  - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7_
+
 - [ ] 8. Implement basic combat system
 - [x] 8.1 Create combat initiation and participant determination
   - Write tests for combat trigger conditions

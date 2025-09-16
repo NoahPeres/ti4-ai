@@ -281,10 +281,81 @@ class TestIntegration(unittest.TestCase):
 - Basic unit tests
 
 ### Phase 2: Essential Game Mechanics
-- Movement and fleet management
+- Movement and fleet management (see Movement System Design below)
 - Basic combat system
 - Resource management (trade goods, commodities)
 - Technology acquisition
+
+## Movement System Design
+
+### Critical TI4 Movement Rules Implementation
+
+The movement system must strictly follow TI4's tactical action structure, which consists of two distinct steps:
+
+#### Step 1: Movement Step
+All units move **to the space area** of the active system. This is the only legal movement during this step:
+
+1. **Ships**: Move from other systems directly to the active system's space area
+2. **Ground Forces**: Move from planets to the active system's space area (requires transport capacity)
+3. **Validation**: Must be performed **jointly** for the entire move, not piece-by-piece
+4. **Technology Effects**: Automatically calculated (e.g., Gravity Drive applied to optimal ships)
+
+**Important**: Ground forces CANNOT move directly from planet to planet within a system. They must first move to space (if capacity exists), then be committed to planets in Step 2.
+
+#### Step 2: Commit Ground Forces Step
+After movement is complete, ground forces in the space area may be committed to planets:
+
+1. **Source**: Ground forces must be in the active system's space area
+2. **Destination**: Specific planets within the active system
+3. **Separate Step**: This occurs after movement validation and execution
+
+### Implementation Architecture
+
+```python
+class TacticalAction:
+    def __init__(self, active_system_id: str, player_id: str):
+        self.movement_step = MovementStep()
+        self.commit_ground_forces_step = CommitGroundForcesStep()
+    
+    def execute(self, game_state: GameState) -> GameState:
+        # Step 1: Execute movement to space area
+        state_after_movement = self.movement_step.execute(game_state)
+        
+        # Step 2: Commit ground forces to planets
+        final_state = self.commit_ground_forces_step.execute(state_after_movement)
+        
+        return final_state
+
+class MovementStep:
+    """Handles movement of all units to the active system's space area."""
+    
+    def validate_movement_plan(self, plan: MovementPlan) -> ValidationResult:
+        # Joint validation of entire movement plan
+        # - Check capacity requirements
+        # - Calculate technology effects (Gravity Drive, etc.)
+        # - Validate movement ranges
+        pass
+    
+    def execute(self, game_state: GameState) -> GameState:
+        # Move all units to active system's space area
+        pass
+
+class CommitGroundForcesStep:
+    """Handles commitment of ground forces from space to planets."""
+    
+    def execute(self, game_state: GameState) -> GameState:
+        # Move ground forces from space area to specific planets
+        pass
+```
+
+### Terminology Guidelines
+
+**Critical**: Avoid using "action" as generic terminology in internal logic. In TI4:
+- **Action** = Specific game term (Tactical Action, Strategic Action, etc.)
+- **Movement** = Substep of a Tactical Action, NOT an action itself
+- Use **"player decision"**, **"player command"**, or **"game operation"** for internal game interface contracts
+
+**Current Code Issues**: The existing `MovementAction` class name is misleading - it should be `MovementCommand` or `MovementOperation` to avoid confusion with TI4's specific "Action" terminology.
 
 ### Phase 3: Advanced Systems
 - Political phase and agenda system

@@ -1,6 +1,7 @@
 """Movement system for TI4 units."""
 
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Optional
 
 from .galaxy import Galaxy
@@ -35,18 +36,43 @@ class MovementValidator:
 
     def is_valid_movement(self, movement: MovementAction) -> bool:
         """Check if a movement action is valid."""
-        from_coord = self._galaxy.get_system_coordinate(movement.from_system_id)
-        to_coord = self._galaxy.get_system_coordinate(movement.to_system_id)
+        # Use cached validation for performance
+        tech_key = (
+            frozenset(movement.player_technologies)
+            if movement.player_technologies
+            else frozenset()
+        )
+        return self._is_valid_movement_cached(
+            movement.unit.unit_type,
+            movement.from_system_id,
+            movement.to_system_id,
+            tech_key,
+        )
+
+    @lru_cache(maxsize=1000)
+    def _is_valid_movement_cached(
+        self,
+        unit_type: str,
+        from_system_id: str,
+        to_system_id: str,
+        technologies: frozenset[str],
+    ) -> bool:
+        """Cached movement validation."""
+        from_coord = self._galaxy.get_system_coordinate(from_system_id)
+        to_coord = self._galaxy.get_system_coordinate(to_system_id)
 
         if from_coord is None or to_coord is None:
             return False
 
+        # Create a mock unit for validation (since we only need the type)
+        mock_unit = Unit(unit_type=unit_type, owner="temp")
+
         # Create movement context
         context = MovementContext(
-            unit=movement.unit,
+            unit=mock_unit,
             from_coordinate=from_coord,
             to_coordinate=to_coord,
-            player_technologies=movement.player_technologies or set(),
+            player_technologies=set(technologies),
             galaxy=self._galaxy,
         )
 

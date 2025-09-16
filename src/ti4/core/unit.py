@@ -1,5 +1,6 @@
 """Unit structure for TI4 game pieces."""
 
+import uuid
 from typing import Optional
 
 from .unit_stats import UnitStats, UnitStatsProvider
@@ -15,7 +16,9 @@ class Unit:
         faction: Optional[str] = None,
         technologies: Optional[set[str]] = None,
         stats_provider: Optional[UnitStatsProvider] = None,
+        unit_id: Optional[str] = None,
     ):
+        self.id = unit_id or str(uuid.uuid4())
         self.unit_type = unit_type
         self.owner = owner
         self.faction = faction

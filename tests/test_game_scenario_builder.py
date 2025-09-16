@@ -1,0 +1,165 @@
+"""Tests for GameScenarioBuilder pattern."""
+
+import pytest
+
+from src.ti4.core.game_phase import GamePhase
+from src.ti4.testing.scenario_builder import GameScenarioBuilder
+
+
+def test_game_scenario_builder_creation():
+    """Test that GameScenarioBuilder can be created."""
+    builder = GameScenarioBuilder()
+    assert builder is not None
+
+
+def test_builder_with_players_fluent_interface():
+    """Test that with_players returns builder for fluent interface."""
+    builder = GameScenarioBuilder()
+    result = builder.with_players(("player1", "sol"), ("player2", "xxcha"))
+    assert result is builder  # Should return self for fluent interface
+
+
+def test_builder_with_galaxy_fluent_interface():
+    """Test that with_galaxy returns builder for fluent interface."""
+    builder = GameScenarioBuilder()
+    result = builder.with_galaxy("standard_6p")
+    assert result is builder
+
+
+def test_builder_in_phase_fluent_interface():
+    """Test that in_phase returns builder for fluent interface."""
+    builder = GameScenarioBuilder()
+    result = builder.in_phase(GamePhase.ACTION)
+    assert result is builder
+
+
+def test_builder_build_creates_game_state():
+    """Test that build() creates a GameState with configured components."""
+    builder = GameScenarioBuilder()
+    game_state = (
+        builder.with_players(("player1", "sol"), ("player2", "xxcha"))
+        .with_galaxy("standard_6p")
+        .in_phase(GamePhase.ACTION)
+        .build()
+    )
+
+    assert game_state is not None
+    assert hasattr(game_state, "players")
+    assert hasattr(game_state, "galaxy")
+    assert hasattr(game_state, "phase")
+    assert len(game_state.players) == 2
+    assert game_state.phase == GamePhase.ACTION
+
+
+def test_builder_validates_configuration_consistency():
+    """Test that builder validates configuration consistency."""
+    builder = GameScenarioBuilder()
+
+    # Test empty players validation
+    with pytest.raises(ValueError, match="players cannot be empty"):
+        builder.build()
+
+    # Test invalid player config
+    with pytest.raises(ValueError, match="Player ID cannot be empty"):
+        builder.with_players(("", "sol")).build()
+
+    # Test invalid faction
+    with pytest.raises(ValueError, match="Faction cannot be empty"):
+        builder.with_players(("player1", "")).build()
+
+
+def test_builder_validates_duplicate_player_ids():
+    """Test that builder prevents duplicate player IDs."""
+    builder = GameScenarioBuilder()
+
+    with pytest.raises(ValueError, match="Duplicate item in players"):
+        builder.with_players(("player1", "sol"), ("player1", "xxcha")).build()
+
+
+def test_builder_with_units_placement():
+    """Test that builder can place units in systems."""
+
+    builder = GameScenarioBuilder()
+    game_state = (
+        builder.with_players(("player1", "sol"), ("player2", "xxcha"))
+        .with_galaxy("standard_6p")
+        .with_units(
+            [
+                ("player1", "cruiser", "system1", "space"),
+                ("player2", "carrier", "system2", "space"),
+                ("player2", "fighter", "system2", "space"),
+            ]
+        )
+        .in_phase(GamePhase.ACTION)
+        .build()
+    )
+
+    assert game_state is not None
+    assert hasattr(game_state, "systems")
+
+    # Check that units were placed correctly
+    system1 = game_state.systems.get("system1")
+    system2 = game_state.systems.get("system2")
+
+    assert system1 is not None
+    assert system2 is not None
+    assert len(system1.space_units) == 1
+    assert len(system2.space_units) == 2
+
+    # Check unit ownership
+    assert system1.space_units[0].owner == "player1"
+    assert system1.space_units[0].unit_type == "cruiser"
+    assert system2.space_units[0].owner == "player2"
+    assert system2.space_units[1].owner == "player2"
+
+
+def test_builder_with_resources_and_technologies():
+    """Test that builder can configure player resources and technologies."""
+    builder = GameScenarioBuilder()
+    game_state = (
+        builder.with_players(("player1", "sol"), ("player2", "xxcha"))
+        .with_galaxy("standard_6p")
+        .with_player_resources("player1", trade_goods=5, command_tokens=8)
+        .with_player_technologies("player1", ["cruiser_ii", "fighter_ii"])
+        .in_phase(GamePhase.ACTION)
+        .build()
+    )
+
+    assert game_state is not None
+    assert hasattr(game_state, "player_resources")
+    assert hasattr(game_state, "player_technologies")
+
+    # Check resources
+    player1_resources = game_state.player_resources.get("player1")
+    assert player1_resources is not None
+    assert player1_resources["trade_goods"] == 5
+    assert player1_resources["command_tokens"] == 8
+
+    # Check technologies
+    player1_techs = game_state.player_technologies.get("player1")
+    assert player1_techs is not None
+    assert "cruiser_ii" in player1_techs
+    assert "fighter_ii" in player1_techs
+
+
+def test_builder_preset_scenarios():
+    """Test that builder provides preset scenario factory methods."""
+    # Test basic 2-player scenario
+    game_state = GameScenarioBuilder.create_basic_2_player_game()
+    assert game_state is not None
+    assert len(game_state.players) == 2
+    assert game_state.phase == GamePhase.ACTION
+
+    # Test combat scenario
+    game_state = GameScenarioBuilder.create_combat_scenario()
+    assert game_state is not None
+    assert hasattr(game_state, "systems")
+    # Should have units ready for combat
+    combat_system = None
+    for system in game_state.systems.values():
+        if len(system.space_units) >= 2:
+            owners = {unit.owner for unit in system.space_units}
+            if len(owners) >= 2:  # Multiple players in same system
+                combat_system = system
+                break
+    assert combat_system is not None

@@ -17,14 +17,34 @@ class PlayerState:
     """Represents the complete state of a player."""
 
     player: Player
-    tactic_tokens: int = 3  # For tactical actions (TI4 rules 20.1)
-    fleet_tokens: int = 3  # For fleet supply - max number of fleets
-    strategy_tokens: int = 2  # For secondary abilities
+    tactic_tokens: int = field(
+        default_factory=lambda: __import__(
+            "src.ti4.core.constants", fromlist=["GameStateConstants"]
+        ).GameStateConstants.DEFAULT_TACTIC_TOKENS
+    )
+    fleet_tokens: int = field(
+        default_factory=lambda: __import__(
+            "src.ti4.core.constants", fromlist=["GameStateConstants"]
+        ).GameStateConstants.DEFAULT_FLEET_TOKENS
+    )
+    strategy_tokens: int = field(
+        default_factory=lambda: __import__(
+            "src.ti4.core.constants", fromlist=["GameStateConstants"]
+        ).GameStateConstants.DEFAULT_STRATEGY_TOKENS
+    )
     strategy_cards: list[StrategyCard] = field(default_factory=list)
     technologies: set[str] = field(default_factory=set)
     fleets: list[Fleet] = field(default_factory=list)
-    resources: int = 0
-    influence: int = 0
+    resources: int = field(
+        default_factory=lambda: __import__(
+            "src.ti4.core.constants", fromlist=["GameStateConstants"]
+        ).GameStateConstants.DEFAULT_RESOURCES
+    )
+    influence: int = field(
+        default_factory=lambda: __import__(
+            "src.ti4.core.constants", fromlist=["GameStateConstants"]
+        ).GameStateConstants.DEFAULT_INFLUENCE
+    )
 
 
 @dataclass
@@ -35,8 +55,16 @@ class GameState:
     galaxy: Optional[Galaxy] = None
     systems: dict[str, System] = field(default_factory=dict)
     current_phase: GamePhase = GamePhase.SETUP
-    current_player_index: int = 0
-    round_number: int = 1
+    current_player_index: int = field(
+        default_factory=lambda: __import__(
+            "src.ti4.core.constants", fromlist=["GameStateConstants"]
+        ).GameStateConstants.DEFAULT_CURRENT_PLAYER_INDEX
+    )
+    round_number: int = field(
+        default_factory=lambda: __import__(
+            "src.ti4.core.constants", fromlist=["GameStateConstants"]
+        ).GameStateConstants.DEFAULT_ROUND_NUMBER
+    )
     unit_stats_provider: UnitStatsProvider = field(default_factory=UnitStatsProvider)
 
     def get_current_player(self) -> Optional[PlayerState]:
@@ -141,7 +169,11 @@ class GameStateManager:
         """Setup when entering a phase."""
         if phase == GamePhase.ACTION:
             # Reset action phase state
-            self.game_state.current_player_index = 0
+            from .constants import GameStateConstants
+
+            self.game_state.current_player_index = (
+                GameStateConstants.DEFAULT_CURRENT_PLAYER_INDEX
+            )
 
     def _update_turn_order_by_initiative(self) -> None:
         """Update turn order based on strategy card initiative."""
