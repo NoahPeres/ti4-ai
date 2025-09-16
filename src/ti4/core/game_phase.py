@@ -7,6 +7,8 @@ class GamePhase(Enum):
     """Represents the different phases of a TI4 game."""
 
     SETUP = "setup"
+    STRATEGY = "strategy"
+    ACTION = "action"
 
 
 def is_valid_transition(from_phase: GamePhase, to_phase: GamePhase) -> bool:

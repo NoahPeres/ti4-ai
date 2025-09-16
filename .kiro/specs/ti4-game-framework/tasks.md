@@ -74,59 +74,59 @@
   - Write tests for unit movement validation and conflicts
   - _Requirements: 1.1, 1.3, 6.2_
 
-- [ ] 5. Implement basic resource management
-- [ ] 5.1 Create player resource tracking (trade goods, commodities)
+- [x] 5. Implement basic resource management
+- [x] 5.1 Create player resource tracking (trade goods, commodities)
   - Write tests for resource initialization and modification
   - Add resource fields to Player class
   - Implement resource validation (non-negative values, limits)
   - Write tests for resource transactions and validation
   - _Requirements: 1.3, 6.2, 6.3_
 
-- [ ] 5.2 Implement command token management
+- [x] 5.2 Implement command token management
   - Write tests for command token allocation and spending
   - Create CommandTokens class with fleet, strategy, and tactic pools
   - Implement command token validation and redistribution
   - Write tests for command token limits and constraints
   - _Requirements: 6.2, 6.3, 1.3_
 
-- [ ] 5.3 Add basic planet resource generation
+- [x] 5.3 Add basic planet resource generation
   - Write tests for planet resource collection
   - Implement planet exhaustion and refresh mechanics
   - Create resource collection actions and validation
   - Write tests for resource collection timing and limits
   - _Requirements: 6.2, 6.3, 2.1_
 
-- [ ] 6. Implement turn management and game controller
-- [ ] 6.1 Create basic turn order and player activation
+- [x] 6. Implement turn management and game controller
+- [x] 6.1 Create basic turn order and player activation
   - Write tests for turn order determination and management
   - Implement GameController class with turn progression
   - Create player activation and turn passing mechanics
   - Write tests for turn order edge cases and validation
   - _Requirements: 1.1, 2.3, 6.1_
 
-- [ ] 6.2 Add strategy phase implementation
+- [x] 6.2 Add strategy phase implementation
   - Write tests for strategy card selection and turn order
   - Implement strategy card draft mechanics
   - Create strategy card effects framework (basic implementation)
   - Write tests for strategy phase completion and validation
   - _Requirements: 6.1, 6.3, 2.3_
 
-- [ ] 6.3 Implement action phase with basic actions
+- [x] 6.3 Implement action phase with basic actions
   - Write tests for action phase turn management
   - Create basic tactical and strategic actions
   - Implement action phase passing and completion
   - Write tests for action phase timing and validation
   - _Requirements: 2.1, 2.3, 6.1_
 
-- [ ] 7. Implement basic movement and fleet management
-- [ ] 7.1 Create unit movement validation and execution
+- [x] 7. Implement basic movement and fleet management
+- [x] 7.1 Create unit movement validation and execution
   - Write tests for unit movement rules and restrictions
   - Implement movement actions with range and capacity validation
   - Create fleet movement with carrier capacity rules
   - Write tests for movement edge cases and invalid moves
   - _Requirements: 2.1, 6.2, 1.2_
 
-- [ ] 7.2 Add basic fleet composition and capacity rules
+- [x] 7.2 Add basic fleet composition and capacity rules
   - Write tests for fleet capacity limits and validation
   - Implement carrier capacity and fighter/infantry transport
   - Create fleet composition validation rules
@@ -134,7 +134,7 @@
   - _Requirements: 6.2, 1.2, 2.1_
 
 - [ ] 8. Implement basic combat system
-- [ ] 8.1 Create combat initiation and participant determination
+- [x] 8.1 Create combat initiation and participant determination
   - Write tests for combat trigger conditions
   - Implement combat detection when fleets meet
   - Create combat participant selection logic
