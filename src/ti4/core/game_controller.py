@@ -198,8 +198,10 @@ class GameController:
             if self._current_game_state is None:
                 # No game state available for undo
                 return False
-            
-            previous_state = self._command_manager.undo_last_command(self._current_game_state)
+
+            previous_state = self._command_manager.undo_last_command(
+                self._current_game_state
+            )
             self._current_game_state = previous_state
             return True
         except ValueError:
