@@ -25,6 +25,7 @@ class Unit:
         self.technologies = technologies or set()
         self._stats_provider = stats_provider or UnitStatsProvider()
         self._cached_stats: Optional[UnitStats] = None
+        self._sustained_damage = False
 
     def get_stats(self) -> UnitStats:
         """Get the current statistics for this unit."""
@@ -50,6 +51,25 @@ class Unit:
         """Check if this unit has sustain damage ability."""
         return self.get_stats().sustain_damage
 
+    def get_combat_dice(self) -> int:
+        """Get the number of combat dice this unit rolls."""
+        return self.get_stats().combat_dice
+
     def invalidate_stats_cache(self) -> None:
         """Invalidate the cached stats (call when technologies change)."""
         self._cached_stats = None
+
+    @property
+    def has_sustained_damage(self) -> bool:
+        """Check if this unit has sustained damage."""
+        return self._sustained_damage
+
+    def sustain_damage(self) -> None:
+        """Mark this unit as having sustained damage."""
+        if not self.has_sustain_damage():
+            raise ValueError(f"Unit {self.unit_type} cannot sustain damage")
+        self._sustained_damage = True
+
+    def repair_damage(self) -> None:
+        """Repair sustained damage on this unit."""
+        self._sustained_damage = False

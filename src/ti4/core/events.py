@@ -1,8 +1,8 @@
 """Event system infrastructure for TI4 game framework."""
 
 import time
-from dataclasses import dataclass
-from typing import Any, Callable
+from dataclasses import dataclass, field
+from typing import Any, Callable, Union
 
 from .validation import validate_non_empty_string
 
@@ -14,11 +14,7 @@ class GameEvent:
     event_type: str
     game_id: str
     data: dict[str, Any]
-    timestamp: float = None
-
-    def __post_init__(self):
-        if self.timestamp is None:
-            object.__setattr__(self, "timestamp", time.time())
+    timestamp: float = field(default_factory=time.time)
 
 
 @dataclass(frozen=True)
@@ -30,11 +26,7 @@ class UnitMovedEvent:
     from_system: str
     to_system: str
     player_id: str
-    timestamp: float = None
-
-    def __post_init__(self):
-        if self.timestamp is None:
-            object.__setattr__(self, "timestamp", time.time())
+    timestamp: float = field(default_factory=time.time)
 
     @property
     def event_type(self) -> str:
@@ -51,6 +43,15 @@ class UnitMovedEvent:
             "player_id": self.player_id,
         }
 
+    def to_game_event(self) -> GameEvent:
+        """Convert to a GameEvent instance."""
+        return GameEvent(
+            event_type=self.event_type,
+            game_id=self.game_id,
+            data=self.data,
+            timestamp=self.timestamp,
+        )
+
 
 @dataclass(frozen=True)
 class CombatStartedEvent:
@@ -59,11 +60,7 @@ class CombatStartedEvent:
     game_id: str
     system_id: str
     participants: list[str]
-    timestamp: float = None
-
-    def __post_init__(self):
-        if self.timestamp is None:
-            object.__setattr__(self, "timestamp", time.time())
+    timestamp: float = field(default_factory=time.time)
 
     @property
     def event_type(self) -> str:
@@ -75,6 +72,15 @@ class CombatStartedEvent:
     def data(self) -> dict[str, Any]:
         return {"system_id": self.system_id, "participants": self.participants}
 
+    def to_game_event(self) -> GameEvent:
+        """Convert to a GameEvent instance."""
+        return GameEvent(
+            event_type=self.event_type,
+            game_id=self.game_id,
+            data=self.data,
+            timestamp=self.timestamp,
+        )
+
 
 @dataclass(frozen=True)
 class PhaseChangedEvent:
@@ -84,11 +90,7 @@ class PhaseChangedEvent:
     from_phase: str
     to_phase: str
     round_number: int
-    timestamp: float = None
-
-    def __post_init__(self):
-        if self.timestamp is None:
-            object.__setattr__(self, "timestamp", time.time())
+    timestamp: float = field(default_factory=time.time)
 
     @property
     def event_type(self) -> str:
@@ -103,6 +105,15 @@ class PhaseChangedEvent:
             "to_phase": self.to_phase,
             "round_number": self.round_number,
         }
+
+    def to_game_event(self) -> GameEvent:
+        """Convert to a GameEvent instance."""
+        return GameEvent(
+            event_type=self.event_type,
+            game_id=self.game_id,
+            data=self.data,
+            timestamp=self.timestamp,
+        )
 
 
 # Factory methods for consistent event creation
@@ -162,7 +173,7 @@ def create_phase_changed_event(
 class GameEventBus:
     """Central event bus for game event notifications."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._observers: dict[str, list[Callable]] = {}
 
     def subscribe(self, event_type: str, observer: Callable) -> None:
@@ -183,12 +194,23 @@ class GameEventBus:
         if event_type in self._observers and observer in self._observers[event_type]:
             self._observers[event_type].remove(observer)
 
-    def publish(self, event: GameEvent) -> None:
+    def publish(
+        self,
+        event: Union[GameEvent, UnitMovedEvent, CombatStartedEvent, PhaseChangedEvent],
+    ) -> None:
         """Publish event to all subscribers."""
-        if event.event_type in self._observers:
-            for observer in self._observers[event.event_type]:
+        # Convert specific event types to GameEvent if needed
+        if isinstance(event, (UnitMovedEvent, CombatStartedEvent, PhaseChangedEvent)):
+            game_event = event.to_game_event()
+        else:
+            game_event = event
+
+        if game_event.event_type in self._observers:
+            for observer in self._observers[game_event.event_type]:
                 try:
-                    observer(event)
+                    observer(
+                        event
+                    )  # Pass the original event to maintain type information
                 except Exception:
                     # Error isolation - continue notifying other observers
                     pass

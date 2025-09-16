@@ -28,6 +28,7 @@ class GameController:
         self._event_bus: Optional[Any] = None
         self._game_id = "default_game"  # TODO: Make this configurable
         self._round_number = 1
+        self._current_game_state: Optional[Any] = None  # Will be set when game starts
 
     def get_turn_order(self) -> list[Player]:
         """Get the current turn order."""
@@ -194,9 +195,12 @@ class GameController:
     def undo_last_action(self) -> bool:
         """Undo the last action taken. Returns True if successful."""
         try:
-            # For now, we don't have a game state to pass, so we'll use None
-            # This will be improved when we have proper game state management
-            self._command_manager.undo_last_command(None)
+            if self._current_game_state is None:
+                # No game state available for undo
+                return False
+            
+            previous_state = self._command_manager.undo_last_command(self._current_game_state)
+            self._current_game_state = previous_state
             return True
         except ValueError:
             # No commands to undo
@@ -207,6 +211,20 @@ class GameController:
         # For now, we don't have redo functionality implemented
         # This would require a separate redo stack in CommandManager
         return False
+
+    def set_current_game_state(self, game_state: Any) -> None:
+        """Set the current game state."""
+        self._current_game_state = game_state
+
+    def get_current_game_state(self) -> Optional[Any]:
+        """Get the current game state."""
+        return self._current_game_state
+
+    def execute_command(self, command: Any, game_state: Any) -> Any:
+        """Execute a command and update the current game state."""
+        new_state = self._command_manager.execute_command(command, game_state)
+        self._current_game_state = new_state
+        return new_state
 
     def get_action_history(self) -> list:
         """Get the history of actions taken."""

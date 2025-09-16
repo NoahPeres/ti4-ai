@@ -1,6 +1,6 @@
 """Command manager for handling command execution and history."""
 
-from typing import Any
+from typing import Any, Optional
 
 from ..core.game_state import GameState
 from .base import GameCommand
@@ -9,7 +9,7 @@ from .base import GameCommand
 class CommandManager:
     """Manages command execution, undo, and replay functionality."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._command_history: list[GameCommand] = []
         self._undo_stack: list[dict[str, Any]] = []
 
@@ -34,10 +34,16 @@ class CommandManager:
 
         return new_state
 
-    def undo_last_command(self, game_state: GameState) -> GameState:
+    def undo_last_command(
+        self, game_state: Optional[GameState] = None
+    ) -> Optional[GameState]:
         """Undo the most recent command."""
         if not self._command_history:
             raise ValueError("No commands to undo")
+
+        if game_state is None:
+            # Cannot undo without game state
+            raise ValueError("Game state required for undo operation")
 
         last_command = self._command_history.pop()
         self._undo_stack.pop()  # Remove corresponding undo data

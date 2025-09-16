@@ -46,9 +46,10 @@ def test_game_controller_undo_functionality():
         unit=unit, from_system_id="system1", to_system_id="system2", player_id="player1"
     )
 
-    # Execute command through command manager directly (for testing)
+    # Set up initial game state and execute command through controller
     initial_state = GameState()
-    controller._command_manager.execute_command(command, initial_state)
+    controller.set_current_game_state(initial_state)
+    controller.execute_command(command, initial_state)
 
     # Verify command was executed
     assert len(controller.get_action_history()) == 1

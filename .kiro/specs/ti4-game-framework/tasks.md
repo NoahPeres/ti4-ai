@@ -142,7 +142,7 @@
   - Write comprehensive tests for correct TI4 movement rules
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7_
 
-- [ ] 8. Implement basic combat system
+- [-] 8. Implement basic combat system
 - [x] 8.1 Create combat initiation and participant determination
   - Write tests for combat trigger conditions
   - Implement combat detection when fleets meet
@@ -150,7 +150,7 @@
   - Write tests for combat avoidance and retreat options
   - _Requirements: 6.2, 6.3, 1.2_
 
-- [ ] 8.2 Implement dice rolling and hit resolution
+- [x] 8.2 Implement dice rolling and hit resolution
   - Write tests for combat dice rolling and hit calculation
   - Create combat resolution engine with unit stats
   - Implement hit assignment and unit destruction
@@ -179,7 +179,7 @@
   - Write tests for technology research timing and limits
   - _Requirements: 2.1, 6.2, 1.2_
 
-- [ ] 10. Implement basic victory condition tracking
+- [-] 10. Implement basic victory condition tracking
 - [ ] 10.1 Create victory point tracking and objective system
   - Write tests for victory point assignment and tracking
   - Implement objective card structure and completion detection

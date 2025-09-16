@@ -33,7 +33,11 @@ class RecoveryStrategy:
 class CircuitBreaker:
     """Circuit breaker implementation for preventing cascading failures."""
 
-    def __init__(self, failure_threshold: int = None, recovery_timeout: float = None):
+    def __init__(
+        self,
+        failure_threshold: Optional[int] = None,
+        recovery_timeout: Optional[float] = None,
+    ) -> None:
         from .constants import CircuitBreakerConstants, PerformanceConstants
 
         if failure_threshold is None:
@@ -78,7 +82,7 @@ class CircuitBreaker:
 class ErrorRecoveryManager:
     """Manages error recovery mechanisms for different failure types."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.recovery_strategies: dict[type[Exception], RecoveryStrategy] = {}
         self.circuit_breakers: dict[str, CircuitBreaker] = {}
         self.logger = logging.getLogger(__name__)
@@ -110,8 +114,8 @@ class ErrorRecoveryManager:
     def execute_with_retry(
         self,
         operation: Callable[[], Any],
-        max_retries: int = None,
-        retry_delay: float = None,
+        max_retries: Optional[int] = None,
+        retry_delay: Optional[float] = None,
     ) -> Any:
         from .constants import PerformanceConstants
 
@@ -142,13 +146,16 @@ class ErrorRecoveryManager:
                 raise
 
         # If we get here, all retries were exhausted
-        raise last_exception
+        if last_exception is not None:
+            raise last_exception
+        else:
+            raise RuntimeError("All retries exhausted with no recorded exception")
 
     def execute_with_circuit_breaker(
         self,
         operation: Callable[[], Any],
         operation_id: str,
-        failure_threshold: int = None,
+        failure_threshold: Optional[int] = None,
     ) -> Any:
         from .constants import PerformanceConstants
 
@@ -192,7 +199,10 @@ class ErrorRecoveryManager:
             raise
 
     def _log_recovery(
-        self, error: Exception, recovery_type: str, context: dict[str, Any] = None
+        self,
+        error: Exception,
+        recovery_type: str,
+        context: Optional[dict[str, Any]] = None,
     ) -> None:
         """Log recovery attempt details."""
         self._log_error_recovery_attempt(error, recovery_type)

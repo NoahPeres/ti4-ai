@@ -16,8 +16,8 @@ class MovementPlan:
     """Represents a complete movement plan for a tactical action."""
 
     def __init__(self) -> None:
-        self.ship_movements = []
-        self.ground_force_movements = []
+        self.ship_movements: list[dict[str, Any]] = []
+        self.ground_force_movements: list[dict[str, Any]] = []
 
     def add_ship_movement(self, unit: Any, from_system: str, to_system: str) -> None:
         """Add a ship movement to the plan."""
@@ -60,7 +60,7 @@ class CommitGroundForcesPlan:
     """Represents a plan for committing ground forces from space to planets."""
 
     def __init__(self) -> None:
-        self.commitments = []
+        self.commitments: list[dict[str, Any]] = []
 
     def add_commitment(self, unit: Any, planet_name: str) -> None:
         """Add a ground force commitment to a planet."""
@@ -202,7 +202,7 @@ class MovementValidator:
         """Validate an entire movement plan jointly."""
         technologies = technologies or set()
         errors = []
-        technology_effects = {}
+        technology_effects: dict[str, Any] = {}
 
         # First pass: identify which ships need technology assistance
         ships_needing_help = []

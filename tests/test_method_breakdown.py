@@ -262,10 +262,12 @@ class TestMethodBreakdownBenefits:
         # Test data enrichment in isolation
         training_record = {"existing": "data"}
         mock_unit_event = Mock()
-        mock_unit_event.unit_id = "test_unit"
-        mock_unit_event.from_system = "from_sys"
-        mock_unit_event.to_system = "to_sys"
-        mock_unit_event.player_id = "test_player"
+        mock_unit_event.data = {
+            "unit_id": "test_unit",
+            "from_system": "from_sys",
+            "to_system": "to_sys",
+            "player_id": "test_player",
+        }
 
         collector._add_unit_moved_data(training_record, mock_unit_event)
 
@@ -316,10 +318,12 @@ class TestMethodBreakdownBenefits:
 
         # These methods have no conditional logic - just data assignment
         mock_event = Mock()
-        mock_event.unit_id = "test"
-        mock_event.from_system = "from"
-        mock_event.to_system = "to"
-        mock_event.player_id = "player"
+        mock_event.data = {
+            "unit_id": "test",
+            "from_system": "from",
+            "to_system": "to",
+            "player_id": "player",
+        }
 
         collector._add_unit_moved_data(training_record, mock_event)
         assert len(training_record) == 4  # All fields added

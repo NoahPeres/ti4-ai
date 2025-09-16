@@ -5,7 +5,7 @@ import time
 import uuid
 from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 from src.ti4.core.game_state import GameState
 from src.ti4.performance.monitoring import ResourceMonitor
@@ -26,7 +26,7 @@ class GameInstance:
 class ConcurrentGameManager:
     """Manages multiple concurrent game instances with thread safety."""
 
-    def __init__(self, max_concurrent_games: int = None):
+    def __init__(self, max_concurrent_games: Optional[int] = None) -> None:
         """Initialize the concurrent game manager."""
         if max_concurrent_games is None:
             from ..core.constants import PerformanceConstants
@@ -74,22 +74,23 @@ class ConcurrentGameManager:
             return game_instance
 
     def execute_game_operation(
-        self, game_id: str, operation: callable, *args, **kwargs
+        self, game_id: str, operation: Callable, *args: Any, **kwargs: Any
     ) -> Future:
         """Execute an operation on a game instance in a thread-safe manner."""
         game_instance = self.get_game(game_id)
         if not game_instance:
             raise ValueError(f"Game {game_id} not found")
 
-        def safe_operation():
+        def safe_operation() -> Any:
             with game_instance.lock:
                 game_instance.active_operations += 1
                 try:
                     start_time = time.time()
                     result = operation(game_instance.game_state, *args, **kwargs)
                     duration = time.time() - start_time
+                    operation_name = getattr(operation, "__name__", "unknown_operation")
                     self._monitor.record_operation_time(
-                        f"game_operation_{operation.__name__}", duration
+                        f"game_operation_{operation_name}", duration
                     )
                     return result
                 finally:
@@ -188,7 +189,7 @@ class ConcurrentGameManager:
 class ThreadSafeGameStateCache:
     """Thread-safe version of game state cache."""
 
-    def __init__(self, max_size: int = None):
+    def __init__(self, max_size: Optional[int] = None) -> None:
         """Initialize thread-safe cache."""
         if max_size is None:
             from ..core.constants import PerformanceConstants
@@ -199,7 +200,7 @@ class ThreadSafeGameStateCache:
         self._cache = GameStateCache(max_size)
         self._lock = threading.RLock()
 
-    def get_legal_moves(self, game_state: GameState, player_id: str):
+    def get_legal_moves(self, game_state: GameState, player_id: str) -> Any:
         """Thread-safe legal moves retrieval."""
         with self._lock:
             return self._cache.get_legal_moves(game_state, player_id)
@@ -210,20 +211,20 @@ class ThreadSafeGameStateCache:
             return self._cache.are_systems_adjacent(system_id1, system_id2)
 
     def find_shortest_path(
-        self, start_system: str, end_system: str, max_distance: int = None
-    ):
+        self, start_system: str, end_system: str, max_distance: Optional[int] = None
+    ) -> Any:
+        """Thread-safe pathfinding."""
         if max_distance is None:
             from ..core.constants import GameConstants
 
             max_distance = GameConstants.DEFAULT_MOVEMENT_RANGE * 10
-        """Thread-safe pathfinding."""
         with self._lock:
             return self._cache.find_shortest_path(
                 start_system, end_system, max_distance
             )
 
     def invalidate_cache(
-        self, game_state: GameState = None, player_id: str = None
+        self, game_state: Optional[GameState] = None, player_id: Optional[str] = None
     ) -> None:
         """Thread-safe cache invalidation."""
         with self._lock:

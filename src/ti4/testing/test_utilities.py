@@ -103,7 +103,7 @@ class TestUtilities:
         Returns:
             Dict mapping owner_id to unit count
         """
-        counts = {}
+        counts: dict[str, int] = {}
         for unit in system.space_units:
             counts[unit.owner] = counts.get(unit.owner, 0) + 1
         return counts

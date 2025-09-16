@@ -10,6 +10,7 @@ class UnitStats:
 
     capacity: int = 0
     combat_value: Optional[int] = None
+    combat_dice: int = 1
     movement: int = 1
     cost: float = 1
     sustain_damage: bool = False
@@ -19,6 +20,7 @@ class UnitStats:
         return UnitStats(
             capacity=kwargs.get("capacity", self.capacity),
             combat_value=kwargs.get("combat_value", self.combat_value),
+            combat_dice=kwargs.get("combat_dice", self.combat_dice),
             movement=kwargs.get("movement", self.movement),
             cost=kwargs.get("cost", self.cost),
             sustain_damage=kwargs.get("sustain_damage", self.sustain_damage),
@@ -30,31 +32,54 @@ class UnitStatsProvider:
 
     # Base unit statistics
     BASE_STATS = {
-        "carrier": UnitStats(capacity=4, combat_value=9, movement=1, cost=3),
+        "carrier": UnitStats(
+            capacity=4, combat_value=9, combat_dice=1, movement=1, cost=3
+        ),
         "cruiser": UnitStats(
-            capacity=0, combat_value=7, movement=2, cost=2
+            capacity=0, combat_value=7, combat_dice=1, movement=2, cost=2
         ),  # Base cruiser has no capacity
         "cruiser_ii": UnitStats(
-            capacity=1, combat_value=6, movement=2, cost=2
+            capacity=1, combat_value=6, combat_dice=1, movement=2, cost=2
         ),  # Upgraded cruiser
         "dreadnought": UnitStats(
-            capacity=1, combat_value=5, movement=1, cost=4, sustain_damage=True
+            capacity=1,
+            combat_value=5,
+            combat_dice=1,
+            movement=1,
+            cost=4,
+            sustain_damage=True,
         ),
-        "destroyer": UnitStats(capacity=0, combat_value=9, movement=2, cost=1),
+        "destroyer": UnitStats(
+            capacity=0, combat_value=9, combat_dice=1, movement=2, cost=1
+        ),
         "fighter": UnitStats(
-            capacity=0, combat_value=9, movement=0, cost=0.5
+            capacity=0, combat_value=9, combat_dice=1, movement=0, cost=0.5
         ),  # Base fighter needs capacity
         "fighter_ii": UnitStats(
-            capacity=0, combat_value=8, movement=1, cost=0.5
+            capacity=0, combat_value=8, combat_dice=1, movement=1, cost=0.5
         ),  # Fighter II independent
-        "infantry": UnitStats(capacity=0, combat_value=8, movement=0, cost=0.5),
-        "mech": UnitStats(
-            capacity=0, combat_value=6, movement=0, cost=2, sustain_damage=True
+        "infantry": UnitStats(
+            capacity=0, combat_value=8, combat_dice=1, movement=0, cost=0.5
         ),
-        "pds": UnitStats(capacity=0, combat_value=6, movement=0, cost=2),
-        "space_dock": UnitStats(capacity=0, movement=0, cost=4),
+        "mech": UnitStats(
+            capacity=0,
+            combat_value=6,
+            combat_dice=1,
+            movement=0,
+            cost=2,
+            sustain_damage=True,
+        ),
+        "pds": UnitStats(capacity=0, combat_value=6, combat_dice=1, movement=0, cost=2),
+        "space_dock": UnitStats(
+            capacity=0, combat_dice=0, movement=0, cost=4
+        ),  # No combat
         "war_sun": UnitStats(
-            capacity=6, combat_value=3, movement=2, cost=12, sustain_damage=True
+            capacity=6,
+            combat_value=3,
+            combat_dice=3,
+            movement=2,
+            cost=12,
+            sustain_damage=True,
         ),
     }
 
@@ -110,6 +135,7 @@ class UnitStatsProvider:
             combat_value=modifications.combat_value
             if modifications.combat_value is not None
             else base.combat_value,
+            combat_dice=base.combat_dice + modifications.combat_dice,
             movement=base.movement + modifications.movement,
             cost=base.cost + modifications.cost,
             sustain_damage=base.sustain_damage or modifications.sustain_damage,

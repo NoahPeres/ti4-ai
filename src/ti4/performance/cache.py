@@ -1,6 +1,7 @@
 """Caching system for expensive TI4 operations."""
 
 import hashlib
+from typing import Optional
 
 from src.ti4.actions.action import PlayerDecision
 from src.ti4.actions.legal_moves import LegalMoveGenerator
@@ -11,7 +12,7 @@ from src.ti4.core.game_state import GameState
 class GameStateCache:
     """Caches expensive computations for game states."""
 
-    def __init__(self, max_size: int = None):
+    def __init__(self, max_size: Optional[int] = None) -> None:
         """Initialize cache with maximum size."""
         if max_size is None:
             from ..core.constants import PerformanceConstants
@@ -51,7 +52,7 @@ class GameStateCache:
         return legal_moves
 
     def invalidate_cache(
-        self, game_state: GameState = None, player_id: str = None
+        self, game_state: Optional[GameState] = None, player_id: Optional[str] = None
     ) -> None:
         """Invalidate cache entries. If no parameters given, clears entire cache."""
         if game_state is None and player_id is None:
@@ -68,7 +69,7 @@ class GameStateCache:
             self._invalidate_matching_entries(game_state, player_id)
 
     def _invalidate_matching_entries(
-        self, game_state: GameState = None, player_id: str = None
+        self, game_state: Optional[GameState] = None, player_id: Optional[str] = None
     ) -> None:
         """Remove cache entries matching the given criteria."""
         # Invalidate legal moves cache
@@ -126,7 +127,7 @@ class GameStateCache:
         return adjacency_result
 
     def find_shortest_path(
-        self, start_system: str, end_system: str, max_distance: int = None
+        self, start_system: str, end_system: str, max_distance: Optional[int] = None
     ) -> list[str]:
         if max_distance is None:
             from ..core.constants import GameConstants

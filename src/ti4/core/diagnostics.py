@@ -4,7 +4,7 @@ import statistics
 import time
 from collections import Counter, defaultdict
 from contextlib import contextmanager
-from typing import Any
+from typing import Any, Callable
 
 from ..commands.base import GameCommand
 from .game_state import GameState
@@ -13,7 +13,7 @@ from .game_state import GameState
 class GameStateInspector:
     """Utilities for inspecting and analyzing game state."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.validation_rules = self._build_validation_rules()
 
     def _safe_get_attr(self, obj: Any, attr_name: str, default: Any = None) -> Any:
@@ -81,7 +81,7 @@ class GameStateInspector:
 
         return {"is_valid": len(issues) == 0, "issues": issues}
 
-    def _build_validation_rules(self) -> dict[str, callable]:
+    def _build_validation_rules(self) -> dict[str, Callable[[Any], bool]]:
         """Build dictionary of validation rules."""
         return {
             "has_players": lambda state: hasattr(state, "players")
@@ -107,7 +107,7 @@ class GameStateInspector:
 class CommandHistoryAnalyzer:
     """Tools for analyzing command history and patterns."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
     def analyze_commands(self, commands: list[GameCommand]) -> dict[str, Any]:
@@ -116,7 +116,7 @@ class CommandHistoryAnalyzer:
             return {"total_commands": 0, "command_types": {}}
 
         # Count command types
-        command_types = Counter()
+        command_types: Counter[str] = Counter()
         for command in commands:
             command_type = self._extract_command_type(command)
             command_types[command_type] += 1
@@ -148,7 +148,7 @@ class CommandHistoryAnalyzer:
             return {"repeated_commands": {}, "command_sequences": []}
 
         # Count repeated commands by type
-        command_type_frequencies = Counter()
+        command_type_frequencies: Counter[str] = Counter()
         for command in commands:
             command_type = self._extract_command_type(command)
             command_type_frequencies[command_type] += 1
@@ -221,21 +221,21 @@ class CommandHistoryAnalyzer:
             str: The command type identifier or lowercase class name
         """
         if hasattr(command, "command_type"):
-            return command.command_type
+            return str(command.command_type)
         return command.__class__.__name__.lower()
 
 
 class PerformanceProfiler:
     """Performance profiling helpers for operations."""
 
-    def __init__(self):
-        self.results = defaultdict(
+    def __init__(self) -> None:
+        self.results: dict[str, dict[str, Any]] = defaultdict(
             lambda: {"call_count": 0, "total_time": 0.0, "times": []}
         )
-        self.active_profiles = {}
+        self.active_profiles: dict[str, float] = {}
 
     @contextmanager
-    def profile(self, operation_name: str):
+    def profile(self, operation_name: str) -> Any:
         """Context manager for profiling operations."""
         start_time = time.time()
         self.active_profiles[operation_name] = start_time
@@ -247,9 +247,10 @@ class PerformanceProfiler:
             execution_time = end_time - start_time
 
             # Record results
-            self.results[operation_name]["call_count"] += 1
-            self.results[operation_name]["total_time"] += execution_time
-            self.results[operation_name]["times"].append(execution_time)
+            result_entry = self.results[operation_name]
+            result_entry["call_count"] += 1
+            result_entry["total_time"] += execution_time
+            result_entry["times"].append(execution_time)
 
             # Clean up active profile
             if operation_name in self.active_profiles:
@@ -276,12 +277,13 @@ class PerformanceProfiler:
                 "max_time": 0.0,
             }
 
+        times_list = list(times)
         return {
             "call_count": data["call_count"],
             "total_time": data["total_time"],
-            "average_time": statistics.mean(times),
-            "min_time": min(times),
-            "max_time": max(times),
+            "average_time": statistics.mean(times_list),
+            "min_time": min(times_list),
+            "max_time": max(times_list),
         }
 
     def reset(self) -> None:

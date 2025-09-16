@@ -6,7 +6,7 @@ from .game_phase import GamePhase
 class GameStateMachine:
     """Manages game phase transitions with validation."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize state machine in SETUP phase."""
         self._current_phase = GamePhase.SETUP
         self._valid_transitions = self._build_transition_map()

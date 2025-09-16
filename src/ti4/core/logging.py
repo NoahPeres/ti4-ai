@@ -52,7 +52,7 @@ class GameLogger:
         # Prevent propagation to avoid duplicate logs
         self.logger.propagate = False
 
-    def _build_base_extra(self, **additional_fields) -> dict[str, Any]:
+    def _build_base_extra(self, **additional_fields: Any) -> dict[str, Any]:
         """Build base extra data for logging with game_id and additional fields."""
         extra = {"game_id": self.game_id}
         extra.update(additional_fields)
@@ -128,7 +128,7 @@ class GameLogger:
         # Add TI4GameError specific context if available
         if isinstance(error, TI4GameError):
             structured_data["error_context"] = error.context
-            structured_data["error_timestamp"] = error.timestamp
+            structured_data["error_timestamp"] = str(error.timestamp)
 
         # Log with structured data as extra
         extra = self._build_base_extra(

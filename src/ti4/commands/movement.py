@@ -22,7 +22,7 @@ class MovementCommand(GameCommand):
     player_technologies: Optional[set[str]] = None
     transport_ship: Optional[Unit] = None  # For ground force transport
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Initialize undo data storage."""
         self._undo_data: dict[str, Any] = {}
 

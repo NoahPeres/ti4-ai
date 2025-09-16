@@ -4,10 +4,10 @@ import gc
 import time
 from collections import defaultdict
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Any, Optional
 
 try:
-    import psutil
+    import psutil  # type: ignore
 
     PSUTIL_AVAILABLE = True
 except ImportError:
@@ -38,7 +38,7 @@ class ResourceUsage:
 class ResourceMonitor:
     """Monitors system resource usage for TI4 operations."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the resource monitor."""
         self._process = psutil.Process() if PSUTIL_AVAILABLE else None
         self._metrics_history: list[PerformanceMetrics] = []
@@ -53,7 +53,7 @@ class ResourceMonitor:
 
         try:
             memory_info = self._process.memory_info()
-            memory_mb = memory_info.rss / 1024 / 1024  # Convert bytes to MB
+            memory_mb = float(memory_info.rss) / 1024 / 1024  # Convert bytes to MB
             self._peak_memory = max(self._peak_memory, memory_mb)
             return memory_mb
         except Exception:
@@ -65,7 +65,8 @@ class ResourceMonitor:
             return 0.0
 
         try:
-            return self._process.cpu_percent()
+            cpu_percent = self._process.cpu_percent()
+            return float(cpu_percent) if cpu_percent is not None else 0.0
         except Exception:
             return 0.0
 
@@ -161,18 +162,18 @@ class ResourceMonitor:
 class GameStateResourceManager:
     """Manages resources for game states."""
 
-    def __init__(self, max_states: int = None):
+    def __init__(self, max_states: Optional[int] = None) -> None:
         """Initialize the resource manager."""
         if max_states is None:
             from ..core.constants import PerformanceConstants
 
             max_states = PerformanceConstants.DEFAULT_MAX_STATES
         self._max_states = max_states
-        self._game_states: dict[str, any] = {}  # game_id -> game_state
+        self._game_states: dict[str, Any] = {}  # game_id -> game_state
         self._access_times: dict[str, float] = {}  # game_id -> last_access_time
         self._monitor = ResourceMonitor()
 
-    def register_game_state(self, game_id: str, game_state: any) -> None:
+    def register_game_state(self, game_id: str, game_state: Any) -> None:
         """Register a game state for resource management."""
         self._game_states[game_id] = game_state
         self._access_times[game_id] = time.time()
@@ -181,7 +182,7 @@ class GameStateResourceManager:
         if len(self._game_states) > self._max_states:
             self._evict_least_recently_used_states()
 
-    def access_game_state(self, game_id: str) -> Optional[any]:
+    def access_game_state(self, game_id: str) -> Optional[Any]:
         """Access a game state and update access time."""
         if game_id in self._game_states:
             self._access_times[game_id] = time.time()
@@ -214,7 +215,7 @@ class GameStateResourceManager:
         for game_id, _ in states_sorted_by_access_time[:number_of_states_to_evict]:
             self.remove_game_state(game_id)
 
-    def get_resource_stats(self) -> dict[str, any]:
+    def get_resource_stats(self) -> dict[str, Any]:
         """Get resource usage statistics."""
         current_usage = self._monitor.get_current_resource_usage()
 

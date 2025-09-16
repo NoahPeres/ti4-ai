@@ -13,7 +13,7 @@ from src.ti4.core.unit import Unit
 class GameScenarioBuilder:
     """Fluent builder for creating complex test scenarios."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._players: list[Player] = []
         self._galaxy: Optional[Galaxy] = None
         self._phase: GamePhase = GamePhase.SETUP
@@ -80,7 +80,7 @@ class GameScenarioBuilder:
         return self
 
     def with_player_resources(
-        self, player_id: str, **resources
+        self, player_id: str, **resources: Any
     ) -> "GameScenarioBuilder":
         """Configure player resources.
 
