@@ -2,7 +2,7 @@
 
 from src.ti4.core.galaxy import Galaxy
 from src.ti4.core.hex_coordinate import HexCoordinate
-from src.ti4.core.movement import MovementAction, MovementExecutor, MovementValidator
+from src.ti4.core.movement import MovementExecutor, MovementOperation, MovementValidator
 from src.ti4.core.system import System
 from src.ti4.core.unit import Unit
 
@@ -30,8 +30,8 @@ class TestMovementValidator:
         unit = Unit(unit_type="cruiser", owner="player1")
         system1.place_unit_in_space(unit)
 
-        # Create movement action
-        movement = MovementAction(
+        # Create movement operation
+        movement = MovementOperation(
             unit=unit,
             from_system_id="system1",
             to_system_id="system2",
@@ -57,8 +57,8 @@ class TestMovementValidator:
         unit = Unit(unit_type="carrier", owner="player1")
         system1.place_unit_in_space(unit)
 
-        # Create movement action
-        movement = MovementAction(
+        # Create movement operation
+        movement = MovementOperation(
             unit=unit,
             from_system_id="system1",
             to_system_id="system2",
@@ -77,7 +77,7 @@ class TestMovementValidator:
         unit = Unit(unit_type="cruiser", owner="player1")
 
         # Test with invalid from_system_id
-        movement = MovementAction(
+        movement = MovementOperation(
             unit=unit,
             from_system_id="invalid_system",
             to_system_id="system1",
@@ -87,7 +87,7 @@ class TestMovementValidator:
         assert validator.is_valid_movement(movement) is False
 
         # Test with invalid to_system_id
-        movement = MovementAction(
+        movement = MovementOperation(
             unit=unit,
             from_system_id="system1",
             to_system_id="invalid_system",
@@ -106,7 +106,7 @@ class TestMovementValidator:
         unit = Unit(unit_type="cruiser", owner="player1")
 
         # Test movement with gravity drive technology
-        movement = MovementAction(
+        movement = MovementOperation(
             unit=unit,
             from_system_id="system1",
             to_system_id="system2",
@@ -135,8 +135,8 @@ class TestMovementExecution:
         unit = Unit(unit_type="cruiser", owner="player1")
         system1.place_unit_in_space(unit)
 
-        # Create movement action
-        movement = MovementAction(
+        # Create movement operation
+        movement = MovementOperation(
             unit=unit,
             from_system_id="system1",
             to_system_id="system2",
@@ -166,7 +166,7 @@ class TestMovementExecution:
         unit = Unit(unit_type="carrier", owner="player1")  # Movement 1
 
         # Without gravity drive, this should be invalid (distance 2 > movement 1)
-        movement_without_tech = MovementAction(
+        movement_without_tech = MovementOperation(
             unit=unit,
             from_system_id="system1",
             to_system_id="system2",
@@ -177,7 +177,7 @@ class TestMovementExecution:
         assert validator.is_valid_movement(movement_without_tech) is False
 
         # With gravity drive technology, this should be valid
-        movement_with_tech = MovementAction(
+        movement_with_tech = MovementOperation(
             unit=unit,
             from_system_id="system1",
             to_system_id="system2",
@@ -203,8 +203,8 @@ class TestMovementExecution:
     def test_ground_force_transport_from_planet(self):
         """Test transporting ground forces from a planet."""
         from src.ti4.core.movement import (
-            TransportAction,
             TransportExecutor,
+            TransportOperation,
             TransportValidator,
         )
         from src.ti4.core.planet import Planet
@@ -233,8 +233,8 @@ class TestMovementExecution:
         system1.place_unit_on_planet(infantry1, "planet1")
         system1.place_unit_on_planet(infantry2, "planet1")
 
-        # Create transport action
-        transport = TransportAction(
+        # Create transport operation
+        transport = TransportOperation(
             transport_ship=carrier,
             ground_forces=[infantry1, infantry2],
             from_system_id="system1",
@@ -260,7 +260,7 @@ class TestMovementExecution:
 
     def test_invalid_transport_exceeds_capacity(self):
         """Test that transport fails when exceeding ship capacity."""
-        from src.ti4.core.movement import TransportAction, TransportValidator
+        from src.ti4.core.movement import TransportOperation, TransportValidator
 
         galaxy = Galaxy()
         coord1 = HexCoordinate(0, 0)
@@ -272,7 +272,7 @@ class TestMovementExecution:
         destroyer = Unit(unit_type="destroyer", owner="player1")
         infantry = Unit(unit_type="infantry", owner="player1")
 
-        transport = TransportAction(
+        transport = TransportOperation(
             transport_ship=destroyer,
             ground_forces=[infantry],  # 1 infantry, but destroyer has 0 capacity
             from_system_id="system1",
@@ -284,7 +284,7 @@ class TestMovementExecution:
         assert validator.is_valid_transport(transport) is False
 
     def test_invalid_direct_planet_to_planet_movement(self):
-        """Test that direct planet-to-planet movement is invalid without capacity."""
+        """Test that direct planet-to-planet movement is invalid according to TI4 rules."""
         from src.ti4.core.planet import Planet
 
         galaxy = Galaxy()
@@ -303,7 +303,7 @@ class TestMovementExecution:
 
         # Attempt to move infantry directly from planet1 to planet2 (same system)
         # This should be INVALID - ground forces must move to space first
-        movement = MovementAction(
+        movement = MovementOperation(
             unit=infantry,
             from_system_id="system1",
             to_system_id="system1",  # Same system
@@ -314,13 +314,7 @@ class TestMovementExecution:
 
         validator = MovementValidator(galaxy)
         # This should be invalid according to TI4 rules
-        # TODO: Current implementation incorrectly allows this - needs architectural fix
-        # assert validator.is_valid_movement(movement) is False
-
-        # For now, document that this is incorrectly allowed
-        assert (
-            validator.is_valid_movement(movement) is True
-        )  # Current incorrect behavior
+        assert validator.is_valid_movement(movement) is False
 
     def test_correct_tactical_action_movement_sequence(self):
         """Test the correct two-step tactical action movement process."""
@@ -344,7 +338,7 @@ class TestMovementExecution:
 
         # Step 1: Movement Step - Infantry moves from planet1 to space area
         # (This would be part of a larger tactical action movement)
-        movement_to_space = MovementAction(
+        movement_to_space = MovementOperation(
             unit=infantry,
             from_system_id="system1",
             to_system_id="system1",
@@ -366,7 +360,7 @@ class TestMovementExecution:
 
         # Step 2: Commit Ground Forces Step - Infantry moves from space to planet2
         # (This would be a separate step in the tactical action)
-        commit_to_planet = MovementAction(
+        commit_to_planet = MovementOperation(
             unit=infantry,
             from_system_id="system1",
             to_system_id="system1",

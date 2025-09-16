@@ -1,6 +1,5 @@
 """Test utilities for common testing patterns."""
 
-
 from src.ti4.core.game_state import GameState
 from src.ti4.core.system import System
 from src.ti4.core.unit import Unit

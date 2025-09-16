@@ -1,7 +1,6 @@
 """Movement system for TI4 units."""
 
 from dataclasses import dataclass
-from functools import lru_cache
 from typing import Optional
 
 from .galaxy import Galaxy
@@ -11,8 +10,12 @@ from .unit import Unit
 
 
 @dataclass
-class MovementAction:
-    """Represents a unit movement action."""
+class MovementOperation:
+    """Represents a unit movement operation (internal game logic).
+
+    Note: This is NOT a TI4 Action - it's an internal operation for moving units.
+    TI4 Actions are handled by the TacticalAction class.
+    """
 
     unit: Unit
     from_system_id: str
@@ -34,9 +37,13 @@ class MovementValidator:
         self._galaxy = galaxy
         self._rule_engine = rule_engine or MovementRuleEngine()
 
-    def is_valid_movement(self, movement: MovementAction) -> bool:
-        """Check if a movement action is valid."""
-        # Use cached validation for performance
+    def is_valid_movement(self, movement: MovementOperation) -> bool:
+        """Check if a movement action is valid according to TI4 rules."""
+        # First check TI4-specific rules
+        if not self._validate_ti4_movement_rules(movement):
+            return False
+
+        # Then check distance/range validation
         tech_key = (
             frozenset(movement.player_technologies)
             if movement.player_technologies
@@ -49,7 +56,19 @@ class MovementValidator:
             tech_key,
         )
 
-    @lru_cache(maxsize=1000)
+    def _validate_ti4_movement_rules(self, movement: MovementOperation) -> bool:
+        """Validate TI4-specific movement rules."""
+        # Rule: Ground forces cannot move directly between planets
+        # They must move to space first, then be committed to planets
+        if (
+            movement.from_location != "space"
+            and movement.to_location != "space"
+            and movement.from_location != movement.to_location
+        ):
+            return False
+
+        return True
+
     def _is_valid_movement_cached(
         self,
         unit_type: str,
@@ -88,7 +107,7 @@ class MovementExecutor:
         self._galaxy = galaxy
         self._systems = systems
 
-    def execute_movement(self, movement: MovementAction) -> None:
+    def execute_movement(self, movement: MovementOperation) -> None:
         """Execute a movement action."""
         from_system = self._systems.get(movement.from_system_id)
         to_system = self._systems.get(movement.to_system_id)
@@ -126,8 +145,8 @@ class MovementExecutor:
 
 
 @dataclass
-class TransportAction:
-    """Represents transporting ground forces with ships."""
+class TransportOperation:
+    """Represents transporting ground forces with ships (internal operation)."""
 
     transport_ship: Unit
     ground_forces: list[Unit]
@@ -145,7 +164,7 @@ class TransportValidator:
         """Initialize transport validator."""
         self._galaxy = galaxy
 
-    def is_valid_transport(self, transport: TransportAction) -> bool:
+    def is_valid_transport(self, transport: TransportOperation) -> bool:
         """Check if a transport action is valid."""
         # Check if transport ship has capacity
         ship_capacity = transport.transport_ship.get_capacity()
@@ -180,7 +199,7 @@ class TransportExecutor:
         """Initialize transport executor."""
         self._systems = systems
 
-    def execute_transport(self, transport: TransportAction) -> None:
+    def execute_transport(self, transport: TransportOperation) -> None:
         """Execute a transport action."""
         from_system = self._systems.get(transport.from_system_id)
         to_system = self._systems.get(transport.to_system_id)

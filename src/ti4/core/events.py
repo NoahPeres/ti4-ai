@@ -105,9 +105,6 @@ class PhaseChangedEvent:
         }
 
 
-
-
-
 # Factory methods for consistent event creation
 def create_unit_moved_event(
     game_id: str, unit_id: str, from_system: str, to_system: str, player_id: str

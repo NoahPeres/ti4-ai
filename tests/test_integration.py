@@ -4,7 +4,7 @@ from src.ti4.core.combat import CombatDetector, CombatInitiator
 from src.ti4.core.fleet import Fleet, FleetCapacityValidator
 from src.ti4.core.galaxy import Galaxy
 from src.ti4.core.hex_coordinate import HexCoordinate
-from src.ti4.core.movement import MovementAction, MovementValidator
+from src.ti4.core.movement import MovementOperation, MovementValidator
 from src.ti4.core.player import Player
 from src.ti4.core.system import System
 from src.ti4.core.unit import Unit
@@ -81,7 +81,7 @@ class TestTI4Integration:
 
         # Test movement
         movement_validator = MovementValidator(galaxy)
-        movement = MovementAction(
+        movement = MovementOperation(
             unit=sol_cruiser,
             from_system_id="system1",
             to_system_id="system2",

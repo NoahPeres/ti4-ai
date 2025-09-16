@@ -1,6 +1,5 @@
 """Game state machine for managing phase transitions."""
 
-
 from .game_phase import GamePhase
 
 

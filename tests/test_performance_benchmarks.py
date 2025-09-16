@@ -40,10 +40,10 @@ class TestPerformanceBenchmarks:
         galaxy = Galaxy()
         validator = MovementValidator(galaxy)
 
-        # Create mock movement action
-        from src.ti4.core.movement import MovementAction
+        # Create mock movement operation
+        from src.ti4.core.movement import MovementOperation
 
-        movement = MovementAction(
+        movement = MovementOperation(
             unit=Unit(unit_type="destroyer", owner="player1"),
             from_system_id="system1",
             to_system_id="system2",

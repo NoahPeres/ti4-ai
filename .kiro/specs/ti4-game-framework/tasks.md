@@ -133,7 +133,7 @@
   - Write tests for fleet splitting and merging
   - _Requirements: 6.2, 1.2, 2.1_
 
-- [ ] 7.3 Refactor movement system to follow correct TI4 tactical action structure
+- [x] 7.3 Refactor movement system to follow correct TI4 tactical action structure
   - Implement proper two-step tactical action: Movement Step + Commit Ground Forces Step
   - Enforce rule that ground forces cannot move directly between planets
   - Create joint movement validation for entire movement plans
@@ -209,15 +209,15 @@
   - Write tests for information visibility and player perspective
   - _Requirements: 3.1, 4.1, 2.2, 1.5_
 
-- [ ] 12. Implement comprehensive testing and validation
-- [ ] 12.1 Add property-based testing for game invariants
+- [x] 12. Implement comprehensive testing and validation
+- [x] 12.1 Add property-based testing for game invariants
   - Write property-based tests using hypothesis for state consistency
   - Create generators for valid game states and actions
   - Implement invariant checking for all game state transitions
   - Write tests for edge cases and boundary conditions
   - _Requirements: 5.2, 7.2, 7.4_
 
-- [ ] 12.2 Create integration tests for complete game scenarios
+- [x] 12.2 Create integration tests for complete game scenarios
   - Write integration tests for full turn sequences
   - Implement end-to-end game simulation tests
   - Create performance benchmarks for game state operations

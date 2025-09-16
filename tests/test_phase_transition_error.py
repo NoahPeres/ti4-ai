@@ -1,6 +1,5 @@
 """Tests for PhaseTransitionError."""
 
-
 from src.ti4.core.game_phase import GamePhase
 
 

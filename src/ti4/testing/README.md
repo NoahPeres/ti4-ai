@@ -183,7 +183,7 @@ def test_movement_validation():
     game_state = TestUtilities.create_game_with_adjacent_systems()
     
     # Test movement between adjacent systems
-    movement = MovementAction(
+    movement = MovementOperation(
         unit=game_state.systems["system_a"].space_units[0],
         from_system_id="system_a",
         to_system_id="system_b",
