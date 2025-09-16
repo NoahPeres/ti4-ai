@@ -1,13 +1,81 @@
-<!------------------------------------------------------------------------------------
-   Add Rules to this file or a short description and have Kiro refine them for you:   I want to stress the importance of making assumptions and guessing: there have been many situations where we assume that something is one way when it is in fact another.
+---
+inclusion: always
+---
 
-   A few golden rules for you:
+# Evidence-Based Development Guidelines
 
-   1. NEVER GUESS EVER. If you are not 100% sure of a fact to be true, you must RESEARCH - look up online, search concrete documentation that you have been provided, or (if required) ASK THE USER (this is ALWAYS preferable to getting something wrong)
+## Core Principle: Never Assume, Always Verify
 
-   2. BEWARE OF ASSUMPTIONS. Do not assume that something is one way when the data suggests another thing. Example, you assumed that mypy was generating 'false positives' and so skipped over some errors it was raising, which turned out not do be the case on closer inspection. If you hypothesise this to be the case, you must PROVE it with DATA before you act on the inference.
+This project requires rigorous, evidence-based development practices. Assumptions and guesswork lead to bugs, technical debt, and wasted time.
 
-   3. ASK FOR HELP. If you feel like there are gaps in your knowledge or you have insufficient context to perform a task, do NOT attempt to fill it in with 'vibes' - rather seek out accurate information (and document it for posterity), or ask the user to provide more comprehensive documentation.
+## Critical Rules
 
-   4. BE DILIGENT. Don't skip repetitive steps during your iteration cycle (e.g. linting, tests, mypy, etc.) because you assume that they will still pass (they probably won't!). Explicitly check everything every time.
--------------------------------------------------------------------------------------> 
+### 1. Zero Tolerance for Guessing
+- **NEVER** make assumptions about code behavior, API responses, or system state
+- If you're not 100% certain of a fact, you MUST:
+  - Research in existing documentation
+  - Examine the actual codebase
+  - Run tests or experiments to verify
+  - Ask the user for clarification
+- **Better to ask than to be wrong**
+
+### 2. Data-Driven Decision Making
+- Do not dismiss tool warnings (mypy, ruff, pytest) as "false positives" without investigation
+- If you hypothesize something is incorrect, **PROVE IT** with concrete evidence
+- Document your findings when you discover the root cause of issues
+- Example: If mypy reports an error, investigate the type system issue rather than assuming it's wrong
+
+### 3. Explicit Knowledge Gaps
+- When you encounter unfamiliar patterns or unclear requirements:
+  - State what you don't know explicitly
+  - Research available documentation first
+  - Ask specific, targeted questions rather than guessing
+  - Document new knowledge for future reference
+
+### 4. Rigorous Development Cycle
+- **Always** run the full validation suite after changes:
+  - `uv run pytest` - Run all tests
+  - `uv run mypy src` - Type checking
+  - `uv run ruff check src tests` - Linting
+  - `make check-all` - Complete validation
+- Don't skip steps because you "think" they'll pass
+- Each change can have unexpected ripple effects
+
+## Project-Specific Practices
+
+### Code Quality Standards
+- Follow TDD practices strictly (RED-GREEN-REFACTOR)
+- Maintain type hints for all public interfaces
+- Use descriptive variable and function names
+- Write comprehensive tests for edge cases
+
+### Error Handling
+- Validate inputs explicitly rather than assuming they're correct
+- Handle edge cases that might seem "impossible"
+- Use proper exception types with descriptive messages
+- Test error conditions as thoroughly as success paths
+
+### Documentation Requirements
+- Update docstrings when changing function behavior
+- Document complex algorithms and business logic
+- Maintain architectural decision records for significant changes
+- Keep README and usage examples current
+
+## Red Flags That Indicate Assumption-Making
+
+- Using phrases like "probably", "should work", "I think"
+- Skipping validation steps "to save time"
+- Implementing features without corresponding tests
+- Ignoring tool warnings without investigation
+- Making changes without understanding the full impact
+
+## Recovery from Mistakes
+
+When you realize you've made an assumption:
+1. Stop and acknowledge the assumption explicitly
+2. Gather the actual facts through research/testing
+3. Correct the implementation based on evidence
+4. Add tests to prevent similar issues
+5. Document the learning for future reference
+
+Remember: Precision and diligence now prevent debugging sessions later.
