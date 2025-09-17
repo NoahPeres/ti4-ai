@@ -77,12 +77,12 @@ class TestConcurrentGameManager:
         def create_games(thread_id):
             nonlocal game_counter
             try:
-                for i in range(10):
+                for _i in range(10):
                     # Use a combination of thread_id and counter for uniqueness
                     with counter_lock:
                         game_counter += 1
                         unique_id = game_counter
-                    
+
                     game_id = manager.create_game(
                         f"concurrent_game_{thread_id}_{unique_id}"
                     )
