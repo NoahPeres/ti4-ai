@@ -71,12 +71,20 @@ class TestConcurrentGameManager:
         manager = ConcurrentGameManager()
         created_games = []
         errors = []
+        game_counter = 0
+        counter_lock = threading.Lock()
 
-        def create_games():
+        def create_games(thread_id):
+            nonlocal game_counter
             try:
                 for i in range(10):
+                    # Use a combination of thread_id and counter for uniqueness
+                    with counter_lock:
+                        game_counter += 1
+                        unique_id = game_counter
+                    
                     game_id = manager.create_game(
-                        f"concurrent_game_{threading.current_thread().ident}_{i}"
+                        f"concurrent_game_{thread_id}_{unique_id}"
                     )
                     created_games.append(game_id)
             except Exception as e:
@@ -84,8 +92,8 @@ class TestConcurrentGameManager:
 
         # Create multiple threads
         threads = []
-        for _ in range(5):
-            thread = threading.Thread(target=create_games)
+        for thread_num in range(5):
+            thread = threading.Thread(target=create_games, args=(thread_num,))
             threads.append(thread)
             thread.start()
 
