@@ -22,16 +22,18 @@ def test_game_state_immutability():
 
 def test_game_state_equality():
     """Test that GameState instances with same data are equal."""
-    state1 = GameState()
-    state2 = GameState()
+    game_id = "test-game-id"
+    state1 = GameState(game_id=game_id)
+    state2 = GameState(game_id=game_id)
 
     assert state1 == state2
 
 
 def test_game_state_hashing():
     """Test that GameState instances can be hashed consistently."""
-    state1 = GameState()
-    state2 = GameState()
+    game_id = "test-game-id"
+    state1 = GameState(game_id=game_id)
+    state2 = GameState(game_id=game_id)
 
     # Same states should have same hash
     assert hash(state1) == hash(state2)

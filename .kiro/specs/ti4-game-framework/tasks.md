@@ -74,141 +74,150 @@
   - Write tests for unit movement validation and conflicts
   - _Requirements: 1.1, 1.3, 6.2_
 
-- [ ] 5. Implement basic resource management
-- [ ] 5.1 Create player resource tracking (trade goods, commodities)
+- [x] 5. Implement basic resource management
+- [x] 5.1 Create player resource tracking (trade goods, commodities)
   - Write tests for resource initialization and modification
   - Add resource fields to Player class
   - Implement resource validation (non-negative values, limits)
   - Write tests for resource transactions and validation
   - _Requirements: 1.3, 6.2, 6.3_
 
-- [ ] 5.2 Implement command token management
+- [x] 5.2 Implement command token management
   - Write tests for command token allocation and spending
   - Create CommandTokens class with fleet, strategy, and tactic pools
   - Implement command token validation and redistribution
   - Write tests for command token limits and constraints
   - _Requirements: 6.2, 6.3, 1.3_
 
-- [ ] 5.3 Add basic planet resource generation
+- [x] 5.3 Add basic planet resource generation
   - Write tests for planet resource collection
   - Implement planet exhaustion and refresh mechanics
   - Create resource collection actions and validation
   - Write tests for resource collection timing and limits
   - _Requirements: 6.2, 6.3, 2.1_
 
-- [ ] 6. Implement turn management and game controller
-- [ ] 6.1 Create basic turn order and player activation
+- [x] 6. Implement turn management and game controller
+- [x] 6.1 Create basic turn order and player activation
   - Write tests for turn order determination and management
   - Implement GameController class with turn progression
   - Create player activation and turn passing mechanics
   - Write tests for turn order edge cases and validation
   - _Requirements: 1.1, 2.3, 6.1_
 
-- [ ] 6.2 Add strategy phase implementation
+- [x] 6.2 Add strategy phase implementation
   - Write tests for strategy card selection and turn order
   - Implement strategy card draft mechanics
   - Create strategy card effects framework (basic implementation)
   - Write tests for strategy phase completion and validation
   - _Requirements: 6.1, 6.3, 2.3_
 
-- [ ] 6.3 Implement action phase with basic actions
+- [x] 6.3 Implement action phase with basic actions
   - Write tests for action phase turn management
   - Create basic tactical and strategic actions
   - Implement action phase passing and completion
   - Write tests for action phase timing and validation
   - _Requirements: 2.1, 2.3, 6.1_
 
-- [ ] 7. Implement basic movement and fleet management
-- [ ] 7.1 Create unit movement validation and execution
+- [x] 7. Implement basic movement and fleet management
+- [x] 7.1 Create unit movement validation and execution
   - Write tests for unit movement rules and restrictions
   - Implement movement actions with range and capacity validation
   - Create fleet movement with carrier capacity rules
   - Write tests for movement edge cases and invalid moves
   - _Requirements: 2.1, 6.2, 1.2_
 
-- [ ] 7.2 Add basic fleet composition and capacity rules
+- [x] 7.2 Add basic fleet composition and capacity rules
   - Write tests for fleet capacity limits and validation
   - Implement carrier capacity and fighter/infantry transport
   - Create fleet composition validation rules
   - Write tests for fleet splitting and merging
   - _Requirements: 6.2, 1.2, 2.1_
 
-- [ ] 8. Implement basic combat system
-- [ ] 8.1 Create combat initiation and participant determination
+- [x] 7.3 Refactor movement system to follow correct TI4 tactical action structure
+  - Implement proper two-step tactical action: Movement Step + Commit Ground Forces Step
+  - Enforce rule that ground forces cannot move directly between planets
+  - Create joint movement validation for entire movement plans
+  - Implement automatic technology effect calculation (Gravity Drive, etc.)
+  - Update MovementAction terminology to MovementCommand/MovementOperation
+  - Write comprehensive tests for correct TI4 movement rules
+  - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7_
+
+- [x] 8. Implement basic combat system
+- [x] 8.1 Create combat initiation and participant determination
   - Write tests for combat trigger conditions
   - Implement combat detection when fleets meet
   - Create combat participant selection logic
   - Write tests for combat avoidance and retreat options
   - _Requirements: 6.2, 6.3, 1.2_
 
-- [ ] 8.2 Implement dice rolling and hit resolution
+- [x] 8.2 Implement dice rolling and hit resolution
   - Write tests for combat dice rolling and hit calculation
   - Create combat resolution engine with unit stats
   - Implement hit assignment and unit destruction
   - Write tests for combat modifiers and special abilities
   - _Requirements: 6.2, 6.3, 3.3_
 
-- [ ] 8.3 Add basic unit abilities (sustain damage, etc.)
+- [x] 8.3 Add basic unit abilities (sustain damage, etc.)
   - Write tests for unit special abilities in combat
   - Implement sustain damage and other basic unit abilities
   - Create ability activation and resolution framework
   - Write tests for ability interactions and timing
   - _Requirements: 6.2, 6.3, 6.4_
 
-- [ ] 9. Implement technology system foundation
-- [ ] 9.1 Create technology tree structure and prerequisites
+- [x] 9. Implement technology system foundation
+- [x] 9.1 Create technology tree structure and prerequisites
   - Write tests for technology prerequisites and validation
-  - Implement Technology class with color, cost, and prerequisites
+  - Implement Technology class with color and prerequisites
   - Create technology tree navigation and validation
-  - Write tests for technology acquisition rules
+  - Write tests for technology prerequisite checking
   - _Requirements: 6.2, 6.4, 2.1_
 
-- [ ] 9.2 Add technology acquisition actions
-  - Write tests for technology research actions and costs
-  - Implement technology research with resource spending
-  - Create technology prerequisite validation
-  - Write tests for technology research timing and limits
+- [x] 9.2 Add technology gain effects and validation
+  - Write tests for technology gain effects triggered by other game actions
+  - Implement technology gain validation (prerequisites must be met)
+  - Create technology effect application system
+  - Write tests for technology effects on game mechanics
   - _Requirements: 2.1, 6.2, 1.2_
 
-- [ ] 10. Implement basic victory condition tracking
-- [ ] 10.1 Create victory point tracking and objective system
+- [x] 10. Implement basic victory condition tracking
+- [x] 10.1 Create victory point tracking and objective system
   - Write tests for victory point assignment and tracking
   - Implement objective card structure and completion detection
   - Create victory condition checking logic
   - Write tests for victory point limits and game end conditions
   - _Requirements: 6.5, 1.5, 7.5_
 
-- [ ] 10.2 Add basic public objective implementation
+- [x] 10.2 Add basic public objective implementation
   - Write tests for public objective completion detection
   - Implement basic public objectives (control planets, spend resources)
   - Create objective scoring and validation
   - Write tests for objective timing and multiple completions
   - _Requirements: 6.5, 2.1, 1.3_
 
-- [ ] 11. Create player interface abstractions
-- [ ] 11.1 Implement abstract player interface for AI and human players
+- [x] 11. Create player interface abstractions
+- [x] 11.1 Implement abstract player interface for AI and human players
   - Write tests for player decision-making interface
   - Create Player interface with choose_action and make_choice methods
   - Implement basic AI player stub for testing
   - Write tests for player interface contract compliance
   - _Requirements: 3.1, 3.2, 4.1, 4.2_
 
-- [ ] 11.2 Add game state querying interface for players
+- [x] 11.2 Add game state querying interface for players
   - Write tests for game state information access
   - Implement player-specific state views and information hiding
   - Create query methods for legal actions and game information
   - Write tests for information visibility and player perspective
   - _Requirements: 3.1, 4.1, 2.2, 1.5_
 
-- [ ] 12. Implement comprehensive testing and validation
-- [ ] 12.1 Add property-based testing for game invariants
+- [x] 12. Implement comprehensive testing and validation
+- [x] 12.1 Add property-based testing for game invariants
   - Write property-based tests using hypothesis for state consistency
   - Create generators for valid game states and actions
   - Implement invariant checking for all game state transitions
   - Write tests for edge cases and boundary conditions
   - _Requirements: 5.2, 7.2, 7.4_
 
-- [ ] 12.2 Create integration tests for complete game scenarios
+- [x] 12.2 Create integration tests for complete game scenarios
   - Write integration tests for full turn sequences
   - Implement end-to-end game simulation tests
   - Create performance benchmarks for game state operations

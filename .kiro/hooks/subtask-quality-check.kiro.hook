@@ -1,0 +1,18 @@
+{
+  "enabled": true,
+  "name": "Subtask Quality Check",
+  "description": "Runs formatting, mypy, ruff checks, and all software tests whenever a subtask X.Y is completed",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "**/*.md",
+      "**/*.txt",
+      "**/*.toml"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A subtask has been completed. Please run the following quality checks and tests:\n\n1. Format all code: `uv run ruff format src tests`\n2. Run mypy type checking: `uv run mypy src`\n3. Run ruff linting checks: `uv run ruff check --fix src tests`\n4. Run all software tests: `uv run pytest tests/ -v`\n\nPlease execute these commands in order and report any failures that need to be addressed.\nDo NOT simply ignore any of these issues, you must be vigilant to preserve code quality. Take proactive steps to resolving all the issues (including refactoring and rerunning tests if required)"
+  }
+}
