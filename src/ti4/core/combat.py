@@ -1,7 +1,7 @@
 """Combat system for TI4."""
 
 import random
-from typing import Optional
+from typing import Callable, Optional
 
 from .system import System
 from .unit import Unit
@@ -183,3 +183,75 @@ class CombatResolver:
         # Apply modifier by adjusting the effective combat value
         effective_combat_value = max(1, min(10, combat_value - modifier))
         return self.calculate_hits(dice_results, effective_combat_value)
+
+    def _perform_ability_attack(
+        self,
+        unit: Unit,
+        target_units: list[Unit],
+        ability_check_func: Callable[[Unit], bool],
+        target_filter_func: Optional[Callable[[list[Unit]], list[Unit]]] = None,
+    ) -> int:
+        """Generic method for performing ability-based attacks.
+
+        Args:
+            unit: The unit performing the ability
+            target_units: List of potential target units
+            ability_check_func: Function to check if unit has the ability
+            target_filter_func: Optional function to filter valid targets
+
+        Returns:
+            Number of hits scored
+        """
+        if not ability_check_func(unit):
+            return 0
+
+        # Filter targets if filter function provided
+        valid_targets = target_units
+        if target_filter_func:
+            valid_targets = target_filter_func(target_units)
+
+        if not valid_targets:
+            return 0
+
+        # Get unit stats and validate combat capability
+        stats = self.unit_stats_provider.get_unit_stats(unit.unit_type)
+        if stats.combat_value is None:
+            return 0
+
+        # Roll dice and calculate hits
+        dice_count = stats.combat_dice
+        if dice_count <= 0:
+            return 0
+
+        dice_results = [random.randint(1, 10) for _ in range(dice_count)]
+        return self.calculate_hits(dice_results, stats.combat_value)
+
+    def perform_anti_fighter_barrage(self, unit: Unit, target_units: list[Unit]) -> int:
+        """Perform anti-fighter barrage against fighters.
+
+        Args:
+            unit: The unit performing anti-fighter barrage
+            target_units: List of potential target units
+
+        Returns:
+            Number of hits scored against fighters
+        """
+
+        def filter_fighters(units: list[Unit]) -> list[Unit]:
+            return [u for u in units if u.unit_type == "fighter"]
+
+        return self._perform_ability_attack(
+            unit, target_units, Unit.has_anti_fighter_barrage, filter_fighters
+        )
+
+    def perform_space_cannon(self, unit: Unit, target_units: list[Unit]) -> int:
+        """Perform space cannon defensive fire.
+
+        Args:
+            unit: The unit performing space cannon
+            target_units: List of potential target units
+
+        Returns:
+            Number of hits scored
+        """
+        return self._perform_ability_attack(unit, target_units, Unit.has_space_cannon)

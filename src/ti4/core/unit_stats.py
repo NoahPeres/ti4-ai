@@ -14,6 +14,12 @@ class UnitStats:
     movement: int = 1
     cost: float = 1
     sustain_damage: bool = False
+    anti_fighter_barrage: bool = False
+    space_cannon: bool = False
+    bombardment: bool = False
+    deploy: bool = False
+    planetary_shield: bool = False
+    production: int = 0
 
     def with_modifications(self, **kwargs: Any) -> "UnitStats":
         """Create a new UnitStats with modifications."""
@@ -24,6 +30,14 @@ class UnitStats:
             movement=kwargs.get("movement", self.movement),
             cost=kwargs.get("cost", self.cost),
             sustain_damage=kwargs.get("sustain_damage", self.sustain_damage),
+            anti_fighter_barrage=kwargs.get(
+                "anti_fighter_barrage", self.anti_fighter_barrage
+            ),
+            space_cannon=kwargs.get("space_cannon", self.space_cannon),
+            bombardment=kwargs.get("bombardment", self.bombardment),
+            deploy=kwargs.get("deploy", self.deploy),
+            planetary_shield=kwargs.get("planetary_shield", self.planetary_shield),
+            production=kwargs.get("production", self.production),
         )
 
 
@@ -48,9 +62,15 @@ class UnitStatsProvider:
             movement=1,
             cost=4,
             sustain_damage=True,
+            bombardment=True,
         ),
         "destroyer": UnitStats(
-            capacity=0, combat_value=9, combat_dice=1, movement=2, cost=1
+            capacity=0,
+            combat_value=9,
+            combat_dice=1,
+            movement=2,
+            cost=1,
+            anti_fighter_barrage=True,
         ),
         "fighter": UnitStats(
             capacity=0, combat_value=9, combat_dice=1, movement=0, cost=0.5
@@ -68,11 +88,20 @@ class UnitStatsProvider:
             movement=0,
             cost=2,
             sustain_damage=True,
+            deploy=True,
         ),
-        "pds": UnitStats(capacity=0, combat_value=6, combat_dice=1, movement=0, cost=2),
+        "pds": UnitStats(
+            capacity=0,
+            combat_value=6,
+            combat_dice=1,
+            movement=0,
+            cost=2,
+            space_cannon=True,
+            planetary_shield=True,
+        ),
         "space_dock": UnitStats(
-            capacity=0, combat_dice=0, movement=0, cost=4
-        ),  # No combat
+            capacity=0, combat_dice=0, movement=0, cost=4, production=2
+        ),  # No combat, has production
         "war_sun": UnitStats(
             capacity=6,
             combat_value=3,
@@ -80,6 +109,7 @@ class UnitStatsProvider:
             movement=2,
             cost=12,
             sustain_damage=True,
+            bombardment=True,
         ),
     }
 
@@ -139,6 +169,13 @@ class UnitStatsProvider:
             movement=base.movement + modifications.movement,
             cost=base.cost + modifications.cost,
             sustain_damage=base.sustain_damage or modifications.sustain_damage,
+            anti_fighter_barrage=base.anti_fighter_barrage
+            or modifications.anti_fighter_barrage,
+            space_cannon=base.space_cannon or modifications.space_cannon,
+            bombardment=base.bombardment or modifications.bombardment,
+            deploy=base.deploy or modifications.deploy,
+            planetary_shield=base.planetary_shield or modifications.planetary_shield,
+            production=base.production + modifications.production,
         )
 
     def register_faction_modifier(

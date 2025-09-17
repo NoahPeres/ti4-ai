@@ -51,6 +51,30 @@ class Unit:
         """Check if this unit has sustain damage ability."""
         return self.get_stats().sustain_damage
 
+    def has_anti_fighter_barrage(self) -> bool:
+        """Check if this unit has anti-fighter barrage ability."""
+        return self.get_stats().anti_fighter_barrage
+
+    def has_space_cannon(self) -> bool:
+        """Check if this unit has space cannon ability."""
+        return self.get_stats().space_cannon
+
+    def has_bombardment(self) -> bool:
+        """Check if this unit has bombardment ability."""
+        return self.get_stats().bombardment
+
+    def has_deploy(self) -> bool:
+        """Check if this unit has deploy ability."""
+        return self.get_stats().deploy
+
+    def has_planetary_shield(self) -> bool:
+        """Check if this unit has planetary shield ability."""
+        return self.get_stats().planetary_shield
+
+    def get_production(self) -> int:
+        """Get the production value of this unit."""
+        return self.get_stats().production
+
     def get_combat_dice(self) -> int:
         """Get the number of combat dice this unit rolls."""
         return self.get_stats().combat_dice

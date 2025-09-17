@@ -285,3 +285,132 @@ class TestCombatResolver:
             dice_results, combat_value, modifier
         )
         assert hits == 2  # Only 8 and 9 should hit with -1 modifier
+
+
+class TestUnitAbilitiesInCombat:
+    def test_anti_fighter_barrage_timing(self):
+        """Test that anti-fighter barrage occurs before regular combat."""
+        resolver = CombatResolver()
+
+        # Create destroyer with anti-fighter barrage
+        destroyer = Unit(unit_type="destroyer", owner="player1")
+        assert destroyer.has_anti_fighter_barrage() is True
+
+        # Anti-fighter barrage should be able to target fighters
+        fighters = [
+            Unit(unit_type="fighter", owner="player2"),
+            Unit(unit_type="fighter", owner="player2"),
+        ]
+
+        # Test that destroyer can perform anti-fighter barrage
+        hits = resolver.perform_anti_fighter_barrage(destroyer, fighters)
+        assert isinstance(hits, int)
+        assert 0 <= hits <= 1  # Destroyer rolls 1 die for anti-fighter barrage
+
+    def test_space_cannon_defensive_fire(self):
+        """Test that space cannon can fire defensively when units move into system."""
+        resolver = CombatResolver()
+
+        # Create PDS with space cannon
+        pds = Unit(unit_type="pds", owner="player1")
+        assert pds.has_space_cannon() is True
+
+        # Incoming units that can be targeted
+        incoming_units = [
+            Unit(unit_type="cruiser", owner="player2"),
+            Unit(unit_type="fighter", owner="player2"),
+        ]
+
+        # Test that PDS can perform space cannon
+        hits = resolver.perform_space_cannon(pds, incoming_units)
+        assert isinstance(hits, int)
+        assert 0 <= hits <= 1  # PDS rolls 1 die for space cannon
+
+    def test_sustain_damage_prevents_destruction(self):
+        """Test that sustain damage prevents unit destruction in combat."""
+        resolver = CombatResolver()
+
+        # Create dreadnought with sustain damage
+        dreadnought = Unit(unit_type="dreadnought", owner="player1")
+        assert dreadnought.has_sustain_damage() is True
+        assert dreadnought.has_sustained_damage is False
+
+        # Apply 1 hit with sustain damage choice
+        units = [dreadnought]
+        hits = 1
+        sustain_choices = {dreadnought.id: True}
+
+        remaining_hits = resolver.resolve_sustain_damage_abilities(
+            units, hits, sustain_choices
+        )
+
+        # Hit should be absorbed by sustain damage
+        assert remaining_hits == 0
+        assert dreadnought.has_sustained_damage is True
+
+    def test_anti_fighter_barrage_only_targets_fighters(self):
+        """Test that anti-fighter barrage only affects fighters."""
+        resolver = CombatResolver()
+
+        destroyer = Unit(unit_type="destroyer", owner="player1")
+
+        # Mix of fighters and non-fighters
+        mixed_units = [
+            Unit(unit_type="fighter", owner="player2"),
+            Unit(unit_type="cruiser", owner="player2"),
+            Unit(unit_type="fighter", owner="player2"),
+        ]
+
+        # Should be able to target the fighters
+        hits = resolver.perform_anti_fighter_barrage(destroyer, mixed_units)
+        assert isinstance(hits, int)
+        assert 0 <= hits <= 1  # Destroyer rolls 1 die
+
+        # Should return 0 hits if no fighters present
+        non_fighter_units = [
+            Unit(unit_type="cruiser", owner="player2"),
+            Unit(unit_type="dreadnought", owner="player2"),
+        ]
+
+        hits_no_fighters = resolver.perform_anti_fighter_barrage(
+            destroyer, non_fighter_units
+        )
+        assert hits_no_fighters == 0
+
+    def test_unit_without_ability_cannot_use_it(self):
+        """Test that units without abilities cannot use them."""
+        resolver = CombatResolver()
+
+        # Fighter doesn't have anti-fighter barrage
+        fighter = Unit(unit_type="fighter", owner="player1")
+        target_fighters = [Unit(unit_type="fighter", owner="player2")]
+
+        hits = resolver.perform_anti_fighter_barrage(fighter, target_fighters)
+        assert hits == 0
+
+        # Cruiser doesn't have space cannon
+        cruiser = Unit(unit_type="cruiser", owner="player1")
+        target_units = [Unit(unit_type="fighter", owner="player2")]
+
+        hits = resolver.perform_space_cannon(cruiser, target_units)
+        assert hits == 0
+
+    def test_sustain_damage_can_only_be_used_once(self):
+        """Test that sustain damage can only be used once per unit."""
+        dreadnought = Unit(unit_type="dreadnought", owner="player1")
+
+        # Use sustain damage once
+        dreadnought.sustain_damage()
+        assert dreadnought.has_sustained_damage is True
+
+        # Cannot use sustain damage again (unit already sustained)
+        resolver = CombatResolver()
+        units = [dreadnought]
+        hits = 1
+        sustain_choices = {dreadnought.id: True}  # Player tries to sustain again
+
+        # Should not absorb the hit since unit already sustained damage
+        remaining_hits = resolver.resolve_sustain_damage_abilities(
+            units, hits, sustain_choices
+        )
+        assert remaining_hits == 1  # Hit not absorbed

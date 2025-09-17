@@ -142,7 +142,7 @@
   - Write comprehensive tests for correct TI4 movement rules
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7_
 
-- [-] 8. Implement basic combat system
+- [x] 8. Implement basic combat system
 - [x] 8.1 Create combat initiation and participant determination
   - Write tests for combat trigger conditions
   - Implement combat detection when fleets meet
@@ -157,52 +157,52 @@
   - Write tests for combat modifiers and special abilities
   - _Requirements: 6.2, 6.3, 3.3_
 
-- [ ] 8.3 Add basic unit abilities (sustain damage, etc.)
+- [x] 8.3 Add basic unit abilities (sustain damage, etc.)
   - Write tests for unit special abilities in combat
   - Implement sustain damage and other basic unit abilities
   - Create ability activation and resolution framework
   - Write tests for ability interactions and timing
   - _Requirements: 6.2, 6.3, 6.4_
 
-- [ ] 9. Implement technology system foundation
-- [ ] 9.1 Create technology tree structure and prerequisites
+- [x] 9. Implement technology system foundation
+- [x] 9.1 Create technology tree structure and prerequisites
   - Write tests for technology prerequisites and validation
-  - Implement Technology class with color, cost, and prerequisites
+  - Implement Technology class with color and prerequisites
   - Create technology tree navigation and validation
-  - Write tests for technology acquisition rules
+  - Write tests for technology prerequisite checking
   - _Requirements: 6.2, 6.4, 2.1_
 
-- [ ] 9.2 Add technology acquisition actions
-  - Write tests for technology research actions and costs
-  - Implement technology research with resource spending
-  - Create technology prerequisite validation
-  - Write tests for technology research timing and limits
+- [x] 9.2 Add technology gain effects and validation
+  - Write tests for technology gain effects triggered by other game actions
+  - Implement technology gain validation (prerequisites must be met)
+  - Create technology effect application system
+  - Write tests for technology effects on game mechanics
   - _Requirements: 2.1, 6.2, 1.2_
 
-- [-] 10. Implement basic victory condition tracking
-- [ ] 10.1 Create victory point tracking and objective system
+- [x] 10. Implement basic victory condition tracking
+- [x] 10.1 Create victory point tracking and objective system
   - Write tests for victory point assignment and tracking
   - Implement objective card structure and completion detection
   - Create victory condition checking logic
   - Write tests for victory point limits and game end conditions
   - _Requirements: 6.5, 1.5, 7.5_
 
-- [ ] 10.2 Add basic public objective implementation
+- [x] 10.2 Add basic public objective implementation
   - Write tests for public objective completion detection
   - Implement basic public objectives (control planets, spend resources)
   - Create objective scoring and validation
   - Write tests for objective timing and multiple completions
   - _Requirements: 6.5, 2.1, 1.3_
 
-- [ ] 11. Create player interface abstractions
-- [ ] 11.1 Implement abstract player interface for AI and human players
+- [x] 11. Create player interface abstractions
+- [x] 11.1 Implement abstract player interface for AI and human players
   - Write tests for player decision-making interface
   - Create Player interface with choose_action and make_choice methods
   - Implement basic AI player stub for testing
   - Write tests for player interface contract compliance
   - _Requirements: 3.1, 3.2, 4.1, 4.2_
 
-- [ ] 11.2 Add game state querying interface for players
+- [x] 11.2 Add game state querying interface for players
   - Write tests for game state information access
   - Implement player-specific state views and information hiding
   - Create query methods for legal actions and game information

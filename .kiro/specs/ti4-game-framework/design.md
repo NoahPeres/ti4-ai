@@ -284,7 +284,7 @@ class TestIntegration(unittest.TestCase):
 - Movement and fleet management (see Movement System Design below)
 - Basic combat system
 - Resource management (trade goods, commodities)
-- Technology acquisition
+- Technology system and effects
 
 ## Movement System Design
 
