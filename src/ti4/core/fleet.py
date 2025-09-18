@@ -28,7 +28,18 @@ class Fleet:
 
     def get_total_capacity(self) -> int:
         """Get the total capacity of all ships in the fleet."""
-        return sum(unit.get_capacity() for unit in self.units)
+        total_capacity = 0
+        for unit in self.units:
+            # Only ships (not fighters or infantry) provide capacity
+            if unit.unit_type in [
+                UnitType.CARRIER.value,
+                UnitType.CRUISER.value,
+                UnitType.CRUISER_II.value,
+                UnitType.DREADNOUGHT.value,
+                UnitType.WAR_SUN.value,
+            ]:
+                total_capacity += unit.get_capacity()
+        return total_capacity
 
     def get_carried_units_count(self) -> int:
         """Get the count of units that need to be carried (fighters and infantry)."""

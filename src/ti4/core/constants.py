@@ -75,30 +75,66 @@ class GameConstants:
     INFANTRY_CAPACITY_COST = 1
 
 
-class TechnologyConstants:
-    """Technology-related constants."""
+class Technology(Enum):
+    """Enumeration of TI4 technologies."""
 
-    # Common technologies that affect movement
+    # Movement technologies
     GRAVITY_DRIVE = "gravity_drive"
     FLEET_LOGISTICS = "fleet_logistics"
     LIGHT_WAVE_DEFLECTOR = "light_wave_deflector"
 
     # Unit upgrade technologies
-    CRUISER_II_TECH = "cruiser_ii"
-    DREADNOUGHT_II_TECH = "dreadnought_ii"
-    CARRIER_II_TECH = "carrier_ii"
-    DESTROYER_II_TECH = "destroyer_ii"
-    FIGHTER_II_TECH = "fighter_ii"
+    CRUISER_II = "cruiser_ii"
+    DREADNOUGHT_II = "dreadnought_ii"
+    CARRIER_II = "carrier_ii"
+    DESTROYER_II = "destroyer_ii"
+    FIGHTER_II = "fighter_ii"
+
+    # Other technologies
+    PLASMA_SCORING = "plasma_scoring"
 
 
-class FactionConstants:
-    """Faction-related constants."""
+class TechnologyConstants:
+    """Technology-related constants (deprecated - use Technology enum instead)."""
 
-    # Example factions (would be expanded)
+    # Deprecated: Use Technology enum instead
+    GRAVITY_DRIVE = Technology.GRAVITY_DRIVE.value
+    FLEET_LOGISTICS = Technology.FLEET_LOGISTICS.value
+    LIGHT_WAVE_DEFLECTOR = Technology.LIGHT_WAVE_DEFLECTOR.value
+
+    # Unit upgrade technologies
+    CRUISER_II_TECH = Technology.CRUISER_II.value
+    DREADNOUGHT_II_TECH = Technology.DREADNOUGHT_II.value
+    CARRIER_II_TECH = Technology.CARRIER_II.value
+    DESTROYER_II_TECH = Technology.DESTROYER_II.value
+    FIGHTER_II_TECH = Technology.FIGHTER_II.value
+
+
+class Faction(Enum):
+    """Enumeration of TI4 factions."""
+
     SOL = "sol"
     HACAN = "hacan"
     XXCHA = "xxcha"
     JORD = "jord"
+    YSSARIL = "yssaril"
+    NAALU = "naalu"
+    BARONY = "barony"
+    SAAR = "saar"
+    MUAAT = "muaat"
+    ARBOREC = "arborec"
+    L1Z1X = "l1z1x"
+    WINNU = "winnu"
+
+
+class FactionConstants:
+    """Faction-related constants (deprecated - use Faction enum instead)."""
+
+    # Deprecated: Use Faction enum instead
+    SOL = Faction.SOL.value
+    HACAN = Faction.HACAN.value
+    XXCHA = Faction.XXCHA.value
+    JORD = Faction.JORD.value
 
 
 class EventConstants:

@@ -1,8 +1,9 @@
 """Unit structure for TI4 game pieces."""
 
 import uuid
-from typing import Optional
+from typing import Optional, Union
 
+from .constants import UnitType, Faction, Technology
 from .unit_stats import UnitStats, UnitStatsProvider
 
 
@@ -11,18 +12,38 @@ class Unit:
 
     def __init__(
         self,
-        unit_type: str,
+        unit_type: Union[UnitType, str],
         owner: str,
-        faction: Optional[str] = None,
-        technologies: Optional[set[str]] = None,
+        faction: Optional[Union[Faction, str]] = None,
+        technologies: Optional[set[Union[Technology, str]]] = None,
         stats_provider: Optional[UnitStatsProvider] = None,
         unit_id: Optional[str] = None,
     ) -> None:
         self.id = unit_id or str(uuid.uuid4())
-        self.unit_type = unit_type
+        
+        # Convert enum to string value if needed for backward compatibility
+        if isinstance(unit_type, UnitType):
+            self.unit_type = unit_type.value
+        else:
+            self.unit_type = unit_type
+            
         self.owner = owner
-        self.faction = faction
-        self.technologies = technologies or set()
+        
+        # Convert enum to string value if needed for backward compatibility
+        if isinstance(faction, Faction):
+            self.faction = faction.value
+        else:
+            self.faction = faction
+            
+        # Convert technology enums to string values if needed
+        if technologies:
+            self.technologies = {
+                tech.value if isinstance(tech, Technology) else tech
+                for tech in technologies
+            }
+        else:
+            self.technologies = set()
+            
         self._stats_provider = stats_provider or UnitStatsProvider()
         self._cached_stats: Optional[UnitStats] = None
         self._sustained_damage = False
