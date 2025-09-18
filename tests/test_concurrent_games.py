@@ -18,13 +18,13 @@ from src.ti4.performance.concurrent import (
 class TestConcurrentGameManager:
     """Test cases for ConcurrentGameManager."""
 
-    def test_manager_initialization(self):
+    def test_manager_initialization(self) -> None:
         """Test that manager initializes correctly."""
         manager = ConcurrentGameManager(max_concurrent_games=50)
         assert manager._max_concurrent_games == 50
         assert len(manager._games) == 0
 
-    def test_create_game(self):
+    def test_create_game(self) -> None:
         """Test game creation."""
         manager = ConcurrentGameManager()
 
@@ -42,7 +42,7 @@ class TestConcurrentGameManager:
         with pytest.raises(ValueError, match="already exists"):
             manager.create_game("test_game")
 
-    def test_get_game(self):
+    def test_get_game(self) -> None:
         """Test game retrieval."""
         manager = ConcurrentGameManager()
         manager.create_game("test_game")
@@ -54,7 +54,7 @@ class TestConcurrentGameManager:
         # Test non-existent game
         assert manager.get_game("non_existent") is None
 
-    def test_remove_game(self):
+    def test_remove_game(self) -> None:
         """Test game removal."""
         manager = ConcurrentGameManager()
         manager.create_game("test_game")
@@ -66,7 +66,7 @@ class TestConcurrentGameManager:
         # Try to remove non-existent game
         assert manager.remove_game("non_existent") is False
 
-    def test_concurrent_game_creation(self):
+    def test_concurrent_game_creation(self) -> None:
         """Test concurrent game creation."""
         manager = ConcurrentGameManager()
         created_games = []
@@ -74,7 +74,7 @@ class TestConcurrentGameManager:
         game_counter = 0
         counter_lock = threading.Lock()
 
-        def create_games(thread_id):
+        def create_games(thread_id) -> None:
             nonlocal game_counter
             try:
                 for _i in range(10):
@@ -106,12 +106,12 @@ class TestConcurrentGameManager:
         assert len(created_games) == 50  # 5 threads * 10 games each
         assert len(set(created_games)) == 50  # All games should be unique
 
-    def test_execute_game_operation(self):
+    def test_execute_game_operation(self) -> None:
         """Test thread-safe game operation execution."""
         manager = ConcurrentGameManager()
         game_id = manager.create_game("test_game")
 
-        def test_operation(game_state, value):
+        def test_operation(game_state, value) -> None:
             # Simulate some work
             time.sleep(0.01)
             return value * 2
@@ -122,14 +122,14 @@ class TestConcurrentGameManager:
 
         assert result == 10
 
-    def test_concurrent_operations_on_same_game(self):
+    def test_concurrent_operations_on_same_game(self) -> None:
         """Test multiple concurrent operations on the same game."""
         manager = ConcurrentGameManager()
         game_id = manager.create_game("test_game")
 
         results = []
 
-        def increment_operation(game_state, increment):
+        def increment_operation(game_state, increment) -> None:
             # Simulate some work and return the increment
             time.sleep(0.01)
             return increment
@@ -148,7 +148,7 @@ class TestConcurrentGameManager:
         assert len(results) == 10
         assert sorted(results) == list(range(10))
 
-    def test_game_stats(self):
+    def test_game_stats(self) -> None:
         """Test game statistics collection."""
         manager = ConcurrentGameManager(max_concurrent_games=10)
 
@@ -164,7 +164,7 @@ class TestConcurrentGameManager:
         assert "average_game_age_seconds" in stats
         assert "oldest_game_age_seconds" in stats
 
-    def test_max_concurrent_games_limit(self):
+    def test_max_concurrent_games_limit(self) -> None:
         """Test maximum concurrent games limit."""
         manager = ConcurrentGameManager(max_concurrent_games=2)
 
@@ -178,7 +178,7 @@ class TestConcurrentGameManager:
         ):
             manager.create_game("game_3")
 
-    def test_manager_shutdown(self):
+    def test_manager_shutdown(self) -> None:
         """Test manager shutdown."""
         manager = ConcurrentGameManager()
         manager.create_game("test_game")
@@ -193,12 +193,12 @@ class TestConcurrentGameManager:
 class TestThreadSafeGameStateCache:
     """Test cases for ThreadSafeGameStateCache."""
 
-    def test_cache_initialization(self):
+    def test_cache_initialization(self) -> None:
         """Test cache initialization."""
         cache = ThreadSafeGameStateCache(max_size=500)
         assert cache._cache._max_size == 500
 
-    def test_concurrent_cache_access(self):
+    def test_concurrent_cache_access(self) -> None:
         """Test concurrent access to cache."""
         cache = ThreadSafeGameStateCache()
         GameState(game_id="test_game")
@@ -206,7 +206,7 @@ class TestThreadSafeGameStateCache:
         results = []
         errors = []
 
-        def cache_operation():
+        def cache_operation() -> None:
             try:
                 # Test different cache operations
                 cache.are_systems_adjacent("system1", "system2")
@@ -234,17 +234,17 @@ class TestThreadSafeGameStateCache:
 class TestStressTesting:
     """Stress tests for concurrent game support."""
 
-    def test_high_concurrency_stress(self):
+    def test_high_concurrency_stress(self) -> None:
         """Stress test with high concurrency."""
         manager = ConcurrentGameManager(max_concurrent_games=50)
 
-        def stress_operations():
+        def stress_operations() -> None:
             try:
                 # Create a game
                 game_id = manager.create_game()
 
                 # Perform multiple operations
-                def dummy_operation(game_state):
+                def dummy_operation(game_state) -> None:
                     time.sleep(0.001)  # Very short operation
                     return "done"
 
@@ -279,7 +279,7 @@ class TestStressTesting:
         # Cleanup
         manager.shutdown()
 
-    def test_memory_usage_under_load(self):
+    def test_memory_usage_under_load(self) -> None:
         """Test memory usage doesn't grow excessively under load."""
         manager = ConcurrentGameManager(max_concurrent_games=20)
 
@@ -295,7 +295,7 @@ class TestStressTesting:
             # Perform operations on each game
             for game_id in game_ids:
 
-                def simple_operation(game_state):
+                def simple_operation(game_state) -> None:
                     return "completed"
 
                 future = manager.execute_game_operation(game_id, simple_operation)
@@ -314,14 +314,14 @@ class TestStressTesting:
 class TestGlobalGameManager:
     """Test cases for global game manager."""
 
-    def test_global_manager_singleton(self):
+    def test_global_manager_singleton(self) -> None:
         """Test that global manager is a singleton."""
         manager1 = get_game_manager()
         manager2 = get_game_manager()
 
         assert manager1 is manager2
 
-    def test_global_manager_shutdown(self):
+    def test_global_manager_shutdown(self) -> None:
         """Test global manager shutdown."""
         manager = get_game_manager()
         manager.create_game("test_shutdown")

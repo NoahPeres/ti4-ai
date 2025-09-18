@@ -18,14 +18,14 @@ from src.ti4.performance.monitoring import (
 class TestResourceMonitor:
     """Test cases for ResourceMonitor."""
 
-    def test_monitor_initialization(self):
+    def test_monitor_initialization(self) -> None:
         """Test that monitor initializes correctly."""
         monitor = ResourceMonitor()
         assert monitor._peak_memory == 0.0
         assert len(monitor._metrics_history) == 0
         assert len(monitor._operation_times) == 0
 
-    def test_memory_usage_tracking(self):
+    def test_memory_usage_tracking(self) -> None:
         """Test memory usage tracking."""
         monitor = ResourceMonitor()
 
@@ -41,7 +41,7 @@ class TestResourceMonitor:
             assert memory_usage == 100.0  # Should be 100 MB
             assert monitor._peak_memory == 100.0
 
-    def test_cpu_usage_tracking(self):
+    def test_cpu_usage_tracking(self) -> None:
         """Test CPU usage tracking."""
         monitor = ResourceMonitor()
 
@@ -54,7 +54,7 @@ class TestResourceMonitor:
             cpu_usage = monitor.get_current_cpu_usage()
             assert cpu_usage == 25.5
 
-    def test_operation_time_recording(self):
+    def test_operation_time_recording(self) -> None:
         """Test operation time recording."""
         monitor = ResourceMonitor()
 
@@ -68,7 +68,7 @@ class TestResourceMonitor:
         assert stats["min"] == 0.1
         assert stats["max"] == 0.2
 
-    def test_metrics_collection(self):
+    def test_metrics_collection(self) -> None:
         """Test performance metrics collection."""
         monitor = ResourceMonitor()
 
@@ -87,7 +87,7 @@ class TestResourceMonitor:
             assert metrics.operation_count == 2
             assert metrics.average_operation_time == pytest.approx(0.15, rel=1e-2)
 
-    def test_resource_cleanup(self):
+    def test_resource_cleanup(self) -> None:
         """Test resource cleanup functionality."""
         monitor = ResourceMonitor()
 
@@ -109,13 +109,13 @@ class TestResourceMonitor:
 class TestGameStateResourceManager:
     """Test cases for GameStateResourceManager."""
 
-    def test_manager_initialization(self):
+    def test_manager_initialization(self) -> None:
         """Test that manager initializes correctly."""
         manager = GameStateResourceManager(max_states=50)
         assert manager._max_states == 50
         assert len(manager._game_states) == 0
 
-    def test_game_state_registration(self):
+    def test_game_state_registration(self) -> None:
         """Test game state registration."""
         manager = GameStateResourceManager()
         game_state = GameState(game_id="test_game")
@@ -126,7 +126,7 @@ class TestGameStateResourceManager:
         assert "test_game" in manager._access_times
         assert manager._game_states["test_game"] == game_state
 
-    def test_game_state_access(self):
+    def test_game_state_access(self) -> None:
         """Test game state access and time tracking."""
         manager = GameStateResourceManager()
         game_state = GameState(game_id="test_game")
@@ -143,7 +143,7 @@ class TestGameStateResourceManager:
         assert accessed_state == game_state
         assert updated_time > initial_time
 
-    def test_game_state_removal(self):
+    def test_game_state_removal(self) -> None:
         """Test game state removal."""
         manager = GameStateResourceManager()
         game_state = GameState(game_id="test_game")
@@ -154,7 +154,7 @@ class TestGameStateResourceManager:
         assert "test_game" not in manager._game_states
         assert "test_game" not in manager._access_times
 
-    def test_automatic_cleanup(self):
+    def test_automatic_cleanup(self) -> None:
         """Test automatic cleanup when max states exceeded."""
         manager = GameStateResourceManager(max_states=3)
 
@@ -167,7 +167,7 @@ class TestGameStateResourceManager:
         # Should have cleaned up to be within limits
         assert len(manager._game_states) <= manager._max_states
 
-    def test_resource_stats(self):
+    def test_resource_stats(self) -> None:
         """Test resource statistics collection."""
         manager = GameStateResourceManager(max_states=10)
 
@@ -184,7 +184,7 @@ class TestGameStateResourceManager:
         assert "cpu_usage_percent" in stats
         assert "uptime_seconds" in stats
 
-    def test_resource_cleanup(self):
+    def test_resource_cleanup(self) -> None:
         """Test comprehensive resource cleanup."""
         manager = GameStateResourceManager()
 
@@ -206,14 +206,14 @@ class TestGameStateResourceManager:
 class TestGlobalResourceManager:
     """Test cases for global resource manager."""
 
-    def test_global_manager_singleton(self):
+    def test_global_manager_singleton(self) -> None:
         """Test that global manager is a singleton."""
         manager1 = get_resource_manager()
         manager2 = get_resource_manager()
 
         assert manager1 is manager2
 
-    def test_global_cleanup(self):
+    def test_global_cleanup(self) -> None:
         """Test global resource cleanup."""
         manager = get_resource_manager()
 

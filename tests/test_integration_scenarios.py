@@ -10,7 +10,7 @@ from src.ti4.core.player import Player
 
 
 # GREEN Phase: Minimal integration test
-def test_full_turn_sequence_integration():
+def test_full_turn_sequence_integration() -> None:
     """Test that a complete turn sequence can be executed."""
     game_controller = create_test_game_controller()
 
@@ -60,7 +60,7 @@ def execute_full_turn_sequence(controller: GameController) -> GameController:
 
 
 # RED Phase: Test for end-to-end game simulation
-def test_end_to_end_game_simulation():
+def test_end_to_end_game_simulation() -> None:
     """Test that a complete game can be simulated from start to finish."""
     # This should fail because we don't have complete game simulation yet
     game_controller = create_test_game_controller()
@@ -97,7 +97,7 @@ def simulate_complete_game(controller: GameController) -> Player:
 
 
 # RED Phase: Test for performance benchmarks
-def test_game_state_operations_performance():
+def test_game_state_operations_performance() -> None:
     """Test that game state operations meet performance requirements."""
     # This should fail because we don't have performance benchmarking yet
     game_controller = create_test_game_controller()
@@ -130,7 +130,7 @@ def benchmark_game_operations(controller: GameController) -> dict[str, float]:
 
 
 # RED Phase: Test for concurrent game handling
-def test_concurrent_game_handling():
+def test_concurrent_game_handling() -> None:
     """Test that multiple games can be handled concurrently."""
     # This should fail because we don't have concurrent game handling yet
     num_games = 3

@@ -8,7 +8,7 @@ from src.ti4.core.system import System
 class TestWormholeAdjacency:
     """Test wormhole adjacency rules from LRR 6.1."""
 
-    def test_alpha_wormhole_systems_are_adjacent_regardless_of_distance(self):
+    def test_alpha_wormhole_systems_are_adjacent_regardless_of_distance(self) -> None:
         """
         Test LRR 6.1: A system that has a wormhole is treated as being adjacent
         to a system that has a matching wormhole.
@@ -43,7 +43,7 @@ class TestWormholeAdjacency:
         # Systems with matching alpha wormholes should be adjacent per LRR 6.1
         assert galaxy.are_systems_adjacent("system1", "system2") is True
 
-    def test_different_wormhole_types_are_not_adjacent(self):
+    def test_different_wormhole_types_are_not_adjacent(self) -> None:
         """
         Test LRR 6.1: Systems with different wormhole types should not be adjacent.
         Only matching wormholes create adjacency.
@@ -70,7 +70,7 @@ class TestWormholeAdjacency:
         # Systems with different wormhole types should NOT be adjacent
         assert galaxy.are_systems_adjacent("system1", "system2") is False
 
-    def test_system_without_wormhole_not_adjacent_to_wormhole_system(self):
+    def test_system_without_wormhole_not_adjacent_to_wormhole_system(self) -> None:
         """
         Test LRR 6.1: A system without wormholes should not be adjacent
         to a system with wormholes (unless physically adjacent).

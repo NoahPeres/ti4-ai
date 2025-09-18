@@ -2,6 +2,7 @@
 
 from unittest.mock import Mock, patch
 
+from src.ti4.commands.base import GameCommand
 from src.ti4.core.diagnostics import CommandHistoryAnalyzer
 from src.ti4.core.error_recovery import ErrorRecoveryManager
 from src.ti4.core.events import UnitMovedEvent
@@ -17,7 +18,7 @@ from src.ti4.performance.monitoring import GameStateResourceManager
 class TestObserverNamingImprovements:
     """Test that observer method naming improvements work correctly."""
 
-    def test_event_type_extraction_method_works(self):
+    def test_event_type_extraction_method_works(self) -> None:
         """Test that the renamed event type extraction method works."""
         logger = LoggingObserver()
         event = UnitMovedEvent(
@@ -32,7 +33,7 @@ class TestObserverNamingImprovements:
         event_type = logger._extract_event_type_identifier(event)
         assert event_type == "unit_moved"
 
-    def test_event_type_extraction_fallback_works(self):
+    def test_event_type_extraction_fallback_works(self) -> None:
         """Test that event type extraction falls back to class name."""
         logger = LoggingObserver()
 
@@ -45,7 +46,7 @@ class TestObserverNamingImprovements:
         assert event_type == "TestEvent"
 
     @patch("src.ti4.core.observers.logger")
-    def test_event_logging_with_improved_method(self, mock_logger):
+    def test_event_logging_with_improved_method(self, mock_logger) -> None:
         """Test that event logging works with the improved method name."""
 
         logger = LoggingObserver()
@@ -63,7 +64,7 @@ class TestObserverNamingImprovements:
         # Verify logging was called
         mock_logger.info.assert_called_once()
 
-    def test_statistics_collector_with_improved_method(self):
+    def test_statistics_collector_with_improved_method(self) -> None:
         """Test that statistics collector works with improved method name."""
         collector = StatisticsCollector()
         event = UnitMovedEvent(
@@ -81,7 +82,7 @@ class TestObserverNamingImprovements:
         stats = collector.get_statistics()
         assert stats["unit_movements"] == 1
 
-    def test_ai_training_collector_with_improved_method(self):
+    def test_ai_training_collector_with_improved_method(self) -> None:
         """Test that AI training collector works with improved method name."""
         collector = AITrainingDataCollector()
         event = UnitMovedEvent(
@@ -104,7 +105,7 @@ class TestObserverNamingImprovements:
 class TestDiagnosticsNamingImprovements:
     """Test that diagnostics method naming improvements work correctly."""
 
-    def test_command_type_extraction_method_works(self):
+    def test_command_type_extraction_method_works(self) -> None:
         """Test that the renamed command type extraction method works."""
         diagnostics = CommandHistoryAnalyzer()
 
@@ -115,7 +116,7 @@ class TestDiagnosticsNamingImprovements:
         command_type = diagnostics._extract_command_type(mock_command)
         assert command_type == "move_unit"
 
-    def test_command_type_extraction_fallback_works(self):
+    def test_command_type_extraction_fallback_works(self) -> None:
         """Test that command type extraction falls back to class name."""
         diagnostics = CommandHistoryAnalyzer()
 
@@ -127,14 +128,14 @@ class TestDiagnosticsNamingImprovements:
         command_type = diagnostics._extract_command_type(mock_command)
         assert command_type == "testcommand"  # Should be lowercase
 
-    def test_pattern_analysis_with_improved_method_name(self):
+    def test_pattern_analysis_with_improved_method_name(self) -> None:
         """Test that pattern analysis works with the improved method name."""
         diagnostics = CommandHistoryAnalyzer()
 
         # Create mock commands
-        mock_commands = []
+        mock_commands: list[GameCommand] = []
         for i in range(3):
-            mock_command = Mock()
+            mock_command = Mock(spec=GameCommand)
             mock_command.command_type = (
                 f"command_type_{i % 2}"  # Create some repetition
             )
@@ -153,7 +154,7 @@ class TestErrorRecoveryNamingImprovements:
     """Test that error recovery method naming improvements work correctly."""
 
     @patch("src.ti4.core.error_recovery.logging.getLogger")
-    def test_error_recovery_logging_with_improved_method(self, mock_get_logger):
+    def test_error_recovery_logging_with_improved_method(self, mock_get_logger) -> None:
         """Test that error recovery logging works with the improved method name."""
         mock_logger = Mock()
         mock_get_logger.return_value = mock_logger
@@ -173,7 +174,7 @@ class TestErrorRecoveryNamingImprovements:
 class TestPerformanceMonitoringNamingImprovements:
     """Test that performance monitoring method naming improvements work correctly."""
 
-    def test_lru_eviction_method_works(self):
+    def test_lru_eviction_method_works(self) -> None:
         """Test that the renamed LRU eviction method works."""
         manager = GameStateResourceManager(max_states=2)
 
@@ -192,7 +193,7 @@ class TestPerformanceMonitoringNamingImprovements:
 class TestCacheNamingImprovements:
     """Test that cache variable naming improvements work correctly."""
 
-    def test_adjacency_cache_with_improved_variable_names(self):
+    def test_adjacency_cache_with_improved_variable_names(self) -> None:
         """Test that adjacency caching works with improved variable names."""
         # Create a mock galaxy
         mock_galaxy = Mock()
@@ -219,7 +220,7 @@ class TestCacheNamingImprovements:
 class TestDocstringImprovements:
     """Test that improved docstrings are accessible and informative."""
 
-    def test_observer_docstrings_are_comprehensive(self):
+    def test_observer_docstrings_are_comprehensive(self) -> None:
         """Test that observer method docstrings are comprehensive."""
         logger = LoggingObserver()
 
@@ -230,7 +231,7 @@ class TestDocstringImprovements:
         assert "Args:" in docstring
         assert "event: The game event to log" in docstring
 
-    def test_diagnostics_docstrings_are_comprehensive(self):
+    def test_diagnostics_docstrings_are_comprehensive(self) -> None:
         """Test that diagnostics method docstrings are comprehensive."""
         diagnostics = CommandHistoryAnalyzer()
 
@@ -248,7 +249,7 @@ class TestDocstringImprovements:
         assert "Repeated command types" in docstring
         assert "Sequential patterns" in docstring
 
-    def test_error_recovery_docstrings_are_comprehensive(self):
+    def test_error_recovery_docstrings_are_comprehensive(self) -> None:
         """Test that error recovery method docstrings are comprehensive."""
         manager = ErrorRecoveryManager()
 

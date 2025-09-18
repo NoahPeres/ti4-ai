@@ -1,7 +1,8 @@
 """Helper functions and fixtures for Rule 61 objective tests."""
 
-import pytest
 from typing import Optional
+
+import pytest
 
 from src.ti4.core.game_phase import GamePhase
 from src.ti4.core.game_state import GameState
@@ -13,7 +14,7 @@ class ObjectiveTestHelpers:
 
     @staticmethod
     def create_public_objective(
-        obj_id: str, name: str, phase: GamePhase, points: int = 1
+        obj_id: str, name: str, phase: GamePhase, points=1
     ) -> Objective:
         """Create a public objective for testing."""
         return Objective(
@@ -27,7 +28,7 @@ class ObjectiveTestHelpers:
 
     @staticmethod
     def create_secret_objective(
-        obj_id: str, name: str, phase: GamePhase, points: int = 1
+        obj_id: str, name: str, phase: GamePhase, points=1
     ) -> Objective:
         """Create a secret objective for testing."""
         return Objective(
@@ -75,19 +76,19 @@ class ObjectiveTestHelpers:
 
 
 @pytest.fixture
-def game_state():
+def game_state() -> None:
     """Fixture providing a fresh GameState for each test."""
     return GameState()
 
 
 @pytest.fixture
-def standard_objectives():
+def standard_objectives() -> None:
     """Fixture providing standard test objectives."""
     return ObjectiveTestHelpers.create_standard_objectives()
 
 
 @pytest.fixture
-def player_with_secrets(game_state, standard_objectives):
+def player_with_secrets(game_state, standard_objectives) -> None:
     """Fixture providing a game state with secret objectives assigned to player1."""
     secret_objs = [
         standard_objectives["status_secret"],

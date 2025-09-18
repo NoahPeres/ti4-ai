@@ -92,7 +92,7 @@ class GameState:
 class GameStateManager:
     """Manages game state transitions and validation."""
 
-    def __init__(self, game_state: Optional[GameState] = None):
+    def __init__(self, game_state: Optional[GameState] = None) -> None:
         """Initialize with optional existing game state."""
         self.game_state = game_state or GameState()
 

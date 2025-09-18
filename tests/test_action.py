@@ -1,26 +1,27 @@
 """Tests for Action framework."""
 
-import pytest
 from typing import Any
+
+import pytest
 
 from src.ti4.actions.action import Action, PlayerDecision
 
 
-def test_player_decision_is_abstract():
+def test_player_decision_is_abstract() -> None:
     """Test that PlayerDecision cannot be instantiated directly."""
     # Should not be able to create PlayerDecision directly
     with pytest.raises(TypeError):
-        PlayerDecision()  # type: ignore[abstract]
+        PlayerDecision()
 
 
-def test_action_is_abstract():
+def test_action_is_abstract() -> None:
     """Test that Action cannot be instantiated directly."""
     # Should not be able to create Action directly
     with pytest.raises(TypeError):
-        Action()  # type: ignore[abstract]
+        Action()
 
 
-def test_concrete_action_implementation():
+def test_concrete_action_implementation() -> None:
     """Test that concrete actions can implement the interface."""
 
     class TestTacticalAction(Action):
@@ -41,7 +42,7 @@ def test_concrete_action_implementation():
     assert action.get_description() == "tactical action: activate system"
 
 
-def test_concrete_player_decision_implementation():
+def test_concrete_player_decision_implementation() -> None:
     """Test that concrete player decisions can implement the interface."""
 
     class TestTransaction(PlayerDecision):
@@ -62,7 +63,7 @@ def test_concrete_player_decision_implementation():
     assert decision.get_description() == "transaction: trade commodities"
 
 
-def test_action_result_creation():
+def test_action_result_creation() -> None:
     """Test that ActionResult can be created with success and new state."""
     from src.ti4.actions.action import ActionResult
 
@@ -75,6 +76,6 @@ def test_action_result_creation():
     assert result.message == "Action succeeded"
 
 
-def test_action_inherits_from_player_decision():
+def test_action_inherits_from_player_decision() -> None:
     """Test that Action is a subclass of PlayerDecision."""
     assert issubclass(Action, PlayerDecision)

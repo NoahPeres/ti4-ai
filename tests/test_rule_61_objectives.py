@@ -17,7 +17,7 @@ from .test_rule_61_test_helpers import (
 class TestPhaseSpecificObjectiveScoring:
     """Test phase-specific objective scoring mechanics (Rule 61.3, 61.5, 61.6, 61.7)."""
 
-    def test_objective_has_scoring_phase_attribute(self):
+    def test_objective_has_scoring_phase_attribute(self) -> None:
         """Test that objectives specify which phase they can be scored in."""
         # Rule 61.3: Each objective card indicates the phase during which a player can score
         objectives = ObjectiveTestHelpers.create_standard_objectives()
@@ -26,7 +26,7 @@ class TestPhaseSpecificObjectiveScoring:
         assert objectives["action_public"].scoring_phase == GamePhase.ACTION
         assert objectives["agenda_public"].scoring_phase == GamePhase.AGENDA
 
-    def test_can_only_score_objective_in_correct_phase(self):
+    def test_can_only_score_objective_in_correct_phase(self) -> None:
         """Test that objectives can only be scored during their designated phase."""
         # Rule 61.5: Players can score objectives following the timing indicated on the card
         game_state = GameState()
@@ -59,7 +59,7 @@ class TestPhaseSpecificObjectiveScoring:
             "Cannot score objective.*requiring status phase during agenda phase",
         )
 
-    def test_status_phase_scoring_limits(self):
+    def test_status_phase_scoring_limits(self) -> None:
         """Test that players can score max one public + one secret objective per status phase."""
         # Rule 61.6: A player can score a maximum of one public objective and one secret objective during each status phase
         GameState()
@@ -110,7 +110,7 @@ class TestPhaseSpecificObjectiveScoring:
             "Already scored.*secret objective.*status phase",
         )
 
-    def test_action_phase_unlimited_scoring(self):
+    def test_action_phase_unlimited_scoring(self) -> None:
         """Test that players can score unlimited objectives during action phase."""
         # Rule 61.7: A player can score any number of objectives during the action phase
         GameState()
@@ -143,7 +143,7 @@ class TestPhaseSpecificObjectiveScoring:
         assert_objective_scored(state3, "player1", action_obj2)
         assert_objective_scored(state3, "player1", action_obj3)
 
-    def test_agenda_phase_unlimited_scoring(self):
+    def test_agenda_phase_unlimited_scoring(self) -> None:
         """Test that players can score unlimited objectives during agenda phase."""
         # Rule 61.7: A player can score any number of objectives during the agenda phase
         game_state = GameState()
@@ -170,7 +170,7 @@ class TestPhaseSpecificObjectiveScoring:
         assert state2.is_objective_completed("player1", agenda_obj1)
         assert state2.is_objective_completed("player1", agenda_obj2)
 
-    def test_combat_objective_scoring_limit(self):
+    def test_combat_objective_scoring_limit(self) -> None:
         """Test that only one objective can be scored during/after each combat."""
         # Rule 61.7: Players can only score one objective during or after each combat
         game_state = GameState()
@@ -197,7 +197,7 @@ class TestPhaseSpecificObjectiveScoring:
         )
         assert state2.is_objective_completed("player1", combat_obj2)
 
-    def test_objective_can_only_be_scored_once_per_game(self):
+    def test_objective_can_only_be_scored_once_per_game(self) -> None:
         """Test that each objective can only be scored once during the game."""
         # Rule 61.8: A player can score each objective only once during the game
         game_state = GameState()
@@ -218,7 +218,7 @@ class TestPhaseSpecificObjectiveScoring:
 class TestObjectiveScoringMechanics:
     """Test objective scoring mechanics and validation."""
 
-    def test_score_objective_awards_victory_points(self):
+    def test_score_objective_awards_victory_points(self) -> None:
         """Test that scoring an objective awards the correct victory points."""
         game_state = GameState()
 
@@ -235,7 +235,7 @@ class TestObjectiveScoringMechanics:
         )
         assert result_state.get_victory_points("player1") == 2
 
-    def test_multiple_players_can_score_same_public_objective(self):
+    def test_multiple_players_can_score_same_public_objective(self) -> None:
         """Test that multiple players can score the same public objective."""
         game_state = GameState()
 
@@ -252,7 +252,7 @@ class TestObjectiveScoringMechanics:
         assert state2.is_objective_completed("player1", public_objective)
         assert state2.is_objective_completed("player2", public_objective)
 
-    def test_secret_objectives_are_player_specific(self):
+    def test_secret_objectives_are_player_specific(self) -> None:
         """Test that secret objectives are specific to individual players."""
         # Rule 61.19: A player can only score their own secret objectives
         game_state = GameState()
@@ -277,7 +277,7 @@ class TestObjectiveScoringMechanics:
 class TestObjectivePhaseIntegration:
     """Test integration between objective system and game phase management."""
 
-    def test_status_phase_objective_scoring_step(self):
+    def test_status_phase_objective_scoring_step(self) -> None:
         """Test that status phase includes objective scoring step."""
         # Rule 81.1: STEP 1-SCORE OBJECTIVES during status phase
         game_state = GameState()
@@ -298,7 +298,7 @@ class TestObjectivePhaseIntegration:
 
         assert result_state.is_objective_completed("player1", objective)
 
-    def test_phase_transition_resets_scoring_limits(self):
+    def test_phase_transition_resets_scoring_limits(self) -> None:
         """Test that phase transitions reset per-phase scoring limits."""
         game_state = GameState()
 

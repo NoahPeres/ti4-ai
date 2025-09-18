@@ -31,7 +31,7 @@ class MockCommand(GameCommand):
 class TestCommandExecutionError:
     """Test CommandExecutionError creation and functionality."""
 
-    def test_command_execution_error_creation(self):
+    def test_command_execution_error_creation(self) -> None:
         """Test CommandExecutionError creation with command context."""
         # RED: This will fail because CommandExecutionError doesn't exist yet
         from src.ti4.core.exceptions import CommandExecutionError
@@ -47,7 +47,7 @@ class TestCommandExecutionError:
         assert error.context == context
         assert hasattr(error, "timestamp")
 
-    def test_command_execution_error_without_context(self):
+    def test_command_execution_error_without_context(self) -> None:
         """Test CommandExecutionError creation without additional context."""
         # RED: This will fail because CommandExecutionError doesn't exist yet
         from src.ti4.core.exceptions import CommandExecutionError

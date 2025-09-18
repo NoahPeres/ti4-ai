@@ -11,7 +11,7 @@ from src.ti4.core.game_state import GameState
 class MockCommand(GameCommand):
     """Mock command for testing."""
 
-    def __init__(self, command_type: str = "mock"):
+    def __init__(self, command_type="mock") -> None:
         self.command_type = command_type
 
     def execute(self, game_state: GameState) -> GameState:
@@ -36,7 +36,7 @@ class MockCommand(GameCommand):
 class TestGameStateInspector:
     """Test game state inspection utilities."""
 
-    def test_game_state_inspector_creation(self):
+    def test_game_state_inspector_creation(self) -> None:
         """Test GameStateInspector creation and basic functionality."""
         # RED: This will fail because GameStateInspector doesn't exist yet
         from src.ti4.core.diagnostics import GameStateInspector
@@ -55,7 +55,7 @@ class TestGameStateInspector:
         assert inspection_result["players"] == ["player1", "player2"]
         assert inspection_result["current_phase"] == "action"
 
-    def test_detailed_state_analysis(self):
+    def test_detailed_state_analysis(self) -> None:
         """Test detailed game state analysis."""
         # RED: This will fail because GameStateInspector doesn't exist yet
         from src.ti4.core.diagnostics import GameStateInspector
@@ -77,7 +77,7 @@ class TestGameStateInspector:
         assert "turn_info" in detailed_analysis
         assert detailed_analysis["summary"]["player_count"] == 2
 
-    def test_state_validation_checks(self):
+    def test_state_validation_checks(self) -> None:
         """Test game state validation and consistency checks."""
         # RED: This will fail because GameStateInspector doesn't exist yet
         from src.ti4.core.diagnostics import GameStateInspector
@@ -101,7 +101,7 @@ class TestGameStateInspector:
 class TestCommandHistoryAnalyzer:
     """Test command history analysis tools."""
 
-    def test_command_history_analyzer_creation(self):
+    def test_command_history_analyzer_creation(self) -> None:
         """Test CommandHistoryAnalyzer creation and basic functionality."""
         # RED: This will fail because CommandHistoryAnalyzer doesn't exist yet
         from src.ti4.core.diagnostics import CommandHistoryAnalyzer
@@ -109,7 +109,11 @@ class TestCommandHistoryAnalyzer:
         analyzer = CommandHistoryAnalyzer()
 
         # Mock command history
-        commands = [MockCommand("move"), MockCommand("attack"), MockCommand("move")]
+        commands: list[GameCommand] = [
+            MockCommand("move"),
+            MockCommand("attack"),
+            MockCommand("move"),
+        ]
 
         analysis = analyzer.analyze_commands(commands)
 
@@ -119,7 +123,7 @@ class TestCommandHistoryAnalyzer:
         assert analysis["command_types"]["move"] == 2
         assert analysis["command_types"]["attack"] == 1
 
-    def test_command_pattern_detection(self):
+    def test_command_pattern_detection(self) -> None:
         """Test detection of command patterns and anomalies."""
         # RED: This will fail because CommandHistoryAnalyzer doesn't exist yet
         from src.ti4.core.diagnostics import CommandHistoryAnalyzer
@@ -127,7 +131,7 @@ class TestCommandHistoryAnalyzer:
         analyzer = CommandHistoryAnalyzer()
 
         # Mock command sequence with patterns
-        commands = [
+        commands: list[GameCommand] = [
             MockCommand("move"),
             MockCommand("move"),
             MockCommand("move"),
@@ -141,7 +145,7 @@ class TestCommandHistoryAnalyzer:
         assert "command_sequences" in patterns
         assert patterns["repeated_commands"]["move"] >= 3
 
-    def test_command_performance_analysis(self):
+    def test_command_performance_analysis(self) -> None:
         """Test command execution performance analysis."""
         # RED: This will fail because CommandHistoryAnalyzer doesn't exist yet
         from src.ti4.core.diagnostics import CommandHistoryAnalyzer
@@ -165,7 +169,7 @@ class TestCommandHistoryAnalyzer:
 class TestPerformanceProfiler:
     """Test performance profiling helpers."""
 
-    def test_performance_profiler_creation(self):
+    def test_performance_profiler_creation(self) -> None:
         """Test PerformanceProfiler creation and basic functionality."""
         # RED: This will fail because PerformanceProfiler doesn't exist yet
         from src.ti4.core.diagnostics import PerformanceProfiler
@@ -182,7 +186,7 @@ class TestPerformanceProfiler:
         assert results["test_operation"]["call_count"] == 1
         assert results["test_operation"]["total_time"] > 0
 
-    def test_nested_profiling(self):
+    def test_nested_profiling(self) -> None:
         """Test nested operation profiling."""
         # RED: This will fail because PerformanceProfiler doesn't exist yet
         from src.ti4.core.diagnostics import PerformanceProfiler
@@ -204,7 +208,7 @@ class TestPerformanceProfiler:
             > results["inner_operation"]["total_time"]
         )
 
-    def test_profiling_statistics(self):
+    def test_profiling_statistics(self) -> None:
         """Test profiling statistics and reporting."""
         # RED: This will fail because PerformanceProfiler doesn't exist yet
         from src.ti4.core.diagnostics import PerformanceProfiler

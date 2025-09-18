@@ -6,7 +6,7 @@ from src.ti4.core.game_phase import GamePhase
 class TestPhaseTransitionError:
     """Test PhaseTransitionError creation and functionality."""
 
-    def test_phase_transition_error_creation(self):
+    def test_phase_transition_error_creation(self) -> None:
         """Test PhaseTransitionError creation with phase information."""
         # RED: This will fail because PhaseTransitionError doesn't exist yet
         from src.ti4.core.exceptions import PhaseTransitionError
@@ -22,7 +22,7 @@ class TestPhaseTransitionError:
         assert error.to_phase == to_phase
         assert hasattr(error, "timestamp")
 
-    def test_phase_transition_error_with_context(self):
+    def test_phase_transition_error_with_context(self) -> None:
         """Test PhaseTransitionError creation with additional context."""
         # RED: This will fail because PhaseTransitionError doesn't exist yet
         from src.ti4.core.exceptions import PhaseTransitionError

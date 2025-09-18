@@ -8,7 +8,7 @@ from src.ti4.core.system import System
 class TestSystemWormholeValidation:
     """Test System class wormhole methods for validation and edge cases."""
 
-    def test_add_valid_wormhole_types(self):
+    def test_add_valid_wormhole_types(self) -> None:
         """Test adding all valid wormhole types."""
         system = System("test_system")
         valid_types = ["alpha", "beta", "gamma", "delta"]
@@ -21,7 +21,7 @@ class TestSystemWormholeValidation:
 
         assert len(system.get_wormhole_types()) == 4, "Should have all 4 wormhole types"
 
-    def test_add_invalid_wormhole_type_raises_error(self):
+    def test_add_invalid_wormhole_type_raises_error(self) -> None:
         """Test that adding invalid wormhole types raises ValueError."""
         system = System("test_system")
 
@@ -33,14 +33,14 @@ class TestSystemWormholeValidation:
             ):
                 system.add_wormhole(invalid_type)
 
-    def test_add_empty_wormhole_type_raises_error(self):
+    def test_add_empty_wormhole_type_raises_error(self) -> None:
         """Test that adding empty wormhole type raises ValueError."""
         system = System("test_system")
 
         with pytest.raises(ValueError, match="Wormhole type cannot be empty"):
             system.add_wormhole("")
 
-    def test_add_duplicate_wormhole_type_ignored(self):
+    def test_add_duplicate_wormhole_type_ignored(self) -> None:
         """Test that adding duplicate wormhole types doesn't create duplicates."""
         system = System("test_system")
 
@@ -53,7 +53,7 @@ class TestSystemWormholeValidation:
         assert wormhole_types.count("alpha") == 1, "Should only have one alpha wormhole"
         assert len(wormhole_types) == 1, "Should only have one wormhole total"
 
-    def test_has_wormhole_returns_false_for_nonexistent(self):
+    def test_has_wormhole_returns_false_for_nonexistent(self) -> None:
         """Test that has_wormhole returns False for non-existent wormhole types."""
         system = System("test_system")
 
@@ -67,7 +67,7 @@ class TestSystemWormholeValidation:
             "Should not have invalid wormhole type"
         )
 
-    def test_get_wormhole_types_returns_copy(self):
+    def test_get_wormhole_types_returns_copy(self) -> None:
         """Test that get_wormhole_types returns a copy to prevent external modification."""
         system = System("test_system")
         system.add_wormhole("alpha")
@@ -87,7 +87,7 @@ class TestSystemWormholeValidation:
         assert system.has_wormhole("alpha"), "System should still have alpha wormhole"
         assert not system.has_wormhole("gamma"), "System should not have gamma wormhole"
 
-    def test_remove_wormhole_success(self):
+    def test_remove_wormhole_success(self) -> None:
         """Test successful wormhole removal."""
         system = System("test_system")
         system.add_wormhole("alpha")
@@ -102,7 +102,7 @@ class TestSystemWormholeValidation:
         )
         assert system.has_wormhole("beta"), "Should still have beta wormhole"
 
-    def test_remove_nonexistent_wormhole(self):
+    def test_remove_nonexistent_wormhole(self) -> None:
         """Test removing non-existent wormhole returns False."""
         system = System("test_system")
         system.add_wormhole("alpha")
@@ -113,7 +113,7 @@ class TestSystemWormholeValidation:
         assert result is False, "Should return False when wormhole doesn't exist"
         assert system.has_wormhole("alpha"), "Should still have alpha wormhole"
 
-    def test_wormhole_operations_integration(self):
+    def test_wormhole_operations_integration(self) -> None:
         """Test integration of all wormhole operations."""
         system = System("test_system")
 

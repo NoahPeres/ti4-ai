@@ -1,7 +1,9 @@
 """Shared validation utilities to eliminate code duplication."""
 
 from collections.abc import Collection
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Optional, TypeVar, Union
+
+T = TypeVar("T")
 
 
 class ValidationError(ValueError):
@@ -9,7 +11,7 @@ class ValidationError(ValueError):
 
     def __init__(
         self, message: str, field_name: Optional[str] = None, value: Any = None
-    ):
+    ) -> None:
         super().__init__(message)
         self.field_name = field_name
         self.value = value
@@ -26,10 +28,15 @@ def validate_required(value: Any, field_name: str) -> None:
         ValidationError: If value is None or empty
     """
     if value is None:
-        raise ValidationError(f"{field_name} cannot be None", field_name, value)
+        raise ValidationError(
+            f"{field_name} is required and cannot be None", field_name, value
+        )
 
+    # Check if value has length attribute and is empty
     if hasattr(value, "__len__") and len(value) == 0:
-        raise ValidationError(f"{field_name} cannot be empty", field_name, value)
+        raise ValidationError(
+            f"{field_name} is required and cannot be empty", field_name, value
+        )
 
 
 def validate_non_empty_string(value: str, field_name: str) -> None:
@@ -51,7 +58,7 @@ def validate_non_empty_string(value: str, field_name: str) -> None:
         )
 
 
-def validate_collection_not_empty(collection: Collection, field_name: str) -> None:
+def validate_collection_not_empty(collection: Collection[Any], field_name: str) -> None:
     """Validate that a collection is not None or empty.
 
     Args:
@@ -100,35 +107,37 @@ def validate_callable(value: Any, field_name: str) -> None:
 
 
 def validate_unique_collection(
-    collection: Optional[Collection],
+    collection: Optional[Collection[Any]],
     field_name: str,
-    key_func: Optional[Callable] = None,
+    key: Optional[Callable[[Any], Any]] = None,
 ) -> None:
     """Validate that all items in a collection are unique.
 
     Args:
         collection: The collection to validate
         field_name: Name of the field for error messages
-        key_func: Optional function to extract key for uniqueness check
+        key: Optional function to extract key for uniqueness check
 
     Raises:
         ValidationError: If collection contains duplicates
     """
     if collection is None:
-        return
+        raise ValidationError(f"{field_name} cannot be None", field_name, collection)
 
-    seen = set()
+    seen: set[Any] = set()
     for item in collection:
-        key = key_func(item) if key_func else item
-        if key in seen:
+        key_value = key(item) if key else item
+        if key_value in seen:
             raise ValidationError(
-                f"Duplicate item in {field_name}: {key}", field_name, key
+                f"Duplicate item in {field_name}: {key_value} - collection must be unique",
+                field_name,
+                key_value,
             )
-        seen.add(key)
+        seen.add(key_value)
 
 
 def validate_minimum_count(
-    collection: Optional[Collection], min_count: int, field_name: str
+    collection: Optional[Collection[Any]], min_count: int, field_name: str
 ) -> None:
     """Validate that a collection has at least the minimum number of items.
 
@@ -147,14 +156,14 @@ def validate_minimum_count(
 
     if actual_count < min_count:
         raise ValidationError(
-            f"{field_name} must have at least {min_count} items, got {actual_count}",
+            f"{field_name} must have at least {min_count} items (minimum count), got {actual_count}",
             field_name,
             actual_count,
         )
 
 
 def validate_maximum_count(
-    collection: Optional[Collection], max_count: int, field_name: str
+    collection: Optional[Collection[Any]], max_count: int, field_name: str
 ) -> None:
     """Validate that a collection has at most the maximum number of items.
 
@@ -167,12 +176,12 @@ def validate_maximum_count(
         ValidationError: If collection has more than max_count items
     """
     if collection is None:
-        return
+        raise ValidationError(f"{field_name} cannot be None", field_name, collection)
 
     actual_count = len(collection)
     if actual_count > max_count:
         raise ValidationError(
-            f"{field_name} must have at most {max_count} items, got {actual_count}",
+            f"{field_name} must have at most {max_count} items (maximum count), got {actual_count}",
             field_name,
             actual_count,
         )
@@ -200,7 +209,7 @@ def validate_in_range(
 
     if value < min_val or value > max_val:
         raise ValidationError(
-            f"{field_name} must be between {min_val} and {max_val}, got {value}",
+            f"{field_name} must be in range between {min_val} and {max_val}, got {value}",
             field_name,
             value,
         )

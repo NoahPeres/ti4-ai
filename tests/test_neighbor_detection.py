@@ -10,7 +10,7 @@ from src.ti4.core.unit import Unit
 class TestNeighborDetection:
     """Test neighbor detection rules from LRR 60."""
 
-    def test_players_with_units_in_same_system_are_neighbors(self):
+    def test_players_with_units_in_same_system_are_neighbors(self) -> None:
         """
         Test LRR 60.0: Two players are neighbors if they both have a unit
         or control a planet in the same system.
@@ -41,7 +41,7 @@ class TestNeighborDetection:
         # Players should be neighbors because they both have units in the same system
         assert galaxy.are_players_neighbors(player1.id, player2.id) is True
 
-    def test_players_with_units_in_adjacent_systems_are_neighbors(self):
+    def test_players_with_units_in_adjacent_systems_are_neighbors(self) -> None:
         """
         Test LRR 60.0: Two players are neighbors if they both have a unit
         or control a planet in systems that are adjacent to each other.
@@ -78,7 +78,7 @@ class TestNeighborDetection:
         # Players should be neighbors because they have units in adjacent systems
         assert galaxy.are_players_neighbors(player1.id, player2.id) is True
 
-    def test_players_with_units_in_non_adjacent_systems_are_not_neighbors(self):
+    def test_players_with_units_in_non_adjacent_systems_are_not_neighbors(self) -> None:
         """
         Test LRR 60.0: Players should not be neighbors if their units/planets
         are in systems that are not adjacent.
@@ -113,7 +113,7 @@ class TestNeighborDetection:
         # Players should NOT be neighbors
         assert galaxy.are_players_neighbors(player1.id, player2.id) is False
 
-    def test_players_with_units_connected_via_wormhole_are_neighbors(self):
+    def test_players_with_units_connected_via_wormhole_are_neighbors(self) -> None:
         """
         Test LRR 60.0: Players should be neighbors if their systems are
         connected via wormholes (extending adjacency).
@@ -152,7 +152,7 @@ class TestNeighborDetection:
         # Players should be neighbors due to wormhole connection
         assert galaxy.are_players_neighbors(player1.id, player2.id) is True
 
-    def test_players_with_no_units_are_not_neighbors(self):
+    def test_players_with_no_units_are_not_neighbors(self) -> None:
         """
         Test edge case: Players with no units should not be neighbors.
         """

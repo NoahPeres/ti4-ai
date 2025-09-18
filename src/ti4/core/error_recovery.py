@@ -22,7 +22,9 @@ class CircuitBreakerOpenError(TI4GameError):
 class RecoveryStrategy:
     """Base class for error recovery strategies."""
 
-    def __init__(self, strategy_func: Callable[[Exception, dict[str, Any]], Any]):
+    def __init__(
+        self, strategy_func: Callable[[Exception, dict[str, Any]], Any]
+    ) -> None:
         self.strategy_func = strategy_func
 
     def recover(self, error: Exception, context: dict[str, Any]) -> Any:

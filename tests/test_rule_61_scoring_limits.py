@@ -17,7 +17,7 @@ from src.ti4.core.objective import Objective
 class TestStatusPhaseScoringLimits:
     """Test status phase scoring limits (Rule 61.6)."""
 
-    def test_can_score_one_public_objective_per_status_phase(self):
+    def test_can_score_one_public_objective_per_status_phase(self) -> None:
         """Test that players can score exactly one public objective per status phase."""
         game_state = GameState()
 
@@ -40,7 +40,7 @@ class TestStatusPhaseScoringLimits:
         ):
             state1.score_objective("player1", public_obj2, GamePhase.STATUS)
 
-    def test_can_score_one_secret_objective_per_status_phase(self):
+    def test_can_score_one_secret_objective_per_status_phase(self) -> None:
         """Test that players can score exactly one secret objective per status phase."""
         game_state = GameState()
 
@@ -71,7 +71,7 @@ class TestStatusPhaseScoringLimits:
         ):
             state1.score_objective("player1", secret_obj2, GamePhase.STATUS)
 
-    def test_can_score_one_public_and_one_secret_per_status_phase(self):
+    def test_can_score_one_public_and_one_secret_per_status_phase(self) -> None:
         """Test that players can score one public AND one secret objective per status phase."""
         game_state = GameState()
 
@@ -97,7 +97,7 @@ class TestStatusPhaseScoringLimits:
         assert state2.is_objective_completed("player1", public_obj)
         assert state2.is_objective_completed("player1", secret_obj)
 
-    def test_different_players_have_separate_scoring_limits(self):
+    def test_different_players_have_separate_scoring_limits(self) -> None:
         """Test that scoring limits are per-player."""
         game_state = GameState()
 
@@ -119,7 +119,7 @@ class TestStatusPhaseScoringLimits:
         assert state2.get_victory_points("player1") == 1
         assert state2.get_victory_points("player2") == 1
 
-    def test_status_phase_limits_reset_between_phases(self):
+    def test_status_phase_limits_reset_between_phases(self) -> None:
         """Test that status phase scoring limits reset when advancing to next status phase."""
         game_state = GameState()
 
@@ -147,7 +147,7 @@ class TestStatusPhaseScoringLimits:
 class TestCombatScoringLimits:
     """Test combat objective scoring limits (Rule 61.7)."""
 
-    def test_can_score_one_objective_per_combat(self):
+    def test_can_score_one_objective_per_combat(self) -> None:
         """Test that players can score only one objective per combat."""
         game_state = GameState()
 
@@ -173,7 +173,7 @@ class TestCombatScoringLimits:
         ):
             state1.score_objective_during_combat("player1", action_obj2, combat_id)
 
-    def test_different_combats_have_separate_limits(self):
+    def test_different_combats_have_separate_limits(self) -> None:
         """Test that different combats have separate scoring limits."""
         game_state = GameState()
 
@@ -201,7 +201,7 @@ class TestCombatScoringLimits:
         assert state2.is_objective_completed("player1", action_obj2)
         assert state2.get_victory_points("player1") == 2
 
-    def test_combat_scoring_requires_action_phase_objective(self):
+    def test_combat_scoring_requires_action_phase_objective(self) -> None:
         """Test that combat scoring only works with action phase objectives."""
         game_state = GameState()
 
@@ -220,7 +220,7 @@ class TestCombatScoringLimits:
 class TestStatusPhaseStepExecution:
     """Test status phase step 1 execution (Rule 81.1)."""
 
-    def test_execute_status_phase_step_1_multiple_objectives(self):
+    def test_execute_status_phase_step_1_multiple_objectives(self) -> None:
         """Test executing status phase step 1 with multiple objectives."""
         game_state = GameState()
 
@@ -244,7 +244,7 @@ class TestStatusPhaseStepExecution:
         assert final_state.is_objective_completed("player1", secret_obj)
         assert final_state.get_victory_points("player1") == 2
 
-    def test_execute_status_phase_step_1_respects_limits(self):
+    def test_execute_status_phase_step_1_respects_limits(self) -> None:
         """Test that status phase step 1 execution respects scoring limits."""
         game_state = GameState()
 
@@ -270,7 +270,7 @@ class TestStatusPhaseStepExecution:
 class TestObjectiveScoringEdgeCases:
     """Test edge cases in objective scoring."""
 
-    def test_cannot_score_same_objective_twice(self):
+    def test_cannot_score_same_objective_twice(self) -> None:
         """Test Rule 61.8: A player can score each objective only once during the game."""
         game_state = GameState()
 
@@ -289,7 +289,7 @@ class TestObjectiveScoringEdgeCases:
         with pytest.raises(ValueError, match="already scored by player"):
             state2.score_objective("player1", public_obj, GamePhase.STATUS)
 
-    def test_multiple_players_can_score_same_public_objective(self):
+    def test_multiple_players_can_score_same_public_objective(self) -> None:
         """Test that multiple players can score the same public objective."""
         game_state = GameState()
 
@@ -308,7 +308,7 @@ class TestObjectiveScoringEdgeCases:
         assert state2.get_victory_points("player1") == 1
         assert state2.get_victory_points("player2") == 1
 
-    def test_non_status_phase_objectives_ignore_status_limits(self):
+    def test_non_status_phase_objectives_ignore_status_limits(self) -> None:
         """Test that non-status phase objectives don't count against status phase limits."""
         game_state = GameState()
 

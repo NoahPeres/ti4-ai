@@ -17,7 +17,7 @@ class Unit:
         technologies: Optional[set[str]] = None,
         stats_provider: Optional[UnitStatsProvider] = None,
         unit_id: Optional[str] = None,
-    ):
+    ) -> None:
         self.id = unit_id or str(uuid.uuid4())
         self.unit_type = unit_type
         self.owner = owner

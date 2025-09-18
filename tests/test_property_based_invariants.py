@@ -13,7 +13,7 @@ from src.ti4.core.player import Player
 
 # GREEN Phase: Basic property-based test to verify hypothesis is working
 @given(st.text())
-def test_property_based_testing_setup(text_value):
+def test_property_based_testing_setup(text_value) -> None:
     """Test that property-based testing infrastructure is working."""
     # This should pass to demonstrate hypothesis is working
     assert isinstance(text_value, str)
@@ -21,7 +21,7 @@ def test_property_based_testing_setup(text_value):
 
 # REFACTOR Phase: Use proper hypothesis strategies
 @composite
-def valid_player_strategy(draw):
+def valid_player_strategy(draw) -> None:
     """Generate a valid Player instance using hypothesis."""
     player_id = draw(st.text(min_size=1, max_size=50).filter(lambda x: x.strip()))
     faction = draw(st.text(min_size=1, max_size=50).filter(lambda x: x.strip()))
@@ -29,7 +29,7 @@ def valid_player_strategy(draw):
 
 
 @given(valid_player_strategy())
-def test_player_generator_creates_valid_players(player):
+def test_player_generator_creates_valid_players(player) -> None:
     """Test that we can generate valid Player instances."""
     assert isinstance(player, Player)
     assert player.is_valid()
@@ -39,7 +39,7 @@ def test_player_generator_creates_valid_players(player):
 
 # GREEN Phase: Minimal hex coordinate generator
 @composite
-def valid_hex_coordinate_strategy(draw):
+def valid_hex_coordinate_strategy(draw) -> None:
     """Generate a valid HexCoordinate instance using hypothesis."""
     q = draw(st.integers(min_value=-10, max_value=10))
     r = draw(st.integers(min_value=-10, max_value=10))
@@ -47,7 +47,7 @@ def valid_hex_coordinate_strategy(draw):
 
 
 @given(valid_hex_coordinate_strategy())
-def test_hex_coordinate_generator_creates_valid_coordinates(coord):
+def test_hex_coordinate_generator_creates_valid_coordinates(coord) -> None:
     """Test that we can generate valid HexCoordinate instances."""
     assert isinstance(coord, HexCoordinate)
     assert isinstance(coord.q, int)
@@ -56,7 +56,7 @@ def test_hex_coordinate_generator_creates_valid_coordinates(coord):
 
 # REFACTOR Phase: Fix game state generator to ensure unique player IDs
 @composite
-def valid_game_state_strategy(draw):
+def valid_game_state_strategy(draw) -> None:
     """Generate a valid GameState instance using hypothesis."""
     num_players = draw(st.integers(min_value=2, max_value=6))
 
@@ -81,7 +81,7 @@ def valid_game_state_strategy(draw):
 
 
 @given(valid_game_state_strategy())
-def test_game_state_invariants_always_hold(state):
+def test_game_state_invariants_always_hold(state) -> None:
     """Test that game state invariants always hold regardless of input."""
     # Test basic invariants
     assert state.is_valid()
@@ -93,7 +93,7 @@ def test_game_state_invariants_always_hold(state):
 
 
 @given(valid_hex_coordinate_strategy(), valid_hex_coordinate_strategy())
-def test_hex_coordinate_distance_is_symmetric(coord1, coord2):
+def test_hex_coordinate_distance_is_symmetric(coord1, coord2) -> None:
     """Test that hex coordinate distance calculation is symmetric."""
     # Distance from A to B should equal distance from B to A
     distance_ab = coord1.distance_to(coord2)
@@ -103,7 +103,7 @@ def test_hex_coordinate_distance_is_symmetric(coord1, coord2):
 
 
 @given(valid_hex_coordinate_strategy())
-def test_hex_coordinate_distance_to_self_is_zero(coord):
+def test_hex_coordinate_distance_to_self_is_zero(coord) -> None:
     """Test that distance from a coordinate to itself is always zero."""
     assert coord.distance_to(coord) == 0
 
@@ -113,7 +113,7 @@ def test_hex_coordinate_distance_to_self_is_zero(coord):
     valid_hex_coordinate_strategy(),
     valid_hex_coordinate_strategy(),
 )
-def test_hex_coordinate_triangle_inequality(coord1, coord2, coord3):
+def test_hex_coordinate_triangle_inequality(coord1, coord2, coord3) -> None:
     """Test that hex coordinate distances satisfy triangle inequality."""
     # For any three points A, B, C: distance(A,C) <= distance(A,B) + distance(B,C)
     distance_ac = coord1.distance_to(coord3)
@@ -124,14 +124,14 @@ def test_hex_coordinate_triangle_inequality(coord1, coord2, coord3):
 
 
 @given(valid_game_state_strategy())
-def test_game_state_players_have_unique_ids(state):
+def test_game_state_players_have_unique_ids(state) -> None:
     """Test that all players in a game state have unique IDs."""
     player_ids = [player.id for player in state.players]
     assert len(player_ids) == len(set(player_ids)), "Player IDs must be unique"
 
 
 @given(valid_game_state_strategy())
-def test_game_state_immutability_preserved(state):
+def test_game_state_immutability_preserved(state) -> None:
     """Test that game state immutability is preserved."""
     # Should not be able to modify the state after creation
     with pytest.raises(AttributeError):

@@ -2,10 +2,11 @@
 
 from unittest.mock import Mock
 
+from src.ti4.core.constants import LocationType
 from src.ti4.core.game_state import GameState
 
 
-def test_movement_command_exists():
+def test_movement_command_exists() -> None:
     """Test that MovementCommand can be imported and implements GameCommand."""
     from src.ti4.commands.base import GameCommand
     from src.ti4.commands.movement import MovementCommand
@@ -20,7 +21,7 @@ def test_movement_command_exists():
     assert hasattr(MovementCommand, "get_undo_data")
 
 
-def test_movement_command_creation():
+def test_movement_command_creation() -> None:
     """Test that MovementCommand can be created with required parameters."""
     from src.ti4.commands.movement import MovementCommand
 
@@ -37,11 +38,11 @@ def test_movement_command_creation():
     assert command.from_system_id == "system1"
     assert command.to_system_id == "system2"
     assert command.player_id == "player1"
-    assert command.from_location == "space"  # default
-    assert command.to_location == "space"  # default
+    assert command.from_location == LocationType.SPACE.value  # default
+    assert command.to_location == LocationType.SPACE.value  # default
 
 
-def test_movement_command_execute_and_undo_data():
+def test_movement_command_execute_and_undo_data() -> None:
     """Test that MovementCommand collects undo data during execution."""
     from src.ti4.commands.movement import MovementCommand
 
@@ -75,7 +76,7 @@ def test_movement_command_execute_and_undo_data():
     assert result_state == initial_state
 
 
-def test_movement_command_execute_undo_cycle():
+def test_movement_command_execute_undo_cycle() -> None:
     """Test that MovementCommand can execute and then undo properly."""
     from src.ti4.commands.manager import CommandManager
     from src.ti4.commands.movement import MovementCommand

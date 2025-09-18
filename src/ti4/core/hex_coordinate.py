@@ -4,7 +4,7 @@
 class HexCoordinate:
     """Represents a position in the hex-based galaxy using axial coordinates."""
 
-    def __init__(self, q: int, r: int):
+    def __init__(self, q: int, r: int) -> None:
         self.q = q
         self.r = r
 

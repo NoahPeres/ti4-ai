@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 class System:
     """Represents a star system containing planets."""
 
-    def __init__(self, system_id: str):
+    def __init__(self, system_id: str) -> None:
         self.system_id = system_id
         self.planets: list[Planet] = []
         self.space_units: list[Unit] = []  # Units in the space area of the system

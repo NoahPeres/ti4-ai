@@ -3,6 +3,7 @@
 import random
 from typing import Callable, Optional
 
+from .constants import UnitType
 from .system import System
 from .unit import Unit
 from .unit_stats import UnitStatsProvider
@@ -33,9 +34,9 @@ class CombatInitiator:
         """Initialize the combat initiator."""
         pass
 
-    def get_combat_participants(self, system: System) -> dict[str, list]:
+    def get_combat_participants(self, system: System) -> dict[str, list[Unit]]:
         """Get combat participants grouped by owner."""
-        participants: dict[str, list] = {}
+        participants: dict[str, list[Unit]] = {}
 
         for unit in system.space_units:
             owner = unit.owner
@@ -238,7 +239,7 @@ class CombatResolver:
         """
 
         def filter_fighters(units: list[Unit]) -> list[Unit]:
-            return [u for u in units if u.unit_type == "fighter"]
+            return [u for u in units if u.unit_type == UnitType.FIGHTER.value]
 
         return self._perform_ability_attack(
             unit, target_units, Unit.has_anti_fighter_barrage, filter_fighters

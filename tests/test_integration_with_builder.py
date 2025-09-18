@@ -9,7 +9,7 @@ from src.ti4.testing.scenario_builder import GameScenarioBuilder
 class TestTI4IntegrationWithBuilder:
     """Integration tests demonstrating the builder pattern usage."""
 
-    def test_complete_game_scenario_with_builder(self):
+    def test_complete_game_scenario_with_builder(self) -> None:
         """Test a complete scenario using GameScenarioBuilder."""
         # Create game state using builder pattern
         game_state = (
@@ -79,7 +79,7 @@ class TestTI4IntegrationWithBuilder:
         assert len(participants["player1"]) == 1  # Sol cruiser
         assert len(participants["player2"]) == 2  # Hacan carrier + fighter
 
-    def test_technology_upgrade_scenario_with_builder(self):
+    def test_technology_upgrade_scenario_with_builder(self) -> None:
         """Test scenario with technology upgrades using builder."""
         game_state = (
             GameScenarioBuilder()
@@ -100,7 +100,7 @@ class TestTI4IntegrationWithBuilder:
         assert len(system1.space_units) == 1
         assert system1.space_units[0].unit_type == "cruiser"
 
-    def test_combat_scenario_with_builder(self):
+    def test_combat_scenario_with_builder(self) -> None:
         """Test combat scenario using preset builder method."""
         game_state = GameScenarioBuilder.create_combat_scenario()
 
@@ -120,7 +120,7 @@ class TestTI4IntegrationWithBuilder:
         combat_detector = CombatDetector()
         assert combat_detector.should_initiate_combat(combat_system) is True
 
-    def test_resource_configuration_with_builder(self):
+    def test_resource_configuration_with_builder(self) -> None:
         """Test resource configuration using builder."""
         game_state = (
             GameScenarioBuilder()

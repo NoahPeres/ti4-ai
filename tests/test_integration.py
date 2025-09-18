@@ -15,7 +15,11 @@ from src.ti4.core.unit_stats import UnitStats, UnitStatsProvider
 
 class TestTI4Integration:
     def debug_test_failure(
-        self, test_name: str, expected: Any, actual: Any, context: Optional[dict[Any, Any]] = None
+        self,
+        test_name: str,
+        expected: Any,
+        actual: Any,
+        context: Optional[dict[Any, Any]] = None,
     ) -> None:
         """Helper method to provide debugging output for failed test scenarios."""
         print(f"\n=== DEBUG INFO FOR FAILED TEST: {test_name} ===")
@@ -27,7 +31,7 @@ class TestTI4Integration:
                 print(f"  {key}: {value}")
         print("=" * 50)
 
-    def test_complete_game_scenario(self):
+    def test_complete_game_scenario(self) -> None:
         """Test a complete scenario using all refactored systems."""
         # Setup game with players
         player1 = Player(id="player1", faction="sol")
@@ -111,7 +115,7 @@ class TestTI4Integration:
         assert len(participants[player1.id]) == 1  # Sol cruiser
         assert len(participants[player2.id]) == 2  # Hacan carrier + fighter
 
-    def test_technology_upgrade_scenario(self):
+    def test_technology_upgrade_scenario(self) -> None:
         """Test scenario with technology upgrades."""
         # Create stats provider with technology
         stats_provider = UnitStatsProvider()
@@ -150,7 +154,7 @@ class TestTI4Integration:
         validator = FleetCapacityValidator()
         assert validator.is_fleet_capacity_valid(fleet) is True
 
-    def test_faction_specific_abilities(self):
+    def test_faction_specific_abilities(self) -> None:
         """Test faction-specific unit modifications."""
         # Create stats provider with faction modifiers
         stats_provider = UnitStatsProvider()

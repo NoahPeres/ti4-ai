@@ -1,5 +1,7 @@
 """Tests for TI4 Tactical Action implementation."""
 
+from typing import Any, Optional
+
 import pytest
 
 from src.ti4.core.galaxy import Galaxy
@@ -12,7 +14,7 @@ from src.ti4.core.unit import Unit
 class TestTacticalAction:
     """Test the proper two-step tactical action structure."""
 
-    def test_tactical_action_creation(self):
+    def test_tactical_action_creation(self) -> None:
         """Test that TacticalAction can be created with active system."""
         from src.ti4.actions.tactical_action import TacticalAction
 
@@ -33,19 +35,19 @@ class TestTacticalAction:
         assert "Movement" in step_names
         assert "Commit Ground Forces" in step_names
 
-    def test_extensible_step_architecture(self):
+    def test_extensible_step_architecture(self) -> None:
         """Test that the new step-based architecture is extensible."""
         from src.ti4.actions.tactical_action import TacticalAction, TacticalActionStep
 
         # Create a custom step for testing
         class TestStep(TacticalActionStep):
-            def can_execute(self, game_state, context):
+            def can_execute(self, game_state, context) -> None:
                 return True
 
-            def execute(self, game_state, context):
+            def execute(self, game_state, context) -> None:
                 return game_state
 
-            def get_step_name(self):
+            def get_step_name(self) -> None:
                 return "Test Step"
 
         tactical_action = TacticalAction("system1", "player1")
@@ -64,7 +66,7 @@ class TestTacticalAction:
         assert tactical_action.remove_step("Test Step") is True
         assert len(tactical_action.steps) == initial_count
 
-    def test_movement_step_moves_units_to_space_area(self):
+    def test_movement_step_moves_units_to_space_area(self) -> None:
         """Test that Movement Step moves all units to the active system's space area."""
         from src.ti4.actions.tactical_action import MovementPlan, TacticalAction
 
@@ -111,7 +113,7 @@ class TestTacticalAction:
         assert cruiser not in new_state.systems["system1"].space_units
         assert destroyer not in new_state.systems["system1"].space_units
 
-    def test_ground_forces_cannot_move_directly_between_planets(self):
+    def test_ground_forces_cannot_move_directly_between_planets(self) -> None:
         """Test that ground forces cannot move directly from planet to planet."""
         from src.ti4.actions.tactical_action import (
             MovementPlan,
@@ -149,7 +151,7 @@ class TestTacticalAction:
                 to_location="planet2",  # Direct planet-to-planet - INVALID
             )
 
-    def test_joint_movement_validation(self):
+    def test_joint_movement_validation(self) -> None:
         """Test that movement validation is performed jointly for entire plan."""
         from src.ti4.actions.tactical_action import MovementPlan, MovementValidator
 
@@ -191,7 +193,7 @@ class TestTacticalAction:
         assert validation_result.is_valid is True
         assert validation_result.transport_assignments is not None
 
-    def test_commit_ground_forces_step(self):
+    def test_commit_ground_forces_step(self) -> None:
         """Test that Commit Ground Forces Step moves ground forces from space to planets."""
         from src.ti4.actions.tactical_action import (
             CommitGroundForcesPlan,
@@ -235,7 +237,7 @@ class TestTacticalAction:
         assert infantry1 not in system1.space_units
         assert infantry2 not in system1.space_units
 
-    def test_complete_tactical_action_sequence(self):
+    def test_complete_tactical_action_sequence(self) -> None:
         """Test a complete tactical action with both movement and commit steps."""
         from src.ti4.actions.tactical_action import (
             CommitGroundForcesPlan,
@@ -301,7 +303,7 @@ class TestTacticalAction:
         assert infantry not in planet1.units
         assert infantry not in system2.space_units  # Should be on planet, not in space
 
-    def test_automatic_technology_effect_calculation(self):
+    def test_automatic_technology_effect_calculation(self) -> None:
         """Test that technology effects like Gravity Drive are automatically applied."""
         from src.ti4.actions.tactical_action import MovementPlan, MovementValidator
 
@@ -341,7 +343,7 @@ class TestTacticalAction:
         assert result_with_tech.technology_effects is not None
         assert "gravity_drive" in result_with_tech.technology_effects
 
-    def test_transport_capacity_validation(self):
+    def test_transport_capacity_validation(self) -> None:
         """Test that transport capacity is validated in joint movement planning."""
         from src.ti4.actions.tactical_action import MovementPlan, MovementValidator
 
@@ -386,7 +388,7 @@ class TestTacticalAction:
         assert result.errors is not None
         assert "insufficient transport capacity" in result.errors[0].lower()
 
-    def test_joint_movement_validation_with_sufficient_capacity(self):
+    def test_joint_movement_validation_with_sufficient_capacity(self) -> None:
         """Test that joint movement validation passes with sufficient transport capacity."""
         from src.ti4.actions.tactical_action import MovementPlan, MovementValidator
 
@@ -430,7 +432,7 @@ class TestTacticalAction:
         assert result.is_valid is True
         assert result.transport_assignments is not None
 
-    def test_complete_ti4_tactical_action_validation(self):
+    def test_complete_ti4_tactical_action_validation(self) -> None:
         """Test that the complete TI4 tactical action structure is properly enforced."""
         from src.ti4.actions.tactical_action import (
             CommitGroundForcesPlan,
@@ -511,7 +513,7 @@ class TestTacticalAction:
             infantry not in final_state.systems["system2"].space_units
         )  # Infantry no longer in space
 
-    def test_multiple_systems_converging_movement(self):
+    def test_multiple_systems_converging_movement(self) -> None:
         """Test that units can move from multiple systems into the active system."""
         from src.ti4.actions.tactical_action import MovementPlan, MovementValidator
 
@@ -551,7 +553,7 @@ class TestTacticalAction:
         assert result.is_valid is True
         assert result.errors is None
 
-    def test_gravity_drive_selective_application(self):
+    def test_gravity_drive_selective_application(self) -> None:
         """Test that Gravity Drive is applied optimally to make movement legal."""
         from src.ti4.actions.tactical_action import MovementPlan, MovementValidator
 
@@ -602,7 +604,7 @@ class TestTacticalAction:
         assert result_with_tech.technology_effects is not None
         assert "gravity_drive" in result_with_tech.technology_effects
 
-    def test_gravity_drive_insufficient_for_multiple_ships(self):
+    def test_gravity_drive_insufficient_for_multiple_ships(self) -> None:
         """Test that Gravity Drive cannot make illegal moves with multiple ships needing it."""
         from src.ti4.actions.tactical_action import MovementPlan, MovementValidator
 
@@ -646,7 +648,7 @@ class TestTacticalAction:
             len([e for e in result.errors if "insufficient movement" in e.lower()]) >= 1
         )
 
-    def test_scalable_technology_system(self):
+    def test_scalable_technology_system(self) -> None:
         """Test that the technology system is extensible for future technologies."""
         from src.ti4.actions.tactical_action import MovementValidator
 
@@ -685,7 +687,7 @@ class TestTacticalAction:
         assert result.technology_effects is not None
         assert "gravity_drive" in result.technology_effects
 
-    def test_complex_multi_system_scenario(self):
+    def test_complex_multi_system_scenario(self) -> None:
         """Test a complex scenario with multiple systems, technologies, and edge cases."""
         from src.ti4.actions.tactical_action import (
             MovementPlan,
@@ -782,6 +784,8 @@ class TestTacticalAction:
 class MockGameState:
     """Mock game state for testing."""
 
-    def __init__(self, galaxy=None, systems=None):
+    def __init__(
+        self, galaxy: Optional[Galaxy] = None, systems: Optional[dict[str, Any]] = None
+    ) -> None:
         self.galaxy = galaxy
         self.systems = systems or {}

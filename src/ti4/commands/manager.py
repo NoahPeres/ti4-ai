@@ -1,6 +1,6 @@
 """Command manager for handling command execution and history."""
 
-from typing import Any, Optional
+from typing import Any
 
 from ..core.game_state import GameState
 from .base import GameCommand

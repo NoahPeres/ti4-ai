@@ -53,7 +53,7 @@ class TestRule101Wormholes:
             system.add_wormhole(wormhole_type)
         return system
 
-    def test_alpha_wormhole_systems_are_adjacent(self):
+    def test_alpha_wormhole_systems_are_adjacent(self) -> None:
         """Test LRR 101.1: Alpha wormhole systems are adjacent to each other."""
         wormhole_configs = [
             ("alpha_system_1", "alpha", HexCoordinate(0, 0)),
@@ -71,7 +71,7 @@ class TestRule101Wormholes:
                     f"{system_a} should be adjacent to {system_b} via alpha wormhole"
                 )
 
-    def test_beta_wormhole_systems_are_adjacent(self):
+    def test_beta_wormhole_systems_are_adjacent(self) -> None:
         """Test LRR 101.2: Beta wormhole systems are adjacent to each other."""
         wormhole_configs = [
             ("beta_system_1", "beta", HexCoordinate(0, 0)),
@@ -84,7 +84,7 @@ class TestRule101Wormholes:
             "Beta wormhole systems should be adjacent"
         )
 
-    def test_gamma_wormhole_systems_are_adjacent(self):
+    def test_gamma_wormhole_systems_are_adjacent(self) -> None:
         """Test LRR 101.3: Gamma wormhole systems are adjacent to each other."""
         wormhole_configs = [
             ("gamma_system_1", "gamma", HexCoordinate(0, 0)),
@@ -97,7 +97,7 @@ class TestRule101Wormholes:
             "Gamma wormhole systems should be adjacent"
         )
 
-    def test_delta_wormhole_systems_are_adjacent(self):
+    def test_delta_wormhole_systems_are_adjacent(self) -> None:
         """Test LRR 101.4: Delta wormhole systems are adjacent to each other."""
         wormhole_configs = [
             ("delta_system_1", "delta", HexCoordinate(0, 0)),
@@ -124,7 +124,7 @@ class TestRule101Wormholes:
             f"{wormhole_type}_system_1", f"{wormhole_type}_system_2"
         ), f"Systems with {wormhole_type} wormholes should be adjacent"
 
-    def test_different_wormhole_types_are_not_adjacent(self):
+    def test_different_wormhole_types_are_not_adjacent(self) -> None:
         """Test LRR 101.5: Different wormhole types are not adjacent to each other."""
         coords = [
             HexCoordinate(0, 0),
@@ -147,7 +147,7 @@ class TestRule101Wormholes:
                     f"{system_a} should NOT be adjacent to {system_b} (different wormhole types)"
                 )
 
-    def test_multiple_wormhole_types_create_multiple_adjacencies(self):
+    def test_multiple_wormhole_types_create_multiple_adjacencies(self) -> None:
         """Test LRR 101: Systems with multiple wormhole types are adjacent to systems with any matching type."""
         galaxy = Galaxy()
 
@@ -184,7 +184,7 @@ class TestRule101Wormholes:
             "multi_wormhole_system", "gamma_only_system"
         ), "Multi-wormhole system should NOT be adjacent to gamma system"
 
-    def test_wormhole_adjacency_is_symmetric(self):
+    def test_wormhole_adjacency_is_symmetric(self) -> None:
         """Test that wormhole adjacency is symmetric (A adjacent to B implies B adjacent to A)."""
         wormhole_configs = [
             ("system_a", "alpha", HexCoordinate(0, 0)),
@@ -201,7 +201,7 @@ class TestRule101Wormholes:
             "System B should be adjacent to System A (symmetry)"
         )
 
-    def test_system_with_no_wormhole_not_adjacent_to_wormhole_systems(self):
+    def test_system_with_no_wormhole_not_adjacent_to_wormhole_systems(self) -> None:
         """Test that systems without wormholes are not adjacent to wormhole systems via wormholes."""
         galaxy = Galaxy()
 

@@ -7,7 +7,7 @@ from src.ti4.core.game_state import GameState
 from src.ti4.core.player import Player
 
 
-def test_game_controller_has_command_manager():
+def test_game_controller_has_command_manager() -> None:
     """Test that GameController has a CommandManager."""
     # Create test players
     players = [
@@ -26,7 +26,7 @@ def test_game_controller_has_command_manager():
     assert hasattr(controller, "get_action_history")
 
 
-def test_game_controller_undo_functionality():
+def test_game_controller_undo_functionality() -> None:
     """Test that GameController can undo actions."""
     from src.ti4.commands.movement import MovementCommand
 
@@ -61,7 +61,7 @@ def test_game_controller_undo_functionality():
     assert len(controller.get_action_history()) == 0
 
 
-def test_game_controller_undo_empty_history():
+def test_game_controller_undo_empty_history() -> None:
     """Test that GameController handles undo with no history gracefully."""
     # Create test players
     players = [
@@ -78,7 +78,7 @@ def test_game_controller_undo_empty_history():
     assert len(controller.get_action_history()) == 0
 
 
-def test_game_controller_redo_not_implemented():
+def test_game_controller_redo_not_implemented() -> None:
     """Test that GameController redo returns False (not implemented yet)."""
     # Create test players
     players = [

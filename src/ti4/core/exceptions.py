@@ -16,7 +16,7 @@ class TI4GameError(Exception):
         message: str,
         context: Optional[dict[str, Any]] = None,
         cause: Optional[Exception] = None,
-    ):
+    ) -> None:
         super().__init__(message)
         self.context = context or {}
         self.timestamp = time.time()
@@ -33,7 +33,7 @@ class CommandExecutionError(TI4GameError):
         command: "GameCommand",
         reason: str,
         context: Optional[dict[str, Any]] = None,
-    ):
+    ) -> None:
         super().__init__(f"Command execution failed: {reason}", context)
         self.command = command
 
@@ -46,7 +46,7 @@ class PhaseTransitionError(TI4GameError):
         from_phase: "GamePhase",
         to_phase: "GamePhase",
         context: Optional[dict[str, Any]] = None,
-    ):
+    ) -> None:
         super().__init__(f"Invalid transition from {from_phase} to {to_phase}", context)
         self.from_phase = from_phase
         self.to_phase = to_phase

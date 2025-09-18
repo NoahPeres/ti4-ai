@@ -95,7 +95,9 @@ class GameStateCache:
                 str(len(game_state.players)),
                 player_id,
             ]
-            state_hash = hashlib.md5("_".join(state_components).encode()).hexdigest()
+            state_hash = hashlib.sha256(
+                "_".join(state_components).encode()
+            ).hexdigest()[:16]
             return f"{game_state.game_id}_{player_id}_{state_hash}"
         except Exception:
             # Fallback to simpler key generation

@@ -7,12 +7,12 @@ from src.ti4.core.unit import Unit
 
 
 class TestCombatDetector:
-    def test_combat_detector_creation(self):
+    def test_combat_detector_creation(self) -> None:
         """Test that CombatDetector can be created."""
         detector = CombatDetector()
         assert detector is not None
 
-    def test_detect_combat_opposing_fleets(self):
+    def test_detect_combat_opposing_fleets(self) -> None:
         """Test that combat is detected when opposing fleets are in same system."""
         detector = CombatDetector()
         system = System(system_id="test_system")
@@ -35,7 +35,7 @@ class TestCombatDetector:
         # Should detect combat
         assert detector.should_initiate_combat(system) is True
 
-    def test_no_combat_same_owner(self):
+    def test_no_combat_same_owner(self) -> None:
         """Test that no combat occurs when all units have same owner."""
         detector = CombatDetector()
         system = System(system_id="test_system")
@@ -60,12 +60,12 @@ class TestCombatDetector:
 
 
 class TestCombatInitiator:
-    def test_combat_initiator_creation(self):
+    def test_combat_initiator_creation(self) -> None:
         """Test that CombatInitiator can be created."""
         initiator = CombatInitiator()
         assert initiator is not None
 
-    def test_get_combat_participants(self):
+    def test_get_combat_participants(self) -> None:
         """Test getting combat participants from a system."""
         initiator = CombatInitiator()
         system = System(system_id="test_system")
@@ -90,7 +90,7 @@ class TestCombatInitiator:
         assert len(participants["player1"]) == 2  # cruiser + fighter
         assert len(participants["player2"]) == 1  # cruiser
 
-    def test_no_participants_empty_system(self):
+    def test_no_participants_empty_system(self) -> None:
         """Test that empty system has no combat participants."""
         initiator = CombatInitiator()
         system = System(system_id="test_system")
@@ -101,12 +101,12 @@ class TestCombatInitiator:
 
 
 class TestCombatResolver:
-    def test_combat_resolver_creation(self):
+    def test_combat_resolver_creation(self) -> None:
         """Test that CombatResolver can be created."""
         resolver = CombatResolver()
         assert resolver is not None
 
-    def test_roll_dice_for_unit(self):
+    def test_roll_dice_for_unit(self) -> None:
         """Test rolling dice for a single unit."""
         resolver = CombatResolver()
         unit = Unit(unit_type="cruiser", owner="player1")
@@ -118,7 +118,7 @@ class TestCombatResolver:
         assert isinstance(hits, int)
         assert 0 <= hits <= 1
 
-    def test_roll_dice_for_multi_dice_unit(self):
+    def test_roll_dice_for_multi_dice_unit(self) -> None:
         """Test rolling dice for a unit that rolls multiple dice."""
         resolver = CombatResolver()
         unit = Unit(unit_type="war_sun", owner="player1")
@@ -130,7 +130,7 @@ class TestCombatResolver:
         assert isinstance(hits, int)
         assert 0 <= hits <= 3
 
-    def test_roll_dice_with_override(self):
+    def test_roll_dice_with_override(self) -> None:
         """Test rolling dice with dice count override."""
         resolver = CombatResolver()
         unit = Unit(unit_type="cruiser", owner="player1")
@@ -142,7 +142,7 @@ class TestCombatResolver:
         assert isinstance(hits, int)
         assert 0 <= hits <= 2
 
-    def test_unit_combat_dice_values(self):
+    def test_unit_combat_dice_values(self) -> None:
         """Test that units have correct combat dice values."""
         # Test various unit types have correct dice counts
         cruiser = Unit(unit_type="cruiser", owner="player1")
@@ -160,7 +160,7 @@ class TestCombatResolver:
         space_dock = Unit(unit_type="space_dock", owner="player1")
         assert space_dock.get_combat_dice() == 0  # Non-combat unit
 
-    def test_calculate_hits_multiple_dice(self):
+    def test_calculate_hits_multiple_dice(self) -> None:
         """Test calculating hits from multiple dice rolls."""
         resolver = CombatResolver()
 
@@ -171,7 +171,7 @@ class TestCombatResolver:
         hits = resolver.calculate_hits(dice_results, combat_value)
         assert hits == 4
 
-    def test_calculate_hits_no_hits(self):
+    def test_calculate_hits_no_hits(self) -> None:
         """Test calculating hits when no dice meet combat value."""
         resolver = CombatResolver()
 
@@ -182,7 +182,7 @@ class TestCombatResolver:
         hits = resolver.calculate_hits(dice_results, combat_value)
         assert hits == 0
 
-    def test_resolve_sustain_damage_abilities(self):
+    def test_resolve_sustain_damage_abilities(self) -> None:
         """Test resolving sustain damage abilities before hit assignment."""
         resolver = CombatResolver()
 
@@ -205,7 +205,7 @@ class TestCombatResolver:
         assert remaining_hits == 1
         assert dreadnought.has_sustained_damage
 
-    def test_assign_hits_with_player_choice(self):
+    def test_assign_hits_with_player_choice(self) -> None:
         """Test hit assignment with player choice."""
         resolver = CombatResolver()
 
@@ -226,7 +226,7 @@ class TestCombatResolver:
         assert fighter in destroyed_units
         assert cruiser not in destroyed_units
 
-    def test_validate_hit_assignment_choices(self):
+    def test_validate_hit_assignment_choices(self) -> None:
         """Test validation of player hit assignment choices."""
         resolver = CombatResolver()
 
@@ -250,7 +250,7 @@ class TestCombatResolver:
             is False
         )
 
-    def test_apply_combat_modifiers(self):
+    def test_apply_combat_modifiers(self) -> None:
         """Test applying combat modifiers to dice rolls."""
         resolver = CombatResolver()
 
@@ -268,7 +268,7 @@ class TestCombatResolver:
         )
         assert hits == 3  # All dice should hit with +1 modifier
 
-    def test_calculate_hits_with_negative_modifiers(self):
+    def test_calculate_hits_with_negative_modifiers(self) -> None:
         """Test calculating hits with negative modifiers."""
         resolver = CombatResolver()
 
@@ -288,7 +288,7 @@ class TestCombatResolver:
 
 
 class TestUnitAbilitiesInCombat:
-    def test_anti_fighter_barrage_timing(self):
+    def test_anti_fighter_barrage_timing(self) -> None:
         """Test that anti-fighter barrage occurs before regular combat."""
         resolver = CombatResolver()
 
@@ -307,7 +307,7 @@ class TestUnitAbilitiesInCombat:
         assert isinstance(hits, int)
         assert 0 <= hits <= 1  # Destroyer rolls 1 die for anti-fighter barrage
 
-    def test_space_cannon_defensive_fire(self):
+    def test_space_cannon_defensive_fire(self) -> None:
         """Test that space cannon can fire defensively when units move into system."""
         resolver = CombatResolver()
 
@@ -326,7 +326,7 @@ class TestUnitAbilitiesInCombat:
         assert isinstance(hits, int)
         assert 0 <= hits <= 1  # PDS rolls 1 die for space cannon
 
-    def test_sustain_damage_prevents_destruction(self):
+    def test_sustain_damage_prevents_destruction(self) -> None:
         """Test that sustain damage prevents unit destruction in combat."""
         resolver = CombatResolver()
 
@@ -348,7 +348,7 @@ class TestUnitAbilitiesInCombat:
         assert remaining_hits == 0
         assert dreadnought.has_sustained_damage is True
 
-    def test_anti_fighter_barrage_only_targets_fighters(self):
+    def test_anti_fighter_barrage_only_targets_fighters(self) -> None:
         """Test that anti-fighter barrage only affects fighters."""
         resolver = CombatResolver()
 
@@ -377,7 +377,7 @@ class TestUnitAbilitiesInCombat:
         )
         assert hits_no_fighters == 0
 
-    def test_unit_without_ability_cannot_use_it(self):
+    def test_unit_without_ability_cannot_use_it(self) -> None:
         """Test that units without abilities cannot use them."""
         resolver = CombatResolver()
 
@@ -395,7 +395,7 @@ class TestUnitAbilitiesInCombat:
         hits = resolver.perform_space_cannon(cruiser, target_units)
         assert hits == 0
 
-    def test_sustain_damage_can_only_be_used_once(self):
+    def test_sustain_damage_can_only_be_used_once(self) -> None:
         """Test that sustain damage can only be used once per unit."""
         dreadnought = Unit(unit_type="dreadnought", owner="player1")
 

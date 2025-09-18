@@ -18,12 +18,12 @@ from src.ti4.core.observers import (
 class TestLoggingObserver:
     """Test the logging observer."""
 
-    def test_logging_observer_creation(self):
+    def test_logging_observer_creation(self) -> None:
         """Test that LoggingObserver can be created."""
         observer = LoggingObserver()
         assert observer is not None
 
-    def test_logging_observer_logs_unit_moved_event(self):
+    def test_logging_observer_logs_unit_moved_event(self) -> None:
         """Test that LoggingObserver logs unit moved events."""
         observer = LoggingObserver()
 
@@ -45,7 +45,7 @@ class TestLoggingObserver:
             assert "unit_456" in call_args
             assert "player_1" in call_args
 
-    def test_logging_observer_logs_phase_changed_event(self):
+    def test_logging_observer_logs_phase_changed_event(self) -> None:
         """Test that LoggingObserver logs phase changed events."""
         observer = LoggingObserver()
 
@@ -63,7 +63,7 @@ class TestLoggingObserver:
             assert "action" in call_args
             assert "status" in call_args
 
-    def test_logging_observer_can_be_registered_with_event_bus(self):
+    def test_logging_observer_can_be_registered_with_event_bus(self) -> None:
         """Test that LoggingObserver can be registered with event bus."""
         event_bus = GameEventBus()
         observer = LoggingObserver()
@@ -88,12 +88,12 @@ class TestLoggingObserver:
 class TestStatisticsCollector:
     """Test the statistics collector observer."""
 
-    def test_statistics_collector_creation(self):
+    def test_statistics_collector_creation(self) -> None:
         """Test that StatisticsCollector can be created."""
         collector = StatisticsCollector()
         assert collector is not None
 
-    def test_statistics_collector_tracks_unit_movements(self):
+    def test_statistics_collector_tracks_unit_movements(self) -> None:
         """Test that StatisticsCollector tracks unit movement statistics."""
         collector = StatisticsCollector()
 
@@ -111,7 +111,7 @@ class TestStatisticsCollector:
         assert stats["unit_movements"] == 1
         assert stats["player_actions"]["player_1"] == 1
 
-    def test_statistics_collector_tracks_phase_changes(self):
+    def test_statistics_collector_tracks_phase_changes(self) -> None:
         """Test that StatisticsCollector tracks phase change statistics."""
         collector = StatisticsCollector()
 
@@ -125,7 +125,7 @@ class TestStatisticsCollector:
         assert stats["phase_changes"] == 1
         assert stats["current_round"] == 3
 
-    def test_statistics_collector_accumulates_statistics(self):
+    def test_statistics_collector_accumulates_statistics(self) -> None:
         """Test that StatisticsCollector accumulates statistics over multiple events."""
         collector = StatisticsCollector()
 
@@ -144,7 +144,7 @@ class TestStatisticsCollector:
         assert stats["unit_movements"] == 3
         assert stats["player_actions"]["player_1"] == 3
 
-    def test_statistics_collector_can_be_registered_with_event_bus(self):
+    def test_statistics_collector_can_be_registered_with_event_bus(self) -> None:
         """Test that StatisticsCollector can be registered with event bus."""
         event_bus = GameEventBus()
         collector = StatisticsCollector()
@@ -170,12 +170,12 @@ class TestStatisticsCollector:
 class TestAITrainingDataCollector:
     """Test the AI training data collector observer."""
 
-    def test_ai_training_data_collector_creation(self):
+    def test_ai_training_data_collector_creation(self) -> None:
         """Test that AITrainingDataCollector can be created."""
         collector = AITrainingDataCollector()
         assert collector is not None
 
-    def test_ai_training_data_collector_collects_unit_movements(self):
+    def test_ai_training_data_collector_collects_unit_movements(self) -> None:
         """Test that AITrainingDataCollector collects unit movement data."""
         collector = AITrainingDataCollector()
 
@@ -196,7 +196,7 @@ class TestAITrainingDataCollector:
         assert training_data[0]["from_system"] == "system_1"
         assert training_data[0]["to_system"] == "system_2"
 
-    def test_ai_training_data_collector_collects_combat_events(self):
+    def test_ai_training_data_collector_collects_combat_events(self) -> None:
         """Test that AITrainingDataCollector collects combat event data."""
         collector = AITrainingDataCollector()
 
@@ -214,7 +214,7 @@ class TestAITrainingDataCollector:
         assert training_data[0]["system_id"] == "system_1"
         assert training_data[0]["participants"] == ["player_1", "player_2"]
 
-    def test_ai_training_data_collector_exports_data(self):
+    def test_ai_training_data_collector_exports_data(self) -> None:
         """Test that AITrainingDataCollector can export training data."""
         collector = AITrainingDataCollector()
 
@@ -241,7 +241,7 @@ class TestAITrainingDataCollector:
         assert exported_data[0]["event_type"] == "unit_moved"
         assert exported_data[1]["event_type"] == "phase_changed"
 
-    def test_ai_training_data_collector_can_be_registered_with_event_bus(self):
+    def test_ai_training_data_collector_can_be_registered_with_event_bus(self) -> None:
         """Test that AITrainingDataCollector can be registered with event bus."""
         event_bus = GameEventBus()
         collector = AITrainingDataCollector()
@@ -267,7 +267,7 @@ class TestAITrainingDataCollector:
 class TestObserverIntegration:
     """Test integration scenarios with multiple observers."""
 
-    def test_multiple_observers_can_be_registered(self):
+    def test_multiple_observers_can_be_registered(self) -> None:
         """Test that multiple observers can be registered with the same event bus."""
         event_bus = GameEventBus()
 

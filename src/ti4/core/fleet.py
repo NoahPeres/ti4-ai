@@ -1,5 +1,6 @@
-"""Fleet management for TI4."""
+"""Fleet management for TI4 game framework."""
 
+from .constants import UnitType
 from .unit import Unit
 
 
@@ -15,7 +16,7 @@ class Fleet:
     can contain fleets with non-fighter ships.
     """
 
-    def __init__(self, owner: str, system_id: str):
+    def __init__(self, owner: str, system_id: str) -> None:
         """Initialize a fleet for a player in a specific system."""
         self.owner = owner
         self.system_id = system_id
@@ -39,9 +40,9 @@ class Fleet:
         stats = unit.get_stats()
         # Fighters and infantry need capacity unless they have independent movement
         # Fighter II has movement > 0 and doesn't need capacity
-        if unit.unit_type == "fighter":
+        if unit.unit_type == UnitType.FIGHTER.value:
             return stats.movement == 0  # Base fighters need capacity, Fighter II don't
-        elif unit.unit_type == "infantry":
+        elif unit.unit_type == UnitType.INFANTRY.value:
             return True  # Infantry always need capacity (no independent space movement)
         else:
             return False  # Ships don't need capacity
