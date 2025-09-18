@@ -57,9 +57,64 @@ class Galaxy:
         if system1 is None or system2 is None:
             return False
         
-        # Check if both systems have any matching wormholes
-        for wormhole1 in system1.wormholes:
-            if system2.has_wormhole(wormhole1):
+        # Check if systems share any wormhole types
+        for wormhole_type in system1.wormholes:
+            if system2.has_wormhole(wormhole_type):
                 return True
         
         return False
+
+    def are_players_neighbors(self, player_id1: str, player_id2: str) -> bool:
+        """
+        Check if two players are neighbors according to LRR Rule 60.
+        
+        Players are neighbors if they both have a unit or control a planet 
+        in the same system or in systems that are adjacent to each other.
+        """
+        # Get all systems where each player has presence
+        player1_systems = self._get_player_systems(player_id1)
+        player2_systems = self._get_player_systems(player_id2)
+        
+        # Check if players share any systems
+        shared_systems = player1_systems.intersection(player2_systems)
+        if shared_systems:
+            return True
+        
+        # Check if any of player1's systems are adjacent to any of player2's systems
+        for system1_id in player1_systems:
+            for system2_id in player2_systems:
+                if self.are_systems_adjacent(system1_id, system2_id):
+                    return True
+        
+        return False
+
+    def _get_player_systems(self, player_id: str) -> set[str]:
+        """
+        Get all system IDs where a player has units or controls planets.
+        
+        Returns a set of system IDs where the player has presence.
+        """
+        player_systems = set()
+        
+        # Check all registered systems for player presence
+        for system_id, system in self.system_objects.items():
+            # Check space units
+            for unit in system.space_units:
+                if unit.owner == player_id:
+                    player_systems.add(system_id)
+                    break
+            
+            # Check planet units and control
+            for planet in system.planets:
+                # Check units on planet
+                for unit in planet.units:
+                    if unit.owner == player_id:
+                        player_systems.add(system_id)
+                        break
+                
+                # Check planet control
+                if hasattr(planet, 'controller') and planet.controller == player_id:
+                    player_systems.add(system_id)
+                    break
+        
+        return player_systems

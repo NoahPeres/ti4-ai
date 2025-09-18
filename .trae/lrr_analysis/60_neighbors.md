@@ -18,13 +18,13 @@ RELATED TOPICS: Promissory Notes, Transactions
 ### 60.0 Basic Neighbor Definition
 **Rule**: "Two players are neighbors if they both have a unit or control a planet in the same system. They are also neighbors if they both have a unit or control a planet in systems that are adjacent to each other."
 
-**Implementation Status**: ⚠️ PARTIALLY IMPLEMENTED
-- **Code**: Basic adjacency checking exists in `src/ti4/core/galaxy.py` and cached in `src/ti4/performance/cache.py`
-- **Tests**: Adjacency tests exist but no neighbor detection tests
-- **Assessment**: System adjacency is implemented but player neighbor detection is missing
-- **Priority**: HIGH
-- **Dependencies**: Requires player unit/planet tracking and adjacency system
-- **Notes**: Core mechanic for transactions and many game effects
+**Implementation Status**: ✅ IMPLEMENTED
+- **Code**: `Galaxy.are_players_neighbors()` method in `src/ti4/core/galaxy.py` with comprehensive neighbor detection
+- **Tests**: Full test coverage in `tests/test_neighbor_detection.py` with 5 test scenarios
+- **Assessment**: Complete implementation with same system, adjacent system, wormhole, and edge case coverage
+- **Priority**: COMPLETED
+- **Dependencies**: Uses existing adjacency system and unit/planet tracking
+- **Notes**: Core mechanic for transactions and many game effects - READY FOR USE
 
 ### 60.1 Transaction Eligibility
 **Rule**: "Players can resolve transactions with their neighbors."
@@ -40,13 +40,13 @@ RELATED TOPICS: Promissory Notes, Transactions
 ### 60.2 Wormhole Neighbor Adjacency
 **Rule**: "Players are neighbors if the adjacency of systems is granted by a wormhole."
 
-**Implementation Status**: ❌ NOT IMPLEMENTED
-- **Code**: No wormhole system or wormhole adjacency rules
-- **Tests**: No wormhole adjacency tests
-- **Assessment**: Wormholes create virtual adjacency for neighbor determination
-- **Priority**: MEDIUM
-- **Dependencies**: Requires wormhole system and adjacency calculation
-- **Notes**: Extends neighbor relationships beyond physical adjacency
+**Implementation Status**: ✅ IMPLEMENTED
+- **Code**: Integrated into `Galaxy.are_players_neighbors()` method using existing wormhole adjacency system
+- **Tests**: Covered in `tests/test_neighbor_detection.py` with wormhole connection test scenario
+- **Assessment**: Wormhole adjacency properly extends neighbor relationships beyond physical adjacency
+- **Priority**: COMPLETED
+- **Dependencies**: Uses existing wormhole system and adjacency calculation
+- **Notes**: Extends neighbor relationships beyond physical adjacency - READY FOR USE
 
 ### 60.3 Ghosts of Creuss Special Case
 **Rule**: "Players are neighbors with the Ghosts of Creuss if the Ghosts of Creuss' 'Quantum Entanglement' faction ability is causing adjacency from the perspective of the Ghosts of Creuss player."
