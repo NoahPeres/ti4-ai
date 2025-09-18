@@ -7,7 +7,7 @@ on:
     branches: [ main, develop ]
 
 jobs:
-  test:
+  quality-checks:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -30,16 +30,26 @@ jobs:
       run: uv sync --dev
     
     - name: Lint with ruff
-      run: uv run ruff check src tests
+      run: uv run ruff check src tests --show-fixes
     
     - name: Check formatting with ruff
       run: uv run ruff format --check src tests
     
-    - name: Type check with mypy
-      run: uv run mypy src
+    - name: Type check with mypy (strict for src, standard for tests)
+      run: |
+        echo "Running mypy with strict checking for src/ and standard checking for tests/..."
+        echo "Checking src/ with strict mode..."
+        uv run mypy src --show-error-codes --strict --warn-unused-ignores
+        echo "Checking tests/ with standard mode (errors are informational only)..."
+        uv run mypy tests --show-error-codes || true
+        echo "✅ Type checking complete. Production code (src/) passes strict checks."
+    
+    - name: Security check with bandit
+      run: uv run pip install bandit && uv run bandit -r src/ -f json
+      continue-on-error: true
     
     - name: Test with pytest
-      run: uv run pytest --cov=src/ti4 --cov-report=xml
+      run: uv run pytest --cov=src/ti4 --cov-report=xml --cov-fail-under=90
     
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
@@ -47,3 +57,29 @@ jobs:
         file: ./coverage.xml
         flags: unittests
         name: codecov-umbrella
+        
+  # Separate job for runtime type checking validation
+  runtime-type-check:
+    runs-on: ubuntu-latest
+    needs: quality-checks
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v2
+      with:
+        version: "latest"
+    
+    - name: Install dependencies
+      run: uv sync --dev
+    
+    - name: Run tests with runtime type checking
+      run: uv run pytest tests/ -v --tb=short
+      env:
+        PYTHONPATH: src

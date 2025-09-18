@@ -6,34 +6,34 @@ from src.ti4.core.game_phase import GamePhase
 from src.ti4.testing.scenario_builder import GameScenarioBuilder
 
 
-def test_game_scenario_builder_creation():
+def test_game_scenario_builder_creation() -> None:
     """Test that GameScenarioBuilder can be created."""
     builder = GameScenarioBuilder()
     assert builder is not None
 
 
-def test_builder_with_players_fluent_interface():
+def test_builder_with_players_fluent_interface() -> None:
     """Test that with_players returns builder for fluent interface."""
     builder = GameScenarioBuilder()
     result = builder.with_players(("player1", "sol"), ("player2", "xxcha"))
     assert result is builder  # Should return self for fluent interface
 
 
-def test_builder_with_galaxy_fluent_interface():
+def test_builder_with_galaxy_fluent_interface() -> None:
     """Test that with_galaxy returns builder for fluent interface."""
     builder = GameScenarioBuilder()
     result = builder.with_galaxy("standard_6p")
     assert result is builder
 
 
-def test_builder_in_phase_fluent_interface():
+def test_builder_in_phase_fluent_interface() -> None:
     """Test that in_phase returns builder for fluent interface."""
     builder = GameScenarioBuilder()
     result = builder.in_phase(GamePhase.ACTION)
     assert result is builder
 
 
-def test_builder_build_creates_game_state():
+def test_builder_build_creates_game_state() -> None:
     """Test that build() creates a GameState with configured components."""
     builder = GameScenarioBuilder()
     game_state = (
@@ -51,7 +51,7 @@ def test_builder_build_creates_game_state():
     assert game_state.phase == GamePhase.ACTION
 
 
-def test_builder_validates_configuration_consistency():
+def test_builder_validates_configuration_consistency() -> None:
     """Test that builder validates configuration consistency."""
     builder = GameScenarioBuilder()
 
@@ -68,7 +68,7 @@ def test_builder_validates_configuration_consistency():
         builder.with_players(("player1", "")).build()
 
 
-def test_builder_validates_duplicate_player_ids():
+def test_builder_validates_duplicate_player_ids() -> None:
     """Test that builder prevents duplicate player IDs."""
     builder = GameScenarioBuilder()
 
@@ -76,7 +76,7 @@ def test_builder_validates_duplicate_player_ids():
         builder.with_players(("player1", "sol"), ("player1", "xxcha")).build()
 
 
-def test_builder_with_units_placement():
+def test_builder_with_units_placement() -> None:
     """Test that builder can place units in systems."""
 
     builder = GameScenarioBuilder()
@@ -113,7 +113,7 @@ def test_builder_with_units_placement():
     assert system2.space_units[1].owner == "player2"
 
 
-def test_builder_with_resources_and_technologies():
+def test_builder_with_resources_and_technologies() -> None:
     """Test that builder can configure player resources and technologies."""
     builder = GameScenarioBuilder()
     game_state = (
@@ -142,7 +142,7 @@ def test_builder_with_resources_and_technologies():
     assert "fighter_ii" in player1_techs
 
 
-def test_builder_preset_scenarios():
+def test_builder_preset_scenarios() -> None:
     """Test that builder provides preset scenario factory methods."""
     # Test basic 2-player scenario
     game_state = GameScenarioBuilder.create_basic_2_player_game()

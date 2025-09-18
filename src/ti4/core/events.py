@@ -30,9 +30,9 @@ class UnitMovedEvent:
 
     @property
     def event_type(self) -> str:
-        from .constants import EventConstants
+        from .constants import EventType
 
-        return EventConstants.UNIT_MOVED
+        return EventType.UNIT_MOVED.value
 
     @property
     def data(self) -> dict[str, Any]:
@@ -64,9 +64,9 @@ class CombatStartedEvent:
 
     @property
     def event_type(self) -> str:
-        from .constants import EventConstants
+        from .constants import EventType
 
-        return EventConstants.COMBAT_STARTED
+        return EventType.COMBAT_STARTED.value
 
     @property
     def data(self) -> dict[str, Any]:
@@ -94,9 +94,9 @@ class PhaseChangedEvent:
 
     @property
     def event_type(self) -> str:
-        from .constants import EventConstants
+        from .constants import EventType
 
-        return EventConstants.PHASE_CHANGED
+        return EventType.PHASE_CHANGED.value
 
     @property
     def data(self) -> dict[str, Any]:
@@ -174,9 +174,9 @@ class GameEventBus:
     """Central event bus for game event notifications."""
 
     def __init__(self) -> None:
-        self._observers: dict[str, list[Callable]] = {}
+        self._observers: dict[str, list[Callable[..., Any]]] = {}
 
-    def subscribe(self, event_type: str, observer: Callable) -> None:
+    def subscribe(self, event_type: str, observer: Callable[..., Any]) -> None:
         """Subscribe to specific event types."""
         validate_non_empty_string(event_type, "Event type")
         from .validation import validate_callable
@@ -187,7 +187,7 @@ class GameEventBus:
             self._observers[event_type] = []
         self._observers[event_type].append(observer)
 
-    def unsubscribe(self, event_type: str, observer: Callable) -> None:
+    def unsubscribe(self, event_type: str, observer: Callable[..., Any]) -> None:
         """Unsubscribe from event types."""
         validate_non_empty_string(event_type, "Event type")
 
@@ -211,6 +211,11 @@ class GameEventBus:
                     observer(
                         event
                     )  # Pass the original event to maintain type information
-                except Exception:
+                except Exception as e:
                     # Error isolation - continue notifying other observers
-                    pass
+                    # Log the error for debugging purposes
+                    import logging
+
+                    logging.warning(
+                        f"Observer {observer} failed to handle event {event}: {e}"
+                    )

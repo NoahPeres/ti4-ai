@@ -11,10 +11,11 @@ if TYPE_CHECKING:
 class System:
     """Represents a star system containing planets."""
 
-    def __init__(self, system_id: str):
+    def __init__(self, system_id: str) -> None:
         self.system_id = system_id
         self.planets: list[Planet] = []
         self.space_units: list[Unit] = []  # Units in the space area of the system
+        self.wormholes: list[str] = []  # List of wormhole types in this system
 
     def place_unit_in_space(self, unit: Unit) -> None:
         """Place a unit in the space area of this system."""
@@ -46,3 +47,65 @@ class System:
     def add_planet(self, planet: "Planet") -> None:
         """Add a planet to this system."""
         self.planets.append(planet)
+
+    def add_wormhole(self, wormhole_type: str) -> None:
+        """
+        Add a wormhole of the specified type to this system.
+
+        Implements support for LRR 101 wormhole adjacency rules.
+        Valid wormhole types: alpha, beta, gamma, delta
+
+        Args:
+            wormhole_type: Type of wormhole to add (alpha, beta, gamma, delta)
+
+        Raises:
+            ValueError: If wormhole_type is invalid
+        """
+        if not wormhole_type:
+            raise ValueError("Wormhole type cannot be empty")
+
+        valid_types = {"alpha", "beta", "gamma", "delta"}
+        if wormhole_type not in valid_types:
+            raise ValueError(
+                f"Invalid wormhole type: {wormhole_type}. Valid types: {valid_types}"
+            )
+
+        # Avoid duplicates
+        if wormhole_type not in self.wormholes:
+            self.wormholes.append(wormhole_type)
+
+    def has_wormhole(self, wormhole_type: str) -> bool:
+        """
+        Check if this system has a wormhole of the specified type.
+
+        Args:
+            wormhole_type: Type of wormhole to check for
+
+        Returns:
+            True if system contains the specified wormhole type, False otherwise
+        """
+        return wormhole_type in self.wormholes
+
+    def get_wormhole_types(self) -> list[str]:
+        """
+        Get all wormhole types present in this system.
+
+        Returns:
+            List of wormhole types in this system (copy to prevent external modification)
+        """
+        return self.wormholes.copy()
+
+    def remove_wormhole(self, wormhole_type: str) -> bool:
+        """
+        Remove a wormhole of the specified type from this system.
+
+        Args:
+            wormhole_type: Type of wormhole to remove
+
+        Returns:
+            True if wormhole was removed, False if it wasn't present
+        """
+        if wormhole_type in self.wormholes:
+            self.wormholes.remove(wormhole_type)
+            return True
+        return False

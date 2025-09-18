@@ -1,38 +1,43 @@
 """Tests for GameStateMachine."""
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from src.ti4.core.game_phase import GamePhase
 from src.ti4.core.game_state_machine import GameStateMachine
 
+if TYPE_CHECKING:
+    pass
+
 
 class TestGameStateMachine:
     """Test cases for GameStateMachine."""
 
-    def test_initial_phase_is_setup(self):
+    def test_initial_phase_is_setup(self) -> None:
         """Test that state machine starts in SETUP phase."""
         state_machine = GameStateMachine()
         assert state_machine.current_phase == GamePhase.SETUP
 
-    def test_can_transition_to_valid_phase(self):
+    def test_can_transition_to_valid_phase(self) -> None:
         """Test that can_transition_to returns True for valid transitions."""
         state_machine = GameStateMachine()
         # From SETUP, should be able to go to STRATEGY
         assert state_machine.can_transition_to(GamePhase.STRATEGY)
 
-    def test_can_transition_to_invalid_phase(self):
+    def test_can_transition_to_invalid_phase(self) -> None:
         """Test that can_transition_to returns False for invalid transitions."""
         state_machine = GameStateMachine()
         # From SETUP, should NOT be able to go directly to ACTION
         assert not state_machine.can_transition_to(GamePhase.ACTION)
 
-    def test_transition_to_valid_phase(self):
+    def test_transition_to_valid_phase(self) -> None:
         """Test that transition_to changes phase for valid transitions."""
         state_machine = GameStateMachine()
         state_machine.transition_to(GamePhase.STRATEGY)
         assert state_machine.current_phase == GamePhase.STRATEGY
 
-    def test_transition_to_invalid_phase_raises_error(self):
+    def test_transition_to_invalid_phase_raises_error(self) -> None:
         """Test that transition_to raises error for invalid transitions."""
         state_machine = GameStateMachine()
         with pytest.raises(
@@ -41,13 +46,13 @@ class TestGameStateMachine:
         ):
             state_machine.transition_to(GamePhase.ACTION)
 
-    def test_get_valid_transitions(self):
+    def test_get_valid_transitions(self) -> None:
         """Test that get_valid_transitions returns correct transitions."""
         state_machine = GameStateMachine()
         valid_transitions = state_machine.get_valid_transitions()
         assert valid_transitions == {GamePhase.STRATEGY}
 
-    def test_full_phase_cycle(self):
+    def test_full_phase_cycle(self) -> None:
         """Test a complete phase transition cycle."""
         state_machine = GameStateMachine()
 
@@ -58,6 +63,7 @@ class TestGameStateMachine:
 
         # STRATEGY -> ACTION
         state_machine.transition_to(GamePhase.ACTION)
+        # After transitioning to ACTION phase, verify state
         assert state_machine.current_phase == GamePhase.ACTION
         assert state_machine.get_valid_transitions() == {GamePhase.STATUS}
 
@@ -75,7 +81,7 @@ class TestGameStateMachine:
         state_machine.transition_to(GamePhase.STRATEGY)
         assert state_machine.current_phase == GamePhase.STRATEGY
 
-    def test_transition_map_completeness(self):
+    def test_transition_map_completeness(self) -> None:
         """Test that all phases have defined transitions."""
         GameStateMachine()
 

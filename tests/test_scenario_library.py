@@ -7,7 +7,7 @@ from src.ti4.testing.scenario_builder import GameScenarioBuilder
 class TestScenarioLibrary:
     """Test the comprehensive scenario library."""
 
-    def test_faction_specific_sol_scenario(self):
+    def test_faction_specific_sol_scenario(self) -> None:
         """Test Sol faction-specific scenario."""
         game_state = GameScenarioBuilder.create_faction_specific_scenario("sol")
 
@@ -26,7 +26,7 @@ class TestScenarioLibrary:
         assert len(infantry_units) == 1
         assert infantry_units[0].owner == "player1"
 
-    def test_faction_specific_xxcha_scenario(self):
+    def test_faction_specific_xxcha_scenario(self) -> None:
         """Test Xxcha faction-specific scenario."""
         game_state = GameScenarioBuilder.create_faction_specific_scenario("xxcha")
 
@@ -44,7 +44,7 @@ class TestScenarioLibrary:
         assert len(flagship_units) == 1
         assert flagship_units[0].owner == "player1"
 
-    def test_faction_specific_unknown_faction(self):
+    def test_faction_specific_unknown_faction(self) -> None:
         """Test faction-specific scenario with unknown faction defaults to basic game."""
         game_state = GameScenarioBuilder.create_faction_specific_scenario(
             "unknown_faction"
@@ -54,7 +54,7 @@ class TestScenarioLibrary:
         assert len(game_state.players) == 2
         assert game_state.phase == GamePhase.ACTION
 
-    def test_edge_case_max_units_scenario(self):
+    def test_edge_case_max_units_scenario(self) -> None:
         """Test edge case scenario with maximum units."""
         game_state = GameScenarioBuilder.create_edge_case_scenario("max_units")
 
@@ -76,7 +76,7 @@ class TestScenarioLibrary:
         ]
         assert sorted(unit_types) == sorted(expected_types)
 
-    def test_edge_case_empty_systems_scenario(self):
+    def test_edge_case_empty_systems_scenario(self) -> None:
         """Test edge case scenario with mostly empty systems."""
         game_state = GameScenarioBuilder.create_edge_case_scenario("empty_systems")
 
@@ -90,7 +90,7 @@ class TestScenarioLibrary:
         assert len(isolated_system.space_units) == 1
         assert isolated_system.space_units[0].unit_type == "fighter"
 
-    def test_edge_case_resource_overflow_scenario(self):
+    def test_edge_case_resource_overflow_scenario(self) -> None:
         """Test edge case scenario with maximum resources."""
         game_state = GameScenarioBuilder.create_edge_case_scenario("resource_overflow")
 
@@ -100,7 +100,7 @@ class TestScenarioLibrary:
         assert player1_resources["influence"] == 999
         assert player1_resources["resources"] == 999
 
-    def test_edge_case_unknown_scenario(self):
+    def test_edge_case_unknown_scenario(self) -> None:
         """Test edge case scenario with unknown type defaults to basic game."""
         game_state = GameScenarioBuilder.create_edge_case_scenario("unknown_scenario")
 
@@ -108,7 +108,7 @@ class TestScenarioLibrary:
         assert len(game_state.players) == 2
         assert game_state.phase == GamePhase.ACTION
 
-    def test_multi_player_scenario_6_players(self):
+    def test_multi_player_scenario_6_players(self) -> None:
         """Test 6-player scenario."""
         game_state = GameScenarioBuilder.create_multi_player_scenario(6)
 
@@ -126,7 +126,7 @@ class TestScenarioLibrary:
             for unit in home_system.space_units:
                 assert unit.owner == player_id
 
-    def test_multi_player_scenario_3_players(self):
+    def test_multi_player_scenario_3_players(self) -> None:
         """Test 3-player scenario."""
         game_state = GameScenarioBuilder.create_multi_player_scenario(3)
 
@@ -138,7 +138,7 @@ class TestScenarioLibrary:
         actual_factions = [player.faction for player in game_state.players]
         assert actual_factions == expected_factions
 
-    def test_multi_player_scenario_max_players(self):
+    def test_multi_player_scenario_max_players(self) -> None:
         """Test multi-player scenario caps at 6 players."""
         game_state = GameScenarioBuilder.create_multi_player_scenario(
             10
@@ -146,7 +146,7 @@ class TestScenarioLibrary:
 
         assert len(game_state.players) == 6  # Should cap at 6
 
-    def test_late_game_scenario(self):
+    def test_late_game_scenario(self) -> None:
         """Test late-game scenario with advanced units."""
         game_state = GameScenarioBuilder.create_late_game_scenario()
 
@@ -176,7 +176,7 @@ class TestScenarioLibrary:
         assert game_state.player_resources["player1"]["trade_goods"] == 15
         assert game_state.player_resources["player2"]["command_tokens"] == 14
 
-    def test_scenario_library_coverage(self):
+    def test_scenario_library_coverage(self) -> None:
         """Test that all major scenario types can be created without errors."""
         scenarios = [
             GameScenarioBuilder.create_basic_2_player_game(),
@@ -203,7 +203,7 @@ class TestScenarioLibrary:
                 GamePhase.ACTION,
             ]
 
-    def test_scenario_consistency(self):
+    def test_scenario_consistency(self) -> None:
         """Test that scenarios maintain internal consistency."""
         scenarios = [
             ("basic_2_player", GameScenarioBuilder.create_basic_2_player_game()),

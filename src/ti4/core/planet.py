@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 class Planet:
     """Represents a planet within a system."""
 
-    def __init__(self, name: str, resources: int, influence: int):
+    def __init__(self, name: str, resources: int, influence: int) -> None:
         self.name = name
         self.resources = resources
         self.influence = influence

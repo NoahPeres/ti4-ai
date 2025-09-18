@@ -3,13 +3,13 @@
 from src.ti4.core.player import Player
 
 
-def test_player_has_unique_identification():
+def test_player_has_unique_identification() -> None:
     """Test that Player has unique identification."""
     player = Player(id="player1", faction="sol")
     assert player.id == "player1"
 
 
-def test_player_equality():
+def test_player_equality() -> None:
     """Test that Player instances with same data are equal."""
     player1 = Player(id="player1", faction="sol")
     player2 = Player(id="player1", faction="sol")
@@ -17,7 +17,7 @@ def test_player_equality():
     assert player1 == player2
 
 
-def test_player_validation():
+def test_player_validation() -> None:
     """Test that Player has validation methods."""
     player = Player(id="player1", faction="sol")
 
@@ -29,7 +29,7 @@ def test_player_validation():
     assert player.is_valid() is True
 
 
-def test_multiple_players_in_game_state():
+def test_multiple_players_in_game_state() -> None:
     """Test that multiple players can be created with different IDs."""
     player1 = Player(id="player1", faction="sol")
     player2 = Player(id="player2", faction="hacan")

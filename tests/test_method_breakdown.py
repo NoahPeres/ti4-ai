@@ -1,5 +1,6 @@
 """Tests to verify that complex method breakdown works correctly."""
 
+from typing import Any
 from unittest.mock import Mock, patch
 
 from src.ti4.core.events import CombatStartedEvent, PhaseChangedEvent, UnitMovedEvent
@@ -10,7 +11,7 @@ from src.ti4.testing.scenario_builder import GameScenarioBuilder
 class TestObserverMethodBreakdown:
     """Test that observer method breakdown works correctly."""
 
-    def test_ai_training_collector_broken_down_methods_work(self):
+    def test_ai_training_collector_broken_down_methods_work(self) -> None:
         """Test that the broken down AI training collector methods work correctly."""
         collector = AITrainingDataCollector()
         event = UnitMovedEvent(
@@ -36,7 +37,7 @@ class TestObserverMethodBreakdown:
         assert record["to_system"] == "sys2"
         assert record["player_id"] == "player1"
 
-    def test_ai_training_collector_base_record_creation(self):
+    def test_ai_training_collector_base_record_creation(self) -> None:
         """Test that base training record creation works correctly."""
         collector = AITrainingDataCollector()
         event = UnitMovedEvent(
@@ -54,7 +55,7 @@ class TestObserverMethodBreakdown:
         assert base_record["game_id"] == "test"
         assert "timestamp" in base_record
 
-    def test_ai_training_collector_event_specific_enrichment(self):
+    def test_ai_training_collector_event_specific_enrichment(self) -> None:
         """Test that event-specific data enrichment works correctly."""
         collector = AITrainingDataCollector()
 
@@ -67,7 +68,7 @@ class TestObserverMethodBreakdown:
             player_id="player1",
         )
 
-        training_record = {}
+        training_record: dict[str, Any] = {}
         collector._add_unit_moved_data(training_record, unit_event)
 
         assert training_record["unit_id"] == "unit1"
@@ -80,7 +81,7 @@ class TestObserverMethodBreakdown:
             game_id="test", system_id="sys1", participants=["player1", "player2"]
         )
 
-        combat_record = {}
+        combat_record: dict[str, Any] = {}
         collector._add_combat_started_data(combat_record, combat_event)
 
         assert combat_record["system_id"] == "sys1"
@@ -91,7 +92,7 @@ class TestObserverMethodBreakdown:
             game_id="test", from_phase="setup", to_phase="strategy", round_number=1
         )
 
-        phase_record = {}
+        phase_record: dict[str, Any] = {}
         collector._add_phase_changed_data(phase_record, phase_event)
 
         assert phase_record["from_phase"] == "setup"
@@ -99,7 +100,7 @@ class TestObserverMethodBreakdown:
         assert phase_record["round_number"] == 1
 
     @patch("src.ti4.core.observers.logger")
-    def test_logging_observer_broken_down_methods_work(self, mock_logger):
+    def test_logging_observer_broken_down_methods_work(self, mock_logger) -> None:
         """Test that the broken down logging observer methods work correctly."""
 
         observer = LoggingObserver()
@@ -124,7 +125,7 @@ class TestObserverMethodBreakdown:
         assert "player1" in log_message
 
     @patch("src.ti4.core.observers.logger")
-    def test_logging_observer_event_specific_methods(self, mock_logger):
+    def test_logging_observer_event_specific_methods(self, mock_logger) -> None:
         """Test that event-specific logging methods work correctly."""
 
         observer = LoggingObserver()
@@ -178,7 +179,7 @@ class TestObserverMethodBreakdown:
 class TestScenarioBuilderMethodBreakdown:
     """Test that scenario builder method breakdown works correctly."""
 
-    def test_faction_specific_scenario_with_dictionary_dispatch(self):
+    def test_faction_specific_scenario_with_dictionary_dispatch(self) -> None:
         """Test that faction-specific scenarios work with dictionary dispatch."""
         # Test Sol scenario
         sol_scenario = GameScenarioBuilder.create_faction_specific_scenario("sol")
@@ -194,7 +195,7 @@ class TestScenarioBuilderMethodBreakdown:
         )
         assert unknown_scenario is not None
 
-    def test_individual_faction_scenario_builders(self):
+    def test_individual_faction_scenario_builders(self) -> None:
         """Test that individual faction scenario builders work correctly."""
         # Test Sol scenario builder
         sol_scenario = GameScenarioBuilder._create_sol_faction_scenario()
@@ -204,7 +205,7 @@ class TestScenarioBuilderMethodBreakdown:
         xxcha_scenario = GameScenarioBuilder._create_xxcha_faction_scenario()
         assert xxcha_scenario is not None
 
-    def test_edge_case_scenario_with_dictionary_dispatch(self):
+    def test_edge_case_scenario_with_dictionary_dispatch(self) -> None:
         """Test that edge case scenarios work with dictionary dispatch."""
         # Test max units scenario
         max_units_scenario = GameScenarioBuilder.create_edge_case_scenario("max_units")
@@ -224,7 +225,7 @@ class TestScenarioBuilderMethodBreakdown:
         unknown_scenario = GameScenarioBuilder.create_edge_case_scenario("unknown")
         assert unknown_scenario is not None
 
-    def test_individual_edge_case_scenario_builders(self):
+    def test_individual_edge_case_scenario_builders(self) -> None:
         """Test that individual edge case scenario builders work correctly."""
         # Test max units scenario builder
         max_units_scenario = GameScenarioBuilder._create_max_units_scenario()
@@ -242,7 +243,7 @@ class TestScenarioBuilderMethodBreakdown:
 class TestMethodBreakdownBenefits:
     """Test that method breakdown provides the expected benefits."""
 
-    def test_method_breakdown_improves_testability(self):
+    def test_method_breakdown_improves_testability(self) -> None:
         """Test that broken down methods are more testable."""
         collector = AITrainingDataCollector()
 
@@ -278,7 +279,7 @@ class TestMethodBreakdownBenefits:
         assert training_record["to_system"] == "to_sys"
         assert training_record["player_id"] == "test_player"
 
-    def test_method_breakdown_improves_maintainability(self):
+    def test_method_breakdown_improves_maintainability(self) -> None:
         """Test that broken down methods are easier to maintain."""
         # With the dictionary dispatch pattern, adding new faction scenarios
         # is now easier and doesn't require modifying the main method
@@ -303,7 +304,7 @@ class TestMethodBreakdownBenefits:
         assert len(training_data) == 1
         assert training_data[0]["event_type"] == "unit_moved"
 
-    def test_method_breakdown_reduces_cyclomatic_complexity(self):
+    def test_method_breakdown_reduces_cyclomatic_complexity(self) -> None:
         """Test that method breakdown reduces cyclomatic complexity."""
         # The original handle_event methods had multiple if/elif branches
         # Now each method has a single responsibility and lower complexity
@@ -314,7 +315,7 @@ class TestMethodBreakdownBenefits:
         # and focuses on a single task
 
         # Test that each helper method works independently
-        training_record = {}
+        training_record: dict[str, Any] = {}
 
         # These methods have no conditional logic - just data assignment
         mock_event = Mock()

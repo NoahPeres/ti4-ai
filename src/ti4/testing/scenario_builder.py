@@ -2,6 +2,7 @@
 
 from typing import Any, Optional
 
+from src.ti4.core.constants import LocationType
 from src.ti4.core.galaxy import Galaxy
 from src.ti4.core.game_phase import GamePhase
 from src.ti4.core.game_state import GameState
@@ -155,7 +156,7 @@ class GameScenarioBuilder:
             validate_non_empty_string(player.faction, "Faction")
 
         # Validate unique player IDs
-        validate_unique_collection(self._players, "players", key_func=lambda p: p.id)
+        validate_unique_collection(self._players, "players", key=lambda p: p.id)
 
     def _setup_systems_and_units(self) -> None:
         """Set up systems and place units according to configuration."""
@@ -174,7 +175,7 @@ class GameScenarioBuilder:
             unit = Unit(unit_type=unit_type, owner=owner)
             system = self._systems[system_id]
 
-            if location == "space":
+            if location == LocationType.SPACE.value:
                 system.place_unit_in_space(unit)
             else:
                 # Assume it's a planet name

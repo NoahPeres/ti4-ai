@@ -13,7 +13,7 @@ from src.ti4.core.unit_stats import UnitStatsProvider
 class TestPerformanceBenchmarks:
     """Benchmark tests for performance-critical operations."""
 
-    def test_unit_stats_calculation_performance(self):
+    def test_unit_stats_calculation_performance(self) -> None:
         """Benchmark unit statistics calculation."""
         provider = UnitStatsProvider()
         unit_type = "cruiser"
@@ -35,7 +35,7 @@ class TestPerformanceBenchmarks:
         # Should be very fast - less than 1ms per calculation
         assert avg_time < 0.001, f"Unit stats calculation too slow: {avg_time:.6f}s"
 
-    def test_movement_validation_performance(self):
+    def test_movement_validation_performance(self) -> None:
         """Benchmark movement validation."""
         galaxy = Galaxy()
         validator = MovementValidator(galaxy)
@@ -71,7 +71,7 @@ class TestPerformanceBenchmarks:
         # Should be fast - less than 5ms per validation
         assert avg_time < 0.005, f"Movement validation too slow: {avg_time:.6f}s"
 
-    def test_cached_operations_performance(self):
+    def test_cached_operations_performance(self) -> None:
         """Test that cached operations provide performance benefits."""
         provider = UnitStatsProvider()
         unit_type = "cruiser"
@@ -95,7 +95,7 @@ class TestPerformanceBenchmarks:
         # This test mainly ensures caching doesn't break functionality
         assert second_call_time <= first_call_time * 2  # Allow some variance
 
-    def test_game_state_operations_performance(self):
+    def test_game_state_operations_performance(self) -> None:
         """Benchmark common game state operations."""
         game_state = GameState(game_id="benchmark_game")
 

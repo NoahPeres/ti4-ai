@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
+from .constants import LocationType
 from .galaxy import Galaxy
 from .movement_rules import MovementContext, MovementRuleEngine
 from .system import System
@@ -32,7 +33,7 @@ class MovementValidator:
 
     def __init__(
         self, galaxy: Galaxy, rule_engine: Optional[MovementRuleEngine] = None
-    ):
+    ) -> None:
         """Initialize the movement validator with a galaxy."""
         self._galaxy = galaxy
         self._rule_engine = rule_engine or MovementRuleEngine()
@@ -61,8 +62,8 @@ class MovementValidator:
         # Rule: Ground forces cannot move directly between planets
         # They must move to space first, then be committed to planets
         if (
-            movement.from_location != "space"
-            and movement.to_location != "space"
+            movement.from_location != LocationType.SPACE.value
+            and movement.to_location != LocationType.SPACE.value
             and movement.from_location != movement.to_location
         ):
             return False
@@ -102,7 +103,7 @@ class MovementValidator:
 class MovementExecutor:
     """Executes unit movement actions."""
 
-    def __init__(self, galaxy: Galaxy, systems: dict[str, System]):
+    def __init__(self, galaxy: Galaxy, systems: dict[str, System]) -> None:
         """Initialize the movement executor."""
         self._galaxy = galaxy
         self._systems = systems
@@ -127,7 +128,7 @@ class MovementExecutor:
         self, system: System, unit: Unit, location: str
     ) -> None:
         """Remove unit from specified location (space or planet)."""
-        if location == "space":
+        if location == LocationType.SPACE.value:
             system.remove_unit_from_space(unit)
         else:
             # Remove from planet
@@ -137,7 +138,7 @@ class MovementExecutor:
         self, system: System, unit: Unit, location: str
     ) -> None:
         """Place unit at specified location (space or planet)."""
-        if location == "space":
+        if location == LocationType.SPACE.value:
             system.place_unit_in_space(unit)
         else:
             # Place on planet
@@ -160,7 +161,7 @@ class TransportOperation:
 class TransportValidator:
     """Validates transport actions for ground forces."""
 
-    def __init__(self, galaxy: Galaxy):
+    def __init__(self, galaxy: Galaxy) -> None:
         """Initialize transport validator."""
         self._galaxy = galaxy
 
@@ -195,7 +196,7 @@ class TransportValidator:
 class TransportExecutor:
     """Executes transport actions."""
 
-    def __init__(self, systems: dict[str, System]):
+    def __init__(self, systems: dict[str, System]) -> None:
         """Initialize transport executor."""
         self._systems = systems
 
@@ -234,13 +235,13 @@ class TransportExecutor:
     ) -> None:
         """Move a single ground force unit."""
         # Remove from source
-        if from_location == "space":
+        if from_location == LocationType.SPACE.value:
             from_system.remove_unit_from_space(unit)
         else:
             from_system.remove_unit_from_planet(unit, from_location)
 
         # Place at destination
-        if to_location == "space":
+        if to_location == LocationType.SPACE.value:
             to_system.place_unit_in_space(unit)
         else:
             to_system.place_unit_on_planet(unit, to_location)

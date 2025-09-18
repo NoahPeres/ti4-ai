@@ -20,7 +20,7 @@ class GameInstance:
     lock: threading.RLock = field(default_factory=threading.RLock)
     created_at: float = field(default_factory=time.time)
     last_accessed: float = field(default_factory=time.time)
-    active_operations: int = 0
+    active_operations = 0
 
 
 class ConcurrentGameManager:
@@ -74,8 +74,8 @@ class ConcurrentGameManager:
             return game_instance
 
     def execute_game_operation(
-        self, game_id: str, operation: Callable, *args: Any, **kwargs: Any
-    ) -> Future:
+        self, game_id: str, operation: Callable[..., Any], *args: Any, **kwargs: Any
+    ) -> Future[Any]:
         """Execute an operation on a game instance in a thread-safe manner."""
         game_instance = self.get_game(game_id)
         if not game_instance:

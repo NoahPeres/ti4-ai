@@ -28,7 +28,7 @@ class StructuredFormatter(logging.Formatter):
 class GameLogger:
     """Enhanced logging with structured data for game events and operations."""
 
-    def __init__(self, game_id: str):
+    def __init__(self, game_id: str) -> None:
         """Initialize GameLogger for specific game instance."""
         self.game_id = game_id
         self.logger = logging.getLogger(f"ti4.game.{game_id}")

@@ -2,6 +2,7 @@
 
 from typing import Any, Optional
 
+from src.ti4.commands.base import GameCommand
 from src.ti4.commands.manager import CommandManager
 from src.ti4.core.events import create_phase_changed_event
 from src.ti4.core.game_phase import GamePhase
@@ -12,7 +13,7 @@ from src.ti4.core.strategy_card import STANDARD_STRATEGY_CARDS, StrategyCard
 class GameController:
     """Manages game flow and turn order for TI4."""
 
-    def __init__(self, players: list[Player]):
+    def __init__(self, players: list[Player]) -> None:
         """Initialize the game controller with players."""
         if not players:
             raise ValueError("At least one player is required")
@@ -228,7 +229,7 @@ class GameController:
         self._current_game_state = new_state
         return new_state
 
-    def get_action_history(self) -> list:
+    def get_action_history(self) -> list[GameCommand]:
         """Get the history of actions taken."""
         return self._command_manager.get_command_history()
 

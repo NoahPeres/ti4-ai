@@ -8,13 +8,13 @@ from src.ti4.core.unit import Unit
 
 
 class TestMovementValidator:
-    def test_movement_validator_creation(self):
+    def test_movement_validator_creation(self) -> None:
         """Test that MovementValidator can be created."""
         galaxy = Galaxy()
         validator = MovementValidator(galaxy)
         assert validator is not None
 
-    def test_validate_basic_movement(self):
+    def test_validate_basic_movement(self) -> None:
         """Test basic movement validation between adjacent systems."""
         galaxy = Galaxy()
 
@@ -41,7 +41,7 @@ class TestMovementValidator:
         validator = MovementValidator(galaxy)
         assert validator.is_valid_movement(movement) is True
 
-    def test_validate_invalid_movement_non_adjacent(self):
+    def test_validate_invalid_movement_non_adjacent(self) -> None:
         """Test that movement between non-adjacent systems is invalid."""
         galaxy = Galaxy()
 
@@ -68,7 +68,7 @@ class TestMovementValidator:
         validator = MovementValidator(galaxy)
         assert validator.is_valid_movement(movement) is False
 
-    def test_validate_movement_invalid_system_ids(self):
+    def test_validate_movement_invalid_system_ids(self) -> None:
         """Test movement validation with invalid system IDs."""
         galaxy = Galaxy()
         coord1 = HexCoordinate(0, 0)
@@ -95,7 +95,7 @@ class TestMovementValidator:
         )
         assert validator.is_valid_movement(movement) is False
 
-    def test_validate_movement_with_technologies(self):
+    def test_validate_movement_with_technologies(self) -> None:
         """Test movement validation with player technologies."""
         galaxy = Galaxy()
         coord1 = HexCoordinate(0, 0)
@@ -118,7 +118,7 @@ class TestMovementValidator:
 
 
 class TestMovementExecution:
-    def test_execute_movement(self):
+    def test_execute_movement(self) -> None:
         """Test executing a valid movement action."""
         galaxy = Galaxy()
 
@@ -151,7 +151,7 @@ class TestMovementExecution:
         assert unit not in system1.space_units
         assert unit in system2.space_units
 
-    def test_movement_with_gravity_drive(self):
+    def test_movement_with_gravity_drive(self) -> None:
         """Test movement with gravity drive technology."""
         galaxy = Galaxy()
 
@@ -188,7 +188,7 @@ class TestMovementExecution:
         # Should be valid with gravity drive (assuming it adds +1 movement)
         assert validator.is_valid_movement(movement_with_tech) is True
 
-    def test_unit_movement_range(self):
+    def test_unit_movement_range(self) -> None:
         """Test that different units have different movement ranges."""
         # Test different unit types
         cruiser = Unit(unit_type="cruiser", owner="player1")
@@ -200,7 +200,7 @@ class TestMovementExecution:
         assert destroyer.get_movement() == 2
         assert carrier.get_movement() == 1
 
-    def test_ground_force_transport_from_planet(self):
+    def test_ground_force_transport_from_planet(self) -> None:
         """Test transporting ground forces from a planet."""
         from src.ti4.core.movement import (
             TransportExecutor,
@@ -258,7 +258,7 @@ class TestMovementExecution:
         assert infantry1 not in planet1.units  # No longer on planet
         assert infantry2 not in planet1.units
 
-    def test_invalid_transport_exceeds_capacity(self):
+    def test_invalid_transport_exceeds_capacity(self) -> None:
         """Test that transport fails when exceeding ship capacity."""
         from src.ti4.core.movement import TransportOperation, TransportValidator
 
@@ -283,7 +283,7 @@ class TestMovementExecution:
         validator = TransportValidator(galaxy)
         assert validator.is_valid_transport(transport) is False
 
-    def test_invalid_direct_planet_to_planet_movement(self):
+    def test_invalid_direct_planet_to_planet_movement(self) -> None:
         """Test that direct planet-to-planet movement is invalid according to TI4 rules."""
         from src.ti4.core.planet import Planet
 
@@ -316,7 +316,7 @@ class TestMovementExecution:
         # This should be invalid according to TI4 rules
         assert validator.is_valid_movement(movement) is False
 
-    def test_correct_tactical_action_movement_sequence(self):
+    def test_correct_tactical_action_movement_sequence(self) -> None:
         """Test the correct two-step tactical action movement process."""
         from src.ti4.core.planet import Planet
 

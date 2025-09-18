@@ -4,6 +4,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Optional
 
+from ..core.constants import LocationType
+
 
 class MovementValidationError(Exception):
     """Raised when movement validation fails."""
@@ -36,8 +38,8 @@ class MovementPlan:
         """Add a ground force movement to the plan."""
         # Validate that ground forces cannot move directly between planets
         if (
-            from_location != "space"
-            and to_location != "space"
+            from_location != LocationType.SPACE.value
+            and to_location != LocationType.SPACE.value
             and from_location != to_location
         ):
             raise MovementValidationError(
@@ -129,13 +131,13 @@ class MovementStep(TacticalActionStep):
             to_system = game_state.systems[to_system_id]
 
             # Remove unit from source location
-            if from_location == "space":
+            if from_location == LocationType.SPACE.value:
                 from_system.remove_unit_from_space(unit)
             else:
                 from_system.remove_unit_from_planet(unit, from_location)
 
             # Add unit to destination location
-            if to_location == "space":
+            if to_location == LocationType.SPACE.value:
                 to_system.place_unit_in_space(unit)
             else:
                 to_system.place_unit_on_planet(unit, to_location)
@@ -190,7 +192,7 @@ class ValidationResult:
 class MovementValidator:
     """Validates movement plans according to TI4 rules."""
 
-    def __init__(self, galaxy: Any):
+    def __init__(self, galaxy: Any) -> None:
         self.galaxy = galaxy
 
     def validate_movement_plan(
@@ -270,7 +272,7 @@ class MovementValidator:
             from_location = movement["from_location"]
 
             # Ground forces moving from planets need transport
-            if from_location != "space":
+            if from_location != LocationType.SPACE.value:
                 # Find available transport
                 transport_found = False
                 for ship_key in transport_capacity:

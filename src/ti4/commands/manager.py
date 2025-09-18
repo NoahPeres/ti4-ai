@@ -1,6 +1,6 @@
 """Command manager for handling command execution and history."""
 
-from typing import Any, Optional
+from typing import Any
 
 from ..core.game_state import GameState
 from .base import GameCommand
@@ -34,16 +34,10 @@ class CommandManager:
 
         return new_state
 
-    def undo_last_command(
-        self, game_state: Optional[GameState] = None
-    ) -> Optional[GameState]:
+    def undo_last_command(self, game_state: GameState) -> GameState:
         """Undo the most recent command."""
         if not self._command_history:
             raise ValueError("No commands to undo")
-
-        if game_state is None:
-            # Cannot undo without game state
-            raise ValueError("Game state required for undo operation")
 
         last_command = self._command_history.pop()
         self._undo_stack.pop()  # Remove corresponding undo data

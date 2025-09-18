@@ -1,6 +1,6 @@
 """Test utilities for TI4 game framework tests."""
 
-from typing import Optional
+from typing import Any, Optional
 
 from src.ti4.core.constants import FactionConstants, UnitType
 from src.ti4.core.fleet import Fleet
@@ -105,7 +105,7 @@ class TestAssertions:
 
     @staticmethod
     def assert_combat_participants(
-        participants: dict, expected_players: list[str]
+        participants: dict[str, Any], expected_players: list[str]
     ) -> None:
         """Assert that combat participants match expected players."""
         assert set(participants.keys()) == set(expected_players), (
@@ -116,12 +116,14 @@ class TestAssertions:
 class MockStatsProvider(UnitStatsProvider):
     """Mock stats provider for testing."""
 
-    def __init__(self, custom_stats: Optional[dict] = None):
+    def __init__(self, custom_stats: Optional[dict[str, Any]] = None) -> None:
         """Initialize with optional custom stats."""
         super().__init__()
         self.custom_stats = custom_stats or {}
 
-    def get_unit_stats(self, unit_type: str, faction=None, technologies=None):
+    def get_unit_stats(
+        self, unit_type: str, faction: Optional[str] = None, technologies: Any = None
+    ) -> Any:
         """Get stats, using custom stats if provided."""
         if unit_type in self.custom_stats:
             return self.custom_stats[unit_type]

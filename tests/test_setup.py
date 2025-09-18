@@ -3,12 +3,12 @@
 from src.ti4 import __version__
 
 
-def test_version():
+def test_version() -> None:
     """Test that version is defined."""
     assert __version__ == "0.1.0"
 
 
-def test_imports():
+def test_imports() -> None:
     """Test that basic imports work."""
     import src.ti4.actions
     import src.ti4.core
@@ -25,7 +25,7 @@ def test_imports():
 class TestProjectStructure:
     """Test that project structure is set up correctly."""
 
-    def test_package_structure_exists(self):
+    def test_package_structure_exists(self) -> None:
         """Test that all expected packages exist."""
 
         # If we can import them, they exist

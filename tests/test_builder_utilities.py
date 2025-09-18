@@ -5,7 +5,7 @@ from src.ti4.testing.scenario_builder import GameScenarioBuilder
 from src.ti4.testing.test_utilities import TestUtilities
 
 
-def test_early_game_scenario():
+def test_early_game_scenario() -> None:
     """Test early game scenario preset."""
     game_state = GameScenarioBuilder.create_early_game_scenario()
 
@@ -24,7 +24,7 @@ def test_early_game_scenario():
     assert game_state.player_resources["player2"]["command_tokens"] == 8
 
 
-def test_mid_game_scenario():
+def test_mid_game_scenario() -> None:
     """Test mid-game scenario preset."""
     game_state = GameScenarioBuilder.create_mid_game_scenario()
 
@@ -46,7 +46,7 @@ def test_mid_game_scenario():
     assert "war_sun" in game_state.player_technologies["player2"]
 
 
-def test_test_utilities_simple_game():
+def test_test_utilities_simple_game() -> None:
     """Test TestUtilities simple game creation."""
     game_state = TestUtilities.create_simple_2_player_game()
 
@@ -54,7 +54,7 @@ def test_test_utilities_simple_game():
     assert game_state.phase == GamePhase.ACTION
 
 
-def test_test_utilities_adjacent_systems():
+def test_test_utilities_adjacent_systems() -> None:
     """Test TestUtilities adjacent systems scenario."""
     game_state = TestUtilities.create_game_with_adjacent_systems()
 
@@ -71,7 +71,7 @@ def test_test_utilities_adjacent_systems():
     assert system_b.space_units[0].unit_type == "destroyer"
 
 
-def test_test_utilities_fleet_capacity():
+def test_test_utilities_fleet_capacity() -> None:
     """Test TestUtilities fleet capacity scenario."""
     game_state = TestUtilities.create_fleet_capacity_test_scenario()
 
@@ -85,7 +85,7 @@ def test_test_utilities_fleet_capacity():
     assert unit_types.count("infantry") == 1
 
 
-def test_test_utilities_verification_methods():
+def test_test_utilities_verification_methods() -> None:
     """Test TestUtilities verification methods."""
     game_state = TestUtilities.create_fleet_capacity_test_scenario()
     test_system = game_state.systems["test_system"]

@@ -5,14 +5,14 @@ from src.ti4.core.unit import Unit
 
 
 class TestFleet:
-    def test_fleet_creation(self):
+    def test_fleet_creation(self) -> None:
         """Test that a fleet can be created."""
         fleet = Fleet(owner="player1", system_id="system1")
         assert fleet.owner == "player1"
         assert fleet.system_id == "system1"
         assert len(fleet.units) == 0
 
-    def test_add_unit_to_fleet(self):
+    def test_add_unit_to_fleet(self) -> None:
         """Test adding units to a fleet."""
         fleet = Fleet(owner="player1", system_id="system1")
         unit = Unit(unit_type="cruiser", owner="player1")
@@ -22,7 +22,7 @@ class TestFleet:
         assert unit in fleet.units
         assert len(fleet.units) == 1
 
-    def test_fleet_capacity_calculation(self):
+    def test_fleet_capacity_calculation(self) -> None:
         """Test that fleet calculates its capacity correctly."""
         fleet = Fleet(owner="player1", system_id="system1")
 
@@ -40,12 +40,12 @@ class TestFleet:
 
 
 class TestFleetCapacityValidator:
-    def test_fleet_capacity_validator_creation(self):
+    def test_fleet_capacity_validator_creation(self) -> None:
         """Test that FleetCapacityValidator can be created."""
         validator = FleetCapacityValidator()
         assert validator is not None
 
-    def test_validate_fleet_within_capacity(self):
+    def test_validate_fleet_within_capacity(self) -> None:
         """Test that a fleet within capacity is valid."""
         validator = FleetCapacityValidator()
         fleet = Fleet(owner="player1", system_id="system1")
@@ -64,7 +64,7 @@ class TestFleetCapacityValidator:
         # Should be valid (3 fighters fit in carrier capacity of 4)
         assert validator.is_fleet_capacity_valid(fleet) is True
 
-    def test_validate_fleet_exceeds_capacity(self):
+    def test_validate_fleet_exceeds_capacity(self) -> None:
         """Test that a fleet exceeding capacity is invalid."""
         validator = FleetCapacityValidator()
         fleet = Fleet(owner="player1", system_id="system1")
@@ -80,7 +80,7 @@ class TestFleetCapacityValidator:
         # Should be invalid (5 fighters exceed carrier capacity of 4)
         assert validator.is_fleet_capacity_valid(fleet) is False
 
-    def test_validate_fleet_supply_limit(self):
+    def test_validate_fleet_supply_limit(self) -> None:
         """Test that fleet supply (fleet pool tokens) limits are enforced."""
         validator = FleetCapacityValidator()
 
@@ -98,7 +98,7 @@ class TestFleetCapacityValidator:
         # Should be invalid (4 fleets with ships exceed 3 fleet tokens)
         assert validator.is_fleet_supply_valid(fleets, player_fleet_tokens) is False
 
-    def test_validate_fleet_supply_within_limit(self):
+    def test_validate_fleet_supply_within_limit(self) -> None:
         """Test that fleet supply within limits is valid."""
         validator = FleetCapacityValidator()
 
@@ -116,7 +116,7 @@ class TestFleetCapacityValidator:
         # Should be valid (2 fleets with ships within 3 fleet tokens)
         assert validator.is_fleet_supply_valid(fleets, player_fleet_tokens) is True
 
-    def test_fleet_capacity_with_upgraded_cruiser(self):
+    def test_fleet_capacity_with_upgraded_cruiser(self) -> None:
         """Test that upgraded cruiser II has capacity."""
         fleet = Fleet(owner="player1", system_id="system1")
 
@@ -130,7 +130,7 @@ class TestFleetCapacityValidator:
         # Total capacity should be 5 (1 + 4)
         assert fleet.get_total_capacity() == 5
 
-    def test_faction_specific_unit_stats(self):
+    def test_faction_specific_unit_stats(self) -> None:
         """Test that faction-specific modifications work."""
         from src.ti4.core.unit_stats import UnitStats, UnitStatsProvider
 
@@ -157,7 +157,7 @@ class TestFleetCapacityValidator:
         regular_infantry = Unit(unit_type="infantry", owner="player2")
         assert regular_infantry.get_combat_value() == 8  # Default value
 
-    def test_technology_unit_upgrades(self):
+    def test_technology_unit_upgrades(self) -> None:
         """Test that technology upgrades affect unit stats."""
         from src.ti4.core.unit_stats import UnitStats, UnitStatsProvider
 
@@ -179,7 +179,7 @@ class TestFleetCapacityValidator:
         assert upgraded_cruiser.get_capacity() == 1
         assert upgraded_cruiser.get_combat_value() == 6
 
-    def test_fighter_ii_requires_fleet_supply(self):
+    def test_fighter_ii_requires_fleet_supply(self) -> None:
         """Test that Fighter II (with independent movement) requires fleet supply."""
         from src.ti4.core.unit_stats import UnitStats, UnitStatsProvider
 
@@ -212,7 +212,7 @@ class TestFleetCapacityValidator:
         # Should be invalid (3 Fighter II fleets exceed 2 fleet tokens)
         assert validator.is_fleet_supply_valid(fleets, player_fleet_tokens) is False
 
-    def test_base_fighters_cannot_exist_alone(self):
+    def test_base_fighters_cannot_exist_alone(self) -> None:
         """Test that base fighters cannot exist without carrier capacity."""
         validator = FleetCapacityValidator()
         fleet = Fleet(owner="player1", system_id="system1")
@@ -224,7 +224,7 @@ class TestFleetCapacityValidator:
         # Should be invalid (fighter needs capacity but fleet has none)
         assert validator.is_fleet_capacity_valid(fleet) is False
 
-    def test_fleet_requires_supply_method(self):
+    def test_fleet_requires_supply_method(self) -> None:
         """Test the requires_fleet_supply method."""
         # Fleet with cruiser requires supply
         fleet_with_ship = Fleet(owner="player1", system_id="system1")

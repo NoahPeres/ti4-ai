@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from typing import Any, Optional
 
 try:
-    import psutil  # type: ignore
+    import psutil
 
     PSUTIL_AVAILABLE = True
 except ImportError:

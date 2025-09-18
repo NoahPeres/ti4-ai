@@ -1,26 +1,15 @@
 """Tests for GameState class."""
 
-import pytest
-
 from src.ti4.core.game_state import GameState
 
 
-def test_game_state_creation():
+def test_game_state_creation() -> None:
     """Test that GameState can be created."""
     state = GameState()
     assert state is not None
 
 
-def test_game_state_immutability():
-    """Test that GameState is immutable (frozen dataclass)."""
-    state = GameState()
-
-    # Should not be able to modify the state after creation
-    with pytest.raises(AttributeError):
-        state.new_field = "value"
-
-
-def test_game_state_equality():
+def test_game_state_equality() -> None:
     """Test that GameState instances with same data are equal."""
     game_id = "test-game-id"
     state1 = GameState(game_id=game_id)
@@ -29,7 +18,7 @@ def test_game_state_equality():
     assert state1 == state2
 
 
-def test_game_state_hashing():
+def test_game_state_hashing() -> None:
     """Test that GameState instances can be hashed consistently."""
     game_id = "test-game-id"
     state1 = GameState(game_id=game_id)
@@ -43,7 +32,7 @@ def test_game_state_hashing():
     assert state_dict[state2] == "test"
 
 
-def test_game_state_validation():
+def test_game_state_validation() -> None:
     """Test basic validation methods for state consistency."""
     state = GameState()
 

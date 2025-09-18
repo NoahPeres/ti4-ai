@@ -19,6 +19,29 @@ class UnitType(Enum):
     WAR_SUN = "war_sun"
 
 
+class LocationType(Enum):
+    """Enumeration of unit location types."""
+
+    SPACE = "space"
+    PLANET = "planet"
+
+
+class EventType(Enum):
+    """Enumeration of game event types."""
+
+    UNIT_MOVED = "unit_moved"
+    COMBAT_STARTED = "combat_started"
+    PHASE_CHANGED = "phase_changed"
+
+
+class CircuitBreakerState(Enum):
+    """Enumeration of circuit breaker states."""
+
+    CLOSED = "closed"
+    OPEN = "open"
+    HALF_OPEN = "half-open"
+
+
 class GameConstants:
     """Game constants and configuration."""
 
@@ -79,11 +102,12 @@ class FactionConstants:
 
 
 class EventConstants:
-    """Event type constants for the event system."""
+    """Event type constants."""
 
-    UNIT_MOVED = "unit_moved"
-    COMBAT_STARTED = "combat_started"
-    PHASE_CHANGED = "phase_changed"
+    # Deprecated: Use EventType enum instead
+    UNIT_MOVED = EventType.UNIT_MOVED.value
+    COMBAT_STARTED = EventType.COMBAT_STARTED.value
+    PHASE_CHANGED = EventType.PHASE_CHANGED.value
 
 
 class PerformanceConstants:
@@ -120,11 +144,12 @@ class ValidationConstants:
 
 
 class CircuitBreakerConstants:
-    """Constants for circuit breaker pattern."""
+    """Circuit breaker state constants."""
 
-    STATE_CLOSED = "closed"
-    STATE_OPEN = "open"
-    STATE_HALF_OPEN = "half-open"
+    # Deprecated: Use CircuitBreakerState enum instead
+    STATE_CLOSED = CircuitBreakerState.CLOSED.value
+    STATE_OPEN = CircuitBreakerState.OPEN.value
+    STATE_HALF_OPEN = CircuitBreakerState.HALF_OPEN.value
 
 
 class GameStateConstants:

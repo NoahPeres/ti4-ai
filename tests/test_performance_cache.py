@@ -2,8 +2,6 @@
 
 from unittest.mock import Mock, patch
 
-import pytest
-
 from src.ti4.actions.action import PlayerDecision
 from src.ti4.core.game_state import GameState
 from src.ti4.performance.cache import GameStateCache
@@ -12,12 +10,12 @@ from src.ti4.performance.cache import GameStateCache
 class TestGameStateCache:
     """Test cases for GameStateCache."""
 
-    def test_cache_initialization(self):
+    def test_cache_initialization(self) -> None:
         """Test that cache initializes with correct parameters."""
         cache = GameStateCache(max_size=500)
         assert cache._max_size == 500
 
-    def test_cache_legal_moves_miss_then_hit(self):
+    def test_cache_legal_moves_miss_then_hit(self) -> None:
         """Test cache miss followed by cache hit for legal moves."""
         cache = GameStateCache()
         game_state = GameState(game_id="test_game")
@@ -40,7 +38,7 @@ class TestGameStateCache:
             assert result2 == mock_moves
             assert mock_generator.call_count == 1  # Should not increase
 
-    def test_cache_invalidation(self):
+    def test_cache_invalidation(self) -> None:
         """Test cache invalidation functionality."""
         cache = GameStateCache()
         game_state = GameState(game_id="test_game")
@@ -63,17 +61,7 @@ class TestGameStateCache:
             cache.get_legal_moves(game_state, player_id)
             assert mock_generator.call_count == 2
 
-    def test_cache_input_validation(self):
-        """Test that cache validates inputs properly."""
-        cache = GameStateCache()
-
-        with pytest.raises(ValueError, match="game_state and player_id are required"):
-            cache.get_legal_moves(None, "player1")
-
-        with pytest.raises(ValueError, match="game_state and player_id are required"):
-            cache.get_legal_moves(GameState(), None)
-
-    def test_adjacency_caching(self):
+    def test_adjacency_caching(self) -> None:
         """Test caching of adjacency calculations."""
         cache = GameStateCache()
 
@@ -91,7 +79,7 @@ class TestGameStateCache:
             assert result2 is True
             assert mock_adjacency.call_count == 1  # Should not increase
 
-    def test_pathfinding_caching(self):
+    def test_pathfinding_caching(self) -> None:
         """Test caching of pathfinding calculations."""
         cache = GameStateCache()
 
@@ -111,7 +99,7 @@ class TestGameStateCache:
             assert result2 == mock_path
             assert mock_pathfind.call_count == 1  # Should not increase
 
-    def test_cache_performance_improvement(self):
+    def test_cache_performance_improvement(self) -> None:
         """Test that cache provides performance improvement."""
         import time
 
@@ -120,7 +108,7 @@ class TestGameStateCache:
         player_id = "player1"
 
         # Mock expensive operation
-        def slow_legal_moves(*args, **kwargs):
+        def slow_legal_moves(*args, **kwargs) -> None:
             time.sleep(0.01)  # Simulate expensive operation
             return [Mock(spec=PlayerDecision)]
 

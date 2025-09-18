@@ -14,7 +14,7 @@ from src.ti4.core.unit import Unit
 class TestMovementEventIntegration:
     """Test event publishing in movement commands."""
 
-    def test_movement_command_publishes_unit_moved_event(self):
+    def test_movement_command_publishes_unit_moved_event(self) -> None:
         """Test that executing a movement command publishes a UnitMovedEvent."""
         # Setup
         event_bus = GameEventBus()
@@ -43,7 +43,7 @@ class TestMovementEventIntegration:
         assert published_event.to_system == "system_2"
         assert published_event.player_id == "player_1"
 
-    def test_movement_command_without_event_bus_still_works(self):
+    def test_movement_command_without_event_bus_still_works(self) -> None:
         """Test that movement commands work without event bus for backward compatibility."""
         unit = Unit("destroyer", "player_1")
         command = MovementCommand(
@@ -63,7 +63,7 @@ class TestMovementEventIntegration:
 class TestGameControllerEventIntegration:
     """Test event publishing in game controller."""
 
-    def test_game_controller_publishes_phase_changed_event(self):
+    def test_game_controller_publishes_phase_changed_event(self) -> None:
         """Test that changing game phase publishes a PhaseChangedEvent."""
         # Setup
         players = [
@@ -90,7 +90,7 @@ class TestGameControllerEventIntegration:
         assert published_event.from_phase == "setup"
         assert published_event.to_phase == "strategy"
 
-    def test_game_controller_without_event_bus_still_works(self):
+    def test_game_controller_without_event_bus_still_works(self) -> None:
         """Test that game controller works without event bus for backward compatibility."""
         players = [
             Player("player_1", "sol"),
@@ -107,12 +107,12 @@ class TestGameControllerEventIntegration:
 class TestEventBusIntegration:
     """Test integration scenarios with event bus."""
 
-    def test_multiple_actions_publish_multiple_events(self):
+    def test_multiple_actions_publish_multiple_events(self) -> None:
         """Test that multiple actions publish their respective events."""
         event_bus = GameEventBus()
         all_events = []
 
-        def capture_event(event):
+        def capture_event(event) -> None:
             all_events.append(event)
 
         event_bus.subscribe("unit_moved", capture_event)

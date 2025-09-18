@@ -1,6 +1,7 @@
 """Tests for player interface abstractions."""
 
 from abc import ABC
+from typing import Any
 
 import pytest
 
@@ -60,18 +61,18 @@ def test_basic_ai_player_implements_choose_action():
 
     # Create a mock action for testing
     class MockAction(Action):
-        def is_legal(self, state, player_id):
+        def is_legal(self, state: Any, player_id: Any) -> bool:
             return True
 
-        def execute(self, state, player_id):
+        def execute(self, state: Any, player_id: Any) -> Any:
             return state
 
-        def get_description(self):
+        def get_description(self) -> str:
             return "Mock action"
 
     ai_player = BasicAIPlayer(player_id="ai1")
     game_state = GameState()
-    legal_actions = [MockAction()]
+    legal_actions: list[Action] = [MockAction()]
 
     chosen_action = ai_player.choose_action(game_state, legal_actions)
     assert chosen_action == legal_actions[0]
@@ -96,7 +97,7 @@ def test_basic_ai_player_handles_no_legal_actions():
 
     ai_player = BasicAIPlayer(player_id="ai1")
     game_state = GameState()
-    legal_actions = []
+    legal_actions: list[Action] = []
 
     with pytest.raises(ValueError, match="No legal actions available"):
         ai_player.choose_action(game_state, legal_actions)

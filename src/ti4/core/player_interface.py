@@ -24,7 +24,7 @@ class PlayerInterface(ABC):
 class PlayerStateView:
     """Player-specific view of the game state with information hiding."""
 
-    def __init__(self, player_id: str, game_state: GameState):
+    def __init__(self, player_id: str, game_state: GameState) -> None:
         """Initialize the player state view."""
         self.player_id = player_id
         self._game_state = game_state
@@ -54,7 +54,7 @@ class PlayerStateView:
 class BasicAIPlayer(PlayerInterface):
     """Basic AI player implementation for testing purposes."""
 
-    def __init__(self, player_id: str):
+    def __init__(self, player_id: str) -> None:
         """Initialize the AI player with a player ID."""
         self.player_id = player_id
 

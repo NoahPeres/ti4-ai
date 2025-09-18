@@ -8,7 +8,7 @@ from src.ti4.core.game_phase import GamePhase
 from src.ti4.core.player import Player
 
 
-def create_test_players(count: int = 3) -> list[Player]:
+def create_test_players(count=3) -> list[Player]:
     """Create test players for GameController tests."""
     factions = ["sol", "hacan", "xxcha", "yssaril", "naalu", "barony", "saar", "muaat"]
     return [
@@ -17,14 +17,14 @@ def create_test_players(count: int = 3) -> list[Player]:
     ]
 
 
-def test_game_controller_creation():
+def test_game_controller_creation() -> None:
     """Test that GameController can be created with players."""
     players = create_test_players(3)
     controller = GameController(players)
     assert controller is not None
 
 
-def test_turn_order_determination():
+def test_turn_order_determination() -> None:
     """Test that GameController determines initial turn order."""
     players = [
         Player(id="player1", faction="sol"),
@@ -39,7 +39,7 @@ def test_turn_order_determination():
     assert all(player.id in ["player1", "player2", "player3"] for player in turn_order)
 
 
-def test_current_player_tracking():
+def test_current_player_tracking() -> None:
     """Test that GameController tracks the current active player."""
     players = create_test_players(3)
     controller = GameController(players)
@@ -49,7 +49,7 @@ def test_current_player_tracking():
     assert current_player.id == "player1"
 
 
-def test_turn_progression():
+def test_turn_progression() -> None:
     """Test that GameController can advance to the next player."""
     players = [
         Player(id="player1", faction="sol"),
@@ -70,7 +70,7 @@ def test_turn_progression():
     assert controller.get_current_player().id == "player3"
 
 
-def test_turn_wrapping():
+def test_turn_wrapping() -> None:
     """Test that turn order wraps around to first player."""
     players = create_test_players(3)
     controller = GameController(players)
@@ -82,13 +82,13 @@ def test_turn_wrapping():
     assert controller.get_current_player().id == "player1"
 
 
-def test_empty_players_list_raises_error():
+def test_empty_players_list_raises_error() -> None:
     """Test that GameController raises error with empty players list."""
     with pytest.raises(ValueError, match="At least one player is required"):
         GameController([])
 
 
-def test_insufficient_players_raises_error():
+def test_insufficient_players_raises_error() -> None:
     """Test that GameController raises error with fewer than 3 players."""
     players = [
         Player(id="player1", faction="sol"),
@@ -98,7 +98,7 @@ def test_insufficient_players_raises_error():
         GameController(players)
 
 
-def test_player_activation_status():
+def test_player_activation_status() -> None:
     """Test that GameController tracks which player is currently activated."""
     players = create_test_players(3)
     controller = GameController(players)
@@ -113,7 +113,7 @@ def test_player_activation_status():
     assert controller.is_player_activated("player2") is True
 
 
-def test_player_activation_invalid_player():
+def test_player_activation_invalid_player() -> None:
     """Test that checking activation for non-existent player raises error."""
     players = create_test_players(3)
     controller = GameController(players)
@@ -122,7 +122,7 @@ def test_player_activation_invalid_player():
         controller.is_player_activated("invalid")
 
 
-def test_player_pass_turn():
+def test_player_pass_turn() -> None:
     """Test that a player can pass their turn."""
     players = create_test_players(3)
     controller = GameController(players)
@@ -137,7 +137,7 @@ def test_player_pass_turn():
     assert controller.get_current_player().id == "player2"
 
 
-def test_inactive_player_cannot_pass():
+def test_inactive_player_cannot_pass() -> None:
     """Test that inactive player cannot pass turn."""
     players = create_test_players(3)
     controller = GameController(players)
@@ -147,7 +147,7 @@ def test_inactive_player_cannot_pass():
         controller.pass_turn("player2")
 
 
-def test_strategy_phase_initialization():
+def test_strategy_phase_initialization() -> None:
     """Test that GameController can enter strategy phase."""
     players = create_test_players(3)
     controller = GameController(players)
@@ -160,7 +160,7 @@ def test_strategy_phase_initialization():
     assert len(available_cards) > 0
 
 
-def test_strategy_card_selection():
+def test_strategy_card_selection() -> None:
     """Test that players can select strategy cards."""
     players = create_test_players(3)
     controller = GameController(players)
@@ -184,7 +184,7 @@ def test_strategy_card_selection():
     assert player_cards[0] == leadership_card
 
 
-def test_strategy_phase_turn_order():
+def test_strategy_phase_turn_order() -> None:
     """Test that turn order is determined by strategy card initiative."""
     players = [
         Player(id="player1", faction="sol"),
@@ -206,7 +206,7 @@ def test_strategy_phase_turn_order():
     assert turn_order[2].id == "player1"  # Imperial (8)
 
 
-def test_strategy_phase_completion():
+def test_strategy_phase_completion() -> None:
     """Test that strategy phase can be completed when all players have cards."""
     # Use 8 players (each gets 1 card) for simplicity
     players = [
@@ -240,7 +240,7 @@ def test_strategy_phase_completion():
     assert controller.is_strategy_phase_complete() is True
 
 
-def test_action_phase_initialization():
+def test_action_phase_initialization() -> None:
     """Test that GameController can enter action phase."""
     players = create_test_players(3)
     controller = GameController(players)
@@ -252,7 +252,7 @@ def test_action_phase_initialization():
     assert controller.get_current_phase() == GamePhase.ACTION
 
 
-def test_action_phase_turn_management():
+def test_action_phase_turn_management() -> None:
     """Test that action phase manages turns properly."""
     players = create_test_players(3)
     controller = GameController(players)
@@ -268,7 +268,7 @@ def test_action_phase_turn_management():
     assert controller.get_current_player().id == "player2"
 
 
-def test_strategic_action():
+def test_strategic_action() -> None:
     """Test that players can take strategic actions."""
     players = create_test_players(3)
     controller = GameController(players)
@@ -281,7 +281,7 @@ def test_strategic_action():
     assert controller.get_current_player().id == "player2"
 
 
-def test_action_phase_passing():
+def test_action_phase_passing() -> None:
     """Test that players can pass in action phase."""
     players = create_test_players(3)
     controller = GameController(players)
@@ -294,7 +294,7 @@ def test_action_phase_passing():
     assert controller.get_current_player().id == "player2"
 
 
-def test_action_phase_completion():
+def test_action_phase_completion() -> None:
     """Test that action phase can be completed."""
     players = create_test_players(3)
     controller = GameController(players)
@@ -312,7 +312,7 @@ def test_action_phase_completion():
     assert controller.is_action_phase_complete() is True
 
 
-def test_player_can_select_multiple_strategy_cards():
+def test_player_can_select_multiple_strategy_cards() -> None:
     """Test that a player can select multiple strategy cards (for games with fewer than 6 players)."""
     # 4 players = 2 cards each (8 total cards / 4 players)
     players = [
@@ -337,7 +337,7 @@ def test_player_can_select_multiple_strategy_cards():
     assert any(card.id == 5 for card in player_cards)  # Trade
 
 
-def test_multiple_strategy_cards_turn_order():
+def test_multiple_strategy_cards_turn_order() -> None:
     """Test that turn order uses lowest initiative when player has multiple cards."""
     players = create_test_players(3)
     controller = GameController(players)
@@ -360,7 +360,7 @@ def test_multiple_strategy_cards_turn_order():
     assert turn_order[2].id == "player3"  # Warfare (6)
 
 
-def test_strategy_phase_completion_with_multiple_cards():
+def test_strategy_phase_completion_with_multiple_cards() -> None:
     """Test strategy phase completion when players have multiple cards."""
     # 4 players = 2 cards each (8 total cards / 4 players)
     players = [
@@ -394,7 +394,7 @@ def test_strategy_phase_completion_with_multiple_cards():
     assert controller.is_strategy_phase_complete() is True
 
 
-def test_cannot_select_already_taken_strategy_card():
+def test_cannot_select_already_taken_strategy_card() -> None:
     """Test that a strategy card cannot be selected by multiple players."""
     players = create_test_players(3)
     controller = GameController(players)
@@ -408,7 +408,7 @@ def test_cannot_select_already_taken_strategy_card():
         controller.select_strategy_card("player2", 1)
 
 
-def test_get_player_strategy_cards_empty():
+def test_get_player_strategy_cards_empty() -> None:
     """Test getting strategy cards for player who hasn't selected any."""
     players = create_test_players(3)
     controller = GameController(players)
@@ -419,7 +419,7 @@ def test_get_player_strategy_cards_empty():
     assert player_cards == []
 
 
-def test_strategy_phase_requires_equal_card_distribution():
+def test_strategy_phase_requires_equal_card_distribution() -> None:
     """Test that strategy phase requires equal number of cards per player."""
     # 3 players = 2 cards each, 2 cards left over (8 total cards / 3 players = 2 remainder 2)
     # In TI4, remaining cards are not distributed
@@ -456,7 +456,7 @@ def test_strategy_phase_requires_equal_card_distribution():
         assert len(player_cards) == expected_cards_per_player
 
 
-def test_backward_compatibility_get_player_strategy_card():
+def test_backward_compatibility_get_player_strategy_card() -> None:
     """Test that the old singular method still works for backward compatibility."""
     players = [
         Player(id="player1", faction="sol"),
@@ -479,4 +479,5 @@ def test_backward_compatibility_get_player_strategy_card():
 
     # Old method should still return the first card (for backward compatibility)
     player_card = controller.get_player_strategy_card("player1")
+    assert player_card is not None
     assert player_card.id == 1  # Should return first card selected

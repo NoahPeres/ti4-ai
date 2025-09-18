@@ -2,6 +2,7 @@
 
 from typing import TYPE_CHECKING
 
+from .game_phase import GamePhase
 from .objective import CompletableObjective, Objective
 
 if TYPE_CHECKING:
@@ -9,15 +10,16 @@ if TYPE_CHECKING:
 
 
 class ControlPlanetsObjective(CompletableObjective):
-    """Control 6 planets outside your home system."""
+    """Objective for controlling a certain number of planets."""
 
     def __init__(self) -> None:
         self._objective = Objective(
             id="control_planets",
-            name="Control 6 planets",
-            description="Control 6 planets outside your home system",
+            name="Control Planets",
+            description="Control 6 planets",
             points=1,
             is_public=True,
+            scoring_phase=GamePhase.STATUS,
         )
 
     def get_objective(self) -> Objective:
@@ -31,15 +33,16 @@ class ControlPlanetsObjective(CompletableObjective):
 
 
 class SpendResourcesObjective(CompletableObjective):
-    """Spend 8 resources."""
+    """Objective for spending resources."""
 
     def __init__(self) -> None:
         self._objective = Objective(
             id="spend_resources",
-            name="Spend 8 resources",
+            name="Spend Resources",
             description="Spend 8 resources",
             points=1,
             is_public=True,
+            scoring_phase=GamePhase.STATUS,
         )
 
     def get_objective(self) -> Objective:

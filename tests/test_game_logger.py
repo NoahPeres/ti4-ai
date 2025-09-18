@@ -34,7 +34,7 @@ class MockCommand(GameCommand):
 class TestGameLogger:
     """Test GameLogger structured logging functionality."""
 
-    def test_game_logger_creation(self):
+    def test_game_logger_creation(self) -> None:
         """Test GameLogger creation with game ID."""
         # RED: This will fail because GameLogger doesn't exist yet
         from src.ti4.core.logging import GameLogger
@@ -45,7 +45,7 @@ class TestGameLogger:
         assert logger.game_id == game_id
         assert logger.logger.name == f"ti4.game.{game_id}"
 
-    def test_command_logging_with_context(self):
+    def test_command_logging_with_context(self) -> None:
         """Test logging command execution with structured context."""
         # RED: This will fail because GameLogger doesn't exist yet
         from src.ti4.core.logging import GameLogger
@@ -71,7 +71,7 @@ class TestGameLogger:
             assert extra_data["result"] == "success"
             assert extra_data["context"] == context
 
-    def test_event_logging(self):
+    def test_event_logging(self) -> None:
         """Test logging game events with structured data."""
         # RED: This will fail because GameLogger doesn't exist yet
         from src.ti4.core.logging import GameLogger
@@ -100,7 +100,7 @@ class TestGameLogger:
             assert extra_data["event_type"] == "unit_moved"
             assert extra_data["event_data"] == event.data
 
-    def test_error_logging_with_context(self):
+    def test_error_logging_with_context(self) -> None:
         """Test logging errors with full context information."""
         # RED: This will fail because GameLogger doesn't exist yet
         from src.ti4.core.exceptions import TI4GameError
@@ -129,7 +129,7 @@ class TestGameLogger:
             assert extra_data["error_context"] == error.context
             assert extra_data["additional_context"] == context
 
-    def test_logger_configuration(self):
+    def test_logger_configuration(self) -> None:
         """Test that logger is properly configured for structured output."""
         # RED: This will fail because GameLogger doesn't exist yet
         from src.ti4.core.logging import GameLogger
