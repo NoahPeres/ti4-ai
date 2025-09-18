@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .game_state import GameState
+    from .game_phase import GamePhase
 
 
 @dataclass(frozen=True)
@@ -17,6 +18,7 @@ class Objective:
     description: str
     points: int
     is_public: bool
+    scoring_phase: "GamePhase"
 
 
 class CompletableObjective(ABC):
