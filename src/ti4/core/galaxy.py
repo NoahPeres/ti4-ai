@@ -1,21 +1,27 @@
 """Galaxy structure for TI4 game board."""
 
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from .hex_coordinate import HexCoordinate
 from .system import System
+
+if TYPE_CHECKING:
+    from .planet import Planet
+    from .unit import Unit
 
 
 class Galaxy:
     """Represents the hex-based galaxy game board."""
 
     def __init__(self) -> None:
-        self.systems: dict[HexCoordinate, str] = {}
-        self.system_objects: dict[str, System] = {}  # Registry of system objects
+        """Initialize an empty galaxy."""
+        self.system_coordinates: dict[str, HexCoordinate] = {}
+        self.system_objects: dict[str, System] = {}
+        self.hyperlane_connections: set[tuple[str, str]] = set()
 
     def place_system(self, coordinate: HexCoordinate, system_id: str) -> None:
-        """Place a system at the given hex coordinate."""
-        self.systems[coordinate] = system_id
+        """Place a system at the given coordinate."""
+        self.system_coordinates[system_id] = coordinate
 
     def register_system(self, system: System) -> None:
         """Register a system object in the galaxy."""
@@ -23,10 +29,7 @@ class Galaxy:
 
     def get_system_coordinate(self, system_id: str) -> Optional[HexCoordinate]:
         """Get the coordinate of a system by its ID."""
-        for coord, sid in self.systems.items():
-            if sid == system_id:
-                return coord
-        return None
+        return self.system_coordinates.get(system_id)
 
     def get_system(self, system_id: str) -> Optional[System]:
         """Get a system object by its ID."""
@@ -58,7 +61,14 @@ class Galaxy:
             return True
 
         # Check wormhole adjacency (Rule 101)
-        return self._check_wormhole_adjacency(system_id1, system_id2)
+        if self._check_wormhole_adjacency(system_id1, system_id2):
+            return True
+
+        # Check for hyperlane adjacency
+        if self._check_hyperlane_adjacency(system_id1, system_id2):
+            return True
+
+        return False
 
     def _check_wormhole_adjacency(self, system_id1: str, system_id2: str) -> bool:
         """
@@ -100,6 +110,135 @@ class Galaxy:
                 return True
 
         return False
+
+    def _check_hyperlane_adjacency(self, system_id1: str, system_id2: str) -> bool:
+        """
+        Check if two systems are adjacent via hyperlanes (Rule 6.4).
+
+        Systems are hyperlane-adjacent if they are connected by hyperlane tiles.
+        This implements LRR 6.4: "Systems that are connected by lines drawn
+        across one or more hyperlane tiles are adjacent for all purposes."
+
+        Args:
+            system_id1: ID of the first system
+            system_id2: ID of the second system
+
+        Returns:
+            True if systems are connected by hyperlanes, False otherwise
+        """
+        # Check if there's a direct hyperlane connection
+        connection1 = (system_id1, system_id2)
+        connection2 = (system_id2, system_id1)
+
+        return (
+            connection1 in self.hyperlane_connections
+            or connection2 in self.hyperlane_connections
+        )
+
+    def add_hyperlane_connection(self, system_id1: str, system_id2: str) -> None:
+        """
+        Add a hyperlane connection between two systems.
+
+        Args:
+            system_id1: ID of the first system
+            system_id2: ID of the second system
+        """
+        # Store both directions for easier lookup
+        self.hyperlane_connections.add((system_id1, system_id2))
+        self.hyperlane_connections.add((system_id2, system_id1))
+
+    def is_unit_adjacent_to_system(self, unit: "Unit", target_system_id: str) -> bool:
+        """
+        Check if a unit is adjacent to a target system according to LRR Rule 6.2.
+
+        A unit is adjacent to all system tiles that are adjacent to the system tile
+        that contains that unit. A system is not adjacent to itself (Rule 6.2a).
+
+        Args:
+            unit: The unit to check adjacency for
+            target_system_id: ID of the target system
+
+        Returns:
+            True if unit is adjacent to target system, False otherwise
+        """
+        # Find which system contains this unit
+        containing_system_id = self._find_unit_system(unit)
+        if containing_system_id is None:
+            return False
+
+        # Rule 6.2a: A system is not adjacent to itself
+        if containing_system_id == target_system_id:
+            return False
+
+        # Check if the containing system is adjacent to the target system
+        return self.are_systems_adjacent(containing_system_id, target_system_id)
+
+    def is_planet_adjacent_to_system(
+        self, planet: "Planet", target_system_id: str
+    ) -> bool:
+        """
+        Check if a planet is adjacent to a target system according to LRR Rules 6.2 and 6.3.
+
+        Rule 6.2: A planet is adjacent to all system tiles that are adjacent to the
+        system tile that contains that planet.
+        Rule 6.3: A planet is treated as being adjacent to the system that contains that planet.
+
+        Args:
+            planet: The planet to check adjacency for
+            target_system_id: ID of the target system
+
+        Returns:
+            True if planet is adjacent to target system, False otherwise
+        """
+        # Find which system contains this planet
+        containing_system_id = self._find_planet_system(planet)
+        if containing_system_id is None:
+            return False
+
+        # Rule 6.3: Planet is adjacent to its containing system
+        if containing_system_id == target_system_id:
+            return True
+
+        # Rule 6.2: Planet is adjacent to systems adjacent to its containing system
+        return self.are_systems_adjacent(containing_system_id, target_system_id)
+
+    def _find_unit_system(self, unit: "Unit") -> Optional[str]:
+        """
+        Find which system contains the given unit.
+
+        Args:
+            unit: The unit to locate
+
+        Returns:
+            System ID containing the unit, or None if not found
+        """
+        for system_id, system in self.system_objects.items():
+            # Check space units
+            if unit in system.space_units:
+                return system_id
+
+            # Check planet units
+            for planet in system.planets:
+                if unit in planet.units:
+                    return system_id
+
+        return None
+
+    def _find_planet_system(self, planet: "Planet") -> Optional[str]:
+        """
+        Find which system contains the given planet.
+
+        Args:
+            planet: The planet to locate
+
+        Returns:
+            System ID containing the planet, or None if not found
+        """
+        for system_id, system in self.system_objects.items():
+            if planet in system.planets:
+                return system_id
+
+        return None
 
     def are_players_neighbors(self, player_id1: str, player_id2: str) -> bool:
         """
