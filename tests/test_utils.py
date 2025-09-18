@@ -1,6 +1,6 @@
 """Test utilities for TI4 game framework tests."""
 
-from typing import Optional
+from typing import Any, Optional
 
 from src.ti4.core.constants import FactionConstants, UnitType
 from src.ti4.core.fleet import Fleet
@@ -121,7 +121,7 @@ class MockStatsProvider(UnitStatsProvider):
         super().__init__()
         self.custom_stats = custom_stats or {}
 
-    def get_unit_stats(self, unit_type: str, faction=None, technologies=None):
+    def get_unit_stats(self, unit_type: str, faction: Any = None, technologies: Any = None) -> Any:
         """Get stats, using custom stats if provided."""
         if unit_type in self.custom_stats:
             return self.custom_stats[unit_type]

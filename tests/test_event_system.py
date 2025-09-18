@@ -37,7 +37,7 @@ class TestGameEvent:
         )
 
         # Should not be able to modify the event
-        with pytest.raises(AttributeError):
+        with pytest.raises((AttributeError, TypeError)):
             event.event_type = "modified"
 
 

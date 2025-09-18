@@ -479,4 +479,5 @@ def test_backward_compatibility_get_player_strategy_card():
 
     # Old method should still return the first card (for backward compatibility)
     player_card = controller.get_player_strategy_card("player1")
+    assert player_card is not None
     assert player_card.id == 1  # Should return first card selected

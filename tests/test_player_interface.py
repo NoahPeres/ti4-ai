@@ -71,7 +71,7 @@ def test_basic_ai_player_implements_choose_action():
 
     ai_player = BasicAIPlayer(player_id="ai1")
     game_state = GameState()
-    legal_actions = [MockAction()]
+    legal_actions: list[Action] = [MockAction()]
 
     chosen_action = ai_player.choose_action(game_state, legal_actions)
     assert chosen_action == legal_actions[0]
@@ -96,7 +96,7 @@ def test_basic_ai_player_handles_no_legal_actions():
 
     ai_player = BasicAIPlayer(player_id="ai1")
     game_state = GameState()
-    legal_actions = []
+    legal_actions: list[Action] = []
 
     with pytest.raises(ValueError, match="No legal actions available"):
         ai_player.choose_action(game_state, legal_actions)

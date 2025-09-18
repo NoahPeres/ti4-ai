@@ -1,5 +1,7 @@
 """Integration tests demonstrating the refactored TI4 system."""
 
+from typing import Any, Optional
+
 from src.ti4.core.combat import CombatDetector, CombatInitiator
 from src.ti4.core.fleet import Fleet, FleetCapacityValidator
 from src.ti4.core.galaxy import Galaxy
@@ -13,8 +15,8 @@ from src.ti4.core.unit_stats import UnitStats, UnitStatsProvider
 
 class TestTI4Integration:
     def debug_test_failure(
-        self, test_name: str, expected: any, actual: any, context: dict = None
-    ):
+        self, test_name: str, expected: Any, actual: Any, context: Optional[dict[Any, Any]] = None
+    ) -> None:
         """Helper method to provide debugging output for failed test scenarios."""
         print(f"\n=== DEBUG INFO FOR FAILED TEST: {test_name} ===")
         print(f"Expected: {expected}")

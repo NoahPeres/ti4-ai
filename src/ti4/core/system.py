@@ -51,23 +51,25 @@ class System:
     def add_wormhole(self, wormhole_type: str) -> None:
         """
         Add a wormhole of the specified type to this system.
-        
+
         Implements support for LRR 101 wormhole adjacency rules.
         Valid wormhole types: alpha, beta, gamma, delta
-        
+
         Args:
             wormhole_type: Type of wormhole to add (alpha, beta, gamma, delta)
-            
+
         Raises:
             ValueError: If wormhole_type is invalid
         """
         if not wormhole_type:
             raise ValueError("Wormhole type cannot be empty")
-            
+
         valid_types = {"alpha", "beta", "gamma", "delta"}
         if wormhole_type not in valid_types:
-            raise ValueError(f"Invalid wormhole type: {wormhole_type}. Valid types: {valid_types}")
-        
+            raise ValueError(
+                f"Invalid wormhole type: {wormhole_type}. Valid types: {valid_types}"
+            )
+
         # Avoid duplicates
         if wormhole_type not in self.wormholes:
             self.wormholes.append(wormhole_type)
@@ -75,31 +77,31 @@ class System:
     def has_wormhole(self, wormhole_type: str) -> bool:
         """
         Check if this system has a wormhole of the specified type.
-        
+
         Args:
             wormhole_type: Type of wormhole to check for
-            
+
         Returns:
             True if system contains the specified wormhole type, False otherwise
         """
         return wormhole_type in self.wormholes
-    
+
     def get_wormhole_types(self) -> list[str]:
         """
         Get all wormhole types present in this system.
-        
+
         Returns:
             List of wormhole types in this system (copy to prevent external modification)
         """
         return self.wormholes.copy()
-    
+
     def remove_wormhole(self, wormhole_type: str) -> bool:
         """
         Remove a wormhole of the specified type from this system.
-        
+
         Args:
             wormhole_type: Type of wormhole to remove
-            
+
         Returns:
             True if wormhole was removed, False if it wasn't present
         """

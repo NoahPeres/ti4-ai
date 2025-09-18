@@ -45,7 +45,7 @@ class TestTechnologyTree:
             color=TechnologyColor.BLUE,
             prerequisites=[],
         )
-        player_technologies = []
+        player_technologies: list[str] = []
 
         result = tree.can_research(tech, player_technologies)
         assert result is True
@@ -58,7 +58,7 @@ class TestTechnologyTree:
             color=TechnologyColor.RED,
             prerequisites=["Dreadnought"],
         )
-        player_technologies = []  # Player has no technologies
+        player_technologies: list[str] = []  # Player has no technologies
 
         result = tree.can_research(tech, player_technologies)
         assert result is False
@@ -116,6 +116,7 @@ class TestTechnologyGainEffects:
         player = Player(id="player1", faction="Sol")
         game_state.add_player(player)
         player_state = game_state.get_player_state("player1")
+        assert player_state is not None
         player_state.technologies.add("Antimass Deflectors")
 
         # Create a technology that requires prerequisites
@@ -162,6 +163,7 @@ class TestTechnologyGainEffects:
         player = Player(id="player1", faction="Sol")
         game_state.add_player(player)
         player_state = game_state.get_player_state("player1")
+        assert player_state is not None
         player_state.technologies.add("Antimass Deflectors")
 
         # Create a technology that requires prerequisites
@@ -257,6 +259,7 @@ class TestTechnologyEffects:
         player = Player(id="player1", faction="Sol")
         game_state.add_player(player)
         player_state = game_state.get_player_state("player1")
+        assert player_state is not None
         player_state.technologies.add("Antimass Deflectors")
 
         # Create a technology with effects

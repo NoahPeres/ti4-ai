@@ -330,6 +330,7 @@ class TestTacticalAction:
 
         # RED: This should fail because we need to implement proper validation
         assert result_without_tech.is_valid is False
+        assert result_without_tech.errors is not None
         assert "insufficient movement" in result_without_tech.errors[0].lower()
 
         # Test with Gravity Drive - should be valid and automatically applied
@@ -382,6 +383,7 @@ class TestTacticalAction:
 
         # This should fail because destroyer has 0 capacity but we're trying to transport 2 infantry
         assert result.is_valid is False
+        assert result.errors is not None
         assert "insufficient transport capacity" in result.errors[0].lower()
 
     def test_joint_movement_validation_with_sufficient_capacity(self):
@@ -588,6 +590,7 @@ class TestTacticalAction:
         result_without_tech = validator.validate_movement_plan(movement_plan, "player1")
 
         assert result_without_tech.is_valid is False
+        assert result_without_tech.errors is not None
         assert "insufficient movement" in result_without_tech.errors[0].lower()
 
         # Test with Gravity Drive - should be valid and applied to carrier1
@@ -638,6 +641,7 @@ class TestTacticalAction:
         # This should be invalid because Gravity Drive can only be applied to one ship
         # and we have two ships that both need it
         assert result.is_valid is False
+        assert result.errors is not None
         assert (
             len([e for e in result.errors if "insufficient movement" in e.lower()]) >= 1
         )
@@ -678,6 +682,7 @@ class TestTacticalAction:
 
         # Should work with gravity drive (2 + 1 = 3 movement)
         assert result.is_valid is True
+        assert result.technology_effects is not None
         assert "gravity_drive" in result.technology_effects
 
     def test_complex_multi_system_scenario(self):
@@ -754,6 +759,7 @@ class TestTacticalAction:
         # Should be valid - Gravity Drive helps carrier, other ships don't need help
         # Carrier has capacity 4, so can transport both infantry
         assert result.is_valid is True
+        assert result.technology_effects is not None
         assert "gravity_drive" in result.technology_effects
         assert result.transport_assignments is not None
 

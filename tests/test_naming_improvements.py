@@ -225,6 +225,7 @@ class TestDocstringImprovements:
 
         # Check that the docstring is comprehensive
         docstring = logger.handle_event.__doc__
+        assert docstring is not None
         assert "Log game events with appropriate detail level" in docstring
         assert "Args:" in docstring
         assert "event: The game event to log" in docstring
@@ -235,12 +236,14 @@ class TestDocstringImprovements:
 
         # Check command type extraction docstring
         docstring = diagnostics._extract_command_type.__doc__
+        assert docstring is not None
         assert "Extract the command type identifier" in docstring
         assert "Args:" in docstring
         assert "Returns:" in docstring
 
         # Check pattern analysis docstring
         docstring = diagnostics.analyze_command_patterns_and_sequences.__doc__
+        assert docstring is not None
         assert "Analyze command patterns and detect sequences" in docstring
         assert "Repeated command types" in docstring
         assert "Sequential patterns" in docstring
@@ -251,6 +254,7 @@ class TestDocstringImprovements:
 
         # Check error recovery logging docstring
         docstring = manager._log_error_recovery_attempt.__doc__
+        assert docstring is not None
         assert "Log details of an error recovery attempt" in docstring
         assert "recovery_mechanism_type" in docstring
         assert "Args:" in docstring

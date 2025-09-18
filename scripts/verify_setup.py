@@ -17,7 +17,7 @@ def main() -> None:
 
     # Test basic imports
     try:
-        import ti4
+        import ti4  # type: ignore[import-untyped]
 
         print(f"✅ Core package imported successfully (version: {ti4.__version__})")
     except ImportError as e:

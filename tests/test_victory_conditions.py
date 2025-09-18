@@ -42,8 +42,8 @@ class TestObjectiveSystem:
 
     def test_create_objective_card(self):
         """Test that objective cards can be created with proper structure."""
-        from src.ti4.core.objective import Objective
         from src.ti4.core.game_phase import GamePhase
+        from src.ti4.core.objective import Objective
 
         # This should fail initially - we need to implement Objective class
         objective = Objective(
@@ -52,7 +52,7 @@ class TestObjectiveSystem:
             description="Control 6 planets outside your home system",
             points=1,
             is_public=True,
-            scoring_phase=GamePhase.STATUS
+            scoring_phase=GamePhase.STATUS,
         )
         assert objective.id == "control_planets"
         assert objective.points == 1
@@ -60,8 +60,8 @@ class TestObjectiveSystem:
 
     def test_objective_completion_detection(self):
         """Test that objective completion can be detected."""
-        from src.ti4.core.objective import Objective
         from src.ti4.core.game_phase import GamePhase
+        from src.ti4.core.objective import Objective
 
         player = Player(id="player1", faction="sol")
         game_state = GameState(players=[player])
@@ -72,7 +72,7 @@ class TestObjectiveSystem:
             description="Control 6 planets outside your home system",
             points=1,
             is_public=True,
-            scoring_phase=GamePhase.STATUS
+            scoring_phase=GamePhase.STATUS,
         )
 
         # This should fail initially - we need to implement completion detection
@@ -85,8 +85,8 @@ class TestObjectiveSystem:
 
     def test_completing_objective_awards_victory_points(self):
         """Test that completing an objective awards the correct victory points."""
-        from src.ti4.core.objective import Objective
         from src.ti4.core.game_phase import GamePhase
+        from src.ti4.core.objective import Objective
 
         player = Player(id="player1", faction="sol")
         game_state = GameState(players=[player])
@@ -97,7 +97,7 @@ class TestObjectiveSystem:
             description="Control 6 planets outside your home system",
             points=2,
             is_public=True,
-            scoring_phase=GamePhase.STATUS
+            scoring_phase=GamePhase.STATUS,
         )
 
         # Initially no points

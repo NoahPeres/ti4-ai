@@ -19,7 +19,7 @@ class ControlPlanetsObjective(CompletableObjective):
             description="Control 6 planets",
             points=1,
             is_public=True,
-            scoring_phase=GamePhase.STATUS
+            scoring_phase=GamePhase.STATUS,
         )
 
     def get_objective(self) -> Objective:
@@ -42,7 +42,7 @@ class SpendResourcesObjective(CompletableObjective):
             description="Spend 8 resources",
             points=1,
             is_public=True,
-            scoring_phase=GamePhase.STATUS
+            scoring_phase=GamePhase.STATUS,
         )
 
     def get_objective(self) -> Objective:

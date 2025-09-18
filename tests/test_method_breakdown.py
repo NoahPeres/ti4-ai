@@ -1,5 +1,6 @@
 """Tests to verify that complex method breakdown works correctly."""
 
+from typing import Any, Dict
 from unittest.mock import Mock, patch
 
 from src.ti4.core.events import CombatStartedEvent, PhaseChangedEvent, UnitMovedEvent
@@ -67,7 +68,7 @@ class TestObserverMethodBreakdown:
             player_id="player1",
         )
 
-        training_record = {}
+        training_record: Dict[str, Any] = {}
         collector._add_unit_moved_data(training_record, unit_event)
 
         assert training_record["unit_id"] == "unit1"
@@ -80,7 +81,7 @@ class TestObserverMethodBreakdown:
             game_id="test", system_id="sys1", participants=["player1", "player2"]
         )
 
-        combat_record = {}
+        combat_record: Dict[str, Any] = {}
         collector._add_combat_started_data(combat_record, combat_event)
 
         assert combat_record["system_id"] == "sys1"
@@ -91,7 +92,7 @@ class TestObserverMethodBreakdown:
             game_id="test", from_phase="setup", to_phase="strategy", round_number=1
         )
 
-        phase_record = {}
+        phase_record: Dict[str, Any] = {}
         collector._add_phase_changed_data(phase_record, phase_event)
 
         assert phase_record["from_phase"] == "setup"
@@ -314,7 +315,7 @@ class TestMethodBreakdownBenefits:
         # and focuses on a single task
 
         # Test that each helper method works independently
-        training_record = {}
+        training_record: Dict[str, Any] = {}
 
         # These methods have no conditional logic - just data assignment
         mock_event = Mock()

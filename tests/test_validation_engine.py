@@ -1,5 +1,7 @@
 """Tests for ValidationEngine class."""
 
+from typing import Any
+
 import pytest
 
 from src.ti4.actions.validation import (
@@ -167,7 +169,7 @@ def test_validation_engine_integration_with_action_framework():
             self.preconditions_met = preconditions_met
             self.follows_rules = follows_rules
 
-        def is_legal(self, state, player_id) -> bool:
+        def is_legal(self, state: Any, player_id: Any) -> bool:
             # Use the validation engine to determine legality
             try:
                 engine.validate(self, state, player_id)
@@ -175,7 +177,7 @@ def test_validation_engine_integration_with_action_framework():
             except ValidationError:
                 return False
 
-        def execute(self, state, player_id):
+        def execute(self, state: Any, player_id: Any) -> Any:
             return state
 
         def get_description(self) -> str:

@@ -1,9 +1,13 @@
 """Tests for GameStateMachine."""
 
 import pytest
+from typing import TYPE_CHECKING
 
 from src.ti4.core.game_phase import GamePhase
 from src.ti4.core.game_state_machine import GameStateMachine
+
+if TYPE_CHECKING:
+    pass
 
 
 class TestGameStateMachine:
@@ -58,8 +62,10 @@ class TestGameStateMachine:
 
         # STRATEGY -> ACTION
         state_machine.transition_to(GamePhase.ACTION)
-        assert state_machine.current_phase == GamePhase.ACTION
-        assert state_machine.get_valid_transitions() == {GamePhase.STATUS}
+        current_phase = state_machine.current_phase
+        assert current_phase == GamePhase.ACTION
+        valid_transitions = state_machine.get_valid_transitions()
+        assert valid_transitions == {GamePhase.STATUS}
 
         # ACTION -> STATUS
         state_machine.transition_to(GamePhase.STATUS)

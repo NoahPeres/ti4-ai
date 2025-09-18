@@ -1,5 +1,7 @@
 """Tests for LegalMoveGenerator class."""
 
+from typing import Any
+
 from src.ti4.actions.legal_moves import LegalMoveGenerator
 from src.ti4.core.game_state import GameState
 from src.ti4.core.player import Player
@@ -70,10 +72,10 @@ def test_generate_legal_actions_integrates_with_validation_engine():
         def __init__(self, is_legal_result=True):
             self._is_legal_result = is_legal_result
 
-        def is_legal(self, state, player_id) -> bool:
-            return self._is_legal_result
+        def is_legal(self, state: Any, player_id: Any) -> bool:
+            return bool(self._is_legal_result)
 
-        def execute(self, state, player_id):
+        def execute(self, state: Any, player_id: Any) -> Any:
             return state
 
         def get_description(self) -> str:

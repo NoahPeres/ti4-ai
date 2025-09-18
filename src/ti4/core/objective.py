@@ -5,8 +5,8 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .game_state import GameState
     from .game_phase import GamePhase
+    from .game_state import GameState
 
 
 @dataclass(frozen=True)
