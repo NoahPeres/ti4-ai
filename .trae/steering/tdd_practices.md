@@ -1,6 +1,22 @@
 # Test-Driven Development (TDD) Practices
 
-## Core TDD Cycle: RED-GREEN-REFACTOR
+## TDD Best Practices
+
+### Red-Green-Refactor Cycle
+1. **RED**: Write a failing test that fails on an ASSERTION, not missing interfaces
+   - First implement all necessary stubs/minimal interfaces so code compiles/runs
+   - Test should fail because expected behavior doesn't match actual behavior
+   - Never write tests that fail due to AttributeError, ImportError, etc.
+2. **GREEN**: Write minimal code to make it pass
+3. **REFACTOR**: Improve code while keeping tests green
+
+### Proper RED Phase Requirements
+- All classes, methods, and interfaces referenced in test must exist (even as stubs)
+- Test must run without compilation/import errors
+- Test must fail on an assertion (assert statement failure)
+- Failure should be due to incorrect behavior, not missing implementation
+
+### Core TDD Cycle: RED-GREEN-REFACTOR
 
 ### RED Phase (Test Fails)
 - **CRITICAL**: Write a test that fails on an ASSERTION, not on compilation/syntax/import errors

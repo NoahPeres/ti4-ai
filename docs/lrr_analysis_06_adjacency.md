@@ -7,13 +7,18 @@
 ### 6.1 Wormhole Adjacency
 **Rule**: "A system that has a wormhole is treated as being adjacent to a system that has a matching wormhole."
 
-**Implementation Status**: ❌ NOT IMPLEMENTED
-- **Code**: Basic adjacency exists in galaxy system but no wormhole rules
-- **Tests**: No wormhole adjacency tests
-- **Assessment**: Special adjacency rules missing - wormholes create virtual adjacency
-- **Priority**: MEDIUM
-- **Dependencies**: Requires wormhole system and adjacency calculation
-- **Notes**: Wormholes effectively make distant systems adjacent for movement and other purposes
+**Implementation Status**: ✅ IMPLEMENTED (90% complete)
+- **Code**: Wormhole adjacency logic in `Galaxy._check_wormhole_adjacency`
+- **Tests**: `tests/test_wormhole_adjacency.py` with comprehensive coverage
+- **Assessment**: Full TDD cycle completed with core functionality and edge cases
+- **Priority**: HIGH
+- **Dependencies**: Systems registry in `Galaxy.system_objects` for efficient lookup
+- **Notes**: Ready for integration with other adjacency rules. Performance optimized with system registry lookup.
+
+**Test Coverage**:
+- ✅ `test_alpha_wormhole_systems_are_adjacent_regardless_of_distance` - Core functionality
+- ✅ `test_different_wormhole_types_are_not_adjacent` - Edge case: different wormhole types
+- ✅ `test_system_without_wormhole_not_adjacent_to_wormhole_system` - Edge case: missing wormholes
 
 ### 6.2 Unit/Planet Adjacency to Systems
 **Rule**: "A unit or planet is adjacent to all system tiles that are adjacent to the system tile that contains that unit or planet."

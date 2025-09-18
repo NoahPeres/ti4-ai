@@ -15,6 +15,7 @@ class System:
         self.system_id = system_id
         self.planets: list[Planet] = []
         self.space_units: list[Unit] = []  # Units in the space area of the system
+        self.wormholes: list[str] = []  # List of wormhole types in this system
 
     def place_unit_in_space(self, unit: Unit) -> None:
         """Place a unit in the space area of this system."""
@@ -46,3 +47,14 @@ class System:
     def add_planet(self, planet: "Planet") -> None:
         """Add a planet to this system."""
         self.planets.append(planet)
+
+    def add_wormhole(self, wormhole_type: str) -> None:
+        """Add a wormhole of the specified type to this system."""
+        # Stub implementation - just adds to list for now
+        if wormhole_type not in self.wormholes:
+            self.wormholes.append(wormhole_type)
+
+    def has_wormhole(self, wormhole_type: str) -> bool:
+        """Check if this system has a wormhole of the specified type."""
+        # Stub implementation - just checks list
+        return wormhole_type in self.wormholes
