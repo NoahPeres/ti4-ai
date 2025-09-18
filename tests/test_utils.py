@@ -2,7 +2,7 @@
 
 from typing import Any, Optional
 
-from src.ti4.core.constants import FactionConstants, UnitType
+from src.ti4.core.constants import Faction, FactionConstants, UnitType
 from src.ti4.core.fleet import Fleet
 from src.ti4.core.galaxy import Galaxy
 from src.ti4.core.hex_coordinate import HexCoordinate
@@ -17,16 +17,16 @@ class TestDataFactory:
 
     @staticmethod
     def create_player(
-        player_id: str = "test_player", faction: str = FactionConstants.SOL
+        player_id: str = "test_player", faction: Faction = FactionConstants.SOL
     ) -> Player:
         """Create a test player."""
         return Player(id=player_id, faction=faction)
 
     @staticmethod
     def create_unit(
-        unit_type: str = UnitType.CRUISER.value,
+        unit_type: UnitType = UnitType.CRUISER,
         owner: str = "test_player",
-        faction: Optional[str] = None,
+        faction: Optional[Faction] = None,
         technologies: Optional[set[str]] = None,
     ) -> Unit:
         """Create a test unit."""

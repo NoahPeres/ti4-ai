@@ -2,6 +2,7 @@
 
 import pytest
 
+from src.ti4.core.constants import Faction
 from src.ti4.core.game_phase import GamePhase
 from src.ti4.testing.scenario_builder import GameScenarioBuilder
 
@@ -15,7 +16,7 @@ def test_game_scenario_builder_creation() -> None:
 def test_builder_with_players_fluent_interface() -> None:
     """Test that with_players returns builder for fluent interface."""
     builder = GameScenarioBuilder()
-    result = builder.with_players(("player1", "sol"), ("player2", "xxcha"))
+    result = builder.with_players(("player1", Faction.SOL), ("player2", Faction.XXCHA))
     assert result is builder  # Should return self for fluent interface
 
 
@@ -37,7 +38,7 @@ def test_builder_build_creates_game_state() -> None:
     """Test that build() creates a GameState with configured components."""
     builder = GameScenarioBuilder()
     game_state = (
-        builder.with_players(("player1", "sol"), ("player2", "xxcha"))
+        builder.with_players(("player1", Faction.SOL), ("player2", Faction.XXCHA))
         .with_galaxy("standard_6p")
         .in_phase(GamePhase.ACTION)
         .build()
@@ -61,11 +62,10 @@ def test_builder_validates_configuration_consistency() -> None:
 
     # Test invalid player config
     with pytest.raises(ValueError, match="Player ID cannot be empty"):
-        builder.with_players(("", "sol")).build()
+        builder.with_players(("", Faction.SOL)).build()
 
-    # Test invalid faction
-    with pytest.raises(ValueError, match="Faction cannot be empty"):
-        builder.with_players(("player1", "")).build()
+    # Test that we can't pass invalid faction types (this would be caught at type checking level)
+    # For now, we'll skip the empty faction test since it requires a valid Faction enum
 
 
 def test_builder_validates_duplicate_player_ids() -> None:
@@ -73,7 +73,9 @@ def test_builder_validates_duplicate_player_ids() -> None:
     builder = GameScenarioBuilder()
 
     with pytest.raises(ValueError, match="Duplicate item in players"):
-        builder.with_players(("player1", "sol"), ("player1", "xxcha")).build()
+        builder.with_players(
+            ("player1", Faction.SOL), ("player1", Faction.XXCHA)
+        ).build()
 
 
 def test_builder_with_units_placement() -> None:
@@ -81,7 +83,7 @@ def test_builder_with_units_placement() -> None:
 
     builder = GameScenarioBuilder()
     game_state = (
-        builder.with_players(("player1", "sol"), ("player2", "xxcha"))
+        builder.with_players(("player1", Faction.SOL), ("player2", Faction.XXCHA))
         .with_galaxy("standard_6p")
         .with_units(
             [
@@ -117,7 +119,7 @@ def test_builder_with_resources_and_technologies() -> None:
     """Test that builder can configure player resources and technologies."""
     builder = GameScenarioBuilder()
     game_state = (
-        builder.with_players(("player1", "sol"), ("player2", "xxcha"))
+        builder.with_players(("player1", Faction.SOL), ("player2", Faction.XXCHA))
         .with_galaxy("standard_6p")
         .with_player_resources("player1", trade_goods=5, command_tokens=8)
         .with_player_technologies("player1", ["cruiser_ii", "fighter_ii"])

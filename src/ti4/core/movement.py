@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from .constants import LocationType
+from .constants import LocationType, UnitType
 from .galaxy import Galaxy
 from .movement_rules import MovementContext, MovementRuleEngine
 from .system import System
@@ -51,7 +51,7 @@ class MovementValidator:
             else frozenset()
         )
         return self._is_valid_movement_cached(
-            movement.unit.unit_type,
+            UnitType(movement.unit.unit_type),
             movement.from_system_id,
             movement.to_system_id,
             tech_key,
@@ -70,9 +70,13 @@ class MovementValidator:
 
         return True
 
+    def validate_movement(self, movement: MovementOperation) -> bool:
+        """Validate a movement operation (alias for is_valid_movement)."""
+        return self.is_valid_movement(movement)
+
     def _is_valid_movement_cached(
         self,
-        unit_type: str,
+        unit_type: UnitType,
         from_system_id: str,
         to_system_id: str,
         technologies: frozenset[str],
@@ -108,7 +112,7 @@ class MovementExecutor:
         self._galaxy = galaxy
         self._systems = systems
 
-    def execute_movement(self, movement: MovementOperation) -> None:
+    def execute_movement(self, movement: MovementOperation) -> bool:
         """Execute a movement action."""
         from_system = self._systems.get(movement.from_system_id)
         to_system = self._systems.get(movement.to_system_id)
@@ -118,11 +122,21 @@ class MovementExecutor:
 
             raise InvalidSystemError("Invalid system ID in movement")
 
+        # Check for invalid direct planet-to-planet movement
+        if (
+            movement.from_location != LocationType.SPACE.value
+            and movement.to_location != LocationType.SPACE.value
+        ):
+            # Direct planet-to-planet movement is not allowed
+            return False
+
         # Handle different movement types
         self._remove_unit_from_location(
             from_system, movement.unit, movement.from_location
         )
         self._place_unit_at_location(to_system, movement.unit, movement.to_location)
+
+        return True
 
     def _remove_unit_from_location(
         self, system: System, unit: Unit, location: str

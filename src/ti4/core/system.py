@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Optional
 from .unit import Unit
 
 if TYPE_CHECKING:
+    from .fleet import Fleet
     from .planet import Planet
 
 
@@ -16,6 +17,7 @@ class System:
         self.planets: list[Planet] = []
         self.space_units: list[Unit] = []  # Units in the space area of the system
         self.wormholes: list[str] = []  # List of wormhole types in this system
+        self.fleets: list[Fleet] = []  # Fleets in this system
 
     def place_unit_in_space(self, unit: Unit) -> None:
         """Place a unit in the space area of this system."""
@@ -47,6 +49,10 @@ class System:
     def add_planet(self, planet: "Planet") -> None:
         """Add a planet to this system."""
         self.planets.append(planet)
+
+    def add_fleet(self, fleet: "Fleet") -> None:
+        """Add a fleet to this system."""
+        self.fleets.append(fleet)
 
     def add_wormhole(self, wormhole_type: str) -> None:
         """
@@ -109,3 +115,14 @@ class System:
             self.wormholes.remove(wormhole_type)
             return True
         return False
+
+    def get_units_in_space(self) -> list[Unit]:
+        """Get all units in the space area of this system."""
+        return self.space_units.copy()
+
+    def get_units_on_planet(self, planet_name: str) -> list[Unit]:
+        """Get all units on a specific planet in this system."""
+        planet = self.get_planet_by_name(planet_name)
+        if planet:
+            return planet.units.copy()
+        return []

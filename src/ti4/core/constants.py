@@ -12,6 +12,7 @@ class UnitType(Enum):
     DREADNOUGHT = "dreadnought"
     DESTROYER = "destroyer"
     FIGHTER = "fighter"
+    FLAGSHIP = "flagship"
     INFANTRY = "infantry"
     MECH = "mech"
     PDS = "pds"

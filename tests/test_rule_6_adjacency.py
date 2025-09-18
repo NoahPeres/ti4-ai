@@ -8,6 +8,7 @@ This module tests the adjacency rules according to LRR Rule 6:
 Following TDD discipline: RED-GREEN-REFACTOR
 """
 
+from src.ti4.core.constants import UnitType
 from src.ti4.core.galaxy import Galaxy
 from src.ti4.core.hex_coordinate import HexCoordinate
 from src.ti4.core.planet import Planet
@@ -46,8 +47,8 @@ class TestRule6UnitPlanetAdjacency:
         galaxy.register_system(system_b)
         galaxy.register_system(system_c)
 
-        # Place unit in system A space
-        unit = Unit(unit_type="cruiser", owner="player1")
+        # Place unit in system A
+        unit = Unit(unit_type=UnitType.INFANTRY, owner="player1")
         system_a.place_unit_in_space(unit)
 
         # Test: Unit should be adjacent to system B (adjacent to system A)
@@ -80,7 +81,7 @@ class TestRule6UnitPlanetAdjacency:
         galaxy.register_system(system_b)
 
         # Place unit on planet in system A
-        unit = Unit(unit_type="infantry", owner="player1")
+        unit = Unit(unit_type=UnitType.INFANTRY, owner="player1")
         system_a.place_unit_on_planet(unit, "Mecatol Rex")
 
         # Test: Unit on planet should be adjacent to system B
@@ -145,8 +146,8 @@ class TestRule6UnitPlanetAdjacency:
         galaxy.register_system(system_b)
 
         # Place units in system A
-        space_unit = Unit(unit_type="destroyer", owner="player1")
-        ground_unit = Unit(unit_type="infantry", owner="player1")
+        space_unit = Unit(unit_type=UnitType.DESTROYER, owner="player1")
+        ground_unit = Unit(unit_type=UnitType.INFANTRY, owner="player1")
         system_a.place_unit_in_space(space_unit)
         system_a.place_unit_on_planet(ground_unit, "Wormhole Planet")
 
@@ -210,7 +211,7 @@ class TestRule6EdgeCases:
         galaxy = Galaxy()
 
         # Create unit not placed in any system
-        unit = Unit(unit_type="fighter", owner="player1")
+        unit = Unit(unit_type=UnitType.FIGHTER, owner="player1")
 
         # Create a system
         coord_a = HexCoordinate(0, 0)
@@ -247,7 +248,7 @@ class TestRule6EdgeCases:
         planet = Planet(name="Test Planet", resources=1, influence=1)
         system_a.add_planet(planet)
 
-        unit = Unit(unit_type="cruiser", owner="player1")
+        unit = Unit(unit_type=UnitType.CRUISER, owner="player1")
         system_a.place_unit_in_space(unit)
 
         galaxy.place_system(coord_a, "system_a")
@@ -313,7 +314,7 @@ class TestRule6HyperlaneAdjacency:
         system_a.add_planet(planet)
 
         # Add unit to system A
-        unit = Unit(unit_type="destroyer", owner="player1")
+        unit = Unit(unit_type=UnitType.DESTROYER, owner="player1")
         system_a.place_unit_in_space(unit)
 
         galaxy.place_system(coord_a, "system_a")

@@ -1,5 +1,7 @@
 """Tests for technology system."""
 
+from src.ti4.core.constants import Technology as TechnologyEnum
+from src.ti4.core.constants import UnitType
 from src.ti4.core.game_state_manager import GameState
 from src.ti4.core.player import Player
 from src.ti4.core.technology import Technology, TechnologyColor, TechnologyTree
@@ -226,16 +228,16 @@ class TestTechnologyEffects:
         # Create an effect system and register the technology effect
         effect_system = TechnologyEffectSystem()
         effect_system.register_technology_effect(
-            technology_name="Gravity Drive",
-            unit_type="destroyer",
+            technology_name=TechnologyEnum.GRAVITY_DRIVE,
+            unit_type=UnitType.DESTROYER,
             stat_modifier=UnitStats(movement=1),  # +1 movement
         )
 
         # Create a unit and apply technology effects using the same stats provider
         unit = Unit(
-            unit_type="destroyer",
+            unit_type=UnitType.DESTROYER,
             owner="player1",
-            technologies={"Gravity Drive"},
+            technologies={TechnologyEnum.GRAVITY_DRIVE},
             stats_provider=effect_system._unit_stats_provider,
         )
 
@@ -270,8 +272,8 @@ class TestTechnologyEffects:
         # Set up the effect system in the game state
         effect_system = TechnologyEffectSystem(game_state.unit_stats_provider)
         effect_system.register_technology_effect(
-            technology_name="Gravity Drive",
-            unit_type="destroyer",
+            technology_name=TechnologyEnum.GRAVITY_DRIVE,
+            unit_type=UnitType.DESTROYER,
             stat_modifier=UnitStats(movement=1),  # +1 movement
         )
 
@@ -285,9 +287,9 @@ class TestTechnologyEffects:
 
         # Create a unit with the new technology and verify effects are applied
         unit = Unit(
-            unit_type="destroyer",
+            unit_type=UnitType.DESTROYER,
             owner="player1",
-            technologies=new_player_state.technologies,
+            technologies={TechnologyEnum.GRAVITY_DRIVE},
             stats_provider=new_state.unit_stats_provider,
         )
 

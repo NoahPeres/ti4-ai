@@ -2,13 +2,15 @@
 
 from dataclasses import dataclass
 
+from .constants import Faction
+
 
 @dataclass(frozen=True)
 class Player:
     """Represents a player in a TI4 game."""
 
     id: str
-    faction: str
+    faction: Faction
 
     def is_valid(self) -> bool:
         """Validate the player data."""

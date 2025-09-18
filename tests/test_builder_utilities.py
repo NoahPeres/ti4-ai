@@ -1,5 +1,7 @@
 """Tests for builder utilities and test patterns."""
 
+
+from src.ti4.core.constants import UnitType
 from src.ti4.core.game_phase import GamePhase
 from src.ti4.testing.scenario_builder import GameScenarioBuilder
 from src.ti4.testing.test_utilities import TestUtilities
@@ -95,10 +97,10 @@ def test_test_utilities_verification_methods() -> None:
     assert counts["player1"] == 6
 
     # Test unit filtering by type
-    fighters = TestUtilities.get_units_by_type(test_system, "fighter")
+    fighters = TestUtilities.get_units_by_type(test_system, UnitType.FIGHTER)
     assert len(fighters) == 4
 
-    carriers = TestUtilities.get_units_by_type(test_system, "carrier")
+    carriers = TestUtilities.get_units_by_type(test_system, UnitType.CARRIER)
     assert len(carriers) == 1
 
     # Test placement verification

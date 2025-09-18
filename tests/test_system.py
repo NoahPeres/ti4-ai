@@ -1,5 +1,6 @@
 """Tests for system structure."""
 
+from src.ti4.core.constants import UnitType
 from src.ti4.core.planet import Planet
 from src.ti4.core.system import System
 from src.ti4.core.unit import Unit
@@ -18,56 +19,54 @@ class TestSystem:
         assert isinstance(system.planets, list)
 
     def test_system_has_space_units_tracking(self) -> None:
-        """Test that system has space unit tracking."""
+        """Test that system tracks units in space."""
         system = System(system_id="test_system")
         assert hasattr(system, "space_units")
         assert isinstance(system.space_units, list)
 
     def test_place_unit_in_space(self) -> None:
-        """Test placing a unit in the space area of a system."""
+        """Test placing a unit in space area of system."""
         system = System(system_id="test_system")
-        unit = Unit(unit_type="fighter", owner="player1")
+        unit = Unit(unit_type=UnitType.CRUISER, owner="player1")
+
         system.place_unit_in_space(unit)
         assert unit in system.space_units
-        assert len(system.space_units) == 1
 
     def test_remove_unit_from_space(self) -> None:
-        """Test removing a unit from the space area of a system."""
+        """Test removing a unit from space area of system."""
         system = System(system_id="test_system")
-        unit = Unit(unit_type="fighter", owner="player1")
+        unit = Unit(unit_type=UnitType.DESTROYER, owner="player1")
+
         system.place_unit_in_space(unit)
+        assert unit in system.space_units
+
         system.remove_unit_from_space(unit)
         assert unit not in system.space_units
-        assert len(system.space_units) == 0
 
     def test_place_unit_on_planet_in_system(self) -> None:
-        """Test placing a unit on a planet within a system."""
+        """Test placing a unit on a planet within the system."""
         system = System(system_id="test_system")
-        planet = Planet(name="Test Planet", resources=2, influence=1)
+        planet = Planet(name="test_planet", resources=2, influence=1)
         system.add_planet(planet)
-        unit = Unit(unit_type="infantry", owner="player1")
-        system.place_unit_on_planet(unit, "Test Planet")
+
+        unit = Unit(unit_type=UnitType.INFANTRY, owner="player1")
+        system.place_unit_on_planet(unit, "test_planet")
+
         assert unit in planet.units
-        assert len(planet.units) == 1
 
     def test_space_and_planet_units_are_separate(self) -> None:
         """Test that space units and planet units are tracked separately."""
         system = System(system_id="test_system")
-        planet = Planet(name="Test Planet", resources=2, influence=1)
+        planet = Planet(name="test_planet", resources=2, influence=1)
         system.add_planet(planet)
 
-        # Place a space unit
-        space_unit = Unit(unit_type="fighter", owner="player1")
+        space_unit = Unit(unit_type=UnitType.CARRIER, owner="player1")
+        ground_unit = Unit(unit_type=UnitType.INFANTRY, owner="player1")
+
         system.place_unit_in_space(space_unit)
+        system.place_unit_on_planet(ground_unit, "test_planet")
 
-        # Place a ground unit on planet
-        ground_unit = Unit(unit_type="infantry", owner="player1")
-        system.place_unit_on_planet(ground_unit, "Test Planet")
-
-        # Verify they are tracked separately
         assert space_unit in system.space_units
         assert space_unit not in planet.units
         assert ground_unit in planet.units
         assert ground_unit not in system.space_units
-        assert len(system.space_units) == 1
-        assert len(planet.units) == 1

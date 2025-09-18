@@ -2,7 +2,7 @@
 
 from typing import Any, Optional
 
-from src.ti4.core.constants import LocationType
+from src.ti4.core.constants import Faction, LocationType, UnitType
 from src.ti4.core.galaxy import Galaxy
 from src.ti4.core.game_phase import GamePhase
 from src.ti4.core.game_state import GameState
@@ -26,7 +26,9 @@ class GameScenarioBuilder:
         self._player_resources: dict[str, dict[str, Any]] = {}
         self._player_technologies: dict[str, list[str]] = {}
 
-    def with_players(self, *player_configs: tuple[str, str]) -> "GameScenarioBuilder":
+    def with_players(
+        self, *player_configs: tuple[str, Faction]
+    ) -> "GameScenarioBuilder":
         """Add players to the scenario.
 
         Args:
@@ -153,7 +155,7 @@ class GameScenarioBuilder:
         # Validate player IDs and factions
         for player in self._players:
             validate_non_empty_string(player.id, "Player ID")
-            validate_non_empty_string(player.faction, "Faction")
+            validate_non_empty_string(player.faction.value, "Faction")
 
         # Validate unique player IDs
         validate_unique_collection(self._players, "players", key=lambda p: p.id)
@@ -172,7 +174,7 @@ class GameScenarioBuilder:
 
         # Place units
         for owner, unit_type, system_id, location in self._unit_placements:
-            unit = Unit(unit_type=unit_type, owner=owner)
+            unit = Unit(unit_type=UnitType(unit_type), owner=owner)
             system = self._systems[system_id]
 
             if location == LocationType.SPACE.value:
@@ -190,7 +192,7 @@ class GameScenarioBuilder:
         """
         return (
             GameScenarioBuilder()
-            .with_players(("player1", "sol"), ("player2", "xxcha"))
+            .with_players(("player1", Faction.SOL), ("player2", Faction.XXCHA))
             .with_galaxy("standard_6p")
             .in_phase(GamePhase.ACTION)
             .build()
@@ -205,7 +207,7 @@ class GameScenarioBuilder:
         """
         return (
             GameScenarioBuilder()
-            .with_players(("player1", "sol"), ("player2", "xxcha"))
+            .with_players(("player1", Faction.SOL), ("player2", Faction.XXCHA))
             .with_galaxy("standard_6p")
             .with_units(
                 [
@@ -228,7 +230,7 @@ class GameScenarioBuilder:
         """
         return (
             GameScenarioBuilder()
-            .with_players(("player1", "sol"), ("player2", "xxcha"))
+            .with_players(("player1", Faction.SOL), ("player2", Faction.XXCHA))
             .with_galaxy("standard_6p")
             .with_units(
                 [
@@ -255,7 +257,7 @@ class GameScenarioBuilder:
         """
         return (
             GameScenarioBuilder()
-            .with_players(("player1", "sol"), ("player2", "xxcha"))
+            .with_players(("player1", Faction.SOL), ("player2", Faction.XXCHA))
             .with_galaxy("standard_6p")
             .with_units(
                 [
@@ -306,7 +308,7 @@ class GameScenarioBuilder:
         """
         return (
             GameScenarioBuilder()
-            .with_players(("player1", "sol"), ("player2", "xxcha"))
+            .with_players(("player1", Faction.SOL), ("player2", Faction.XXCHA))
             .with_galaxy("standard_6p")
             .with_units(
                 [
@@ -332,7 +334,7 @@ class GameScenarioBuilder:
         """
         return (
             GameScenarioBuilder()
-            .with_players(("player1", "xxcha"), ("player2", "sol"))
+            .with_players(("player1", Faction.XXCHA), ("player2", Faction.SOL))
             .with_galaxy("standard_6p")
             .with_units(
                 [
@@ -377,7 +379,7 @@ class GameScenarioBuilder:
         """
         return (
             GameScenarioBuilder()
-            .with_players(("player1", "sol"))
+            .with_players(("player1", Faction.SOL))
             .with_galaxy("standard_6p")
             .with_units(
                 [
@@ -404,7 +406,7 @@ class GameScenarioBuilder:
         """
         return (
             GameScenarioBuilder()
-            .with_players(("player1", "sol"), ("player2", "xxcha"))
+            .with_players(("player1", Faction.SOL), ("player2", Faction.XXCHA))
             .with_galaxy("standard_6p")
             .with_units([("player1", "fighter", "isolated_system", "space")])
             .build()
@@ -419,7 +421,7 @@ class GameScenarioBuilder:
         """
         return (
             GameScenarioBuilder()
-            .with_players(("player1", "sol"))
+            .with_players(("player1", Faction.SOL))
             .with_galaxy("standard_6p")
             .with_player_resources(
                 "player1",
@@ -441,7 +443,14 @@ class GameScenarioBuilder:
         Returns:
             GameState configured for multi-player testing
         """
-        factions = ["sol", "xxcha", "hacan", "arborec", "l1z1x", "winnu"]
+        factions = [
+            Faction.SOL,
+            Faction.XXCHA,
+            Faction.HACAN,
+            Faction.ARBOREC,
+            Faction.L1Z1X,
+            Faction.WINNU,
+        ]
         players = [(f"player{i + 1}", factions[i]) for i in range(min(player_count, 6))]
 
         # Create unit placements for each player
@@ -474,7 +483,7 @@ class GameScenarioBuilder:
         """
         return (
             GameScenarioBuilder()
-            .with_players(("player1", "sol"), ("player2", "xxcha"))
+            .with_players(("player1", Faction.SOL), ("player2", Faction.XXCHA))
             .with_galaxy("standard_6p")
             .with_units(
                 [

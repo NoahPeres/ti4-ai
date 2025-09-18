@@ -487,6 +487,43 @@ class GameState:
 
         return self.set_player_influence(player_id, current_influence - amount)
 
+    def add_player(self, player: "Player") -> "GameState":
+        """Add a player to the game."""
+        new_players = self.players.copy()
+        new_players.append(player)
+
+        # Initialize player-specific tracking
+        new_player_resources = self.player_resources.copy()
+        new_player_technologies = self.player_technologies.copy()
+        new_victory_points = self.victory_points.copy()
+        new_completed_objectives = self.completed_objectives.copy()
+        new_status_phase_scoring = self.status_phase_scoring.copy()
+        new_combat_scoring = self.combat_scoring.copy()
+        new_player_secret_objectives = self.player_secret_objectives.copy()
+        new_player_influence = self.player_influence.copy()
+
+        # Initialize empty tracking for new player
+        new_player_resources[player.id] = {}
+        new_player_technologies[player.id] = []
+        new_victory_points[player.id] = 0
+        new_completed_objectives[player.id] = []
+        new_status_phase_scoring[player.id] = {"public": 0, "secret": 0}
+        new_combat_scoring[player.id] = []
+        new_player_secret_objectives[player.id] = []
+        new_player_influence[player.id] = 0
+
+        return self._create_new_state(
+            players=new_players,
+            player_resources=new_player_resources,
+            player_technologies=new_player_technologies,
+            victory_points=new_victory_points,
+            completed_objectives=new_completed_objectives,
+            status_phase_scoring=new_status_phase_scoring,
+            combat_scoring=new_combat_scoring,
+            player_secret_objectives=new_player_secret_objectives,
+            player_influence=new_player_influence,
+        )
+
     def eliminate_player(self, player_id: str) -> "GameState":
         """Eliminate a player from the game, removing their secret objectives."""
         new_player_secret_objectives = {

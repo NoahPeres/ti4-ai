@@ -4,6 +4,7 @@ from typing import Any, Optional
 
 import pytest
 
+from src.ti4.core.constants import UnitType
 from src.ti4.core.galaxy import Galaxy
 from src.ti4.core.hex_coordinate import HexCoordinate
 from src.ti4.core.planet import Planet
@@ -82,8 +83,8 @@ class TestTacticalAction:
         galaxy.place_system(coord2, "system2")
 
         # Create units in system1
-        cruiser = Unit(unit_type="cruiser", owner="player1")
-        destroyer = Unit(unit_type="destroyer", owner="player1")
+        cruiser = Unit(unit_type=UnitType.CRUISER, owner="player1")
+        destroyer = Unit(unit_type=UnitType.DESTROYER, owner="player1")
         system1.place_unit_in_space(cruiser)
         system1.place_unit_in_space(destroyer)
 
@@ -132,7 +133,7 @@ class TestTacticalAction:
         galaxy.place_system(coord1, "system1")
 
         # Create infantry on planet1
-        infantry = Unit(unit_type="infantry", owner="player1")
+        infantry = Unit(unit_type=UnitType.INFANTRY, owner="player1")
         system1.place_unit_on_planet(infantry, "planet1")
 
         # Attempt to create movement plan with direct planet-to-planet movement
@@ -167,9 +168,9 @@ class TestTacticalAction:
         galaxy.place_system(coord2, "system2")
 
         # Create carrier and infantry
-        carrier = Unit(unit_type="carrier", owner="player1")  # Capacity 4
-        infantry1 = Unit(unit_type="infantry", owner="player1")
-        infantry2 = Unit(unit_type="infantry", owner="player1")
+        carrier = Unit(unit_type=UnitType.CARRIER, owner="player1")  # Capacity 4
+        infantry1 = Unit(unit_type=UnitType.INFANTRY, owner="player1")
+        infantry2 = Unit(unit_type=UnitType.INFANTRY, owner="player1")
 
         system1.place_unit_in_space(carrier)
         system1.place_unit_on_planet(infantry1, "planet1")
@@ -212,8 +213,8 @@ class TestTacticalAction:
         galaxy.place_system(coord1, "system1")
 
         # Create ground forces in space area
-        infantry1 = Unit(unit_type="infantry", owner="player1")
-        infantry2 = Unit(unit_type="infantry", owner="player1")
+        infantry1 = Unit(unit_type=UnitType.INFANTRY, owner="player1")
+        infantry2 = Unit(unit_type=UnitType.INFANTRY, owner="player1")
         system1.place_unit_in_space(infantry1)
         system1.place_unit_in_space(infantry2)
 
@@ -261,8 +262,8 @@ class TestTacticalAction:
         galaxy.place_system(coord2, "system2")
 
         # Create units: carrier and infantry on planet1
-        carrier = Unit(unit_type="carrier", owner="player1")
-        infantry = Unit(unit_type="infantry", owner="player1")
+        carrier = Unit(unit_type=UnitType.CARRIER, owner="player1")
+        infantry = Unit(unit_type=UnitType.INFANTRY, owner="player1")
         system1.place_unit_in_space(carrier)
         system1.place_unit_on_planet(infantry, "planet1")
 
@@ -319,7 +320,7 @@ class TestTacticalAction:
         galaxy.place_system(coord2, "system2")
 
         # Create carrier (movement 1) - normally can't reach distance 2
-        carrier = Unit(unit_type="carrier", owner="player1")
+        carrier = Unit(unit_type=UnitType.CARRIER, owner="player1")
         system1.place_unit_in_space(carrier)
 
         # Create movement plan
@@ -361,9 +362,9 @@ class TestTacticalAction:
         galaxy.place_system(coord2, "system2")
 
         # Create destroyer (capacity 0) and 2 infantry
-        destroyer = Unit(unit_type="destroyer", owner="player1")
-        infantry1 = Unit(unit_type="infantry", owner="player1")
-        infantry2 = Unit(unit_type="infantry", owner="player1")
+        destroyer = Unit(unit_type=UnitType.DESTROYER, owner="player1")
+        infantry1 = Unit(unit_type=UnitType.INFANTRY, owner="player1")
+        infantry2 = Unit(unit_type=UnitType.INFANTRY, owner="player1")
 
         system1.place_unit_in_space(destroyer)
         system1.place_unit_on_planet(infantry1, "planet1")
@@ -406,9 +407,9 @@ class TestTacticalAction:
         galaxy.place_system(coord2, "system2")
 
         # Create carrier (capacity 4) and 2 infantry
-        carrier = Unit(unit_type="carrier", owner="player1")
-        infantry1 = Unit(unit_type="infantry", owner="player1")
-        infantry2 = Unit(unit_type="infantry", owner="player1")
+        carrier = Unit(unit_type=UnitType.CARRIER, owner="player1")
+        infantry1 = Unit(unit_type=UnitType.INFANTRY, owner="player1")
+        infantry2 = Unit(unit_type=UnitType.INFANTRY, owner="player1")
 
         system1.place_unit_in_space(carrier)
         system1.place_unit_on_planet(infantry1, "planet1")
@@ -457,8 +458,8 @@ class TestTacticalAction:
         galaxy.place_system(coord2, "system2")
 
         # Create units: carrier and infantry on planet1
-        carrier = Unit(unit_type="carrier", owner="player1")
-        infantry = Unit(unit_type="infantry", owner="player1")
+        carrier = Unit(unit_type=UnitType.CARRIER, owner="player1")
+        infantry = Unit(unit_type=UnitType.INFANTRY, owner="player1")
         system1.place_unit_in_space(carrier)
         system1.place_unit_on_planet(infantry, "planet1")
 
@@ -532,9 +533,9 @@ class TestTacticalAction:
         galaxy.place_system(coord3, "system3")
 
         # Create units in different systems
-        cruiser1 = Unit(unit_type="cruiser", owner="player1")  # Movement 2
-        cruiser2 = Unit(unit_type="cruiser", owner="player1")  # Movement 2
-        destroyer = Unit(unit_type="destroyer", owner="player1")  # Movement 2
+        cruiser1 = Unit(unit_type=UnitType.CRUISER, owner="player1")  # Movement 2
+        cruiser2 = Unit(unit_type=UnitType.CRUISER, owner="player1")  # Movement 2
+        destroyer = Unit(unit_type=UnitType.DESTROYER, owner="player1")  # Movement 2
 
         system1.place_unit_in_space(cruiser1)
         system2.place_unit_in_space(cruiser2)
@@ -572,8 +573,8 @@ class TestTacticalAction:
         galaxy.place_system(coord3, "system3")
 
         # Create carriers (movement 1) - need Gravity Drive for distance 2
-        carrier1 = Unit(unit_type="carrier", owner="player1")  # Distance 2 away
-        carrier2 = Unit(unit_type="carrier", owner="player1")  # Distance 1 away
+        carrier1 = Unit(unit_type=UnitType.CARRIER, owner="player1")  # Distance 2 away
+        carrier2 = Unit(unit_type=UnitType.CARRIER, owner="player1")  # Distance 1 away
 
         system1.place_unit_in_space(carrier1)
         system2.place_unit_in_space(carrier2)
@@ -623,8 +624,8 @@ class TestTacticalAction:
         galaxy.place_system(coord3, "system3")
 
         # Create two carriers (movement 1) both distance 2 away
-        carrier1 = Unit(unit_type="carrier", owner="player1")
-        carrier2 = Unit(unit_type="carrier", owner="player1")
+        carrier1 = Unit(unit_type=UnitType.CARRIER, owner="player1")
+        carrier2 = Unit(unit_type=UnitType.CARRIER, owner="player1")
 
         system1.place_unit_in_space(carrier1)
         system2.place_unit_in_space(carrier2)
@@ -664,7 +665,7 @@ class TestTacticalAction:
         galaxy.place_system(coord2, "system2")
 
         # Create a cruiser (movement 2)
-        cruiser = Unit(unit_type="cruiser", owner="player1")
+        cruiser = Unit(unit_type=UnitType.CRUISER, owner="player1")
         system1.place_unit_in_space(cruiser)
 
         # Test with multiple technologies (demonstrating extensibility)
@@ -717,18 +718,18 @@ class TestTacticalAction:
 
         # Create diverse units in different systems
         # System 1: Carrier (movement 1) + Infantry
-        carrier = Unit(unit_type="carrier", owner="player1")
-        infantry1 = Unit(unit_type="infantry", owner="player1")
+        carrier = Unit(unit_type=UnitType.CARRIER, owner="player1")
+        infantry1 = Unit(unit_type=UnitType.INFANTRY, owner="player1")
         systems["system1"].place_unit_in_space(carrier)
         systems["system1"].place_unit_on_planet(infantry1, "planet1")
 
         # System 2: Cruiser (movement 2)
-        cruiser = Unit(unit_type="cruiser", owner="player1")
+        cruiser = Unit(unit_type=UnitType.CRUISER, owner="player1")
         systems["system2"].place_unit_in_space(cruiser)
 
         # System 4: Destroyer (movement 2) + Infantry
-        destroyer = Unit(unit_type="destroyer", owner="player1")
-        infantry2 = Unit(unit_type="infantry", owner="player1")
+        destroyer = Unit(unit_type=UnitType.DESTROYER, owner="player1")
+        infantry2 = Unit(unit_type=UnitType.INFANTRY, owner="player1")
         systems["system4"].place_unit_in_space(destroyer)
         systems["system4"].place_unit_on_planet(infantry2, "planet4")
 

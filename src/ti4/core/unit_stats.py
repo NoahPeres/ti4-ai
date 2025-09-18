@@ -3,6 +3,8 @@
 from dataclasses import dataclass
 from typing import Any, Optional
 
+from .constants import Faction, Technology, UnitType
+
 
 @dataclass(frozen=True)
 class UnitStats:
@@ -120,14 +122,20 @@ class UnitStatsProvider:
 
     def get_unit_stats(
         self,
-        unit_type: str,
-        faction: Optional[str] = None,
-        technologies: Optional[set[str]] = None,
+        unit_type: UnitType,
+        faction: Optional[Faction] = None,
+        technologies: Optional[set[Technology]] = None,
     ) -> UnitStats:
         """Get unit statistics with faction and technology modifications."""
         # Convert technologies to frozenset for hashability
-        tech_key = frozenset(technologies) if technologies else frozenset()
-        return self._get_cached_unit_stats(unit_type, faction, tech_key)
+        tech_key = (
+            frozenset(tech.value for tech in technologies)
+            if technologies
+            else frozenset()
+        )
+        return self._get_cached_unit_stats(
+            unit_type.value, faction.value if faction else None, tech_key
+        )
 
     def _get_cached_unit_stats(
         self,
@@ -179,21 +187,25 @@ class UnitStatsProvider:
         )
 
     def register_faction_modifier(
-        self, faction: str, unit_type: str, stats: UnitStats
+        self, faction: Faction, unit_type: UnitType, stats: UnitStats
     ) -> None:
         """Register faction-specific unit modifications."""
-        if faction not in self._faction_modifiers:
-            self._faction_modifiers[faction] = {}
-        self._faction_modifiers[faction][unit_type] = stats
+        faction_key = faction.value
+        unit_type_key = unit_type.value
+        if faction_key not in self._faction_modifiers:
+            self._faction_modifiers[faction_key] = {}
+        self._faction_modifiers[faction_key][unit_type_key] = stats
         # Clear cache when modifiers change (cache removed for now)
         # self._get_cached_unit_stats.cache_clear()
 
     def register_technology_modifier(
-        self, technology: str, unit_type: str, stats: UnitStats
+        self, technology: Technology, unit_type: UnitType, stats: UnitStats
     ) -> None:
         """Register technology-based unit modifications."""
-        if technology not in self._technology_modifiers:
-            self._technology_modifiers[technology] = {}
-        self._technology_modifiers[technology][unit_type] = stats
+        technology_key = technology.value
+        unit_type_key = unit_type.value
+        if technology_key not in self._technology_modifiers:
+            self._technology_modifiers[technology_key] = {}
+        self._technology_modifiers[technology_key][unit_type_key] = stats
         # Clear cache when modifiers change (cache removed for now)
         # self._get_cached_unit_stats.cache_clear()

@@ -4,6 +4,9 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Optional
 
+from .constants import Technology as TechnologyEnum
+from .constants import UnitType
+
 
 class TechnologyColor(Enum):
     """Technology colors in TI4."""
@@ -52,7 +55,7 @@ class TechnologyEffectSystem:
         self._unit_stats_provider = unit_stats_provider or UnitStatsProvider()
 
     def register_technology_effect(
-        self, technology_name: str, unit_type: str, stat_modifier: Any
+        self, technology_name: TechnologyEnum, unit_type: UnitType, stat_modifier: Any
     ) -> None:
         """Register a technology effect on unit stats."""
         self._unit_stats_provider.register_technology_modifier(

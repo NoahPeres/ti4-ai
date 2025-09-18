@@ -12,7 +12,7 @@ class TestScenarioLibrary:
         game_state = GameScenarioBuilder.create_faction_specific_scenario("sol")
 
         assert len(game_state.players) == 2
-        assert game_state.players[0].faction == "sol"
+        assert game_state.players[0].faction.value == "sol"
         assert game_state.phase == GamePhase.ACTION
 
         # Verify Sol gets extra command tokens
@@ -31,7 +31,7 @@ class TestScenarioLibrary:
         game_state = GameScenarioBuilder.create_faction_specific_scenario("xxcha")
 
         assert len(game_state.players) == 2
-        assert game_state.players[0].faction == "xxcha"
+        assert game_state.players[0].faction.value == "xxcha"
 
         # Verify Xxcha gets extra trade goods
         assert game_state.player_resources["player1"]["trade_goods"] == 10
@@ -135,7 +135,7 @@ class TestScenarioLibrary:
 
         # Verify player factions are assigned correctly
         expected_factions = ["sol", "xxcha", "hacan"]
-        actual_factions = [player.faction for player in game_state.players]
+        actual_factions = [player.faction.value for player in game_state.players]
         assert actual_factions == expected_factions
 
     def test_multi_player_scenario_max_players(self) -> None:

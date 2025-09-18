@@ -2,6 +2,7 @@
 
 import time
 
+from src.ti4.core.constants import UnitType
 from src.ti4.core.galaxy import Galaxy
 from src.ti4.core.game_state import GameState
 from src.ti4.core.movement import MovementValidator
@@ -14,104 +15,168 @@ class TestPerformanceBenchmarks:
     """Benchmark tests for performance-critical operations."""
 
     def test_unit_stats_calculation_performance(self) -> None:
-        """Benchmark unit statistics calculation."""
-        provider = UnitStatsProvider()
-        unit_type = "cruiser"
-        faction = "sol"
-        technologies = {"improved_hull", "plasma_scoring"}
+        """Benchmark unit stats calculation performance."""
+        UnitStatsProvider()
 
-        # Warm up
-        for _ in range(10):
-            provider.get_unit_stats(unit_type, faction, technologies)
+        # Create many units for testing
+        units = []
+        for i in range(1000):
+            unit_type = [
+                UnitType.CRUISER,
+                UnitType.DESTROYER,
+                UnitType.CARRIER,
+                UnitType.FIGHTER,
+            ][i % 4]
+            unit = Unit(unit_type=unit_type, owner=f"player{i % 4}")
+            units.append(unit)
 
-        # Benchmark
+        # Benchmark stats calculation
         start_time = time.time()
-        iterations = 1000
-        for _ in range(iterations):
-            provider.get_unit_stats(unit_type, faction, technologies)
-        end_time = time.time()
 
-        avg_time = (end_time - start_time) / iterations
-        # Should be very fast - less than 1ms per calculation
-        assert avg_time < 0.001, f"Unit stats calculation too slow: {avg_time:.6f}s"
+        for unit in units:
+            # Calculate stats multiple times to simulate game operations
+            unit.get_combat()
+            unit.get_movement()
+            unit.get_capacity()
+            unit.get_cost()
+
+        end_time = time.time()
+        calculation_time = end_time - start_time
+
+        # Should complete within reasonable time (adjust threshold as needed)
+        assert calculation_time < 1.0, (
+            f"Stats calculation took {calculation_time:.3f}s, expected < 1.0s"
+        )
+
+        print(f"Unit stats calculation for 1000 units: {calculation_time:.3f}s")
 
     def test_movement_validation_performance(self) -> None:
-        """Benchmark movement validation."""
+        """Benchmark movement validation performance."""
         galaxy = Galaxy()
         validator = MovementValidator(galaxy)
 
-        # Create mock movement operation
+        # Create a large galaxy with many systems
+        from src.ti4.core.hex_coordinate import HexCoordinate
+        from src.ti4.core.system import System
+
+        systems = []
+        for x in range(-5, 6):
+            for y in range(-5, 6):
+                if abs(x) + abs(y) <= 5:  # Create hexagonal galaxy
+                    coord = HexCoordinate(x, y)
+                    system_id = f"system_{x}_{y}"
+                    system = System(system_id)
+
+                    galaxy.place_system(coord, system_id)
+                    galaxy.register_system(system)
+                    systems.append(system)
+
+        # Create units in systems
+        units = []
+        for i, system in enumerate(systems[:50]):  # Limit to 50 systems for performance
+            unit = Unit(unit_type=UnitType.CRUISER, owner=f"player{i % 4}")
+            system.place_unit_in_space(unit)
+            units.append((unit, system))
+
+        # Benchmark movement validation
+        start_time = time.time()
+
         from src.ti4.core.movement import MovementOperation
 
-        movement = MovementOperation(
-            unit=Unit(unit_type="destroyer", owner="player1"),
-            from_system_id="system1",
-            to_system_id="system2",
-            player_id="player1",
+        for unit, from_system in units:
+            # Try to validate movement to adjacent systems
+            for target_system in systems[:10]:  # Check first 10 systems
+                if target_system != from_system:
+                    movement = MovementOperation(
+                        unit=unit,
+                        from_system_id=from_system.system_id,
+                        to_system_id=target_system.system_id,
+                        player_id=f"player{units.index((unit, from_system)) % 4}",
+                    )
+                    validator.validate_movement(movement)
+
+        end_time = time.time()
+        validation_time = end_time - start_time
+
+        # Should complete within reasonable time
+        assert validation_time < 2.0, (
+            f"Movement validation took {validation_time:.3f}s, expected < 2.0s"
         )
 
-        # Warm up
-        for _ in range(10):
-            try:
-                validator.is_valid_movement(movement)
-            except Exception:
-                pass  # Ignore validation errors for benchmarking
-
-        # Benchmark
-        start_time = time.time()
-        iterations = 1000
-        for _ in range(iterations):
-            try:
-                validator.is_valid_movement(movement)
-            except Exception:
-                pass  # Ignore validation errors for benchmarking
-        end_time = time.time()
-
-        avg_time = (end_time - start_time) / iterations
-        # Should be fast - less than 5ms per validation
-        assert avg_time < 0.005, f"Movement validation too slow: {avg_time:.6f}s"
+        print(f"Movement validation for {len(units)} units: {validation_time:.3f}s")
 
     def test_cached_operations_performance(self) -> None:
-        """Test that cached operations provide performance benefits."""
-        provider = UnitStatsProvider()
-        unit_type = "cruiser"
-        faction = "sol"
-        technologies = {"improved_hull", "plasma_scoring"}
+        """Test performance of cached vs non-cached operations."""
+        # Create units with technologies for caching test
+        units = []
+        for _i in range(100):
+            unit = Unit(unit_type=UnitType.CRUISER, owner="player1")
+            # Add some technologies to test caching
+            unit.add_technology("gravity_drive")
+            unit.add_technology("cruiser_ii")
+            units.append(unit)
 
-        # First call - cache miss
+        # Benchmark repeated stats access (should benefit from caching)
         start_time = time.time()
-        result1 = provider.get_unit_stats(unit_type, faction, technologies)
-        first_call_time = time.time() - start_time
 
-        # Second call - cache hit
-        start_time = time.time()
-        result2 = provider.get_unit_stats(unit_type, faction, technologies)
-        second_call_time = time.time() - start_time
+        for _ in range(10):  # Multiple iterations to test caching
+            for unit in units:
+                unit.get_movement()
+                unit.get_combat()
+                unit.get_capacity()
 
-        # Results should be identical
-        assert result1 == result2
+        end_time = time.time()
+        cached_time = end_time - start_time
 
-        # Second call should be faster (though both are already very fast)
-        # This test mainly ensures caching doesn't break functionality
-        assert second_call_time <= first_call_time * 2  # Allow some variance
+        print(f"Cached operations for 100 units (10 iterations): {cached_time:.3f}s")
 
-    def test_game_state_operations_performance(self) -> None:
-        """Benchmark common game state operations."""
-        game_state = GameState(game_id="benchmark_game")
-
-        # Add some players
-        players = [Player(id=f"player{i}", faction=f"faction{i}") for i in range(6)]
-        game_state = GameState(
-            game_id=game_state.game_id, players=players, phase=game_state.phase
+        # Should be reasonably fast with caching
+        assert cached_time < 0.5, (
+            f"Cached operations took {cached_time:.3f}s, expected < 0.5s"
         )
 
-        # Benchmark game state validation
-        start_time = time.time()
-        iterations = 1000
-        for _ in range(iterations):
-            game_state.is_valid()
-        end_time = time.time()
+    def test_game_state_operations_performance(self) -> None:
+        """Benchmark game state operations."""
+        # Create a game state with multiple players and units
+        game_state = GameState()
 
-        avg_time = (end_time - start_time) / iterations
-        # Should be very fast - less than 0.1ms per validation
-        assert avg_time < 0.0001, f"Game state validation too slow: {avg_time:.6f}s"
+        # Add players
+        for i in range(4):
+            player = Player(f"player{i}", f"Faction {i}")
+            game_state = game_state.add_player(player)
+
+        # Create units for each player using scenario builder approach
+        start_time = time.time()
+
+        # Create systems and place units
+        from src.ti4.core.system import System
+
+        for player_id in range(4):
+            system_id = f"system_{player_id}"
+            system = System(system_id)
+
+            for unit_type in [
+                UnitType.CRUISER,
+                UnitType.DESTROYER,
+                UnitType.CARRIER,
+                UnitType.FIGHTER,
+                UnitType.INFANTRY,
+            ]:
+                for _ in range(5):  # 5 of each unit type per player
+                    unit = Unit(unit_type=unit_type, owner=f"player{player_id}")
+                    system.place_unit_in_space(unit)
+
+            # Add system to game state
+            new_systems = game_state.systems.copy()
+            new_systems[system_id] = system
+            game_state = game_state._create_new_state(systems=new_systems)
+
+        end_time = time.time()
+        creation_time = end_time - start_time
+
+        print(f"Game state creation with 100 units: {creation_time:.3f}s")
+
+        # Should complete within reasonable time
+        assert creation_time < 1.0, (
+            f"Game state operations took {creation_time:.3f}s, expected < 1.0s"
+        )

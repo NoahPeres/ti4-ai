@@ -1,5 +1,6 @@
 """Test utilities for common testing patterns."""
 
+from src.ti4.core.constants import Faction, UnitType
 from src.ti4.core.game_state import GameState
 from src.ti4.core.system import System
 from src.ti4.core.unit import Unit
@@ -28,7 +29,7 @@ class TestUtilities:
         """
         return (
             GameScenarioBuilder()
-            .with_players(("player1", "sol"), ("player2", "xxcha"))
+            .with_players(("player1", Faction.SOL), ("player2", Faction.XXCHA))
             .with_galaxy("standard_6p")
             .with_units(
                 [
@@ -48,7 +49,7 @@ class TestUtilities:
         """
         return (
             GameScenarioBuilder()
-            .with_players(("player1", "sol"))
+            .with_players(("player1", Faction.SOL))
             .with_galaxy("standard_6p")
             .with_units(
                 [
@@ -109,7 +110,7 @@ class TestUtilities:
         return counts
 
     @staticmethod
-    def get_units_by_type(system: System, unit_type: str) -> list[Unit]:
+    def get_units_by_type(system: System, unit_type: UnitType) -> list[Unit]:
         """Get all units of a specific type from a system.
 
         Args:
@@ -119,4 +120,6 @@ class TestUtilities:
         Returns:
             List of units matching the type
         """
-        return [unit for unit in system.space_units if unit.unit_type == unit_type]
+        return [
+            unit for unit in system.space_units if unit.unit_type == unit_type.value
+        ]
