@@ -23,23 +23,30 @@ class Technology:
 
     name: str
     color: TechnologyColor
-    prerequisites: list[str]
+    prerequisites: list[
+        TechnologyColor
+    ]  # Prerequisites are colors, not specific tech names
 
 
 class TechnologyTree:
     """Manages technology tree navigation and validation."""
 
     def can_research(
-        self, technology: Technology, player_technologies: list[str]
+        self, technology: Technology, player_technologies: list[Technology]
     ) -> bool:
-        """Check if a player can research a given technology."""
+        """Check if a player can research a given technology based on color prerequisites."""
         # If technology has no prerequisites, it can always be researched
         if not technology.prerequisites:
             return True
 
-        # Check if all prerequisites are satisfied
-        for prerequisite in technology.prerequisites:
-            if prerequisite not in player_technologies:
+        # Get colors of technologies the player owns
+        player_tech_colors = [tech.color for tech in player_technologies]
+
+        # Check if all prerequisite colors are satisfied
+        for prerequisite_color in technology.prerequisites:
+            if player_tech_colors.count(
+                prerequisite_color
+            ) < technology.prerequisites.count(prerequisite_color):
                 return False
 
         return True

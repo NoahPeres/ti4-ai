@@ -266,6 +266,12 @@ class TestCombatResolver:
             resolver.validate_hit_assignment_choices(units, [cruiser.id, fighter.id], 1)
             is False
         )  # Too many choices
+        assert (
+            resolver.validate_hit_assignment_choices(units, [], 1) is False
+        )  # Too few choices (no units assigned for 1 hit)
+        assert (
+            resolver.validate_hit_assignment_choices(units, [cruiser.id], 2) is False
+        )  # Too few choices (1 unit assigned for 2 hits)
 
     def test_apply_combat_modifiers(self) -> None:
         """Test applying combat modifiers to dice rolls."""
@@ -316,10 +322,7 @@ class TestUnitAbilitiesInCombat:
             Unit(unit_type=UnitType.FIGHTER, owner="player2"),
         ]
 
-        # Anti-fighter barrage should be a boolean ability
-        assert destroyer.get_stats().anti_fighter_barrage is True
-
-        # Test that destroyer has the ability
+        # Test that destroyer has the ability (this internally checks get_stats().anti_fighter_barrage)
         assert destroyer.has_anti_fighter_barrage() is True
 
     def test_space_cannon_defensive_fire(self) -> None:

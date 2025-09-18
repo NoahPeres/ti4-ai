@@ -23,7 +23,7 @@ class GameScenarioBuilder:
         self._unit_placements: list[
             tuple[str, str, str, str]
         ] = []  # (owner, unit_type, system_id, location)
-        self._player_resources: dict[str, dict[str, Any]] = {}
+        # _player_resources field removed - incorrect implementation
         self._player_technologies: dict[str, list[str]] = {}
 
     def with_players(
@@ -94,9 +94,8 @@ class GameScenarioBuilder:
         Returns:
             Self for fluent interface
         """
-        if player_id not in self._player_resources:
-            self._player_resources[player_id] = {}
-        self._player_resources[player_id].update(resources)
+        # Player resource configuration removed - incorrect implementation
+        # Resources should be tracked on planets, not as player pools
         return self
 
     def with_player_technologies(
@@ -133,7 +132,7 @@ class GameScenarioBuilder:
             galaxy=self._galaxy,
             phase=self._phase,
             systems=self._systems,
-            player_resources=self._player_resources,
+            # player_resources parameter removed - incorrect implementation
             player_technologies=self._player_technologies,
         )
 
@@ -242,8 +241,8 @@ class GameScenarioBuilder:
                     ("player2", "fighter", "home_system_2", "space"),
                 ]
             )
-            .with_player_resources("player1", trade_goods=3, command_tokens=8)
-            .with_player_resources("player2", trade_goods=3, command_tokens=8)
+            # with_player_resources calls removed - incorrect implementation
+            # Resources should be tracked on planets, not as player pools
             .in_phase(GamePhase.STRATEGY)
             .build()
         )
@@ -269,8 +268,8 @@ class GameScenarioBuilder:
                     ("player2", "fighter", "system4", "space"),
                 ]
             )
-            .with_player_resources("player1", trade_goods=8, command_tokens=12)
-            .with_player_resources("player2", trade_goods=6, command_tokens=10)
+            # with_player_resources calls removed - incorrect implementation
+            # Resources should be tracked on planets, not as player pools
             .with_player_technologies("player1", ["dreadnought_ii", "cruiser_ii"])
             .with_player_technologies("player2", ["war_sun", "destroyer_ii"])
             .in_phase(GamePhase.ACTION)
@@ -318,9 +317,8 @@ class GameScenarioBuilder:
                     ("player2", "cruiser", "enemy_system", "space"),
                 ]
             )
-            .with_player_resources(
-                "player1", command_tokens=16
-            )  # Sol gets extra command tokens
+            # with_player_resources call removed - incorrect implementation
+            # Resources should be tracked on planets, not as player pools
             .in_phase(GamePhase.ACTION)
             .build()
         )
@@ -343,7 +341,8 @@ class GameScenarioBuilder:
                     ("player2", "dreadnought", "enemy_system", "space"),
                 ]
             )
-            .with_player_resources("player1", trade_goods=10)  # Xxcha good at trade
+            # with_player_resources call removed - incorrect implementation
+            # Resources should be tracked on planets, not as player pools
             .in_phase(GamePhase.ACTION)
             .build()
         )
@@ -423,13 +422,8 @@ class GameScenarioBuilder:
             GameScenarioBuilder()
             .with_players(("player1", Faction.SOL))
             .with_galaxy("standard_6p")
-            .with_player_resources(
-                "player1",
-                trade_goods=999,
-                command_tokens=999,
-                influence=999,
-                resources=999,
-            )
+            # with_player_resources call removed - incorrect implementation
+            # Resources should be tracked on planets, not as player pools
             .build()
         )
 
@@ -497,8 +491,8 @@ class GameScenarioBuilder:
                     ("player2", "destroyer", "border_system_2", "space"),
                 ]
             )
-            .with_player_resources("player1", trade_goods=15, command_tokens=16)
-            .with_player_resources("player2", trade_goods=12, command_tokens=14)
+            # with_player_resources calls removed - incorrect implementation
+            # Resources should be tracked on planets, not as player pools
             .with_player_technologies(
                 "player1",
                 [

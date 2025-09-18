@@ -6,6 +6,7 @@ from src.ti4.commands.base import GameCommand
 from src.ti4.commands.manager import CommandManager
 from src.ti4.core.events import create_phase_changed_event
 from src.ti4.core.game_phase import GamePhase
+from src.ti4.core.game_state_machine import GameStateMachine
 from src.ti4.core.player import Player
 from src.ti4.core.strategy_card import STANDARD_STRATEGY_CARDS, StrategyCard
 
@@ -21,7 +22,7 @@ class GameController:
             raise ValueError("At least 3 players are required for TI4")
         self._players = players
         self._current_player_index = 0
-        self._current_phase = GamePhase.SETUP
+        self._state_machine = GameStateMachine()
         self._available_strategy_cards = list(STANDARD_STRATEGY_CARDS)
         self._selected_strategy_cards: dict[str, list[StrategyCard]] = {}
         self._consecutive_passes = 0
@@ -71,7 +72,7 @@ class GameController:
 
     def start_strategy_phase(self) -> None:
         """Start the strategy phase."""
-        self._current_phase = GamePhase.STRATEGY
+        self._state_machine.transition_to(GamePhase.STRATEGY)
         # Reset strategy card selections
         self._available_strategy_cards = list(STANDARD_STRATEGY_CARDS)
         self._selected_strategy_cards = {}
@@ -102,11 +103,6 @@ class GameController:
     def get_player_strategy_cards(self, player_id: str) -> list[StrategyCard]:
         """Get the strategy cards selected by a player."""
         return self._selected_strategy_cards.get(player_id, [])
-
-    def get_player_strategy_card(self, player_id: str) -> Optional[StrategyCard]:
-        """Get the first strategy card selected by a player (for backward compatibility)."""
-        cards = self._selected_strategy_cards.get(player_id, [])
-        return cards[0] if cards else None
 
     def get_strategy_phase_turn_order(self) -> list[Player]:
         """Get turn order based on strategy card initiative values."""
@@ -143,11 +139,14 @@ class GameController:
 
     def start_action_phase(self) -> None:
         """Start the action phase."""
-        self._current_phase = GamePhase.ACTION
+        # Ensure we're in the correct phase to transition to ACTION
+        if self._state_machine.current_phase == GamePhase.SETUP:
+            self._state_machine.transition_to(GamePhase.STRATEGY)
+        self._state_machine.transition_to(GamePhase.ACTION)
 
     def get_current_phase(self) -> GamePhase:
         """Get the current game phase."""
-        return self._current_phase
+        return self._state_machine.current_phase
 
     def _validate_action_preconditions(self, player_id: str) -> None:
         """Validate that a player can take an action."""
@@ -156,7 +155,7 @@ class GameController:
         if not self.is_player_activated(player_id):
             raise ValueError(f"Player '{player_id}' is not currently active")
 
-        if self._current_phase != GamePhase.ACTION:
+        if self._state_machine.current_phase != GamePhase.ACTION:
             raise ValueError("Not currently in action phase")
 
     def _reset_consecutive_passes(self) -> None:
@@ -238,9 +237,11 @@ class GameController:
         self._event_bus = event_bus
 
     def advance_to_phase(self, new_phase: GamePhase) -> None:
-        """Advance to a new game phase and publish event."""
-        old_phase = self._current_phase
-        self._current_phase = new_phase
+        """Advance to a new game phase with validation and publish event."""
+        old_phase = self._state_machine.current_phase
+
+        # Use state machine for validated transition
+        self._state_machine.transition_to(new_phase)
 
         # Publish phase changed event if event bus is available
         if self._event_bus is not None:

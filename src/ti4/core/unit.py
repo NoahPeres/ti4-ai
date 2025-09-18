@@ -173,8 +173,15 @@ class Unit:
 
     def load_transport_unit(self, unit: "Unit") -> None:
         """Load a unit onto this transport unit."""
-        # This is a placeholder for transport functionality
-        pass
+        from .exceptions import FleetCapacityError
+
+        # Check if this unit has transport capacity
+        capacity = self.get_capacity()
+        if capacity == 0:
+            raise FleetCapacityError(f"Unit {self.unit_type} has no transport capacity")
+
+        # This is a placeholder for full transport functionality
+        # In a complete implementation, we would track loaded units and check against capacity
 
     def unload_unit(self, unit: "Unit") -> None:
         """Unload a unit from this transport unit."""

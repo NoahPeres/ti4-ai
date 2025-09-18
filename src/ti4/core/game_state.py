@@ -29,9 +29,8 @@ class GameState:
     galaxy: Optional[Galaxy] = None
     phase: GamePhase = GamePhase.SETUP
     systems: dict[str, System] = field(default_factory=dict, hash=False)
-    player_resources: dict[str, dict[str, Any]] = field(
-        default_factory=dict, hash=False
-    )
+    # player_resources field removed - incorrect implementation
+    # Resources should be tracked on planets per Rules 47 and 75
     player_technologies: dict[str, list[str]] = field(default_factory=dict, hash=False)
     victory_points: dict[str, int] = field(default_factory=dict, hash=False)
     completed_objectives: dict[str, list[str]] = field(default_factory=dict, hash=False)
@@ -51,9 +50,8 @@ class GameState:
     secret_objective_deck: list[Objective] = field(
         default_factory=list, hash=False
     )  # Deck of unassigned secret objectives
-    player_influence: dict[str, int] = field(
-        default_factory=dict, hash=False
-    )  # player_id -> influence_amount
+    # player_influence field removed - incorrect implementation
+    # Influence should be tracked on planets per Rules 47 and 75
 
     def get_victory_points(self, player_id: str) -> int:
         """Get the victory points for a player."""
@@ -108,7 +106,7 @@ class GameState:
             galaxy=self.galaxy,
             phase=self.phase,
             systems=self.systems,
-            player_resources=self.player_resources,
+            # player_resources parameter removed - incorrect implementation
             player_technologies=self.player_technologies,
             victory_points=kwargs.get("victory_points", self.victory_points),
             completed_objectives=kwargs.get(
@@ -124,7 +122,7 @@ class GameState:
             secret_objective_deck=kwargs.get(
                 "secret_objective_deck", self.secret_objective_deck
             ),
-            player_influence=kwargs.get("player_influence", self.player_influence),
+            # player_influence parameter removed - incorrect implementation
         )
 
     def is_valid(self) -> bool:
@@ -451,41 +449,13 @@ class GameState:
         new_state = self._create_new_state(secret_objective_deck=new_deck)
         return new_state.assign_secret_objective(player_id, drawn_objective)
 
-    def execute_imperial_secondary_ability(self, player_id: str) -> "GameState":
-        """Execute Imperial strategy card secondary ability - spend 1 influence to draw a secret objective."""
-        player_influence = self.get_player_influence(player_id)
-        if player_influence < 1:
-            raise ValueError(
-                f"Insufficient influence - requires 1 influence, player {player_id} has {player_influence}"
-            )
+    # Imperial secondary ability removed - was incorrectly implemented
+    # According to Rule 45.3, players spend one command token from their strategy pool
+    # to draw one secret objective card, not influence
 
-        # Spend 1 influence
-        new_state = self.spend_player_influence(player_id, 1)
-
-        # Draw secret objective
-        return new_state.execute_imperial_primary_ability(player_id)
-
-    # Player Influence Management
-
-    def get_player_influence(self, player_id: str) -> int:
-        """Get player's influence amount."""
-        return self.player_influence.get(player_id, 0)
-
-    def set_player_influence(self, player_id: str, amount: int) -> "GameState":
-        """Set player's influence amount."""
-        new_influence = self.player_influence.copy()
-        new_influence[player_id] = amount
-        return self._create_new_state(player_influence=new_influence)
-
-    def spend_player_influence(self, player_id: str, amount: int) -> "GameState":
-        """Spend player influence."""
-        current_influence = self.get_player_influence(player_id)
-        if current_influence < amount:
-            raise ValueError(
-                f"Insufficient influence - requires {amount}, player {player_id} has {current_influence}"
-            )
-
-        return self.set_player_influence(player_id, current_influence - amount)
+    # Player influence/resource tracking removed - incorrect implementation
+    # According to Rules 47 and 75, influence and resources are planet stats, not player stats
+    # Players spend influence/resources by exhausting planet cards, not from player pools
 
     def add_player(self, player: "Player") -> "GameState":
         """Add a player to the game."""
@@ -493,35 +463,37 @@ class GameState:
         new_players.append(player)
 
         # Initialize player-specific tracking
-        new_player_resources = self.player_resources.copy()
+        # Player resource tracking removed - incorrect implementation
         new_player_technologies = self.player_technologies.copy()
         new_victory_points = self.victory_points.copy()
         new_completed_objectives = self.completed_objectives.copy()
         new_status_phase_scoring = self.status_phase_scoring.copy()
         new_combat_scoring = self.combat_scoring.copy()
         new_player_secret_objectives = self.player_secret_objectives.copy()
-        new_player_influence = self.player_influence.copy()
+        # Player influence tracking removed - incorrect implementation
 
         # Initialize empty tracking for new player
-        new_player_resources[player.id] = {}
+        # Player resource tracking removed - incorrect implementation
+        # Resources should be tracked on planets, not as player pools
         new_player_technologies[player.id] = []
         new_victory_points[player.id] = 0
         new_completed_objectives[player.id] = []
         new_status_phase_scoring[player.id] = {"public": 0, "secret": 0}
         new_combat_scoring[player.id] = []
         new_player_secret_objectives[player.id] = []
-        new_player_influence[player.id] = 0
+        # Player influence tracking removed - incorrect implementation
+        # Influence should be tracked on planets per Rules 47 and 75
 
         return self._create_new_state(
             players=new_players,
-            player_resources=new_player_resources,
+            # player_resources parameter removed - incorrect implementation
             player_technologies=new_player_technologies,
             victory_points=new_victory_points,
             completed_objectives=new_completed_objectives,
             status_phase_scoring=new_status_phase_scoring,
             combat_scoring=new_combat_scoring,
             player_secret_objectives=new_player_secret_objectives,
-            player_influence=new_player_influence,
+            # player_influence parameter removed - incorrect implementation
         )
 
     def eliminate_player(self, player_id: str) -> "GameState":

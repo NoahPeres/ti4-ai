@@ -1,6 +1,6 @@
-"""Tests for unit movement system."""
+"""Tests for movement validation and execution."""
 
-from src.ti4.core.constants import UnitType
+from src.ti4.core.constants import Technology, UnitType
 from src.ti4.core.galaxy import Galaxy
 from src.ti4.core.hex_coordinate import HexCoordinate
 from src.ti4.core.movement import MovementExecutor, MovementOperation, MovementValidator
@@ -188,7 +188,7 @@ class TestMovementExecution:
 
         # Create unit with Gravity Drive
         unit = Unit(unit_type=UnitType.DESTROYER, owner="player1")
-        unit.add_technology("gravity_drive")
+        unit.add_technology(Technology.GRAVITY_DRIVE.value)
         system_a.place_unit_in_space(unit)
 
         # Execute long-range movement
@@ -197,7 +197,7 @@ class TestMovementExecution:
             from_system_id="system_a",
             to_system_id="system_c",
             player_id="player1",
-            player_technologies={"gravity_drive"},
+            player_technologies={Technology.GRAVITY_DRIVE.value},
         )
         result = executor.execute_movement(movement)
 
@@ -317,11 +317,13 @@ class TestMovementExecution:
         system_a.place_unit_in_space(destroyer)
 
         # Try to load infantry onto destroyer (no capacity)
+        from src.ti4.core.exceptions import FleetCapacityError
+
         try:
             destroyer.load_transport_unit(infantry)
             assert False, "Should not be able to load infantry on destroyer"
-        except Exception:
-            pass  # Expected to fail
+        except FleetCapacityError:
+            pass  # Expected to fail with specific exception
 
     def test_invalid_direct_planet_to_planet_movement(self) -> None:
         """Test that direct planet-to-planet movement fails."""

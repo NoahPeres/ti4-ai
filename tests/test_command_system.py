@@ -5,12 +5,14 @@ from unittest.mock import Mock
 
 import pytest
 
+from src.ti4.commands.base import GameCommand
+from src.ti4.commands.manager import CommandManager
+from src.ti4.commands.movement import MovementCommand
 from src.ti4.core.game_state import GameState
 
 
 def test_game_command_interface_exists() -> None:
     """Test that GameCommand interface can be imported."""
-    from src.ti4.commands.base import GameCommand
 
     # Basic interface check
     assert hasattr(GameCommand, "execute")
@@ -32,7 +34,6 @@ def test_command_manager_exists() -> None:
 
 def test_command_manager_execute_command() -> None:
     """Test that CommandManager can execute a command."""
-    from src.ti4.commands.base import GameCommand
     from src.ti4.commands.manager import CommandManager
 
     # Create a mock command
@@ -74,7 +75,6 @@ def test_command_manager_execute_command() -> None:
 
 def test_command_manager_undo_command() -> None:
     """Test that CommandManager can undo a command."""
-    from src.ti4.commands.base import GameCommand
     from src.ti4.commands.manager import CommandManager
 
     # Create a mock command
@@ -121,7 +121,6 @@ def test_command_manager_undo_command() -> None:
 
 def test_command_manager_rejects_invalid_command() -> None:
     """Test that CommandManager rejects commands that cannot be executed."""
-    from src.ti4.commands.base import GameCommand
     from src.ti4.commands.manager import CommandManager
 
     # Create a command that cannot be executed
@@ -167,7 +166,6 @@ def test_command_manager_undo_empty_history() -> None:
 
 def test_command_validation_interface() -> None:
     """Test that command validation interface works correctly."""
-    from src.ti4.commands.base import GameCommand
 
     class TestCommand(GameCommand):
         def __init__(self, can_exec=True) -> None:
@@ -206,7 +204,6 @@ def test_command_validation_interface() -> None:
 
 def test_command_manager_replay_from_initial_state() -> None:
     """Test that CommandManager can replay commands from initial state."""
-    from src.ti4.commands.base import GameCommand
     from src.ti4.commands.manager import CommandManager
 
     # Create mock commands
@@ -256,15 +253,17 @@ def test_command_manager_replay_from_initial_state() -> None:
 
 def test_command_serialization() -> None:
     """Test that commands can be serialized for persistence."""
-    from src.ti4.commands.manager import CommandManager
-    from src.ti4.commands.movement import MovementCommand
+    from src.ti4.core.constants import UnitType
 
-    # Create a movement command
+    # Create a mock unit
     unit = Mock()
-    unit.unit_type = "destroyer"
+    unit.unit_type = UnitType.DESTROYER.value
 
     command = MovementCommand(
-        unit=unit, from_system_id="system1", to_system_id="system2", player_id="player1"
+        unit=unit,
+        from_system_id="system1",
+        to_system_id="system2",
+        player_id="player1",
     )
 
     manager = CommandManager()

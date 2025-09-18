@@ -454,30 +454,3 @@ def test_strategy_phase_requires_equal_card_distribution() -> None:
     for player in players:
         player_cards = controller.get_player_strategy_cards(player.id)
         assert len(player_cards) == expected_cards_per_player
-
-
-def test_backward_compatibility_get_player_strategy_card() -> None:
-    """Test that the old singular method still works for backward compatibility."""
-    players = [
-        Player(id="player1", faction="sol"),
-        Player(id="player2", faction="hacan"),
-        Player(id="player3", faction="xxcha"),
-    ]
-    controller = GameController(players)
-    controller.start_strategy_phase()
-
-    # Player selects one card
-    controller.select_strategy_card("player1", 1)
-
-    # Old method should return the first/only card
-    player_card = controller.get_player_strategy_card("player1")
-    assert player_card is not None
-    assert player_card.id == 1
-
-    # Player selects a second card
-    controller.select_strategy_card("player1", 4)
-
-    # Old method should still return the first card (for backward compatibility)
-    player_card = controller.get_player_strategy_card("player1")
-    assert player_card is not None
-    assert player_card.id == 1  # Should return first card selected

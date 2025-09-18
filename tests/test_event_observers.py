@@ -177,6 +177,8 @@ class TestAITrainingDataCollector:
 
     def test_ai_training_data_collector_collects_unit_movements(self) -> None:
         """Test that AITrainingDataCollector collects unit movement data."""
+        from src.ti4.core.constants import EventType
+
         collector = AITrainingDataCollector()
 
         event = create_unit_moved_event(
@@ -191,7 +193,7 @@ class TestAITrainingDataCollector:
 
         training_data = collector.get_training_data()
         assert len(training_data) == 1
-        assert training_data[0]["event_type"] == "unit_moved"
+        assert training_data[0]["event_type"] == EventType.UNIT_MOVED.value
         assert training_data[0]["player_id"] == "player_1"
         assert training_data[0]["from_system"] == "system_1"
         assert training_data[0]["to_system"] == "system_2"
