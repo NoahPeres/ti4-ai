@@ -6,7 +6,6 @@ All tests follow strict TDD methodology with RED-GREEN-REFACTOR cycles.
 LRR Reference: Rule 91 - TECHNOLOGY (STRATEGY CARD)
 """
 
-
 from src.ti4.core.constants import Technology
 from tests.test_constants import MockPlayer
 

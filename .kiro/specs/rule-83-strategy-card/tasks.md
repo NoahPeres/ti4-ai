@@ -7,7 +7,7 @@
   - Create integration points with existing game state system
   - _Requirements: 1.1, 1.2, 1.3, 6.1, 6.2_
 
-- [ ] 2. Implement strategy phase card selection mechanics
+- [x] 2. Implement strategy phase card selection mechanics
   - Add card selection workflow that integrates with existing phase management
   - Implement speaker order-based selection process
   - Add card availability tracking and validation
