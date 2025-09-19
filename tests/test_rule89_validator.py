@@ -548,7 +548,7 @@ class TestRule89MovementIntegration:
 
     def test_gravity_drive_movement_with_intermediate_system(self) -> None:
         """Test that Gravity Drive allows movement through intermediate systems.
-        
+
         This test verifies the fix for the movement validation issue.
         """
         from src.ti4.core.rule89_validator import Rule89Validator
@@ -581,7 +581,9 @@ class TestRule89MovementIntegration:
             source_system, target_system, [carrier], MockPlayer.PLAYER_1.value, galaxy
         )
         assert result_without_tech.success is False
-        assert "insufficient movement range" in result_without_tech.error_message.lower()
+        assert (
+            "insufficient movement range" in result_without_tech.error_message.lower()
+        )
 
         # Test with Gravity Drive - should succeed
         result_with_tech = manager.execute_movement_step(

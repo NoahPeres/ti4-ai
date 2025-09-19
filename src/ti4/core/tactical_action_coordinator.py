@@ -83,11 +83,15 @@ class TacticalActionCoordinator:
         results["combat_required"] = requires_combat
 
         # Step 4: Validate invasion capabilities
-        can_invade = self.rule89_validator.can_commit_ground_forces(active_system, player)
+        can_invade = self.rule89_validator.can_commit_ground_forces(
+            active_system, player
+        )
         results["invasion_possible"] = can_invade
 
         # Step 5: Validate production abilities
-        can_produce = self.rule89_validator.can_resolve_production_abilities(active_system, player)
+        can_produce = self.rule89_validator.can_resolve_production_abilities(
+            active_system, player
+        )
         results["production_possible"] = can_produce
 
         return results
@@ -103,7 +107,7 @@ class TacticalActionCoordinator:
             "MovementEngine": "Executes complex movement with technology effects",
             "TacticalActionCoordinator": "Integrates validation and execution without redundancy",
             "MovementValidator": "Validates movement operations with technology effects",
-            "MovementExecutor": "Executes validated movement operations"
+            "MovementExecutor": "Executes validated movement operations",
         }
 
     def demonstrate_no_redundancy(self) -> dict[str, list[str]]:
@@ -118,24 +122,24 @@ class TacticalActionCoordinator:
                 "requires_space_combat",
                 "can_commit_ground_forces",
                 "can_resolve_production_abilities",
-                "get_tactical_action_steps"
+                "get_tactical_action_steps",
             ],
             "MovementEngine_unique_methods": [
                 "MovementPlan.add_ship_movement",
                 "MovementValidator.validate_movement_plan",
                 "TacticalAction.execute_all_steps",
                 "MovementValidator._apply_movement_technologies",
-                "SpaceCannonOffenseStep.execute"
+                "SpaceCannonOffenseStep.execute",
             ],
             "MovementPrimitives_unique_methods": [
                 "MovementOperation",
                 "MovementValidator.is_valid_movement",
                 "MovementExecutor.execute_movement",
-                "MovementRuleEngine.can_move"
+                "MovementRuleEngine.can_move",
             ],
             "integration_methods": [
                 "validate_and_execute_tactical_action",
                 "get_system_roles",
-                "demonstrate_no_redundancy"
-            ]
+                "demonstrate_no_redundancy",
+            ],
         }

@@ -22,7 +22,9 @@ class TestTacticalActionIntegration:
         # Verify each system has unique methods
         rule89_methods = set(responsibilities["Rule89Validator_unique_methods"])
         movement_engine_methods = set(responsibilities["MovementEngine_unique_methods"])
-        movement_primitives_methods = set(responsibilities["MovementPrimitives_unique_methods"])
+        movement_primitives_methods = set(
+            responsibilities["MovementPrimitives_unique_methods"]
+        )
 
         # No overlap between systems
         assert rule89_methods.isdisjoint(movement_engine_methods)
@@ -43,7 +45,9 @@ class TestTacticalActionIntegration:
         # Verify distinct roles
         assert "Rule 89 compliance" in roles["Rule89Validator"]
         assert "complex movement" in roles["MovementEngine"]
-        assert "Integrates validation and execution" in roles["TacticalActionCoordinator"]
+        assert (
+            "Integrates validation and execution" in roles["TacticalActionCoordinator"]
+        )
         assert "without redundancy" in roles["TacticalActionCoordinator"]
 
     def test_layered_architecture_integration(self) -> None:
@@ -88,7 +92,9 @@ class TestTacticalActionIntegration:
         galaxy.register_system(system)
 
         # Test Rule 89 validation independently
-        can_activate = validator.can_activate_system(system, MockPlayer.PLAYER_1.value, galaxy)
+        can_activate = validator.can_activate_system(
+            system, MockPlayer.PLAYER_1.value, galaxy
+        )
         requires_combat = validator.requires_space_combat(system)
         steps = validator.get_tactical_action_steps()
 
@@ -117,6 +123,7 @@ class TestTacticalActionIntegration:
         """Test that there are no circular dependencies between systems."""
         # Rule89Validator should not import MovementEngine
         from src.ti4.core.rule89_validator import Rule89Validator
+
         validator = Rule89Validator()
 
         # Should work without MovementEngine
@@ -125,6 +132,7 @@ class TestTacticalActionIntegration:
 
         # MovementEngine should not import Rule89Validator directly
         from src.ti4.actions.movement_engine import MovementPlan
+
         plan = MovementPlan()
 
         # Should work without Rule89Validator

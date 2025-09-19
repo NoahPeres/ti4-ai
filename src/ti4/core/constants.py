@@ -83,6 +83,7 @@ class Technology(Enum):
     GRAVITY_DRIVE = "gravity_drive"
     FLEET_LOGISTICS = "fleet_logistics"
     LIGHT_WAVE_DEFLECTOR = "light_wave_deflector"
+    ANTIMASS_DEFLECTORS = "antimass_deflectors"
 
     # Unit upgrade technologies
     CRUISER_II = "cruiser_ii"
@@ -93,6 +94,13 @@ class Technology(Enum):
 
     # Other technologies
     PLASMA_SCORING = "plasma_scoring"
+
+    # Faction-specific technologies (manually confirmed)
+    # Sol Federation faction technologies
+    SPEC_OPS_II = "spec_ops_ii"  # Confirmed Sol faction tech - unit upgrade, 2x green prereq
+    
+    # Hacan Emirates faction technologies  
+    QUANTUM_DATAHUB_NODE = "quantum_datahub_node"  # Confirmed Hacan faction tech - yellow, 3x yellow prereq
 
 
 class TechnologyConstants:
