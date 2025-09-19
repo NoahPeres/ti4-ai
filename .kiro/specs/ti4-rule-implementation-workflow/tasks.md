@@ -13,7 +13,7 @@
   - Confirm Rule 99 as next target based on dependency analysis
   - _Requirements: 2.1, 2.2, 2.3, 2.4_
 
-- [x] 3. Implement Rule 99 (WARFARE STRATEGY CARD) with Strict TDD
+- [ ] 3. Implement Rule 99 (WARFARE STRATEGY CARD) with Strict TDD
   - Read complete LRR text for Rule 99 thoroughly before writing any tests
   - Create `tests/test_rule_99_warfare_strategy_card.py` with proper test structure
   - Implement Rule 99.1 (Command Token Removal) with RED-GREEN-REFACTOR cycles
