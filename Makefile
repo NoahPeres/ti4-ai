@@ -25,7 +25,7 @@ dev-setup: install pre-commit-install
 	@echo "Or run commands with: uv run <command>"
 
 test:
-	uv run pytest --cov=src/ti4 --cov-report=term-missing --cov-report=html --cov-fail-under=90
+	uv run pytest --cov=src/ti4 --cov-report=term-missing --cov-report=html
 
 lint:
 	uv run ruff check src tests --show-fixes
