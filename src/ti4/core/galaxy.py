@@ -312,6 +312,10 @@ class Galaxy:
         if start_system_id == end_system_id:
             return [start_system_id]
 
+        # Quick check for direct adjacency (common case optimization)
+        if self.are_systems_adjacent(start_system_id, end_system_id):
+            return [start_system_id, end_system_id]
+
         from collections import deque
 
         queue = deque([(start_system_id, [start_system_id])])
