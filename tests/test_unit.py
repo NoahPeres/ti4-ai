@@ -52,7 +52,9 @@ class TestUnitAbilities:
         fighter = Unit(unit_type=UnitType.FIGHTER, owner="player1")
 
         # Fighter cannot sustain damage
-        with pytest.raises(ValueError, match="Unit UnitType.FIGHTER cannot sustain damage"):
+        with pytest.raises(
+            ValueError, match="Unit UnitType.FIGHTER cannot sustain damage"
+        ):
             fighter.sustain_damage()
 
     def test_sustain_damage_repair(self) -> None:

@@ -119,6 +119,7 @@ class TestMovementValidator:
 
         # Create unit with Gravity Drive (movement 2)
         from src.ti4.core.constants import Technology
+
         unit = Unit(unit_type=UnitType.CARRIER, owner="player1")  # Movement 1
         unit.add_technology(Technology.GRAVITY_DRIVE)  # Increases movement to 2
         system_a.place_unit_in_space(unit)

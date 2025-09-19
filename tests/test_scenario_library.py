@@ -22,7 +22,9 @@ class TestScenarioLibrary:
         # Verify Sol Spec Ops (infantry) on Mecatol Rex
         mecatol_system = game_state.systems["mecatol_rex"]
         infantry_units = [
-            unit for unit in mecatol_system.space_units if unit.unit_type == UnitType.INFANTRY
+            unit
+            for unit in mecatol_system.space_units
+            if unit.unit_type == UnitType.INFANTRY
         ]
         assert len(infantry_units) == 1
         assert infantry_units[0].owner == "player1"
@@ -40,7 +42,9 @@ class TestScenarioLibrary:
         # Verify Xxcha flagship
         home_system = game_state.systems["home_system"]
         flagship_units = [
-            unit for unit in home_system.space_units if unit.unit_type == UnitType.FLAGSHIP
+            unit
+            for unit in home_system.space_units
+            if unit.unit_type == UnitType.FLAGSHIP
         ]
         assert len(flagship_units) == 1
         assert flagship_units[0].owner == "player1"

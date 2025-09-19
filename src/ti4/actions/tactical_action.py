@@ -191,7 +191,7 @@ class SpaceCannonOffenseStep(TacticalActionStep):
         """Check if space cannon offense can be executed."""
         if game_state is None:
             return False
-            
+
         active_system_id = context.get("active_system_id")
         if not active_system_id:
             return False

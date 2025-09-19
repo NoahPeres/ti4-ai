@@ -149,9 +149,8 @@ class MovementExecutor:
             raise InvalidSystemError("Invalid system ID in movement")
 
         # Check for invalid direct planet-to-planet movement
-        if (
-            not _is_space_location(movement.from_location)
-            and not _is_space_location(movement.to_location)
+        if not _is_space_location(movement.from_location) and not _is_space_location(
+            movement.to_location
         ):
             # Direct planet-to-planet movement is not allowed
             return False

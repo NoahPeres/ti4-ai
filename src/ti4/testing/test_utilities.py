@@ -121,6 +121,4 @@ class TestUtilities:
         Returns:
             List of units matching the type
         """
-        return [
-            unit for unit in system.space_units if unit.unit_type == unit_type
-        ]
+        return [unit for unit in system.space_units if unit.unit_type == unit_type]

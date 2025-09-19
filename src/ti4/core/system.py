@@ -43,7 +43,7 @@ class System:
     def has_enemy_ships(self, player_id: str) -> bool:
         """Check if this system contains ships belonging to other players (Rule 58.4b)."""
         from .constants import UnitType
-        
+
         ship_types = {
             UnitType.CARRIER,
             UnitType.CRUISER,
