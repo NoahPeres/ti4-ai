@@ -239,7 +239,7 @@ class CombatResolver:
         """
 
         def filter_fighters(units: list[Unit]) -> list[Unit]:
-            return [u for u in units if u.unit_type == UnitType.FIGHTER.value]
+            return [u for u in units if u.unit_type == UnitType.FIGHTER]
 
         return self._perform_ability_attack(
             unit, target_units, Unit.has_anti_fighter_barrage, filter_fighters

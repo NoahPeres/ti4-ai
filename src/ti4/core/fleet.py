@@ -32,11 +32,11 @@ class Fleet:
         for unit in self.units:
             # Only ships (not fighters or infantry) provide capacity
             if unit.unit_type in [
-                UnitType.CARRIER.value,
-                UnitType.CRUISER.value,
-                UnitType.CRUISER_II.value,
-                UnitType.DREADNOUGHT.value,
-                UnitType.WAR_SUN.value,
+                UnitType.CARRIER,
+                UnitType.CRUISER,
+                UnitType.CRUISER_II,
+                UnitType.DREADNOUGHT,
+                UnitType.WAR_SUN,
             ]:
                 total_capacity += unit.get_capacity()
         return total_capacity
@@ -51,9 +51,9 @@ class Fleet:
         stats = unit.get_stats()
         # Fighters and infantry need capacity unless they have independent movement
         # Fighter II has movement > 0 and doesn't need capacity
-        if unit.unit_type == UnitType.FIGHTER.value:
+        if unit.unit_type == UnitType.FIGHTER:
             return stats.movement == 0  # Base fighters need capacity, Fighter II don't
-        elif unit.unit_type == UnitType.INFANTRY.value:
+        elif unit.unit_type == UnitType.INFANTRY:
             return True  # Infantry always need capacity (no independent space movement)
         else:
             return False  # Ships don't need capacity

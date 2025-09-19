@@ -11,6 +11,11 @@ from src.ti4.core.system import System
 from src.ti4.core.unit import Unit
 
 
+def _is_space_location(location: str) -> bool:
+    """Check if a location string represents space."""
+    return location == LocationType.SPACE.value
+
+
 class GameScenarioBuilder:
     """Fluent builder for creating complex test scenarios."""
 
@@ -176,7 +181,7 @@ class GameScenarioBuilder:
             unit = Unit(unit_type=UnitType(unit_type), owner=owner)
             system = self._systems[system_id]
 
-            if location == LocationType.SPACE.value:
+            if _is_space_location(location):
                 system.place_unit_in_space(unit)
             else:
                 # Assume it's a planet name
@@ -420,7 +425,7 @@ class GameScenarioBuilder:
         """
         return (
             GameScenarioBuilder()
-            .with_players(("player1", Faction.SOL))
+            .with_players(("player1", Faction.SOL), ("player2", Faction.XXCHA))
             .with_galaxy("standard_6p")
             # with_player_resources call removed - incorrect implementation
             # Resources should be tracked on planets, not as player pools

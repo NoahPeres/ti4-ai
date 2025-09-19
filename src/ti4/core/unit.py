@@ -12,10 +12,10 @@ class Unit:
 
     # Instance variable type annotations
     id: str
-    unit_type: str
+    unit_type: UnitType
     owner: str
-    faction: Optional[str]
-    technologies: set[str]
+    faction: Optional[Faction]
+    technologies: set[Technology]
     _stats_provider: UnitStatsProvider
     _cached_stats: Optional[UnitStats]
     _sustained_damage: bool
@@ -31,21 +31,21 @@ class Unit:
     ) -> None:
         self.id = unit_id or str(uuid.uuid4())
 
-        # Store enum values directly as strings for internal consistency
+        # Store enums directly for type safety
         # Handle both enum and string inputs for backward compatibility
         if isinstance(unit_type, str):
-            self.unit_type = unit_type
+            self.unit_type = UnitType(unit_type)
         else:
-            self.unit_type = unit_type.value
+            self.unit_type = unit_type
         self.owner = owner
         if isinstance(faction, str):
-            self.faction = faction
+            self.faction = Faction(faction)
         else:
-            self.faction = faction.value if faction else None
+            self.faction = faction
 
-        # Convert technology enums to string values
+        # Store technology enums directly
         if technologies:
-            self.technologies = {tech.value for tech in technologies}
+            self.technologies = set(technologies)
         else:
             self.technologies = set()
 
@@ -57,13 +57,9 @@ class Unit:
         """Get the current statistics for this unit."""
         if self._cached_stats is None:
             # Convert string values back to enums for the stats provider
-            unit_type_enum = UnitType(self.unit_type)
-            faction_enum = Faction(self.faction) if self.faction else None
-            tech_enums = (
-                {Technology(tech) for tech in self.technologies}
-                if self.technologies
-                else None
-            )
+            unit_type_enum = self.unit_type
+            faction_enum = self.faction
+            tech_enums = self.technologies if self.technologies else None
 
             self._cached_stats = self._stats_provider.get_unit_stats(
                 unit_type_enum, faction_enum, tech_enums
@@ -141,8 +137,10 @@ class Unit:
         """Repair sustained damage on this unit."""
         self._sustained_damage = False
 
-    def add_technology(self, technology: str) -> None:
+    def add_technology(self, technology: Technology) -> None:
         """Add a technology to this unit."""
+        if isinstance(technology, str):
+            technology = Technology(technology)
         self.technologies.add(technology)
         self.invalidate_stats_cache()
 

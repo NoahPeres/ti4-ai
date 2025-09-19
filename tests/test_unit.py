@@ -10,7 +10,7 @@ class TestUnit:
     def test_unit_creation(self) -> None:
         """Test that a unit can be created with type and owner."""
         unit = Unit(unit_type=UnitType.FIGHTER, owner="player1")
-        assert unit.unit_type == "fighter"
+        assert unit.unit_type == UnitType.FIGHTER
         assert unit.owner == "player1"
 
 
@@ -52,7 +52,7 @@ class TestUnitAbilities:
         fighter = Unit(unit_type=UnitType.FIGHTER, owner="player1")
 
         # Fighter cannot sustain damage
-        with pytest.raises(ValueError, match="Unit fighter cannot sustain damage"):
+        with pytest.raises(ValueError, match="Unit UnitType.FIGHTER cannot sustain damage"):
             fighter.sustain_damage()
 
     def test_sustain_damage_repair(self) -> None:

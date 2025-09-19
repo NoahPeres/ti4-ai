@@ -363,7 +363,7 @@ class TestUnitAbilitiesInCombat:
         ]
 
         # Anti-fighter barrage should only affect fighters
-        fighters = [unit for unit in enemy_units if unit.unit_type == "fighter"]
+        fighters = [unit for unit in enemy_units if unit.unit_type == UnitType.FIGHTER]
         assert len(fighters) == 2
 
     def test_unit_without_ability_cannot_use_it(self) -> None:

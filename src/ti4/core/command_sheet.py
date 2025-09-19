@@ -74,3 +74,42 @@ class CommandSheet:
     def get_total_tokens(self) -> int:
         """Get total number of tokens on command sheet."""
         return self.tactic_pool + self.fleet_pool + self.strategy_pool
+
+    def redistribute_tokens(
+        self, from_pool: PoolType, to_pool: PoolType, count: int = 1
+    ) -> bool:
+        """Redistribute tokens between pools (Rule 99.2).
+
+        Args:
+            from_pool: Pool to take tokens from
+            to_pool: Pool to place tokens in
+            count: Number of tokens to redistribute
+
+        Returns:
+            True if redistribution successful, False if insufficient tokens
+        """
+        # Check if source pool has enough tokens
+        if from_pool == "tactic" and self.tactic_pool < count:
+            return False
+        elif from_pool == "fleet" and self.fleet_pool < count:
+            return False
+        elif from_pool == "strategy" and self.strategy_pool < count:
+            return False
+
+        # Remove from source pool
+        if from_pool == "tactic":
+            self.tactic_pool -= count
+        elif from_pool == "fleet":
+            self.fleet_pool -= count
+        elif from_pool == "strategy":
+            self.strategy_pool -= count
+
+        # Add to destination pool
+        if to_pool == "tactic":
+            self.tactic_pool += count
+        elif to_pool == "fleet":
+            self.fleet_pool += count
+        elif to_pool == "strategy":
+            self.strategy_pool += count
+
+        return True

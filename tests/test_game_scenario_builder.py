@@ -110,7 +110,7 @@ def test_builder_with_units_placement() -> None:
 
     # Check unit ownership
     assert system1.space_units[0].owner == "player1"
-    assert system1.space_units[0].unit_type == UnitType.CRUISER.value
+    assert system1.space_units[0].unit_type == UnitType.CRUISER
     assert system2.space_units[0].owner == "player2"
     assert system2.space_units[1].owner == "player2"
 

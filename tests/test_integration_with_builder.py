@@ -45,7 +45,7 @@ class TestTI4IntegrationWithBuilder:
         hacan_fighter = system2.space_units[1]
 
         assert sol_cruiser.owner == "player1"
-        assert sol_cruiser.unit_type == "cruiser"
+        assert sol_cruiser.unit_type.value == "cruiser"
         assert hacan_carrier.owner == "player2"
         assert hacan_fighter.owner == "player2"
 
@@ -99,7 +99,7 @@ class TestTI4IntegrationWithBuilder:
         # Verify unit was placed
         system1 = game_state.systems["system1"]
         assert len(system1.space_units) == 1
-        assert system1.space_units[0].unit_type == "cruiser"
+        assert system1.space_units[0].unit_type.value == "cruiser"
 
     def test_combat_scenario_with_builder(self) -> None:
         """Test combat scenario using preset builder method."""

@@ -37,7 +37,7 @@ def test_mid_game_scenario() -> None:
     for system in systems.values():
         all_units.extend(system.space_units)
 
-    unit_types = [unit.unit_type for unit in all_units]
+    unit_types = [unit.unit_type.value for unit in all_units]
     assert "dreadnought" in unit_types
     assert "war_sun" in unit_types
 
@@ -67,8 +67,8 @@ def test_test_utilities_adjacent_systems() -> None:
 
     assert len(system_a.space_units) == 1
     assert len(system_b.space_units) == 1
-    assert system_a.space_units[0].unit_type == "cruiser"
-    assert system_b.space_units[0].unit_type == "destroyer"
+    assert system_a.space_units[0].unit_type.value == "cruiser"
+    assert system_b.space_units[0].unit_type.value == "destroyer"
 
 
 def test_test_utilities_fleet_capacity() -> None:
@@ -79,7 +79,7 @@ def test_test_utilities_fleet_capacity() -> None:
     assert len(test_system.space_units) == 6  # 1 carrier + 4 fighters + 1 infantry
 
     # Verify unit types
-    unit_types = [unit.unit_type for unit in test_system.space_units]
+    unit_types = [unit.unit_type.value for unit in test_system.space_units]
     assert unit_types.count("fighter") == 4
     assert unit_types.count("carrier") == 1
     assert unit_types.count("infantry") == 1

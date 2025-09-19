@@ -7,6 +7,11 @@ from typing import Any, Optional
 from ..core.constants import LocationType
 
 
+def _is_space_location(location: str) -> bool:
+    """Check if a location string represents space."""
+    return location == LocationType.SPACE.value
+
+
 class MovementValidationError(Exception):
     """Raised when movement validation fails."""
 
@@ -38,8 +43,8 @@ class MovementPlan:
         """Add a ground force movement to the plan."""
         # Validate that ground forces cannot move directly between planets
         if (
-            from_location != LocationType.SPACE.value
-            and to_location != LocationType.SPACE.value
+            not _is_space_location(from_location)
+            and not _is_space_location(to_location)
             and from_location != to_location
         ):
             raise MovementValidationError(
@@ -131,13 +136,13 @@ class MovementStep(TacticalActionStep):
             to_system = game_state.systems[to_system_id]
 
             # Remove unit from source location
-            if from_location == LocationType.SPACE.value:
+            if _is_space_location(from_location):
                 from_system.remove_unit_from_space(unit)
             else:
                 from_system.remove_unit_from_planet(unit, from_location)
 
             # Add unit to destination location
-            if to_location == LocationType.SPACE.value:
+            if _is_space_location(to_location):
                 to_system.place_unit_in_space(unit)
             else:
                 to_system.place_unit_on_planet(unit, to_location)
@@ -184,6 +189,9 @@ class SpaceCannonOffenseStep(TacticalActionStep):
 
     def can_execute(self, game_state: Any, context: dict[str, Any]) -> bool:
         """Check if space cannon offense can be executed."""
+        if game_state is None:
+            return False
+            
         active_system_id = context.get("active_system_id")
         if not active_system_id:
             return False
@@ -253,7 +261,7 @@ class SpaceCannonOffenseStep(TacticalActionStep):
         active_player = context.get("player_id")
         if not isinstance(active_player, str):
             return []
-            
+
         target_players = set()
 
         # Space cannon can target ships in space
@@ -385,10 +393,7 @@ class SpaceCannonOffenseStep(TacticalActionStep):
                                 if (
                                     unit.owner == player_id
                                     and hasattr(unit, "unit_type")
-                                    and (
-                                        unit.unit_type == UnitType.PDS
-                                        or unit.unit_type == "pds"
-                                    )  # Handle both enum and string
+                                    and unit.unit_type == UnitType.PDS
                                     and hasattr(unit, "_has_pds_ii_upgrade")
                                     and unit._has_pds_ii_upgrade
                                 ):
@@ -500,7 +505,7 @@ class MovementValidator:
             from_location = movement["from_location"]
 
             # Ground forces moving from planets need transport
-            if from_location != LocationType.SPACE.value:
+            if not _is_space_location(from_location):
                 # Find available transport
                 transport_found = False
                 for ship_key in transport_capacity:

@@ -87,7 +87,8 @@ class TestUtilities:
                 return False
 
             system = game_state.systems[system_id]
-            actual_units = [unit.unit_type for unit in system.space_units]
+            # Convert enum values to strings for comparison
+            actual_units = [unit.unit_type.value for unit in system.space_units]
 
             if sorted(actual_units) != sorted(expected_units):
                 return False
@@ -121,5 +122,5 @@ class TestUtilities:
             List of units matching the type
         """
         return [
-            unit for unit in system.space_units if unit.unit_type == unit_type.value
+            unit for unit in system.space_units if unit.unit_type == unit_type
         ]

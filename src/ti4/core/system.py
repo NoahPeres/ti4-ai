@@ -42,14 +42,16 @@ class System:
 
     def has_enemy_ships(self, player_id: str) -> bool:
         """Check if this system contains ships belonging to other players (Rule 58.4b)."""
+        from .constants import UnitType
+        
         ship_types = {
-            "carrier",
-            "cruiser",
-            "cruiser_ii",
-            "dreadnought",
-            "destroyer",
-            "flagship",
-            "war_sun",
+            UnitType.CARRIER,
+            UnitType.CRUISER,
+            UnitType.CRUISER_II,
+            UnitType.DREADNOUGHT,
+            UnitType.DESTROYER,
+            UnitType.FLAGSHIP,
+            UnitType.WAR_SUN,
         }
 
         for unit in self.space_units:

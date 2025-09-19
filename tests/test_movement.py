@@ -102,20 +102,25 @@ class TestMovementValidator:
         galaxy = Galaxy()
         validator = MovementValidator(galaxy)
 
-        # Create systems that are 2 hexes apart
+        # Create systems that are 2 hexes apart with intermediate system
         coord_a = HexCoordinate(0, 0)
+        coord_b = HexCoordinate(1, 0)  # Intermediate system
         coord_c = HexCoordinate(2, 0)  # 2 hexes away
         system_a = System("system_a")
+        system_b = System("system_b")
         system_c = System("system_c")
 
         galaxy.place_system(coord_a, "system_a")
+        galaxy.place_system(coord_b, "system_b")
         galaxy.place_system(coord_c, "system_c")
         galaxy.register_system(system_a)
+        galaxy.register_system(system_b)
         galaxy.register_system(system_c)
 
         # Create unit with Gravity Drive (movement 2)
+        from src.ti4.core.constants import Technology
         unit = Unit(unit_type=UnitType.CARRIER, owner="player1")  # Movement 1
-        unit.add_technology("gravity_drive")  # Increases movement to 2
+        unit.add_technology(Technology.GRAVITY_DRIVE)  # Increases movement to 2
         system_a.place_unit_in_space(unit)
 
         # Test movement should be valid with technology
@@ -124,7 +129,7 @@ class TestMovementValidator:
             from_system_id="system_a",
             to_system_id="system_c",
             player_id="player1",
-            player_technologies={"gravity_drive"},
+            player_technologies={Technology.GRAVITY_DRIVE},
         )
         assert validator.validate_movement(movement) is True
 
@@ -188,7 +193,7 @@ class TestMovementExecution:
 
         # Create unit with Gravity Drive
         unit = Unit(unit_type=UnitType.DESTROYER, owner="player1")
-        unit.add_technology(Technology.GRAVITY_DRIVE.value)
+        unit.add_technology(Technology.GRAVITY_DRIVE)
         system_a.place_unit_in_space(unit)
 
         # Execute long-range movement
@@ -197,7 +202,7 @@ class TestMovementExecution:
             from_system_id="system_a",
             to_system_id="system_c",
             player_id="player1",
-            player_technologies={Technology.GRAVITY_DRIVE.value},
+            player_technologies={Technology.GRAVITY_DRIVE},
         )
         result = executor.execute_movement(movement)
 

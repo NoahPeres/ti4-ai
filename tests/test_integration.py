@@ -3,7 +3,7 @@
 from typing import Any, Optional
 
 from src.ti4.core.combat import CombatDetector
-from src.ti4.core.constants import UnitType
+from src.ti4.core.constants import Technology, UnitType
 from src.ti4.core.fleet import Fleet, FleetCapacityValidator
 from src.ti4.core.galaxy import Galaxy
 from src.ti4.core.hex_coordinate import HexCoordinate
@@ -160,13 +160,13 @@ class TestTI4Integration:
         assert carrier.get_capacity() == 4
         assert carrier.get_movement() == 1
 
-        # Apply technology upgrade (Advanced Carrier)
-        carrier.add_technology("advanced_carrier")
+        # Apply technology upgrade (Carrier II)
+        carrier.add_technology("carrier_ii")
 
         # Test upgraded stats (assuming technology improves capacity)
         # This would depend on the specific technology implementation
         # For now, we'll test that the technology was applied
-        assert "advanced_carrier" in carrier.technologies
+        assert Technology.CARRIER_II in carrier.technologies
 
         # Test Gravity Drive technology
         cruiser = Unit(unit_type=UnitType.CRUISER, owner="player1")
@@ -175,23 +175,23 @@ class TestTI4Integration:
         cruiser.add_technology("gravity_drive")
         # Gravity Drive should increase movement by 1
         # This would be implemented in the unit's get_movement method
-        assert "gravity_drive" in cruiser.technologies
+        assert Technology.GRAVITY_DRIVE in cruiser.technologies
 
     def test_faction_specific_abilities(self) -> None:
         """Test faction-specific unit abilities and modifications."""
         # Test Sol faction infantry (should have improved combat)
         sol_infantry = Unit(unit_type=UnitType.INFANTRY, owner="player1", faction="sol")
 
-        # Test Sardakk N'orr units (should have combat bonuses)
-        sardakk_cruiser = Unit(
-            unit_type=UnitType.CRUISER, owner="player2", faction="sardakk_norr"
+        # Test Barony units (should have combat bonuses)
+        barony_cruiser = Unit(
+            unit_type=UnitType.CRUISER, owner="player2", faction="barony"
         )
 
         # Test that faction-specific modifications are applied
         # This would depend on the specific faction implementation
-        assert sol_infantry.faction == "sol"
-        assert sardakk_cruiser.faction == "sardakk_norr"
+        assert sol_infantry.faction.value == "sol"
+        assert barony_cruiser.faction.value == "barony"
 
         # Test that units maintain their base functionality
-        assert sol_infantry.unit_type == UnitType.INFANTRY.value
-        assert sardakk_cruiser.unit_type == UnitType.CRUISER.value
+        assert sol_infantry.unit_type == UnitType.INFANTRY
+        assert barony_cruiser.unit_type == UnitType.CRUISER

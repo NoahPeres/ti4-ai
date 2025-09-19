@@ -1,5 +1,6 @@
 """Tests for comprehensive scenario library."""
 
+from src.ti4.core.constants import UnitType
 from src.ti4.core.game_phase import GamePhase
 from src.ti4.testing.scenario_builder import GameScenarioBuilder
 
@@ -21,7 +22,7 @@ class TestScenarioLibrary:
         # Verify Sol Spec Ops (infantry) on Mecatol Rex
         mecatol_system = game_state.systems["mecatol_rex"]
         infantry_units = [
-            unit for unit in mecatol_system.space_units if unit.unit_type == "infantry"
+            unit for unit in mecatol_system.space_units if unit.unit_type == UnitType.INFANTRY
         ]
         assert len(infantry_units) == 1
         assert infantry_units[0].owner == "player1"
@@ -39,7 +40,7 @@ class TestScenarioLibrary:
         # Verify Xxcha flagship
         home_system = game_state.systems["home_system"]
         flagship_units = [
-            unit for unit in home_system.space_units if unit.unit_type == "flagship"
+            unit for unit in home_system.space_units if unit.unit_type == UnitType.FLAGSHIP
         ]
         assert len(flagship_units) == 1
         assert flagship_units[0].owner == "player1"
@@ -62,7 +63,7 @@ class TestScenarioLibrary:
         assert len(test_system.space_units) == 9  # All unit types
 
         # Verify all different unit types are present
-        unit_types = [unit.unit_type for unit in test_system.space_units]
+        unit_types = [unit.unit_type.value for unit in test_system.space_units]
         expected_types = [
             "war_sun",
             "dreadnought",
@@ -88,7 +89,7 @@ class TestScenarioLibrary:
 
         isolated_system = game_state.systems["isolated_system"]
         assert len(isolated_system.space_units) == 1
-        assert isolated_system.space_units[0].unit_type == "fighter"
+        assert isolated_system.space_units[0].unit_type.value == "fighter"
 
     def test_edge_case_resource_overflow_scenario(self) -> None:
         """Test edge case scenario with maximum resources."""
@@ -159,7 +160,7 @@ class TestScenarioLibrary:
         for system in game_state.systems.values():
             all_units.extend(system.space_units)
 
-        unit_types = [unit.unit_type for unit in all_units]
+        unit_types = [unit.unit_type.value for unit in all_units]
         assert "war_sun" in unit_types
         assert "flagship" in unit_types
         assert "dreadnought" in unit_types
