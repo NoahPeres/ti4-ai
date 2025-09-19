@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any
 
 from ..core.constants import UnitType
 from ..core.production import ProductionManager
-from .tactical_action import TacticalActionStep
+from .movement_engine import TacticalActionStep
 
 if TYPE_CHECKING:
     from ..core.system import System

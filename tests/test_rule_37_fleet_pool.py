@@ -63,11 +63,15 @@ class TestRule37FleetPoolLimits:
         system.place_unit_in_space(cruiser2)
 
         # With 2 fleet pool tokens, should be valid
-        is_valid_with_2_tokens = manager.is_fleet_pool_valid(system, MockPlayer.PLAYER_1.value, fleet_tokens=2)
+        is_valid_with_2_tokens = manager.is_fleet_pool_valid(
+            system, MockPlayer.PLAYER_1.value, fleet_tokens=2
+        )
         assert is_valid_with_2_tokens is True
 
         # With 1 fleet pool token, should be invalid (2 ships > 1 token)
-        is_valid_with_1_token = manager.is_fleet_pool_valid(system, MockPlayer.PLAYER_1.value, fleet_tokens=1)
+        is_valid_with_1_token = manager.is_fleet_pool_valid(
+            system, MockPlayer.PLAYER_1.value, fleet_tokens=1
+        )
         assert is_valid_with_1_token is False
 
     def test_fighters_do_not_count_against_fleet_pool(self) -> None:
@@ -94,7 +98,9 @@ class TestRule37FleetPoolLimits:
             system.place_unit_in_space(fighter)
 
         # With 1 fleet pool token, should be valid (only cruiser counts)
-        is_valid = manager.is_fleet_pool_valid(system, MockPlayer.PLAYER_1.value, fleet_tokens=1)
+        is_valid = manager.is_fleet_pool_valid(
+            system, MockPlayer.PLAYER_1.value, fleet_tokens=1
+        )
         assert is_valid is True
 
     def test_mixed_ships_fleet_pool_counting(self) -> None:
@@ -125,10 +131,14 @@ class TestRule37FleetPoolLimits:
 
         # 3 non-fighter ships (cruiser, destroyer, carrier) + 1 fighter
         # Should need 3 fleet pool tokens
-        is_valid_with_3_tokens = manager.is_fleet_pool_valid(system, MockPlayer.PLAYER_1.value, fleet_tokens=3)
+        is_valid_with_3_tokens = manager.is_fleet_pool_valid(
+            system, MockPlayer.PLAYER_1.value, fleet_tokens=3
+        )
         assert is_valid_with_3_tokens is True
 
-        is_valid_with_2_tokens = manager.is_fleet_pool_valid(system, MockPlayer.PLAYER_1.value, fleet_tokens=2)
+        is_valid_with_2_tokens = manager.is_fleet_pool_valid(
+            system, MockPlayer.PLAYER_1.value, fleet_tokens=2
+        )
         assert is_valid_with_2_tokens is False
 
 
@@ -155,7 +165,9 @@ class TestRule37PlanetExclusions:
         system.add_planet(planet)
 
         # Add space dock and infantry on planet (should not count)
-        space_dock = Unit(unit_type=UnitType.SPACE_DOCK, owner=MockPlayer.PLAYER_1.value)
+        space_dock = Unit(
+            unit_type=UnitType.SPACE_DOCK, owner=MockPlayer.PLAYER_1.value
+        )
         infantry = Unit(unit_type=UnitType.INFANTRY, owner=MockPlayer.PLAYER_1.value)
         planet.place_unit(space_dock)
         planet.place_unit(infantry)
@@ -165,7 +177,9 @@ class TestRule37PlanetExclusions:
         system.place_unit_in_space(cruiser)
 
         # Should only need 1 fleet pool token (only cruiser counts)
-        is_valid = manager.is_fleet_pool_valid(system, MockPlayer.PLAYER_1.value, fleet_tokens=1)
+        is_valid = manager.is_fleet_pool_valid(
+            system, MockPlayer.PLAYER_1.value, fleet_tokens=1
+        )
         assert is_valid is True
 
     def test_capacity_consuming_units_do_not_count_against_fleet_pool(self) -> None:
@@ -194,7 +208,9 @@ class TestRule37PlanetExclusions:
         system.place_unit_in_space(infantry)
 
         # Should only need 1 fleet pool token (only carrier counts)
-        is_valid = manager.is_fleet_pool_valid(system, MockPlayer.PLAYER_1.value, fleet_tokens=1)
+        is_valid = manager.is_fleet_pool_valid(
+            system, MockPlayer.PLAYER_1.value, fleet_tokens=1
+        )
         assert is_valid is True
 
 
@@ -230,7 +246,10 @@ class TestRule37TransportExclusions:
 
         # Mark infantry as being transported through system2
         is_valid_in_transit = manager.is_fleet_pool_valid_with_transport(
-            system2, MockPlayer.PLAYER_1.value, fleet_tokens=0, transported_units=[infantry]
+            system2,
+            MockPlayer.PLAYER_1.value,
+            fleet_tokens=0,
+            transported_units=[infantry],
         )
         assert is_valid_in_transit is True
 
@@ -297,14 +316,20 @@ class TestRule37ExcessShipRemoval:
         system.place_unit_in_space(cruiser3)
 
         # Enforce fleet pool limit of 2 tokens
-        removed_ships = manager.enforce_fleet_pool_limit(system, MockPlayer.PLAYER_1.value, fleet_tokens=2)
+        removed_ships = manager.enforce_fleet_pool_limit(
+            system, MockPlayer.PLAYER_1.value, fleet_tokens=2
+        )
 
         # Should remove 1 ship (3 ships - 2 tokens = 1 excess)
         assert len(removed_ships) == 1
         assert removed_ships[0] in [cruiser1, cruiser2, cruiser3]
 
         # System should now have only 2 ships
-        remaining_ships = [unit for unit in system.space_units if unit.owner == MockPlayer.PLAYER_1.value]
+        remaining_ships = [
+            unit
+            for unit in system.space_units
+            if unit.owner == MockPlayer.PLAYER_1.value
+        ]
         assert len(remaining_ships) == 2
 
     def test_player_chooses_which_excess_ships_to_remove(self) -> None:
@@ -333,14 +358,21 @@ class TestRule37ExcessShipRemoval:
 
         # Player chooses to remove the destroyer
         removed_ships = manager.enforce_fleet_pool_limit_with_choice(
-            system, MockPlayer.PLAYER_1.value, fleet_tokens=2, ships_to_remove=[destroyer]
+            system,
+            MockPlayer.PLAYER_1.value,
+            fleet_tokens=2,
+            ships_to_remove=[destroyer],
         )
 
         assert len(removed_ships) == 1
         assert removed_ships[0] == destroyer
 
         # System should have cruiser and carrier remaining
-        remaining_ships = [unit for unit in system.space_units if unit.owner == MockPlayer.PLAYER_1.value]
+        remaining_ships = [
+            unit
+            for unit in system.space_units
+            if unit.owner == MockPlayer.PLAYER_1.value
+        ]
         assert len(remaining_ships) == 2
         assert cruiser in remaining_ships
         assert carrier in remaining_ships
@@ -371,8 +403,13 @@ class TestRule37ExcessShipRemoval:
         reinforcements_before = {UnitType.CRUISER: 0}
 
         # Enforce fleet pool limit
-        reinforcements_after = manager.enforce_fleet_pool_limit_and_return_to_reinforcements(
-            system, MockPlayer.PLAYER_1.value, fleet_tokens=1, reinforcements=reinforcements_before
+        reinforcements_after = (
+            manager.enforce_fleet_pool_limit_and_return_to_reinforcements(
+                system,
+                MockPlayer.PLAYER_1.value,
+                fleet_tokens=1,
+                reinforcements=reinforcements_before,
+            )
         )
 
         # Should have 1 cruiser returned to reinforcements
@@ -393,11 +430,15 @@ class TestRule37SpendingRestrictions:
         fleet_pool = manager.create_fleet_pool(tokens=3)
 
         # Should not be able to spend tokens normally
-        can_spend_normally = manager.can_spend_fleet_pool_token(fleet_pool, game_effect=None)
+        can_spend_normally = manager.can_spend_fleet_pool_token(
+            fleet_pool, game_effect=None
+        )
         assert can_spend_normally is False
 
         # Should not be able to spend for tactical actions
-        can_spend_for_tactical = manager.can_spend_fleet_pool_token_for_tactical_action(fleet_pool)
+        can_spend_for_tactical = manager.can_spend_fleet_pool_token_for_tactical_action(
+            fleet_pool
+        )
         assert can_spend_for_tactical is False
 
     def test_fleet_pool_tokens_can_be_spent_with_game_effect(self) -> None:
@@ -414,7 +455,9 @@ class TestRule37SpendingRestrictions:
         game_effect = "Warfare Strategy Card Secondary"
 
         # Should be able to spend with valid game effect
-        can_spend_with_effect = manager.can_spend_fleet_pool_token(fleet_pool, game_effect=game_effect)
+        can_spend_with_effect = manager.can_spend_fleet_pool_token(
+            fleet_pool, game_effect=game_effect
+        )
         assert can_spend_with_effect is True
 
     def test_fleet_pool_token_spending_validation(self) -> None:
@@ -428,7 +471,9 @@ class TestRule37SpendingRestrictions:
         fleet_pool = manager.create_fleet_pool(tokens=2)
 
         # Attempt to spend without game effect (should fail)
-        spend_result = manager.attempt_spend_fleet_pool_token(fleet_pool, game_effect=None)
+        spend_result = manager.attempt_spend_fleet_pool_token(
+            fleet_pool, game_effect=None
+        )
         assert spend_result.success is False
         assert "game effect" in spend_result.error_message.lower()
 
@@ -446,11 +491,12 @@ class TestRule37FleetPoolIntegration:
         """
         from src.ti4.core.fleet import Fleet, FleetCapacityValidator
 
-
         fleet_validator = FleetCapacityValidator()
 
         # Create fleet with ships
-        fleet = Fleet(owner=MockPlayer.PLAYER_1.value, system_id=MockSystem.TEST_SYSTEM.value)
+        fleet = Fleet(
+            owner=MockPlayer.PLAYER_1.value, system_id=MockSystem.TEST_SYSTEM.value
+        )
 
         cruiser = Unit(unit_type=UnitType.CRUISER, owner=MockPlayer.PLAYER_1.value)
         destroyer = Unit(unit_type=UnitType.DESTROYER, owner=MockPlayer.PLAYER_1.value)
@@ -467,11 +513,17 @@ class TestRule37FleetPoolIntegration:
         assert is_valid is True
 
         # Create a second fleet to test the limit
-        fleet2 = Fleet(owner=MockPlayer.PLAYER_1.value, system_id=MockSystem.SYSTEM_2.value)
-        fleet2.add_unit(Unit(unit_type=UnitType.CRUISER, owner=MockPlayer.PLAYER_1.value))
+        fleet2 = Fleet(
+            owner=MockPlayer.PLAYER_1.value, system_id=MockSystem.SYSTEM_2.value
+        )
+        fleet2.add_unit(
+            Unit(unit_type=UnitType.CRUISER, owner=MockPlayer.PLAYER_1.value)
+        )
 
         # With 2 fleets requiring supply and only 1 token, should be invalid
-        is_invalid = fleet_validator.is_fleet_supply_valid([fleet, fleet2], fleet_tokens=1)
+        is_invalid = fleet_validator.is_fleet_supply_valid(
+            [fleet, fleet2], fleet_tokens=1
+        )
         assert is_invalid is False
 
     def test_fleet_pool_integrates_with_command_sheet_system(self) -> None:

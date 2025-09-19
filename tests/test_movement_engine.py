@@ -17,7 +17,7 @@ class TestTacticalAction:
 
     def test_tactical_action_creation(self) -> None:
         """Test that TacticalAction can be created with active system."""
-        from src.ti4.actions.tactical_action import TacticalAction
+        from src.ti4.actions.movement_engine import TacticalAction
 
         # RED: This should fail because TacticalAction doesn't exist yet
         tactical_action = TacticalAction(
@@ -38,7 +38,7 @@ class TestTacticalAction:
 
     def test_extensible_step_architecture(self) -> None:
         """Test that the new step-based architecture is extensible."""
-        from src.ti4.actions.tactical_action import TacticalAction, TacticalActionStep
+        from src.ti4.actions.movement_engine import TacticalAction, TacticalActionStep
 
         # Create a custom step for testing
         class TestStep(TacticalActionStep):
@@ -69,7 +69,7 @@ class TestTacticalAction:
 
     def test_movement_step_moves_units_to_space_area(self) -> None:
         """Test that Movement Step moves all units to the active system's space area."""
-        from src.ti4.actions.tactical_action import MovementPlan, TacticalAction
+        from src.ti4.actions.movement_engine import MovementPlan, TacticalAction
 
         # Setup galaxy with two systems
         galaxy = Galaxy()
@@ -116,7 +116,7 @@ class TestTacticalAction:
 
     def test_ground_forces_cannot_move_directly_between_planets(self) -> None:
         """Test that ground forces cannot move directly from planet to planet."""
-        from src.ti4.actions.tactical_action import (
+        from src.ti4.actions.movement_engine import (
             MovementPlan,
             MovementValidationError,
         )
@@ -154,7 +154,7 @@ class TestTacticalAction:
 
     def test_joint_movement_validation(self) -> None:
         """Test that movement validation is performed jointly for entire plan."""
-        from src.ti4.actions.tactical_action import MovementPlan, MovementValidator
+        from src.ti4.actions.movement_engine import MovementPlan, MovementValidator
 
         # Setup galaxy
         galaxy = Galaxy()
@@ -196,7 +196,7 @@ class TestTacticalAction:
 
     def test_commit_ground_forces_step(self) -> None:
         """Test that Commit Ground Forces Step moves ground forces from space to planets."""
-        from src.ti4.actions.tactical_action import (
+        from src.ti4.actions.movement_engine import (
             CommitGroundForcesPlan,
             TacticalAction,
         )
@@ -240,7 +240,7 @@ class TestTacticalAction:
 
     def test_complete_tactical_action_sequence(self) -> None:
         """Test a complete tactical action with both movement and commit steps."""
-        from src.ti4.actions.tactical_action import (
+        from src.ti4.actions.movement_engine import (
             CommitGroundForcesPlan,
             MovementPlan,
             TacticalAction,
@@ -306,7 +306,7 @@ class TestTacticalAction:
 
     def test_automatic_technology_effect_calculation(self) -> None:
         """Test that technology effects like Gravity Drive are automatically applied."""
-        from src.ti4.actions.tactical_action import MovementPlan, MovementValidator
+        from src.ti4.actions.movement_engine import MovementPlan, MovementValidator
 
         # Setup galaxy with systems distance 2 apart
         galaxy = Galaxy()
@@ -346,7 +346,7 @@ class TestTacticalAction:
 
     def test_transport_capacity_validation(self) -> None:
         """Test that transport capacity is validated in joint movement planning."""
-        from src.ti4.actions.tactical_action import MovementPlan, MovementValidator
+        from src.ti4.actions.movement_engine import MovementPlan, MovementValidator
 
         # Setup galaxy
         galaxy = Galaxy()
@@ -391,7 +391,7 @@ class TestTacticalAction:
 
     def test_joint_movement_validation_with_sufficient_capacity(self) -> None:
         """Test that joint movement validation passes with sufficient transport capacity."""
-        from src.ti4.actions.tactical_action import MovementPlan, MovementValidator
+        from src.ti4.actions.movement_engine import MovementPlan, MovementValidator
 
         # Setup galaxy
         galaxy = Galaxy()
@@ -435,7 +435,7 @@ class TestTacticalAction:
 
     def test_complete_ti4_tactical_action_validation(self) -> None:
         """Test that the complete TI4 tactical action structure is properly enforced."""
-        from src.ti4.actions.tactical_action import (
+        from src.ti4.actions.movement_engine import (
             CommitGroundForcesPlan,
             MovementPlan,
             MovementValidator,
@@ -516,7 +516,7 @@ class TestTacticalAction:
 
     def test_multiple_systems_converging_movement(self) -> None:
         """Test that units can move from multiple systems into the active system."""
-        from src.ti4.actions.tactical_action import MovementPlan, MovementValidator
+        from src.ti4.actions.movement_engine import MovementPlan, MovementValidator
 
         # Setup galaxy with three systems
         galaxy = Galaxy()
@@ -556,7 +556,7 @@ class TestTacticalAction:
 
     def test_gravity_drive_selective_application(self) -> None:
         """Test that Gravity Drive is applied optimally to make movement legal."""
-        from src.ti4.actions.tactical_action import MovementPlan, MovementValidator
+        from src.ti4.actions.movement_engine import MovementPlan, MovementValidator
 
         # Setup galaxy with systems at different distances
         galaxy = Galaxy()
@@ -607,7 +607,7 @@ class TestTacticalAction:
 
     def test_gravity_drive_insufficient_for_multiple_ships(self) -> None:
         """Test that Gravity Drive cannot make illegal moves with multiple ships needing it."""
-        from src.ti4.actions.tactical_action import MovementPlan, MovementValidator
+        from src.ti4.actions.movement_engine import MovementPlan, MovementValidator
 
         # Setup galaxy
         galaxy = Galaxy()
@@ -651,7 +651,7 @@ class TestTacticalAction:
 
     def test_scalable_technology_system(self) -> None:
         """Test that the technology system is extensible for future technologies."""
-        from src.ti4.actions.tactical_action import MovementValidator
+        from src.ti4.actions.movement_engine import MovementValidator
 
         # This test demonstrates how new technologies could be added
         galaxy = Galaxy()
@@ -669,7 +669,7 @@ class TestTacticalAction:
         system1.place_unit_in_space(cruiser)
 
         # Test with multiple technologies (demonstrating extensibility)
-        from src.ti4.actions.tactical_action import MovementPlan
+        from src.ti4.actions.movement_engine import MovementPlan
 
         movement_plan = MovementPlan()
         movement_plan.add_ship_movement(cruiser, "system1", "system2")
@@ -690,7 +690,7 @@ class TestTacticalAction:
 
     def test_complex_multi_system_scenario(self) -> None:
         """Test a complex scenario with multiple systems, technologies, and edge cases."""
-        from src.ti4.actions.tactical_action import (
+        from src.ti4.actions.movement_engine import (
             MovementPlan,
             MovementValidator,
             TacticalAction,

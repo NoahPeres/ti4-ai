@@ -1,4 +1,10 @@
-"""TI4 Tactical Action implementation with extensible step-based architecture."""
+"""TI4 Movement Engine - Advanced movement planning and execution system.
+
+This module handles complex movement operations with technology effects, transport capacity,
+and multi-system movement planning. This is the EXECUTION layer for movement operations.
+
+For Rule 89 compliance validation, use Rule89Validator in core/rule89_validator.py.
+"""
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass

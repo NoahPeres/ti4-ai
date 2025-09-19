@@ -11,8 +11,8 @@ This test file verifies that all sub-rules of Rule 58 are properly implemented:
 - 58.9: Ability Movement Rules
 """
 
-from src.ti4.actions.tactical_action import MovementPlan, TacticalAction
-from src.ti4.actions.tactical_action import (
+from src.ti4.actions.movement_engine import MovementPlan, TacticalAction
+from src.ti4.actions.movement_engine import (
     MovementValidator as TacticalMovementValidator,
 )
 from src.ti4.core.constants import UnitType
@@ -540,7 +540,7 @@ class TestRule58ComprehensiveIntegration:
         tactical_action.set_movement_plan(movement_plan)
 
         # Mock game state for execution
-        from tests.test_tactical_action import MockGameState
+        from tests.test_movement_engine import MockGameState
 
         game_state = MockGameState(
             galaxy=galaxy, systems={"system_a": system_a, "system_b": system_b}

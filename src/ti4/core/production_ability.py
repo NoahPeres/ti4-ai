@@ -33,7 +33,9 @@ class ProductionAbilityManager:
         """Initialize the production ability manager."""
         pass
 
-    def get_production_value(self, unit: "Unit", planet: Optional["Planet"] = None) -> int:
+    def get_production_value(
+        self, unit: "Unit", planet: Optional["Planet"] = None
+    ) -> int:
         """Get the production value of a unit.
 
         Args:
@@ -55,8 +57,6 @@ class ProductionAbilityManager:
         # War suns do not have production ability in base game
         # Other units with production will be added via faction-specific mechanics
         return 0
-
-
 
     def get_combined_production_in_system(self, system: "System", player: str) -> int:
         """Get the combined production value for a player in a system.
@@ -111,7 +111,10 @@ class ProductionAbilityManager:
         return production_used
 
     def can_produce_units(
-        self, producing_unit: "Unit", units_to_produce: list[UnitType], planet: Optional["Planet"] = None
+        self,
+        producing_unit: "Unit",
+        units_to_produce: list[UnitType],
+        planet: Optional["Planet"] = None,
     ) -> bool:
         """Check if a unit can produce the specified units.
 
