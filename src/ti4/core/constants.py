@@ -97,9 +97,11 @@ class Technology(Enum):
 
     # Faction-specific technologies (manually confirmed)
     # Sol Federation faction technologies
-    SPEC_OPS_II = "spec_ops_ii"  # Confirmed Sol faction tech - unit upgrade, 2x green prereq
-    
-    # Hacan Emirates faction technologies  
+    SPEC_OPS_II = (
+        "spec_ops_ii"  # Confirmed Sol faction tech - unit upgrade, 2x green prereq
+    )
+
+    # Hacan Emirates faction technologies
     QUANTUM_DATAHUB_NODE = "quantum_datahub_node"  # Confirmed Hacan faction tech - yellow, 3x yellow prereq
 
 

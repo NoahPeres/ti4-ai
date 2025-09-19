@@ -1,10 +1,13 @@
 """Technology system for TI4."""
 
 from enum import Enum
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from .constants import Technology as TechnologyEnum
 from .constants import UnitType
+
+if TYPE_CHECKING:
+    from .constants import Faction
 
 
 class TechnologyColor(Enum):
@@ -362,12 +365,12 @@ class TechnologyManager:
         Returns:
             True if the player can research the technology (faction-wise)
 
-        LRR Reference: Rule 90.11 - A player cannot research a faction technology 
+        LRR Reference: Rule 90.11 - A player cannot research a faction technology
         that does not match their faction
         """
         # CONFIRMED FACTION TECHNOLOGY DATA - DO NOT MODIFY WITHOUT USER APPROVAL
         from .constants import Faction
-        
+
         faction_technologies: dict[Faction, set[TechnologyEnum]] = {
             # Sol Federation faction technologies (manually confirmed)
             Faction.SOL: {

@@ -43,14 +43,18 @@ class GameTechnologyManager:
                     continue
 
         # For mock game states, also check player state technologies
-        if hasattr(self.game_state, 'players') and isinstance(self.game_state.players, dict):
+        if hasattr(self.game_state, "players") and isinstance(
+            self.game_state.players, dict
+        ):
             for player_id, player_state in self.game_state.players.items():
-                if hasattr(player_state, 'technologies'):
+                if hasattr(player_state, "technologies"):
                     for tech_name in player_state.technologies:
                         try:
                             # Convert string to Technology enum
                             technology = Technology(tech_name)
-                            self.technology_manager.gain_technology(player_id, technology)
+                            self.technology_manager.gain_technology(
+                                player_id, technology
+                            )
                         except ValueError:
                             # Skip unknown technologies (might be faction-specific)
                             continue
@@ -82,7 +86,7 @@ class GameTechnologyManager:
 
                 # Also update mock player state if it exists
                 player_state = self.game_state.players.get(player_id)
-                if player_state and hasattr(player_state, 'technologies'):
+                if player_state and hasattr(player_state, "technologies"):
                     player_state.technologies = tech_names
 
     def can_research_technology(self, player_id: str, technology: Technology) -> bool:
