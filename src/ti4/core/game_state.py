@@ -10,15 +10,19 @@ from .player import Player
 if TYPE_CHECKING:
     from .galaxy import Galaxy
     from .objective import Objective
+    from .planet import Planet
     from .strategic_action import StrategyCardType
     from .strategy_card_coordinator import StrategyCardCoordinator
     from .system import System
+    from .technology import TechnologyCard
 else:
     Galaxy = "Galaxy"
     System = "System"
     Objective = "Objective"
+    Planet = "Planet"
     StrategyCardType = "StrategyCardType"
     StrategyCardCoordinator = "StrategyCardCoordinator"
+    TechnologyCard = "TechnologyCard"
 
 # Victory condition constants
 VICTORY_POINTS_TO_WIN = 10
@@ -36,6 +40,12 @@ class GameState:
     # player_resources field removed - incorrect implementation
     # Resources should be tracked on planets per Rules 47 and 75
     player_technologies: dict[str, list[str]] = field(default_factory=dict, hash=False)
+    # Player planets (Rule 34)
+    player_planets: dict[str, list["Planet"]] = field(default_factory=dict, hash=False)
+    # Player technology cards (Rule 34)
+    player_technology_cards: dict[str, list["TechnologyCard"]] = field(
+        default_factory=dict, hash=False
+    )
     victory_points: dict[str, int] = field(default_factory=dict, hash=False)
     completed_objectives: dict[str, list[str]] = field(default_factory=dict, hash=False)
 
@@ -64,6 +74,9 @@ class GameState:
     exhausted_strategy_cards: set["StrategyCardType"] = field(
         default_factory=set, hash=False
     )  # Set of exhausted strategy cards
+    strategy_card_coordinator: Optional["StrategyCardCoordinator"] = field(
+        default=None, hash=False
+    )  # Optional strategy card coordinator
 
     def get_victory_points(self, player_id: str) -> int:
         """Get the victory points for a player."""
@@ -119,7 +132,13 @@ class GameState:
             phase=self.phase,
             systems=self.systems,
             # player_resources parameter removed - incorrect implementation
-            player_technologies=self.player_technologies,
+            player_technologies=kwargs.get(
+                "player_technologies", self.player_technologies
+            ),
+            player_planets=kwargs.get("player_planets", self.player_planets),
+            player_technology_cards=kwargs.get(
+                "player_technology_cards", self.player_technology_cards
+            ),
             victory_points=kwargs.get("victory_points", self.victory_points),
             completed_objectives=kwargs.get(
                 "completed_objectives", self.completed_objectives
@@ -140,6 +159,9 @@ class GameState:
             ),
             exhausted_strategy_cards=kwargs.get(
                 "exhausted_strategy_cards", self.exhausted_strategy_cards
+            ),
+            strategy_card_coordinator=kwargs.get(
+                "strategy_card_coordinator", self.strategy_card_coordinator
             ),
         )
 
@@ -656,3 +678,94 @@ class GameState:
             strategy_card_assignments=new_assignments,
             exhausted_strategy_cards=new_exhausted_cards,
         )
+
+    def add_player_planet(self, player_id: str, planet: "Planet") -> "GameState":
+        """Add a planet to a player's control.
+
+        Args:
+            player_id: The player ID
+            planet: The planet to add
+
+        Returns:
+            New GameState with the planet added to the player
+        """
+        new_player_planets = {
+            pid: planets.copy() for pid, planets in self.player_planets.items()
+        }
+
+        if player_id not in new_player_planets:
+            new_player_planets[player_id] = []
+
+        new_player_planets[player_id].append(planet)
+
+        return self._create_new_state(player_planets=new_player_planets)
+
+    def get_player_planets(self, player_id: str) -> list["Planet"]:
+        """Get all planets controlled by a player.
+
+        Args:
+            player_id: The player ID
+
+        Returns:
+            List of planets controlled by the player
+        """
+        return self.player_planets.get(player_id, [])
+
+    def add_player_technology_card(
+        self, player_id: str, tech_card: "TechnologyCard"
+    ) -> "GameState":
+        """Add a technology card to a player.
+
+        Args:
+            player_id: The player ID
+            tech_card: The technology card to add
+
+        Returns:
+            New GameState with the technology card added to the player
+        """
+        new_player_tech_cards = {
+            pid: cards.copy() for pid, cards in self.player_technology_cards.items()
+        }
+
+        if player_id not in new_player_tech_cards:
+            new_player_tech_cards[player_id] = []
+
+        new_player_tech_cards[player_id].append(tech_card)
+
+        return self._create_new_state(player_technology_cards=new_player_tech_cards)
+
+    def get_player_technology_cards(self, player_id: str) -> list["TechnologyCard"]:
+        """Get all technology cards owned by a player.
+
+        Args:
+            player_id: The player ID
+
+        Returns:
+            List of technology cards owned by the player
+        """
+        return self.player_technology_cards.get(player_id, [])
+
+    def add_player_technology(
+        self, player_id: str, tech_card: "TechnologyCard"
+    ) -> "GameState":
+        """Add a technology card to a player (alias for add_player_technology_card).
+
+        Args:
+            player_id: The player ID
+            tech_card: The technology card to add
+
+        Returns:
+            New GameState with the technology card added to the player
+        """
+        return self.add_player_technology_card(player_id, tech_card)
+
+    def get_player_technologies(self, player_id: str) -> list[str]:
+        """Get all technology names owned by a player.
+
+        Args:
+            player_id: The player ID
+
+        Returns:
+            List of technology names owned by the player
+        """
+        return self.player_technologies.get(player_id, [])

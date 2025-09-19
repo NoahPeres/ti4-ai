@@ -12,8 +12,6 @@ Requirements tested:
 - 6.5: Strategic actions work with strategy card coordinator
 """
 
-import pytest
-
 
 class TestRule83StrategicActionIntegration:
     """Test integration between strategy card coordinator and strategic action manager."""
@@ -30,13 +28,13 @@ class TestRule83StrategicActionIntegration:
 
         # Create strategic action manager
         strategic_action_manager = StrategicActionManager()
-        
+
         # Create strategy card coordinator
         coordinator = StrategyCardCoordinator(strategic_action_manager)
-        
+
         # Set up integration
         coordinator.integrate_with_strategic_actions()
-        
+
         # Verify integration was successful
         assert strategic_action_manager._strategy_card_coordinator is coordinator
 
@@ -48,25 +46,28 @@ class TestRule83StrategicActionIntegration:
 
         Requirements: 6.2 - Strategy card validation in strategic action workflow
         """
-        from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
+        from src.ti4.core.strategic_action import (
+            StrategicActionManager,
+            StrategyCardType,
+        )
         from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         # Create and integrate systems
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
         coordinator.integrate_with_strategic_actions()
-        
+
         # Assign strategy card via coordinator
         coordinator.assign_strategy_card("player1", StrategyCardType.WARFARE)
-        
+
         # Set action phase
         strategic_action_manager.set_action_phase(True)
-        
+
         # Test validation via coordinator
         assert strategic_action_manager.can_activate_strategy_card_via_coordinator(
             "player1", StrategyCardType.WARFARE
         )
-        
+
         # Player without the card should not be able to activate it
         assert not strategic_action_manager.can_activate_strategy_card_via_coordinator(
             "player2", StrategyCardType.WARFARE
@@ -80,33 +81,38 @@ class TestRule83StrategicActionIntegration:
 
         Requirements: 6.3 - Card exhaustion during strategic action resolution
         """
-        from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
+        from src.ti4.core.strategic_action import (
+            StrategicActionManager,
+            StrategyCardType,
+        )
         from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         # Create and integrate systems
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
         coordinator.integrate_with_strategic_actions()
-        
+
         # Assign strategy card via coordinator
         coordinator.assign_strategy_card("player1", StrategyCardType.WARFARE)
-        
+
         # Set action phase
         strategic_action_manager.set_action_phase(True)
-        
+
         # Verify card is initially readied
         assert coordinator.is_strategy_card_readied("player1", StrategyCardType.WARFARE)
-        
+
         # Activate strategy card via coordinator integration
         result = strategic_action_manager.activate_strategy_card_via_coordinator(
             "player1", StrategyCardType.WARFARE
         )
-        
+
         # Verify activation was successful
         assert result.success
-        
+
         # Verify card was exhausted via coordinator
-        assert coordinator.is_strategy_card_exhausted("player1", StrategyCardType.WARFARE)
+        assert coordinator.is_strategy_card_exhausted(
+            "player1", StrategyCardType.WARFARE
+        )
 
     def test_backward_compatibility_with_existing_strategic_actions(self) -> None:
         """Test that existing strategic action functionality still works.
@@ -124,7 +130,7 @@ class TestRule83StrategicActionIntegration:
 
         # Create strategic action manager without coordinator
         strategic_action_manager = StrategicActionManager()
-        
+
         # Use existing strategic action functionality
         warfare_card = StrategyCard(
             StrategyCardType.WARFARE,
@@ -133,12 +139,12 @@ class TestRule83StrategicActionIntegration:
         )
         strategic_action_manager.assign_strategy_card("player1", warfare_card)
         strategic_action_manager.set_action_phase(True)
-        
+
         # Verify existing functionality still works
         assert strategic_action_manager.can_activate_strategy_card(
             "player1", StrategyCardType.WARFARE
         )
-        
+
         result = strategic_action_manager.activate_strategy_card(
             "player1", StrategyCardType.WARFARE
         )
@@ -153,28 +159,31 @@ class TestRule83StrategicActionIntegration:
 
         Requirements: 6.5 - Strategic actions work with strategy card coordinator
         """
-        from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
+        from src.ti4.core.strategic_action import (
+            StrategicActionManager,
+            StrategyCardType,
+        )
         from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         # Create and integrate systems
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
         coordinator.integrate_with_strategic_actions()
-        
+
         # Set up player order
         strategic_action_manager.set_player_order(["player1", "player2", "player3"])
-        
+
         # Assign strategy card via coordinator
         coordinator.assign_strategy_card("player1", StrategyCardType.WARFARE)
-        
+
         # Set action phase
         strategic_action_manager.set_action_phase(True)
-        
+
         # Activate strategy card via coordinator
         result = strategic_action_manager.activate_strategy_card_via_coordinator(
             "player1", StrategyCardType.WARFARE
         )
-        
+
         # Verify secondary abilities are offered
         assert result.success
         assert result.secondary_abilities_offered
@@ -190,19 +199,22 @@ class TestRule83CoordinatorValidation:
 
         Requirements: 6.2 - Strategy card validation in strategic action workflow
         """
-        from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
+        from src.ti4.core.strategic_action import (
+            StrategicActionManager,
+            StrategyCardType,
+        )
         from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         # Create and integrate systems
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
         coordinator.integrate_with_strategic_actions()
-        
+
         # Test with empty player ID
         assert not strategic_action_manager.can_activate_strategy_card_via_coordinator(
             "", StrategyCardType.WARFARE
         )
-        
+
         # Test with None card
         assert not strategic_action_manager.can_activate_strategy_card_via_coordinator(
             "player1", None
@@ -213,11 +225,14 @@ class TestRule83CoordinatorValidation:
 
         Requirements: 6.4 - Backward compatibility with existing implementations
         """
-        from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
+        from src.ti4.core.strategic_action import (
+            StrategicActionManager,
+            StrategyCardType,
+        )
 
         # Create strategic action manager without coordinator
         strategic_action_manager = StrategicActionManager()
-        
+
         # Validation should fail gracefully when no coordinator is present
         assert not strategic_action_manager.can_activate_strategy_card_via_coordinator(
             "player1", StrategyCardType.WARFARE
@@ -228,22 +243,27 @@ class TestRule83CoordinatorValidation:
 
         This test ensures the refactored helper method works correctly.
         """
-        from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
+        from src.ti4.core.strategic_action import (
+            StrategicActionManager,
+            StrategyCardType,
+        )
 
         strategic_action_manager = StrategicActionManager()
-        
+
         # Test conversion from enum (should return same enum)
-        result = strategic_action_manager._convert_to_strategy_card_type(StrategyCardType.WARFARE)
+        result = strategic_action_manager._convert_to_strategy_card_type(
+            StrategyCardType.WARFARE
+        )
         assert result == StrategyCardType.WARFARE
-        
+
         # Test conversion from string (should return enum)
         result = strategic_action_manager._convert_to_strategy_card_type("warfare")
         assert result == StrategyCardType.WARFARE
-        
+
         # Test conversion from None (should return None)
         result = strategic_action_manager._convert_to_strategy_card_type(None)
         assert result is None
-        
+
         # Test conversion from invalid string (should return None)
         result = strategic_action_manager._convert_to_strategy_card_type("invalid_card")
         assert result is None

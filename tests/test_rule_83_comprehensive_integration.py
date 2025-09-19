@@ -16,23 +16,27 @@ Requirements tested:
 All tests follow strict TDD methodology with RED-GREEN-REFACTOR cycles.
 """
 
-import pytest
-from typing import List, Tuple
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    pass
+
 from src.ti4.core.constants import Technology
-from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
-from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 from src.ti4.core.game_state import GameState
 from src.ti4.core.player import Player
-from tests.test_constants import MockPlayer
+from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
+from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
 
 class IntegrationTestHelper:
     """Helper class to eliminate code duplication in integration tests."""
 
     @staticmethod
-    def create_integrated_system() -> Tuple[StrategicActionManager, StrategyCardCoordinator]:
+    def create_integrated_system() -> tuple[
+        StrategicActionManager, StrategyCardCoordinator
+    ]:
         """Create and integrate strategic action manager with coordinator.
-        
+
         Returns:
             Tuple of (strategic_action_manager, coordinator)
         """
@@ -42,10 +46,11 @@ class IntegrationTestHelper:
         return strategic_action_manager, coordinator
 
     @staticmethod
-    def setup_action_phase(strategic_action_manager: StrategicActionManager, 
-                          players: List[str]) -> None:
+    def setup_action_phase(
+        strategic_action_manager: StrategicActionManager, players: list[str]
+    ) -> None:
         """Set up action phase with player order.
-        
+
         Args:
             strategic_action_manager: The strategic action manager
             players: List of player IDs
@@ -54,10 +59,12 @@ class IntegrationTestHelper:
         strategic_action_manager.set_action_phase(True)
 
     @staticmethod
-    def assign_cards_to_players(coordinator: StrategyCardCoordinator,
-                               assignments: List[Tuple[str, StrategyCardType]]) -> None:
+    def assign_cards_to_players(
+        coordinator: StrategyCardCoordinator,
+        assignments: list[tuple[str, StrategyCardType]],
+    ) -> None:
         """Assign strategy cards to players.
-        
+
         Args:
             coordinator: The strategy card coordinator
             assignments: List of (player_id, card_type) tuples
@@ -67,12 +74,12 @@ class IntegrationTestHelper:
             assert result.success, f"Failed to assign {card_type.value} to {player_id}"
 
     @staticmethod
-    def create_game_state_with_players(player_ids: List[str]) -> GameState:
+    def create_game_state_with_players(player_ids: list[str]) -> GameState:
         """Create game state with specified players.
-        
+
         Args:
             player_ids: List of player IDs to add
-            
+
         Returns:
             GameState with players added
         """
@@ -95,7 +102,9 @@ class TestRule83Rule82Integration:
         Requirements: 6.1, 6.2, 6.3, 6.5 - Complete Rule 82 integration
         """
         # Create integrated system using helper
-        strategic_action_manager, coordinator = IntegrationTestHelper.create_integrated_system()
+        strategic_action_manager, coordinator = (
+            IntegrationTestHelper.create_integrated_system()
+        )
 
         # Setup multi-player game
         players = ["alice", "bob", "charlie"]
@@ -105,7 +114,7 @@ class TestRule83Rule82Integration:
         assignments = [
             ("alice", StrategyCardType.LEADERSHIP),
             ("bob", StrategyCardType.WARFARE),
-            ("charlie", StrategyCardType.TECHNOLOGY)
+            ("charlie", StrategyCardType.TECHNOLOGY),
         ]
         IntegrationTestHelper.assign_cards_to_players(coordinator, assignments)
 
@@ -122,7 +131,7 @@ class TestRule83Rule82Integration:
             assert result.success
             assert result.primary_ability_resolved
             assert result.secondary_abilities_offered
-            
+
             # Verify card is exhausted via coordinator
             assert coordinator.is_strategy_card_exhausted(player_id, card_type)
 
@@ -132,7 +141,9 @@ class TestRule83Rule82Integration:
         Requirements: 6.2 - Strategy card validation in strategic action workflow
         """
         # Create integrated system using helper
-        strategic_action_manager, coordinator = IntegrationTestHelper.create_integrated_system()
+        strategic_action_manager, coordinator = (
+            IntegrationTestHelper.create_integrated_system()
+        )
 
         # Setup game
         players = ["player1", "player2"]
@@ -141,7 +152,7 @@ class TestRule83Rule82Integration:
         # Assign cards using helper
         assignments = [
             ("player1", StrategyCardType.DIPLOMACY),
-            ("player2", StrategyCardType.POLITICS)
+            ("player2", StrategyCardType.POLITICS),
         ]
         IntegrationTestHelper.assign_cards_to_players(coordinator, assignments)
 
@@ -202,7 +213,9 @@ class TestRule83Rule91Integration:
         from src.ti4.core.technology_strategy_card import TechnologyStrategyCard
 
         # Create integrated system using helper
-        strategic_action_manager, coordinator = IntegrationTestHelper.create_integrated_system()
+        strategic_action_manager, coordinator = (
+            IntegrationTestHelper.create_integrated_system()
+        )
 
         # Setup game with technology card
         players = ["tech_player", "other_player"]
@@ -211,7 +224,7 @@ class TestRule83Rule91Integration:
         # Assign cards using helper
         assignments = [
             ("tech_player", StrategyCardType.TECHNOLOGY),
-            ("other_player", StrategyCardType.WARFARE)
+            ("other_player", StrategyCardType.WARFARE),
         ]
         IntegrationTestHelper.assign_cards_to_players(coordinator, assignments)
 
@@ -226,7 +239,9 @@ class TestRule83Rule91Integration:
         assert result.success
 
         # Verify card is exhausted via coordinator
-        assert coordinator.is_strategy_card_exhausted("tech_player", StrategyCardType.TECHNOLOGY)
+        assert coordinator.is_strategy_card_exhausted(
+            "tech_player", StrategyCardType.TECHNOLOGY
+        )
 
     def test_technology_card_abilities_with_coordinator(self) -> None:
         """Test that technology card abilities work with coordinator integration.
@@ -240,16 +255,19 @@ class TestRule83Rule91Integration:
 
         # Test primary ability (should work independently)
         result = tech_card.execute_primary_ability(
-            "tech_player", Technology.ANTIMASS_DEFLECTORS
+            "tech_player", technology=Technology.ANTIMASS_DEFLECTORS
         )
         assert result.success
-        assert result.technology_researched == Technology.ANTIMASS_DEFLECTORS
+        assert (
+            result.additional_data["technology_researched"]
+            == Technology.ANTIMASS_DEFLECTORS
+        )
         assert result.resources_spent == 0
 
         # Test secondary ability (should work independently)
         result = tech_card.execute_secondary_ability(
             "other_player",
-            Technology.ANTIMASS_DEFLECTORS,
+            technology=Technology.ANTIMASS_DEFLECTORS,
             available_command_tokens=2,
             available_resources=4,
         )
@@ -263,11 +281,13 @@ class TestRule83Rule91Integration:
         Requirements: 6.1 - All strategy cards integrate with coordinator
         """
         # Create integrated system using helper
-        strategic_action_manager, coordinator = IntegrationTestHelper.create_integrated_system()
+        strategic_action_manager, coordinator = (
+            IntegrationTestHelper.create_integrated_system()
+        )
 
         # Test all 8 strategy cards
         all_cards = list(StrategyCardType)
-        players = [f"player{i+1}" for i in range(len(all_cards))]
+        players = [f"player{i + 1}" for i in range(len(all_cards))]
         IntegrationTestHelper.setup_action_phase(strategic_action_manager, players)
 
         # Assign all cards using helper
@@ -293,21 +313,29 @@ class TestRule83GameStateIntegration:
         """
         # Create game state with players using helper
         players = ["player1", "player2"]
-        game_state = IntegrationTestHelper.create_game_state_with_players(players)
+        IntegrationTestHelper.create_game_state_with_players(players)
 
         # Create coordinator
-        strategic_action_manager, coordinator = IntegrationTestHelper.create_integrated_system()
+        strategic_action_manager, coordinator = (
+            IntegrationTestHelper.create_integrated_system()
+        )
 
         # Test strategy card assignment tracking using helper
         assignments = [
             ("player1", StrategyCardType.LEADERSHIP),
-            ("player2", StrategyCardType.DIPLOMACY)
+            ("player2", StrategyCardType.DIPLOMACY),
         ]
         IntegrationTestHelper.assign_cards_to_players(coordinator, assignments)
 
         # Verify assignments are tracked
-        assert coordinator.get_player_strategy_card("player1") == StrategyCardType.LEADERSHIP
-        assert coordinator.get_player_strategy_card("player2") == StrategyCardType.DIPLOMACY
+        assert (
+            coordinator.get_player_strategy_card("player1")
+            == StrategyCardType.LEADERSHIP
+        )
+        assert (
+            coordinator.get_player_strategy_card("player2")
+            == StrategyCardType.DIPLOMACY
+        )
 
         # Test card state tracking
         strategic_action_manager.set_action_phase(True)
@@ -318,7 +346,9 @@ class TestRule83GameStateIntegration:
         strategic_action_manager.activate_strategy_card_via_coordinator(
             "player1", StrategyCardType.LEADERSHIP
         )
-        assert coordinator.is_strategy_card_exhausted("player1", StrategyCardType.LEADERSHIP)
+        assert coordinator.is_strategy_card_exhausted(
+            "player1", StrategyCardType.LEADERSHIP
+        )
 
     def test_game_state_persistence_across_phases(self) -> None:
         """Test that strategy card state persists across game phases.
@@ -326,13 +356,15 @@ class TestRule83GameStateIntegration:
         Requirements: 6.2 - Strategy card state persistence
         """
         # Create integrated system using helper
-        strategic_action_manager, coordinator = IntegrationTestHelper.create_integrated_system()
+        strategic_action_manager, coordinator = (
+            IntegrationTestHelper.create_integrated_system()
+        )
 
         # Strategy phase - assign cards using helper
         players = ["alice", "bob"]
         assignments = [
             ("alice", StrategyCardType.CONSTRUCTION),
-            ("bob", StrategyCardType.TRADE)
+            ("bob", StrategyCardType.TRADE),
         ]
         IntegrationTestHelper.assign_cards_to_players(coordinator, assignments)
 
@@ -345,9 +377,14 @@ class TestRule83GameStateIntegration:
         )
 
         # Verify state persists
-        assert coordinator.get_player_strategy_card("alice") == StrategyCardType.CONSTRUCTION
+        assert (
+            coordinator.get_player_strategy_card("alice")
+            == StrategyCardType.CONSTRUCTION
+        )
         assert coordinator.get_player_strategy_card("bob") == StrategyCardType.TRADE
-        assert coordinator.is_strategy_card_exhausted("alice", StrategyCardType.CONSTRUCTION)
+        assert coordinator.is_strategy_card_exhausted(
+            "alice", StrategyCardType.CONSTRUCTION
+        )
         assert coordinator.is_strategy_card_readied("bob", StrategyCardType.TRADE)
 
     def test_multiple_game_rounds_integration(self) -> None:
@@ -373,7 +410,9 @@ class TestRule83GameStateIntegration:
 
         for player in players:
             card = coordinator.get_player_strategy_card(player)
-            strategic_action_manager.activate_strategy_card_via_coordinator(player, card)
+            strategic_action_manager.activate_strategy_card_via_coordinator(
+                player, card
+            )
 
         # Verify all cards exhausted
         for player in players:
@@ -390,7 +429,7 @@ class TestRule83GameStateIntegration:
 
         # Round 2 - reset and new selection
         coordinator.reset_strategy_phase()
-        
+
         # New card selection for round 2
         coordinator.start_strategy_phase_selection(players)
         coordinator.select_strategy_card("player1", StrategyCardType.DIPLOMACY)
@@ -398,9 +437,17 @@ class TestRule83GameStateIntegration:
         coordinator.select_strategy_card("player3", StrategyCardType.CONSTRUCTION)
 
         # Verify new assignments
-        assert coordinator.get_player_strategy_card("player1") == StrategyCardType.DIPLOMACY
-        assert coordinator.get_player_strategy_card("player2") == StrategyCardType.POLITICS
-        assert coordinator.get_player_strategy_card("player3") == StrategyCardType.CONSTRUCTION
+        assert (
+            coordinator.get_player_strategy_card("player1")
+            == StrategyCardType.DIPLOMACY
+        )
+        assert (
+            coordinator.get_player_strategy_card("player2") == StrategyCardType.POLITICS
+        )
+        assert (
+            coordinator.get_player_strategy_card("player3")
+            == StrategyCardType.CONSTRUCTION
+        )
 
 
 class TestRule83EndToEndWorkflows:
@@ -421,7 +468,7 @@ class TestRule83EndToEndWorkflows:
 
         # Phase 1: Strategy Phase - Card Selection
         coordinator.start_strategy_phase_selection(players)
-        
+
         # Verify initial state
         assert coordinator.get_player_count() == 3
         assert len(coordinator.get_available_cards()) == 8
@@ -438,34 +485,38 @@ class TestRule83EndToEndWorkflows:
 
         # Phase 2: Action Phase - Initiative Order and Activation
         strategic_action_manager.set_action_phase(True)
-        
+
         # Get initiative order
         initiative_order = coordinator.get_action_phase_initiative_order()
-        expected_order = ["alice", "bob", "charlie"]  # Leadership(1), Warfare(6), Technology(7)
+        expected_order = [
+            "alice",
+            "bob",
+            "charlie",
+        ]  # Leadership(1), Warfare(6), Technology(7)
         assert initiative_order == expected_order
 
         # Players activate cards in initiative order
         for player in initiative_order:
             player_card = coordinator.get_player_strategy_card(player)
-            
+
             # Verify can activate
             assert strategic_action_manager.can_activate_strategy_card_via_coordinator(
                 player, player_card
             )
-            
+
             # Activate card
             result = strategic_action_manager.activate_strategy_card_via_coordinator(
                 player, player_card
             )
             assert result.success
             assert result.primary_ability_resolved
-            
+
             # Verify card is exhausted
             assert coordinator.is_strategy_card_exhausted(player, player_card)
 
         # Phase 3: Status Phase - Ready Cards
         coordinator.ready_all_strategy_cards()
-        
+
         # Verify all cards are readied
         for player in players:
             player_card = coordinator.get_player_strategy_card(player)
@@ -473,7 +524,7 @@ class TestRule83EndToEndWorkflows:
 
         # Phase 4: Next Round - Reset and New Selection
         coordinator.reset_strategy_phase()
-        
+
         # Verify reset state
         assert coordinator.get_player_count() == 0
         assert len(coordinator.get_available_cards()) == 8
@@ -489,12 +540,12 @@ class TestRule83EndToEndWorkflows:
         coordinator.integrate_with_strategic_actions()
 
         # 8-player game (maximum)
-        players = [f"player{i+1}" for i in range(8)]
+        players = [f"player{i + 1}" for i in range(8)]
         strategic_action_manager.set_player_order(players)
 
         # Strategy phase - all cards selected
         coordinator.start_strategy_phase_selection(players)
-        
+
         assert coordinator.get_player_count() == 8
         assert coordinator.get_expected_unselected_cards_count() == 0
 
@@ -509,7 +560,7 @@ class TestRule83EndToEndWorkflows:
 
         # Action phase - all players activate
         strategic_action_manager.set_action_phase(True)
-        
+
         initiative_order = coordinator.get_action_phase_initiative_order()
         assert len(initiative_order) == 8
 
@@ -549,7 +600,9 @@ class TestRule83EndToEndWorkflows:
         coordinator.assign_strategy_card("player2", StrategyCardType.WARFARE)
 
         # Test error: assign card that's already assigned to another player
-        result = coordinator.assign_strategy_card("player1", StrategyCardType.WARFARE)  # Already assigned to player2
+        result = coordinator.assign_strategy_card(
+            "player1", StrategyCardType.WARFARE
+        )  # Already assigned to player2
         assert not result.success
 
         # Action phase
@@ -557,14 +610,15 @@ class TestRule83EndToEndWorkflows:
 
         # Test error: wrong player activates card
         assert not strategic_action_manager.can_activate_strategy_card_via_coordinator(
-            "player1", StrategyCardType.WARFARE  # player2's card
+            "player1",
+            StrategyCardType.WARFARE,  # player2's card
         )
 
         # Test error: activate already exhausted card
         strategic_action_manager.activate_strategy_card_via_coordinator(
             "player1", StrategyCardType.LEADERSHIP
         )
-        
+
         # Try to activate again (should fail)
         result = strategic_action_manager.activate_strategy_card_via_coordinator(
             "player1", StrategyCardType.LEADERSHIP
@@ -587,7 +641,9 @@ class TestRule83EndToEndWorkflows:
         coordinator.start_strategy_phase_selection(players)
         coordinator.select_strategy_card("active_player", StrategyCardType.LEADERSHIP)
         coordinator.select_strategy_card("secondary_player1", StrategyCardType.WARFARE)
-        coordinator.select_strategy_card("secondary_player2", StrategyCardType.TECHNOLOGY)
+        coordinator.select_strategy_card(
+            "secondary_player2", StrategyCardType.TECHNOLOGY
+        )
 
         # Action phase
         strategic_action_manager.set_action_phase(True)
@@ -596,14 +652,16 @@ class TestRule83EndToEndWorkflows:
         result = strategic_action_manager.activate_strategy_card_via_coordinator(
             "active_player", StrategyCardType.LEADERSHIP
         )
-        
+
         assert result.success
         assert result.primary_ability_resolved
         assert result.secondary_abilities_offered
-        
+
         # Verify secondary ability order excludes active player
         expected_secondary_order = ["secondary_player1", "secondary_player2"]
         assert result.secondary_ability_order == expected_secondary_order
 
         # Verify card is exhausted after primary ability
-        assert coordinator.is_strategy_card_exhausted("active_player", StrategyCardType.LEADERSHIP)
+        assert coordinator.is_strategy_card_exhausted(
+            "active_player", StrategyCardType.LEADERSHIP
+        )

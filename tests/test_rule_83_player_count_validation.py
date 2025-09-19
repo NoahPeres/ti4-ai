@@ -9,7 +9,6 @@ Requirements tested:
 - 9.1, 9.2: Comprehensive error handling and validation
 """
 
-import pytest
 from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
 from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
@@ -96,7 +95,10 @@ class TestRule83PlayerCountValidation:
         invalid_players = ["player1", "", "player3"]
         result = coordinator.start_strategy_phase_selection(invalid_players)
         assert result.success is False
-        assert "empty" in result.error_message.lower() or "invalid" in result.error_message.lower()
+        assert (
+            "empty" in result.error_message.lower()
+            or "invalid" in result.error_message.lower()
+        )
 
     def test_none_player_id_in_speaker_order_rejected(self):
         """Test that None player IDs in speaker order are rejected.
@@ -110,7 +112,10 @@ class TestRule83PlayerCountValidation:
         invalid_players = ["player1", None, "player3"]
         result = coordinator.start_strategy_phase_selection(invalid_players)
         assert result.success is False
-        assert "invalid" in result.error_message.lower() or "none" in result.error_message.lower()
+        assert (
+            "invalid" in result.error_message.lower()
+            or "none" in result.error_message.lower()
+        )
 
     def test_get_player_count_information(self):
         """Test that coordinator provides player count information.

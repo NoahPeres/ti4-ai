@@ -25,7 +25,7 @@ class TestRule83GameStateExtensions:
 
         # RED: This will fail until we add the field
         state = GameState()
-        assert hasattr(state, 'strategy_card_assignments')
+        assert hasattr(state, "strategy_card_assignments")
         assert isinstance(state.strategy_card_assignments, dict)
 
     def test_game_state_has_exhausted_strategy_cards_field(self) -> None:
@@ -37,7 +37,7 @@ class TestRule83GameStateExtensions:
 
         # RED: This will fail until we add the field
         state = GameState()
-        assert hasattr(state, 'exhausted_strategy_cards')
+        assert hasattr(state, "exhausted_strategy_cards")
         assert isinstance(state.exhausted_strategy_cards, set)
 
     def test_game_state_can_track_strategy_card_assignment(self) -> None:
@@ -53,7 +53,10 @@ class TestRule83GameStateExtensions:
 
         # Should be able to assign a strategy card to a player
         new_state = state.assign_strategy_card("player1", StrategyCardType.LEADERSHIP)
-        assert new_state.strategy_card_assignments["player1"] == StrategyCardType.LEADERSHIP
+        assert (
+            new_state.strategy_card_assignments["player1"]
+            == StrategyCardType.LEADERSHIP
+        )
 
     def test_game_state_can_track_strategy_card_exhaustion(self) -> None:
         """Test that GameState can track strategy card exhaustion.
@@ -152,7 +155,10 @@ class TestRule83GameStateExtensions:
 
         # Synchronize state
         new_state = state.synchronize_with_coordinator(coordinator)
-        assert new_state.strategy_card_assignments["player1"] == StrategyCardType.LEADERSHIP
+        assert (
+            new_state.strategy_card_assignments["player1"]
+            == StrategyCardType.LEADERSHIP
+        )
         assert StrategyCardType.LEADERSHIP in new_state.exhausted_strategy_cards
 
     def test_game_state_maintains_backward_compatibility(self) -> None:

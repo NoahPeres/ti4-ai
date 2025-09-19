@@ -8,8 +8,6 @@ Rule 83 requirements tested:
 - 6.1, 6.2: Integration with strategic action system
 """
 
-import pytest
-
 
 class TestRule83StrategyCardCoordinatorBasics:
     """Test basic strategy card coordinator functionality."""
@@ -22,8 +20,8 @@ class TestRule83StrategyCardCoordinatorBasics:
         Requirements: 1.1 - System initialization with all eight strategy cards
         """
         # This will fail initially - RED phase
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
         from src.ti4.core.strategic_action import StrategicActionManager
+        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -34,12 +32,15 @@ class TestRule83StrategyCardCoordinatorBasics:
 
         Requirements: 1.2 - Card assignment and tracking functionality
         """
+        from src.ti4.core.strategic_action import (
+            StrategicActionManager,
+            StrategyCardType,
+        )
         from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
-        from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
-        
+
         # This will fail initially - RED phase
         result = coordinator.assign_strategy_card("player1", StrategyCardType.WARFARE)
         assert result.success
@@ -49,12 +50,15 @@ class TestRule83StrategyCardCoordinatorBasics:
 
         Requirements: 1.2 - Input validation for card assignment
         """
+        from src.ti4.core.strategic_action import (
+            StrategicActionManager,
+            StrategyCardType,
+        )
         from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
-        from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
-        
+
         result = coordinator.assign_strategy_card("", StrategyCardType.WARFARE)
         assert not result.success
         assert "Player ID cannot be empty" in result.error_message
@@ -64,12 +68,12 @@ class TestRule83StrategyCardCoordinatorBasics:
 
         Requirements: 1.2 - Input validation for card assignment
         """
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
         from src.ti4.core.strategic_action import StrategicActionManager
+        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
-        
+
         result = coordinator.assign_strategy_card("player1", None)
         assert not result.success
         assert "Strategy card cannot be None" in result.error_message
@@ -83,12 +87,15 @@ class TestRule83InitiativeOrderCalculation:
 
         Requirements: 1.3 - Initiative order calculation as pure function
         """
+        from src.ti4.core.strategic_action import (
+            StrategicActionManager,
+            StrategyCardType,
+        )
         from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
-        from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
-        
+
         # This will fail initially - RED phase
         player_assignments = {"player1": StrategyCardType.WARFARE}
         initiative_order = coordinator.calculate_initiative_order(player_assignments)
@@ -99,17 +106,20 @@ class TestRule83InitiativeOrderCalculation:
 
         Requirements: 1.3 - Initiative order calculation as pure function
         """
+        from src.ti4.core.strategic_action import (
+            StrategicActionManager,
+            StrategyCardType,
+        )
         from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
-        from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
-        
+
         # Test with cards in reverse initiative order
         player_assignments = {
-            "player1": StrategyCardType.IMPERIAL,    # 8
+            "player1": StrategyCardType.IMPERIAL,  # 8
             "player2": StrategyCardType.LEADERSHIP,  # 1
-            "player3": StrategyCardType.WARFARE      # 6
+            "player3": StrategyCardType.WARFARE,  # 6
         }
         initiative_order = coordinator.calculate_initiative_order(player_assignments)
         # Should be ordered by initiative: Leadership(1), Warfare(6), Imperial(8)
@@ -120,12 +130,12 @@ class TestRule83InitiativeOrderCalculation:
 
         Requirements: 1.3 - Initiative order calculation as pure function
         """
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
         from src.ti4.core.strategic_action import StrategicActionManager
+        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
-        
+
         initiative_order = coordinator.calculate_initiative_order({})
         assert initiative_order == []
 
@@ -138,14 +148,16 @@ class TestRule83StrategicActionIntegration:
 
         Requirements: 6.1, 6.2 - Integration with strategic action system
         """
+        from src.ti4.core.strategic_action import (
+            StrategicActionManager,
+        )
         from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
-        from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
-        
+
         # This will fail initially - RED phase
         coordinator.integrate_with_strategic_actions()
-        
+
         # Verify integration was successful
-        assert hasattr(strategic_action_manager, '_strategy_card_coordinator')
+        assert hasattr(strategic_action_manager, "_strategy_card_coordinator")

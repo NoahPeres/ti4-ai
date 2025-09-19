@@ -12,6 +12,7 @@ Requirements tested:
 """
 
 import pytest
+
 from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
 from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
@@ -51,7 +52,7 @@ class TestRule83MultiPlayerGameSupport:
             StrategyCardType.POLITICS,
             StrategyCardType.CONSTRUCTION,
             StrategyCardType.TRADE,
-            StrategyCardType.IMPERIAL
+            StrategyCardType.IMPERIAL,
         }
         assert set(unselected_cards) == expected_unselected
 
@@ -119,13 +120,13 @@ class TestRule83MultiPlayerGameSupport:
         speaker_orders = [
             ["alice", "bob", "charlie"],
             ["player_x", "player_y", "player_z"],
-            ["p1", "p2", "p3", "p4"]
+            ["p1", "p2", "p3", "p4"],
         ]
 
         for speaker_order in speaker_orders:
             # Reset coordinator for each test
             coordinator = StrategyCardCoordinator(strategic_action_manager)
-            
+
             result = coordinator.start_strategy_phase_selection(speaker_order)
             assert result.success is True
             assert result.current_selecting_player == speaker_order[0]
@@ -153,7 +154,7 @@ class TestRule83MultiPlayerGameSupport:
             ("player1", StrategyCardType.LEADERSHIP),
             ("player2", StrategyCardType.WARFARE),
             ("player3", StrategyCardType.TECHNOLOGY),
-            ("player4", StrategyCardType.IMPERIAL)
+            ("player4", StrategyCardType.IMPERIAL),
         ]
 
         for player, card in selections:
@@ -217,7 +218,7 @@ class TestRule83MultiPlayerGameSupport:
         invalid_speaker_orders = [
             [],  # No players
             ["player1"],  # 1 player
-            ["player1", "player2"]  # 2 players
+            ["player1", "player2"],  # 2 players
         ]
 
         for speaker_order in invalid_speaker_orders:
@@ -238,19 +239,23 @@ class TestRule83MultiPlayerGameSupport:
 
         # Test with too many players (more than 8)
         too_many_players = [f"player{i}" for i in range(1, 10)]  # 9 players
-        
+
         # This should either work (allowing extra players) or fail with validation
         result = coordinator.start_strategy_phase_selection(too_many_players)
-        
+
         if result.success:
             # If it allows extra players, only first 8 should be able to select
             cards = list(StrategyCardType)
             for i in range(8):  # Only first 8 players
-                player_result = coordinator.select_strategy_card(f"player{i+1}", cards[i])
+                player_result = coordinator.select_strategy_card(
+                    f"player{i + 1}", cards[i]
+                )
                 assert player_result.success is True
-            
+
             # 9th player should not be able to select (no cards left)
-            ninth_result = coordinator.select_strategy_card("player9", StrategyCardType.LEADERSHIP)
+            ninth_result = coordinator.select_strategy_card(
+                "player9", StrategyCardType.LEADERSHIP
+            )
             assert ninth_result.success is False
 
     def test_unselected_cards_remain_in_common_area(self):
@@ -270,7 +275,7 @@ class TestRule83MultiPlayerGameSupport:
             StrategyCardType.LEADERSHIP,
             StrategyCardType.WARFARE,
             StrategyCardType.TECHNOLOGY,
-            StrategyCardType.IMPERIAL
+            StrategyCardType.IMPERIAL,
         ]
 
         for i, player in enumerate(speaker_order):
@@ -303,7 +308,9 @@ class TestRule83MultiPlayerGameSupport:
         coordinator.start_strategy_phase_selection(speaker_order)
 
         # Charlie should go first
-        result = coordinator.select_strategy_card("charlie", StrategyCardType.LEADERSHIP)
+        result = coordinator.select_strategy_card(
+            "charlie", StrategyCardType.LEADERSHIP
+        )
         assert result.success is True
         assert result.next_selecting_player == "alice"
 

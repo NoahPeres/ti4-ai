@@ -51,10 +51,13 @@ class TestRule91PrimaryAbility:
 
         # RED: This will fail until we implement primary ability
         result = card.execute_primary_ability(
-            MockPlayer.PLAYER_1.value, Technology.ANTIMASS_DEFLECTORS
+            MockPlayer.PLAYER_1.value, technology=Technology.ANTIMASS_DEFLECTORS
         )
         assert result.success is True
-        assert result.technology_researched == Technology.ANTIMASS_DEFLECTORS
+        assert (
+            result.additional_data["technology_researched"]
+            == Technology.ANTIMASS_DEFLECTORS
+        )
         assert result.resources_spent == 0  # First research is free
 
     def test_primary_ability_allows_second_research_for_six_resources(self) -> None:
@@ -107,12 +110,15 @@ class TestRule91SecondaryAbility:
         # RED: This will fail until we implement secondary ability
         result = card.execute_secondary_ability(
             MockPlayer.PLAYER_2.value,
-            Technology.ANTIMASS_DEFLECTORS,
+            technology=Technology.ANTIMASS_DEFLECTORS,
             available_command_tokens=2,
             available_resources=4,
         )
         assert result.success is True
-        assert result.technology_researched == Technology.ANTIMASS_DEFLECTORS
+        assert (
+            result.additional_data["technology_researched"]
+            == Technology.ANTIMASS_DEFLECTORS
+        )
         assert result.command_tokens_spent == 1
         assert result.resources_spent == 4
 
@@ -127,7 +133,7 @@ class TestRule91SecondaryAbility:
 
         result = card.execute_secondary_ability(
             MockPlayer.PLAYER_2.value,
-            Technology.ANTIMASS_DEFLECTORS,
+            technology=Technology.ANTIMASS_DEFLECTORS,
             available_command_tokens=0,  # No command tokens
             available_resources=4,
         )
@@ -146,7 +152,7 @@ class TestRule91SecondaryAbility:
 
         result = card.execute_secondary_ability(
             MockPlayer.PLAYER_2.value,
-            Technology.ANTIMASS_DEFLECTORS,
+            technology=Technology.ANTIMASS_DEFLECTORS,
             available_command_tokens=2,
             available_resources=3,  # Insufficient resources
         )
@@ -257,11 +263,16 @@ class TestRule91StrategyCardIntegration:
 
         # Test primary ability with full integration
         result = card.execute_primary_ability(
-            MockPlayer.PLAYER_1.value, Technology.ANTIMASS_DEFLECTORS, game_tech_manager
+            MockPlayer.PLAYER_1.value,
+            technology=Technology.ANTIMASS_DEFLECTORS,
+            game_tech_manager=game_tech_manager,
         )
 
         assert result.success is True
-        assert result.technology_researched == Technology.ANTIMASS_DEFLECTORS
+        assert (
+            result.additional_data["technology_researched"]
+            == Technology.ANTIMASS_DEFLECTORS
+        )
         assert result.resources_spent == 0  # Free research
 
         # Verify technology was actually added to game state
@@ -318,8 +329,8 @@ class TestRule91StrategyCardIntegration:
         # Try to research technology with prerequisites (should fail)
         result = card.execute_primary_ability(
             MockPlayer.PLAYER_1.value,
-            Technology.CRUISER_II,  # Requires prerequisites
-            game_tech_manager,
+            technology=Technology.CRUISER_II,  # Requires prerequisites
+            game_tech_manager=game_tech_manager,
         )
 
         assert result.success is False
@@ -373,14 +384,17 @@ class TestRule91StrategyCardIntegration:
         # Test secondary ability with full integration
         result = card.execute_secondary_ability(
             MockPlayer.PLAYER_2.value,
-            Technology.ANTIMASS_DEFLECTORS,
+            technology=Technology.ANTIMASS_DEFLECTORS,
             available_command_tokens=2,
             available_resources=4,
             game_tech_manager=game_tech_manager,
         )
 
         assert result.success is True
-        assert result.technology_researched == Technology.ANTIMASS_DEFLECTORS
+        assert (
+            result.additional_data["technology_researched"]
+            == Technology.ANTIMASS_DEFLECTORS
+        )
         assert result.command_tokens_spent == 1
         assert result.resources_spent == 4
 

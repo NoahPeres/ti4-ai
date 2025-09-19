@@ -6,7 +6,6 @@ evaluation, and strategic planning support.
 Requirements: 8.1, 8.2, 8.3, 8.4, 8.5
 """
 
-
 from src.ti4.core.strategic_action import StrategyCardType
 from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
@@ -36,7 +35,9 @@ class TestStrategyCardAIInformationAccess:
         self.coordinator.select_strategy_card("player2", StrategyCardType.DIPLOMACY)
 
         # AI should be able to get comprehensive card information
-        card_info = self.coordinator.get_strategy_card_information(StrategyCardType.LEADERSHIP)
+        card_info = self.coordinator.get_strategy_card_information(
+            StrategyCardType.LEADERSHIP
+        )
 
         assert card_info is not None
         assert card_info.card_type == StrategyCardType.LEADERSHIP
@@ -60,14 +61,26 @@ class TestStrategyCardAIInformationAccess:
         assert len(all_cards_info) == 8  # All 8 strategy cards
 
         # Check that assigned cards show ownership
-        leadership_info = next(info for info in all_cards_info if info.card_type == StrategyCardType.LEADERSHIP)
+        leadership_info = next(
+            info
+            for info in all_cards_info
+            if info.card_type == StrategyCardType.LEADERSHIP
+        )
         assert leadership_info.current_owner == "player1"
 
-        diplomacy_info = next(info for info in all_cards_info if info.card_type == StrategyCardType.DIPLOMACY)
+        diplomacy_info = next(
+            info
+            for info in all_cards_info
+            if info.card_type == StrategyCardType.DIPLOMACY
+        )
         assert diplomacy_info.current_owner == "player2"
 
         # Check that unassigned cards show no ownership
-        politics_info = next(info for info in all_cards_info if info.card_type == StrategyCardType.POLITICS)
+        politics_info = next(
+            info
+            for info in all_cards_info
+            if info.card_type == StrategyCardType.POLITICS
+        )
         assert politics_info.current_owner is None
 
     def test_get_player_strategy_card_assignments_for_strategic_planning(self) -> None:
@@ -103,8 +116,12 @@ class TestStrategyCardAIInformationAccess:
 
         available_cards = self.coordinator.get_available_cards_for_ai()
         assert len(available_cards) == 6
-        assert StrategyCardType.LEADERSHIP not in [card.card_type for card in available_cards]
-        assert StrategyCardType.DIPLOMACY not in [card.card_type for card in available_cards]
+        assert StrategyCardType.LEADERSHIP not in [
+            card.card_type for card in available_cards
+        ]
+        assert StrategyCardType.DIPLOMACY not in [
+            card.card_type for card in available_cards
+        ]
 
     def test_analyze_game_state_for_strategic_planning(self) -> None:
         """Test that AI can analyze game state for strategic planning.
@@ -132,7 +149,9 @@ class TestStrategyCardAIInformationAccess:
         Requirements: 8.2, 8.4 - AI has access to card properties and comprehensive information
         """
         # AI should be able to get evaluation data for each card
-        evaluation_data = self.coordinator.get_strategy_card_evaluation_data(StrategyCardType.LEADERSHIP)
+        evaluation_data = self.coordinator.get_strategy_card_evaluation_data(
+            StrategyCardType.LEADERSHIP
+        )
 
         assert evaluation_data is not None
         assert evaluation_data.card_type == StrategyCardType.LEADERSHIP
@@ -148,7 +167,9 @@ class TestStrategyCardAIInformationAccess:
         """
         # Set up cards with different initiative values
         self.coordinator.select_strategy_card("player1", StrategyCardType.IMPERIAL)  # 8
-        self.coordinator.select_strategy_card("player2", StrategyCardType.LEADERSHIP)  # 1
+        self.coordinator.select_strategy_card(
+            "player2", StrategyCardType.LEADERSHIP
+        )  # 1
         self.coordinator.select_strategy_card("player3", StrategyCardType.WARFARE)  # 6
 
         # AI should understand initiative implications
@@ -169,10 +190,18 @@ class TestStrategyCardAIInformationAccess:
         self.coordinator.select_strategy_card("player2", StrategyCardType.WARFARE)
 
         # AI should be able to evaluate secondary ability opportunities
-        secondary_opportunities = self.coordinator.get_secondary_ability_opportunities("player3")
+        secondary_opportunities = self.coordinator.get_secondary_ability_opportunities(
+            "player3"
+        )
 
-        assert len(secondary_opportunities) == 2  # Can use secondary of both assigned cards
-        tech_opportunity = next(opp for opp in secondary_opportunities if opp.card_type == StrategyCardType.TECHNOLOGY)
+        assert (
+            len(secondary_opportunities) == 2
+        )  # Can use secondary of both assigned cards
+        tech_opportunity = next(
+            opp
+            for opp in secondary_opportunities
+            if opp.card_type == StrategyCardType.TECHNOLOGY
+        )
         assert tech_opportunity.can_use is True
         assert tech_opportunity.owner == "player1"
 
@@ -193,10 +222,16 @@ class TestStrategyCardAIInformationAccess:
         legal_move_generator = LegalMoveGenerator()
 
         # During strategy phase, AI should get legal card selection decisions
-        legal_decisions = legal_move_generator.generate_legal_decisions(game_state, "player1")
+        legal_decisions = legal_move_generator.generate_legal_decisions(
+            game_state, "player1"
+        )
 
         # Should have 8 strategy card selection decisions (all cards available)
-        selection_decisions = [decision for decision in legal_decisions if isinstance(decision, StrategyCardSelectionDecision)]
+        selection_decisions = [
+            decision
+            for decision in legal_decisions
+            if isinstance(decision, StrategyCardSelectionDecision)
+        ]
         assert len(selection_decisions) == 8
 
         # All strategy cards should be represented
@@ -230,6 +265,8 @@ class TestStrategyCardAIInformationAccess:
         assert len(available_cards) == 5  # Five still available
 
         # Verify exhaustion status is accessible
-        leadership_info = next(info for info in all_info if info.card_type == StrategyCardType.LEADERSHIP)
+        leadership_info = next(
+            info for info in all_info if info.card_type == StrategyCardType.LEADERSHIP
+        )
         assert leadership_info.is_exhausted is True
         assert leadership_info.current_owner == "player1"

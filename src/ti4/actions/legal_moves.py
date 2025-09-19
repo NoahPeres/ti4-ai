@@ -33,7 +33,7 @@ class LegalMoveGenerator:
         actions = []
 
         # Add strategy card actions if coordinator is available
-        if hasattr(state, 'strategy_card_coordinator'):
+        if hasattr(state, "strategy_card_coordinator"):
             actions.extend(self._generate_strategy_card_decisions(state, player_id))
 
         return actions
@@ -90,7 +90,9 @@ class LegalMoveGenerator:
         """Backward compatibility alias for filter_legal_actions."""
         return self.filter_legal_actions(potential_decisions, state, player_id)
 
-    def _generate_strategy_card_decisions(self, state: Any, player_id: str) -> list[PlayerDecision]:
+    def _generate_strategy_card_decisions(
+        self, state: Any, player_id: str
+    ) -> list[PlayerDecision]:
         """Generate strategy card related decisions for a player.
 
         Args:
@@ -104,6 +106,10 @@ class LegalMoveGenerator:
         """
         decisions: list[PlayerDecision] = []
         coordinator = state.strategy_card_coordinator
+
+        # Only generate strategy card decisions if coordinator is available
+        if coordinator is None:
+            return decisions
 
         # Strategy card selection decisions (during strategy phase)
         if coordinator._strategy_phase_active:
@@ -119,9 +125,13 @@ class LegalMoveGenerator:
             decisions.append(StrategyCardActivationDecision(card_type=player_card))
 
         # Secondary ability decisions
-        secondary_opportunities = coordinator.get_secondary_ability_opportunities(player_id)
+        secondary_opportunities = coordinator.get_secondary_ability_opportunities(
+            player_id
+        )
         for opportunity in secondary_opportunities:
             if opportunity.can_use:
-                decisions.append(SecondaryAbilityDecision(card_type=opportunity.card_type))
+                decisions.append(
+                    SecondaryAbilityDecision(card_type=opportunity.card_type)
+                )
 
         return decisions

@@ -11,7 +11,6 @@ Requirements tested:
 - 7.5: Each player has independent card selection
 """
 
-import pytest
 from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
 from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
@@ -29,7 +28,7 @@ class TestRule83MultiPlayerIntegration:
 
         # Setup 4-player game
         speaker_order = ["alice", "bob", "charlie", "diana"]
-        
+
         # Verify player count validation
         assert coordinator.is_valid_player_count(4) is True
         assert coordinator.get_minimum_player_count() == 3
@@ -52,7 +51,7 @@ class TestRule83MultiPlayerIntegration:
             ("alice", StrategyCardType.LEADERSHIP),
             ("bob", StrategyCardType.WARFARE),
             ("charlie", StrategyCardType.TECHNOLOGY),
-            ("diana", StrategyCardType.IMPERIAL)
+            ("diana", StrategyCardType.IMPERIAL),
         ]
 
         for i, (player, card) in enumerate(selections):
@@ -87,7 +86,12 @@ class TestRule83MultiPlayerIntegration:
 
         # Verify initiative order
         initiative_order = coordinator.get_action_phase_initiative_order()
-        expected_order = ["alice", "bob", "charlie", "diana"]  # Based on card initiative numbers: 1, 6, 7, 8
+        expected_order = [
+            "alice",
+            "bob",
+            "charlie",
+            "diana",
+        ]  # Based on card initiative numbers: 1, 6, 7, 8
         assert initiative_order == expected_order
 
     def test_game_reset_and_different_player_count(self):
@@ -188,7 +192,11 @@ class TestRule83MultiPlayerIntegration:
         assert coordinator.get_expected_unselected_cards_count() == 5
 
         # All players select cards
-        selected_cards = [StrategyCardType.LEADERSHIP, StrategyCardType.WARFARE, StrategyCardType.TECHNOLOGY]
+        selected_cards = [
+            StrategyCardType.LEADERSHIP,
+            StrategyCardType.WARFARE,
+            StrategyCardType.TECHNOLOGY,
+        ]
         for i, player in enumerate(min_players):
             result = coordinator.select_strategy_card(player, selected_cards[i])
             assert result.success is True
@@ -217,11 +225,11 @@ class TestRule83MultiPlayerIntegration:
 
         # Players select cards in speaker order
         selections = [
-            ("zulu", StrategyCardType.IMPERIAL),      # Initiative 8
-            ("alpha", StrategyCardType.LEADERSHIP),   # Initiative 1
-            ("yankee", StrategyCardType.WARFARE),     # Initiative 6
-            ("bravo", StrategyCardType.DIPLOMACY),    # Initiative 2
-            ("charlie", StrategyCardType.POLITICS)    # Initiative 3
+            ("zulu", StrategyCardType.IMPERIAL),  # Initiative 8
+            ("alpha", StrategyCardType.LEADERSHIP),  # Initiative 1
+            ("yankee", StrategyCardType.WARFARE),  # Initiative 6
+            ("bravo", StrategyCardType.DIPLOMACY),  # Initiative 2
+            ("charlie", StrategyCardType.POLITICS),  # Initiative 3
         ]
 
         for player, card in selections:
@@ -254,7 +262,7 @@ class TestRule83MultiPlayerIntegration:
             ("p2", StrategyCardType.DIPLOMACY),
             ("p3", StrategyCardType.POLITICS),
             ("p4", StrategyCardType.CONSTRUCTION),
-            ("p5", StrategyCardType.TRADE)
+            ("p5", StrategyCardType.TRADE),
         ]
 
         for player, card in selections:
@@ -274,5 +282,9 @@ class TestRule83MultiPlayerIntegration:
         # Verify 3 cards remain unselected
         unselected_cards = coordinator.get_available_cards()
         assert len(unselected_cards) == 3
-        expected_unselected = {StrategyCardType.WARFARE, StrategyCardType.TECHNOLOGY, StrategyCardType.IMPERIAL}
+        expected_unselected = {
+            StrategyCardType.WARFARE,
+            StrategyCardType.TECHNOLOGY,
+            StrategyCardType.IMPERIAL,
+        }
         assert set(unselected_cards) == expected_unselected

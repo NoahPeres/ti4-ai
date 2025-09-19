@@ -31,9 +31,9 @@ class TestRule83InitiativeOrderQueryMethods:
         coordinator = StrategyCardCoordinator(strategic_action_manager)
 
         # Assign cards to players
-        coordinator.assign_strategy_card("player1", StrategyCardType.IMPERIAL)    # 8
+        coordinator.assign_strategy_card("player1", StrategyCardType.IMPERIAL)  # 8
         coordinator.assign_strategy_card("player2", StrategyCardType.LEADERSHIP)  # 1
-        coordinator.assign_strategy_card("player3", StrategyCardType.WARFARE)    # 6
+        coordinator.assign_strategy_card("player3", StrategyCardType.WARFARE)  # 6
 
         # Get action phase initiative order
         initiative_order = coordinator.get_action_phase_initiative_order()
@@ -54,9 +54,9 @@ class TestRule83InitiativeOrderQueryMethods:
         coordinator = StrategyCardCoordinator(strategic_action_manager)
 
         # Assign cards to players
-        coordinator.assign_strategy_card("player1", StrategyCardType.POLITICS)     # 3
-        coordinator.assign_strategy_card("player2", StrategyCardType.TRADE)       # 5
-        coordinator.assign_strategy_card("player3", StrategyCardType.DIPLOMACY)   # 2
+        coordinator.assign_strategy_card("player1", StrategyCardType.POLITICS)  # 3
+        coordinator.assign_strategy_card("player2", StrategyCardType.TRADE)  # 5
+        coordinator.assign_strategy_card("player3", StrategyCardType.DIPLOMACY)  # 2
 
         # Get status phase initiative order
         initiative_order = coordinator.get_status_phase_initiative_order()
@@ -76,7 +76,7 @@ class TestRule83InitiativeOrderQueryMethods:
 
         # Only assign cards to some players
         coordinator.assign_strategy_card("player1", StrategyCardType.LEADERSHIP)  # 1
-        coordinator.assign_strategy_card("player3", StrategyCardType.WARFARE)    # 6
+        coordinator.assign_strategy_card("player3", StrategyCardType.WARFARE)  # 6
         # player2 has no card
 
         # Get initiative order
@@ -98,21 +98,29 @@ class TestRule83InitiativeOrderQueryMethods:
         coordinator = StrategyCardCoordinator(strategic_action_manager)
 
         # Assign all cards in random order
-        coordinator.assign_strategy_card("player8", StrategyCardType.IMPERIAL)      # 8
-        coordinator.assign_strategy_card("player1", StrategyCardType.LEADERSHIP)    # 1
-        coordinator.assign_strategy_card("player6", StrategyCardType.WARFARE)      # 6
-        coordinator.assign_strategy_card("player3", StrategyCardType.POLITICS)     # 3
-        coordinator.assign_strategy_card("player7", StrategyCardType.TECHNOLOGY)   # 7
-        coordinator.assign_strategy_card("player2", StrategyCardType.DIPLOMACY)    # 2
-        coordinator.assign_strategy_card("player5", StrategyCardType.TRADE)        # 5
-        coordinator.assign_strategy_card("player4", StrategyCardType.CONSTRUCTION) # 4
+        coordinator.assign_strategy_card("player8", StrategyCardType.IMPERIAL)  # 8
+        coordinator.assign_strategy_card("player1", StrategyCardType.LEADERSHIP)  # 1
+        coordinator.assign_strategy_card("player6", StrategyCardType.WARFARE)  # 6
+        coordinator.assign_strategy_card("player3", StrategyCardType.POLITICS)  # 3
+        coordinator.assign_strategy_card("player7", StrategyCardType.TECHNOLOGY)  # 7
+        coordinator.assign_strategy_card("player2", StrategyCardType.DIPLOMACY)  # 2
+        coordinator.assign_strategy_card("player5", StrategyCardType.TRADE)  # 5
+        coordinator.assign_strategy_card("player4", StrategyCardType.CONSTRUCTION)  # 4
 
         # Get initiative order
         initiative_order = coordinator.get_action_phase_initiative_order()
 
         # Should be ordered 1-8
-        expected_order = ["player1", "player2", "player3", "player4",
-                         "player5", "player6", "player7", "player8"]
+        expected_order = [
+            "player1",
+            "player2",
+            "player3",
+            "player4",
+            "player5",
+            "player6",
+            "player7",
+            "player8",
+        ]
         assert initiative_order == expected_order
 
 
@@ -149,7 +157,7 @@ class TestRule83GamePhaseIntegration:
 
         # Assign cards
         coordinator.assign_strategy_card("player1", StrategyCardType.LEADERSHIP)  # 1
-        coordinator.assign_strategy_card("player2", StrategyCardType.WARFARE)    # 6
+        coordinator.assign_strategy_card("player2", StrategyCardType.WARFARE)  # 6
 
         # Test in action phase
         coordinator.set_current_game_phase(GamePhase.ACTION)

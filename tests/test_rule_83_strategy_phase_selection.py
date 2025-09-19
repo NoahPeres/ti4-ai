@@ -11,7 +11,6 @@ Requirements tested:
 - 2.5: Strategy phase completes when all players have selected cards
 """
 
-
 from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
 
 
@@ -30,11 +29,17 @@ class TestRule83StrategyPhaseCardSelection:
         coordinator = StrategyCardCoordinator(strategic_action_manager)
 
         # Test that we can start a strategy phase card selection workflow
-        result = coordinator.start_strategy_phase_selection(["player1", "player2", "player3"])
+        result = coordinator.start_strategy_phase_selection(
+            ["player1", "player2", "player3"]
+        )
 
         assert result.success is True
-        assert result.current_selecting_player == "player1"  # First player in speaker order
-        assert len(result.available_cards) == 8  # All 8 strategy cards available initially
+        assert (
+            result.current_selecting_player == "player1"
+        )  # First player in speaker order
+        assert (
+            len(result.available_cards) == 8
+        )  # All 8 strategy cards available initially
 
     def test_get_available_cards_returns_unselected_cards(self):
         """Test that available cards returns only unselected strategy cards.
@@ -74,7 +79,9 @@ class TestRule83StrategyPhaseCardSelection:
         coordinator.start_strategy_phase_selection(speaker_order)
 
         # Player 1 should be able to select (first in order)
-        result = coordinator.select_strategy_card("player1", StrategyCardType.LEADERSHIP)
+        result = coordinator.select_strategy_card(
+            "player1", StrategyCardType.LEADERSHIP
+        )
         assert result.success is True
 
         # Player 3 should not be able to select out of turn
@@ -100,11 +107,15 @@ class TestRule83StrategyPhaseCardSelection:
         coordinator.start_strategy_phase_selection(speaker_order)
 
         # Player 1 selects Leadership
-        result = coordinator.select_strategy_card("player1", StrategyCardType.LEADERSHIP)
+        result = coordinator.select_strategy_card(
+            "player1", StrategyCardType.LEADERSHIP
+        )
         assert result.success is True
 
         # Player 2 tries to select the same card - should be rejected
-        result = coordinator.select_strategy_card("player2", StrategyCardType.LEADERSHIP)
+        result = coordinator.select_strategy_card(
+            "player2", StrategyCardType.LEADERSHIP
+        )
         assert result.success is False
         assert "not available" in result.error_message.lower()
 
@@ -204,6 +215,8 @@ class TestRule83StrategyPhaseCardSelection:
         assert "strategy card" in result.error_message.lower()
 
         # Test selection without starting phase
-        result = coordinator.select_strategy_card("player1", StrategyCardType.LEADERSHIP)
+        result = coordinator.select_strategy_card(
+            "player1", StrategyCardType.LEADERSHIP
+        )
         assert result.success is False
         assert "strategy phase not started" in result.error_message.lower()

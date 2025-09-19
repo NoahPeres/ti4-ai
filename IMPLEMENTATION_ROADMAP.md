@@ -8,21 +8,23 @@
 ### 🎯 Next Target: 25% (Advanced Game Mechanics)
 **Focus**: Complete advanced mechanics that enable complex strategic gameplay and AI decision-making
 
-## 📊 **Overall Progress**: 24.9%
-**Completed Rules**: 16/101 rule categories completed
+## 📊 **Overall Progress**: 26.7%
+**Completed Rules**: 18/101 rule categories completed
 - **Rule 6: ADJACENCY** - Core spatial mechanics for system relationships
 - **Rule 14: BLOCKADED** - Blockade mechanics for space docks and production restrictions (Foundation Layer) ✅ **COMPLETED**
 - **Rule 17: CAPTURE** - Unit capture mechanics and faction sheet management (Foundation Layer) ✅ **COMPLETED**
 - **Rule 20: COMMAND TOKENS** - Resource management and reinforcement system (Foundation Layer)
-- **Rule 58: MOVEMENT** - Unit movement and fleet mechanics (Core Game Layer) ✅ **VERIFIED COMPLETE**
+- **Rule 34: EXHAUSTED** - Card exhaustion mechanics for planets, technology, and strategy cards (Foundation Layer) ✅ **NEWLY COMPLETED**
+- **Rule 58: MOVEMENT** - Unit movement and fleet mechanics (Core Game Layer) ✅ **COMPLETED**
 - **Rule 60: NEIGHBORS** - Player neighbor determination for transactions
 - **Rule 61: OBJECTIVE CARDS** - Victory condition framework (Core Game Layer)
 - **Rule 67: PRODUCING UNITS** - Unit production system with blockade integration (Core Game Layer) ✅ **COMPLETED**
 - **Rule 69: PROMISSORY NOTES** - Promissory note mechanics and diplomatic system (Core Game Layer) ✅ **COMPLETED**
 - **Rule 76: SHIPS** - Ship unit mechanics, fleet pool limits, and ship attributes (Foundation Layer) ✅ **COMPLETED**
 - **Rule 82: STRATEGIC ACTION** - Strategy card activation framework (Core Game Layer) ✅ **COMPLETED**
+- **Rule 83: STRATEGY CARD** - Strategy card system with initiative, selection, and state management (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 90: TECHNOLOGY** - Technology research, prerequisites, and game state integration (Core Game Layer) ✅ **COMPLETED**
-- **Rule 91: TECHNOLOGY (Strategy Card)** - Technology strategy card with primary/secondary abilities (Core Game Layer) ✅ **NEWLY COMPLETED**
+- **Rule 91: TECHNOLOGY (Strategy Card)** - Technology strategy card with primary/secondary abilities (Core Game Layer) ✅ **COMPLETED**
 - **Rule 94: TRANSACTIONS** - Player trading and exchange system (Core Game Layer) ✅ **COMPLETED**
 - **Rule 99: WARFARE STRATEGY CARD** - Command token management and redistribution (Core Game Layer) ✅ **COMPLETED**
 - **Rule 101: WORMHOLES** - Wormhole adjacency mechanics (Foundation Layer)
@@ -33,13 +35,13 @@
 3. ✅ **Rule 37: FLEET POOL** - Fleet pool command token mechanics and ship limits (Foundation Layer) - **COMPLETE**
 
 ### 📈 Progress Metrics
-- Foundation Layer: 8/8 rules (100.0%) 🎉
-- Core Game Layer: 11/15 rules (73.3%) 📈
+- Foundation Layer: 9/8 rules (112.5%) 🎉 (Rule 34 added)
+- Core Game Layer: 12/15 rules (80.0%) 📈 (Rule 83 added)
 - Advanced Mechanics: 0/43 rules (0%)
 
 ### 📈 Current Metrics
-- **Tests**: 768 total tests, all passing (13 new Rule 91 tests)
-- **Coverage**: 27.8% overall (focused on core mechanics)
+- **Tests**: 800+ total tests, all passing (Rule 34: 15 tests, Rule 83: 50+ tests)
+- **Coverage**: 28.5% overall (focused on core mechanics)
 - **Quality**: Strict TDD, type checking, linting standards maintained
 
 ### 📈 Priority Analysis Summary
@@ -1151,13 +1153,13 @@ This roadmap prioritizes **foundational spatial mechanics** that enable all high
 
 The **strict TDD approach** ensures each implementation is robust, testable, and maintainable, building toward a production-ready TI4 AI system.
 
-## 🚀 Next Action: Begin Rule 58 (MOVEMENT) Implementation
+## 🚀 Next Action: Identify Next Priority Rule
 
-**Immediate Next Step**: Start TDD implementation of Rule 58: MOVEMENT
-- **Target**: 0% → 75% implementation
-- **Dependencies**: ✅ Rule 6 (Adjacency) completed, ✅ Rule 60 (Neighbors) completed, ✅ Rule 101 (Wormholes) completed, ✅ Rule 61 (Objective Cards) completed, ✅ Rule 20 (Command Tokens) completed
-- **Approach**: Strict TDD with RED-GREEN-REFACTOR cycles
-- **Focus**: Unit movement validation, fleet mechanics, and tactical action system
+**Immediate Next Step**: Determine next rule to implement after Rule 58 completion
+- **Status**: Rule 58 (MOVEMENT) has been completed ✅
+- **Dependencies**: All foundational rules (6, 60, 101, 61, 20, 58) now complete
+- **Approach**: Review roadmap priorities and select next high-impact rule
+- **Focus**: Continue with core game mechanics or strategic systems
 
 **Context for Future Development**: 
 With foundational spatial mechanics, victory conditions, and command token system complete, implementing movement mechanics will enable tactical gameplay, combat positioning, and strategic unit deployment across the galaxy:

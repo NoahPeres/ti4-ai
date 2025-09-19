@@ -11,7 +11,6 @@ Requirements tested:
 - 5.5: System tracks which players have participated in ability resolution
 """
 
-
 from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
 from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
@@ -49,7 +48,9 @@ class TestRule83PrimaryAbilityFramework:
         coordinator.assign_strategy_card("player1", StrategyCardType.WARFARE)
 
         # Test that player2 cannot use player1's primary ability
-        assert not coordinator.can_use_primary_ability("player2", StrategyCardType.WARFARE)
+        assert not coordinator.can_use_primary_ability(
+            "player2", StrategyCardType.WARFARE
+        )
 
     def test_exhausted_card_cannot_use_primary_ability(self) -> None:
         """Test that exhausted cards cannot use primary ability again this round.
@@ -66,7 +67,9 @@ class TestRule83PrimaryAbilityFramework:
         coordinator.exhaust_strategy_card("player1", StrategyCardType.WARFARE)
 
         # Test that exhausted card cannot use primary ability
-        assert not coordinator.can_use_primary_ability("player1", StrategyCardType.WARFARE)
+        assert not coordinator.can_use_primary_ability(
+            "player1", StrategyCardType.WARFARE
+        )
 
 
 class TestRule83SecondaryAbilityFramework:
@@ -87,8 +90,12 @@ class TestRule83SecondaryAbilityFramework:
         coordinator.assign_strategy_card("player1", StrategyCardType.WARFARE)
 
         # Test that other players can access secondary ability
-        assert coordinator.can_use_secondary_ability("player2", StrategyCardType.WARFARE)
-        assert coordinator.can_use_secondary_ability("player3", StrategyCardType.WARFARE)
+        assert coordinator.can_use_secondary_ability(
+            "player2", StrategyCardType.WARFARE
+        )
+        assert coordinator.can_use_secondary_ability(
+            "player3", StrategyCardType.WARFARE
+        )
 
     def test_card_owner_cannot_use_secondary_ability_of_own_card(self) -> None:
         """Test that card owner cannot use secondary ability of their own card.
@@ -104,7 +111,9 @@ class TestRule83SecondaryAbilityFramework:
         coordinator.assign_strategy_card("player1", StrategyCardType.WARFARE)
 
         # Test that card owner cannot use secondary ability of their own card
-        assert not coordinator.can_use_secondary_ability("player1", StrategyCardType.WARFARE)
+        assert not coordinator.can_use_secondary_ability(
+            "player1", StrategyCardType.WARFARE
+        )
 
     def test_secondary_ability_participation_tracking(self) -> None:
         """Test that system tracks which players have participated in secondary abilities.
@@ -120,13 +129,18 @@ class TestRule83SecondaryAbilityFramework:
         coordinator.assign_strategy_card("player1", StrategyCardType.WARFARE)
 
         # Initially no players have participated
-        assert coordinator.get_secondary_ability_participants(StrategyCardType.WARFARE) == []
+        assert (
+            coordinator.get_secondary_ability_participants(StrategyCardType.WARFARE)
+            == []
+        )
 
         # Player2 uses secondary ability
         coordinator.use_secondary_ability("player2", StrategyCardType.WARFARE)
 
         # Verify participation is tracked
-        participants = coordinator.get_secondary_ability_participants(StrategyCardType.WARFARE)
+        participants = coordinator.get_secondary_ability_participants(
+            StrategyCardType.WARFARE
+        )
         assert "player2" in participants
 
     def test_secondary_ability_multiple_participants(self) -> None:
@@ -148,7 +162,9 @@ class TestRule83SecondaryAbilityFramework:
         coordinator.use_secondary_ability("player3", StrategyCardType.WARFARE)
 
         # Verify all participants are tracked
-        participants = coordinator.get_secondary_ability_participants(StrategyCardType.WARFARE)
+        participants = coordinator.get_secondary_ability_participants(
+            StrategyCardType.WARFARE
+        )
         assert "player2" in participants
         assert "player3" in participants
         assert len(participants) == 2
@@ -216,5 +232,9 @@ class TestRule83AbilityValidation:
         assert result.primary_ability_resolved
 
         # Verify secondary abilities are available to other players
-        assert coordinator.can_use_secondary_ability("player2", StrategyCardType.WARFARE)
-        assert coordinator.can_use_secondary_ability("player3", StrategyCardType.WARFARE)
+        assert coordinator.can_use_secondary_ability(
+            "player2", StrategyCardType.WARFARE
+        )
+        assert coordinator.can_use_secondary_ability(
+            "player3", StrategyCardType.WARFARE
+        )

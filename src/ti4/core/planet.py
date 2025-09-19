@@ -15,6 +15,7 @@ class Planet:
         self.influence = influence
         self.controlled_by: Optional[str] = None
         self.units: list[Unit] = []
+        self._exhausted = False  # Rule 34: Track exhausted state
 
     def set_control(self, player_id: str) -> None:
         """Set the controlling player of this planet."""
@@ -27,3 +28,54 @@ class Planet:
     def remove_unit(self, unit: "Unit") -> None:
         """Remove a unit from this planet."""
         self.units.remove(unit)
+
+    # Rule 34: Exhausted state mechanics
+    def is_exhausted(self) -> bool:
+        """Check if this planet is exhausted."""
+        return self._exhausted
+
+    def is_faceup(self) -> bool:
+        """Check if this planet is faceup (readied)."""
+        return not self._exhausted
+
+    def exhaust(self) -> None:
+        """Exhaust this planet (flip facedown)."""
+        if self._exhausted:
+            raise ValueError("Card is already exhausted")
+        self._exhausted = True
+
+    def ready(self) -> None:
+        """Ready this planet (flip faceup)."""
+        self._exhausted = False
+
+    def can_spend_resources(self) -> bool:
+        """Check if this planet can spend resources."""
+        return not self._exhausted
+
+    def can_spend_influence(self) -> bool:
+        """Check if this planet can spend influence."""
+        return not self._exhausted
+
+    def spend_resources(self, amount: int) -> int:
+        """Spend resources from this planet, exhausting it."""
+        if self._exhausted:
+            raise ValueError("Cannot spend from exhausted planet")
+        if amount > self.resources:
+            raise ValueError(
+                f"Cannot spend {amount} resources, planet only has {self.resources}"
+            )
+
+        self.exhaust()
+        return amount
+
+    def spend_influence(self, amount: int) -> int:
+        """Spend influence from this planet, exhausting it."""
+        if self._exhausted:
+            raise ValueError("Cannot spend from exhausted planet")
+        if amount > self.influence:
+            raise ValueError(
+                f"Cannot spend {amount} influence, planet only has {self.influence}"
+            )
+
+        self.exhaust()
+        return amount
