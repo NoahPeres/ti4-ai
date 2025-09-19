@@ -43,7 +43,10 @@ def test_game_controller_undo_functionality() -> None:
     unit.unit_type = "destroyer"
 
     command = MovementCommand(
-        unit=unit, from_system_id="system1", to_system_id="system2", player_id="player1"
+        unit=unit,
+        from_system_id="system1",
+        to_system_id="system2",
+        player_id="player1",
     )
 
     # Set up initial game state and execute command through controller

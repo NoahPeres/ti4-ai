@@ -61,7 +61,7 @@ class CombatResolver:
             unit: The unit rolling dice
             dice_count: Optional override for number of dice (uses unit's combat_dice if None)
         """
-        stats = self.unit_stats_provider.get_unit_stats(unit.unit_type)
+        stats = self.unit_stats_provider.get_unit_stats(UnitType(unit.unit_type))
         if stats.combat_value is None:
             return 0
 
@@ -215,7 +215,7 @@ class CombatResolver:
             return 0
 
         # Get unit stats and validate combat capability
-        stats = self.unit_stats_provider.get_unit_stats(unit.unit_type)
+        stats = self.unit_stats_provider.get_unit_stats(UnitType(unit.unit_type))
         if stats.combat_value is None:
             return 0
 
@@ -239,7 +239,7 @@ class CombatResolver:
         """
 
         def filter_fighters(units: list[Unit]) -> list[Unit]:
-            return [u for u in units if u.unit_type == UnitType.FIGHTER.value]
+            return [u for u in units if u.unit_type == UnitType.FIGHTER]
 
         return self._perform_ability_attack(
             unit, target_units, Unit.has_anti_fighter_barrage, filter_fighters

@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from .constants import LocationType
+from .constants import LocationType, Technology, UnitType
 from .galaxy import Galaxy
 from .movement_rules import MovementContext, MovementRuleEngine
 from .system import System
@@ -24,8 +24,13 @@ class MovementOperation:
     player_id: str
     from_location: str = "space"  # "space" or planet name
     to_location: str = "space"  # "space" or planet name
-    player_technologies: Optional[set[str]] = None
+    player_technologies: Optional[set[Technology]] = None
     transport_ship: Optional[Unit] = None  # For ground force transport
+
+
+def _is_space_location(location: str) -> bool:
+    """Check if a location string represents space."""
+    return location == LocationType.SPACE.value
 
 
 class MovementValidator:
@@ -46,12 +51,12 @@ class MovementValidator:
 
         # Then check distance/range validation
         tech_key = (
-            frozenset(movement.player_technologies)
+            frozenset(tech.value for tech in movement.player_technologies)
             if movement.player_technologies
             else frozenset()
         )
         return self._is_valid_movement_cached(
-            movement.unit.unit_type,
+            UnitType(movement.unit.unit_type),
             movement.from_system_id,
             movement.to_system_id,
             tech_key,
@@ -59,20 +64,45 @@ class MovementValidator:
 
     def _validate_ti4_movement_rules(self, movement: MovementOperation) -> bool:
         """Validate TI4-specific movement rules."""
-        # Rule: Ground forces cannot move directly between planets
-        # They must move to space first, then be committed to planets
-        if (
-            movement.from_location != LocationType.SPACE.value
-            and movement.to_location != LocationType.SPACE.value
-            and movement.from_location != movement.to_location
-        ):
+        from_system = self._galaxy.get_system(movement.from_system_id)
+        to_system = self._galaxy.get_system(movement.to_system_id)
+
+        if not from_system or not to_system:
             return False
+
+        # Rule 58.4c: Cannot move from system with own command token
+        if from_system.has_command_token(movement.player_id):
+            return False
+
+        # Rule 58.4b: Cannot move through systems with enemy ships
+        # Find the path and check each intermediate system
+        path = self._galaxy.find_path(movement.from_system_id, movement.to_system_id)
+
+        if not path:
+            return False  # No path exists
+
+        # Check intermediate systems (exclude start and end)
+        for i in range(1, len(path) - 1):
+            intermediate_system_id = path[i]
+            intermediate_system = self._galaxy.get_system(intermediate_system_id)
+
+            if intermediate_system and intermediate_system.has_enemy_ships(
+                movement.player_id
+            ):
+                return False  # Blocked by enemy ships in intermediate system
+
+        # Rule 58.4d: Can move through systems with own command tokens
+        # This is implicitly allowed by not blocking it
 
         return True
 
+    def validate_movement(self, movement: MovementOperation) -> bool:
+        """Validate a movement operation (alias for is_valid_movement)."""
+        return self.is_valid_movement(movement)
+
     def _is_valid_movement_cached(
         self,
-        unit_type: str,
+        unit_type: UnitType,
         from_system_id: str,
         to_system_id: str,
         technologies: frozenset[str],
@@ -92,7 +122,7 @@ class MovementValidator:
             unit=mock_unit,
             from_coordinate=from_coord,
             to_coordinate=to_coord,
-            player_technologies=set(technologies),
+            player_technologies={Technology(tech) for tech in technologies},
             galaxy=self._galaxy,
         )
 
@@ -108,7 +138,7 @@ class MovementExecutor:
         self._galaxy = galaxy
         self._systems = systems
 
-    def execute_movement(self, movement: MovementOperation) -> None:
+    def execute_movement(self, movement: MovementOperation) -> bool:
         """Execute a movement action."""
         from_system = self._systems.get(movement.from_system_id)
         to_system = self._systems.get(movement.to_system_id)
@@ -118,17 +148,26 @@ class MovementExecutor:
 
             raise InvalidSystemError("Invalid system ID in movement")
 
+        # Check for invalid direct planet-to-planet movement
+        if not _is_space_location(movement.from_location) and not _is_space_location(
+            movement.to_location
+        ):
+            # Direct planet-to-planet movement is not allowed
+            return False
+
         # Handle different movement types
         self._remove_unit_from_location(
             from_system, movement.unit, movement.from_location
         )
         self._place_unit_at_location(to_system, movement.unit, movement.to_location)
 
+        return True
+
     def _remove_unit_from_location(
         self, system: System, unit: Unit, location: str
     ) -> None:
         """Remove unit from specified location (space or planet)."""
-        if location == LocationType.SPACE.value:
+        if _is_space_location(location):
             system.remove_unit_from_space(unit)
         else:
             # Remove from planet
@@ -138,7 +177,7 @@ class MovementExecutor:
         self, system: System, unit: Unit, location: str
     ) -> None:
         """Place unit at specified location (space or planet)."""
-        if location == LocationType.SPACE.value:
+        if _is_space_location(location):
             system.place_unit_in_space(unit)
         else:
             # Place on planet
@@ -175,7 +214,7 @@ class TransportValidator:
             return False
 
         # Check if all units are ground forces that can be transported
-        transportable_types = {"infantry", "mech"}
+        transportable_types = {UnitType.INFANTRY, UnitType.MECH}
         for unit in transport.ground_forces:
             if unit.unit_type not in transportable_types:
                 return False
@@ -235,13 +274,13 @@ class TransportExecutor:
     ) -> None:
         """Move a single ground force unit."""
         # Remove from source
-        if from_location == LocationType.SPACE.value:
+        if _is_space_location(from_location):
             from_system.remove_unit_from_space(unit)
         else:
             from_system.remove_unit_from_planet(unit, from_location)
 
         # Place at destination
-        if to_location == LocationType.SPACE.value:
+        if _is_space_location(to_location):
             to_system.place_unit_in_space(unit)
         else:
             to_system.place_unit_on_planet(unit, to_location)

@@ -2,7 +2,7 @@
 
 from unittest.mock import Mock
 
-from src.ti4.core.constants import LocationType
+from src.ti4.core.constants import LocationType, UnitType
 from src.ti4.core.game_state import GameState
 
 
@@ -27,19 +27,24 @@ def test_movement_command_creation() -> None:
 
     # Create a mock unit
     unit = Mock()
-    unit.unit_type = "destroyer"
+    unit.unit_type = UnitType.DESTROYER.value
 
-    # RED: Test command creation
+    # Create MovementCommand directly
     command = MovementCommand(
-        unit=unit, from_system_id="system1", to_system_id="system2", player_id="player1"
+        unit=unit,
+        from_system_id="system1",
+        to_system_id="system2",
+        player_id="player1",
+        from_location="planet1",
+        to_location=LocationType.SPACE.value,
     )
 
     assert command.unit == unit
     assert command.from_system_id == "system1"
     assert command.to_system_id == "system2"
     assert command.player_id == "player1"
-    assert command.from_location == LocationType.SPACE.value  # default
-    assert command.to_location == LocationType.SPACE.value  # default
+    assert command.from_location == "planet1"
+    assert command.to_location == LocationType.SPACE.value
 
 
 def test_movement_command_execute_and_undo_data() -> None:
@@ -48,7 +53,7 @@ def test_movement_command_execute_and_undo_data() -> None:
 
     # Create a mock unit
     unit = Mock()
-    unit.unit_type = "destroyer"
+    unit.unit_type = UnitType.DESTROYER.value
 
     command = MovementCommand(
         unit=unit,
@@ -83,10 +88,13 @@ def test_movement_command_execute_undo_cycle() -> None:
 
     # Create a mock unit
     unit = Mock()
-    unit.unit_type = "destroyer"
+    unit.unit_type = UnitType.DESTROYER.value
 
     command = MovementCommand(
-        unit=unit, from_system_id="system1", to_system_id="system2", player_id="player1"
+        unit=unit,
+        from_system_id="system1",
+        to_system_id="system2",
+        player_id="player1",
     )
 
     manager = CommandManager()

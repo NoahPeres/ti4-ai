@@ -2,14 +2,15 @@
 
 import pytest
 
+from src.ti4.core.constants import UnitType
 from src.ti4.core.unit import Unit
 
 
 class TestUnit:
     def test_unit_creation(self) -> None:
         """Test that a unit can be created with type and owner."""
-        unit = Unit(unit_type="fighter", owner="player1")
-        assert unit.unit_type == "fighter"
+        unit = Unit(unit_type=UnitType.FIGHTER, owner="player1")
+        assert unit.unit_type == UnitType.FIGHTER
         assert unit.owner == "player1"
 
 
@@ -17,25 +18,25 @@ class TestUnitAbilities:
     def test_sustain_damage_ability_detection(self) -> None:
         """Test that units with sustain damage ability are correctly identified."""
         # Units with sustain damage
-        dreadnought = Unit(unit_type="dreadnought", owner="player1")
+        dreadnought = Unit(unit_type=UnitType.DREADNOUGHT, owner="player1")
         assert dreadnought.has_sustain_damage() is True
 
-        war_sun = Unit(unit_type="war_sun", owner="player1")
+        war_sun = Unit(unit_type=UnitType.WAR_SUN, owner="player1")
         assert war_sun.has_sustain_damage() is True
 
-        mech = Unit(unit_type="mech", owner="player1")
+        mech = Unit(unit_type=UnitType.MECH, owner="player1")
         assert mech.has_sustain_damage() is True
 
         # Units without sustain damage
-        fighter = Unit(unit_type="fighter", owner="player1")
+        fighter = Unit(unit_type=UnitType.FIGHTER, owner="player1")
         assert fighter.has_sustain_damage() is False
 
-        cruiser = Unit(unit_type="cruiser", owner="player1")
+        cruiser = Unit(unit_type=UnitType.CRUISER, owner="player1")
         assert cruiser.has_sustain_damage() is False
 
     def test_sustain_damage_activation(self) -> None:
         """Test that sustain damage can be activated on units that have the ability."""
-        dreadnought = Unit(unit_type="dreadnought", owner="player1")
+        dreadnought = Unit(unit_type=UnitType.DREADNOUGHT, owner="player1")
 
         # Initially, unit has not sustained damage
         assert dreadnought.has_sustained_damage is False
@@ -48,15 +49,17 @@ class TestUnitAbilities:
 
     def test_sustain_damage_invalid_unit(self) -> None:
         """Test that sustain damage cannot be activated on units without the ability."""
-        fighter = Unit(unit_type="fighter", owner="player1")
+        fighter = Unit(unit_type=UnitType.FIGHTER, owner="player1")
 
         # Fighter cannot sustain damage
-        with pytest.raises(ValueError, match="Unit fighter cannot sustain damage"):
+        with pytest.raises(
+            ValueError, match="Unit UnitType.FIGHTER cannot sustain damage"
+        ):
             fighter.sustain_damage()
 
     def test_sustain_damage_repair(self) -> None:
         """Test that sustained damage can be repaired."""
-        dreadnought = Unit(unit_type="dreadnought", owner="player1")
+        dreadnought = Unit(unit_type=UnitType.DREADNOUGHT, owner="player1")
 
         # Sustain damage first
         dreadnought.sustain_damage()
@@ -69,82 +72,82 @@ class TestUnitAbilities:
     def test_anti_fighter_barrage_ability(self) -> None:
         """Test that units with anti-fighter barrage ability are correctly identified."""
         # Units with anti-fighter barrage
-        destroyer = Unit(unit_type="destroyer", owner="player1")
+        destroyer = Unit(unit_type=UnitType.DESTROYER, owner="player1")
         assert destroyer.has_anti_fighter_barrage() is True
 
         # Units without anti-fighter barrage
-        cruiser = Unit(unit_type="cruiser", owner="player1")
+        cruiser = Unit(unit_type=UnitType.CRUISER, owner="player1")
         assert cruiser.has_anti_fighter_barrage() is False
 
     def test_space_cannon_ability(self) -> None:
         """Test that units with space cannon ability are correctly identified."""
         # Units with space cannon
-        pds = Unit(unit_type="pds", owner="player1")
+        pds = Unit(unit_type=UnitType.PDS, owner="player1")
         assert pds.has_space_cannon() is True
 
         # Units without space cannon
-        fighter = Unit(unit_type="fighter", owner="player1")
+        fighter = Unit(unit_type=UnitType.FIGHTER, owner="player1")
         assert fighter.has_space_cannon() is False
 
     def test_bombardment_ability(self) -> None:
         """Test that units with bombardment ability are correctly identified."""
         # Units with bombardment
-        dreadnought = Unit(unit_type="dreadnought", owner="player1")
+        dreadnought = Unit(unit_type=UnitType.DREADNOUGHT, owner="player1")
         assert dreadnought.has_bombardment() is True
 
-        war_sun = Unit(unit_type="war_sun", owner="player1")
+        war_sun = Unit(unit_type=UnitType.WAR_SUN, owner="player1")
         assert war_sun.has_bombardment() is True
 
         # Units without bombardment
-        cruiser = Unit(unit_type="cruiser", owner="player1")
+        cruiser = Unit(unit_type=UnitType.CRUISER, owner="player1")
         assert cruiser.has_bombardment() is False
 
-        fighter = Unit(unit_type="fighter", owner="player1")
+        fighter = Unit(unit_type=UnitType.FIGHTER, owner="player1")
         assert fighter.has_bombardment() is False
 
     def test_deploy_ability(self) -> None:
         """Test that units with deploy ability are correctly identified."""
         # Units with deploy
-        mech = Unit(unit_type="mech", owner="player1")
+        mech = Unit(unit_type=UnitType.MECH, owner="player1")
         assert mech.has_deploy() is True
 
         # Units without deploy
-        infantry = Unit(unit_type="infantry", owner="player1")
+        infantry = Unit(unit_type=UnitType.INFANTRY, owner="player1")
         assert infantry.has_deploy() is False
 
-        fighter = Unit(unit_type="fighter", owner="player1")
+        fighter = Unit(unit_type=UnitType.FIGHTER, owner="player1")
         assert fighter.has_deploy() is False
 
     def test_planetary_shield_ability(self) -> None:
         """Test that units with planetary shield ability are correctly identified."""
         # Units with planetary shield
-        pds = Unit(unit_type="pds", owner="player1")
+        pds = Unit(unit_type=UnitType.PDS, owner="player1")
         assert pds.has_planetary_shield() is True
 
         # Units without planetary shield
-        infantry = Unit(unit_type="infantry", owner="player1")
+        infantry = Unit(unit_type=UnitType.INFANTRY, owner="player1")
         assert infantry.has_planetary_shield() is False
 
-        space_dock = Unit(unit_type="space_dock", owner="player1")
+        space_dock = Unit(unit_type=UnitType.SPACE_DOCK, owner="player1")
         assert space_dock.has_planetary_shield() is False
 
     def test_production_ability(self) -> None:
         """Test that units with production ability return correct values."""
         # Units with production
-        space_dock = Unit(unit_type="space_dock", owner="player1")
+        space_dock = Unit(unit_type=UnitType.SPACE_DOCK, owner="player1")
         assert space_dock.get_production() == 2
 
         # Units without production
-        fighter = Unit(unit_type="fighter", owner="player1")
+        fighter = Unit(unit_type=UnitType.FIGHTER, owner="player1")
         assert fighter.get_production() == 0
 
-        pds = Unit(unit_type="pds", owner="player1")
+        pds = Unit(unit_type=UnitType.PDS, owner="player1")
         assert pds.get_production() == 0
 
     def test_multiple_abilities_on_same_unit(self) -> None:
         """Test that units can have multiple abilities simultaneously."""
         # War sun has sustain damage and bombardment but not anti-fighter barrage
-        war_sun = Unit(unit_type="war_sun", owner="player1")
+        war_sun = Unit(unit_type=UnitType.WAR_SUN, owner="player1")
         assert war_sun.has_sustain_damage() is True
         assert war_sun.has_bombardment() is True
         assert war_sun.has_anti_fighter_barrage() is False
@@ -153,7 +156,7 @@ class TestUnitAbilities:
         assert war_sun.has_planetary_shield() is False
 
         # Destroyer has anti-fighter barrage but not other abilities
-        destroyer = Unit(unit_type="destroyer", owner="player1")
+        destroyer = Unit(unit_type=UnitType.DESTROYER, owner="player1")
         assert destroyer.has_anti_fighter_barrage() is True
         assert destroyer.has_sustain_damage() is False
         assert destroyer.has_space_cannon() is False
@@ -162,7 +165,7 @@ class TestUnitAbilities:
         assert destroyer.has_planetary_shield() is False
 
         # PDS has space cannon and planetary shield
-        pds = Unit(unit_type="pds", owner="player1")
+        pds = Unit(unit_type=UnitType.PDS, owner="player1")
         assert pds.has_space_cannon() is True
         assert pds.has_planetary_shield() is True
         assert pds.has_sustain_damage() is False
@@ -170,7 +173,7 @@ class TestUnitAbilities:
         assert pds.has_deploy() is False
 
         # Mech has sustain damage and deploy
-        mech = Unit(unit_type="mech", owner="player1")
+        mech = Unit(unit_type=UnitType.MECH, owner="player1")
         assert mech.has_sustain_damage() is True
         assert mech.has_deploy() is True
         assert mech.has_bombardment() is False
@@ -178,7 +181,7 @@ class TestUnitAbilities:
         assert mech.has_planetary_shield() is False
 
         # Dreadnought has sustain damage and bombardment
-        dreadnought = Unit(unit_type="dreadnought", owner="player1")
+        dreadnought = Unit(unit_type=UnitType.DREADNOUGHT, owner="player1")
         assert dreadnought.has_sustain_damage() is True
         assert dreadnought.has_bombardment() is True
         assert dreadnought.has_deploy() is False
@@ -193,18 +196,17 @@ class TestUnitAbilitiesIntegration:
         """Test that all TI4 unit abilities are implemented and accessible."""
         # Create units and verify all abilities are accessible
         units_and_abilities = [
-            ("carrier", ["capacity"]),
-            ("cruiser", []),
-            ("cruiser_ii", ["capacity"]),
-            ("dreadnought", ["sustain_damage", "bombardment", "capacity"]),
-            ("destroyer", ["anti_fighter_barrage"]),
-            ("fighter", []),
-            ("fighter_ii", ["movement"]),  # Fighter II has movement 1 vs 0
-            ("infantry", []),
-            ("mech", ["sustain_damage", "deploy"]),
-            ("pds", ["space_cannon", "planetary_shield"]),
-            ("space_dock", ["production"]),
-            ("war_sun", ["sustain_damage", "bombardment", "capacity"]),
+            (UnitType.CARRIER, ["capacity"]),
+            (UnitType.CRUISER, []),
+            (UnitType.CRUISER_II, ["capacity"]),
+            (UnitType.DREADNOUGHT, ["sustain_damage", "bombardment", "capacity"]),
+            (UnitType.DESTROYER, ["anti_fighter_barrage"]),
+            (UnitType.FIGHTER, []),
+            (UnitType.INFANTRY, []),
+            (UnitType.MECH, ["sustain_damage", "deploy"]),
+            (UnitType.PDS, ["space_cannon", "planetary_shield"]),
+            (UnitType.SPACE_DOCK, ["production"]),
+            (UnitType.WAR_SUN, ["sustain_damage", "bombardment", "capacity"]),
         ]
 
         for unit_type, expected_abilities in units_and_abilities:

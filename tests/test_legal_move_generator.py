@@ -4,6 +4,7 @@ from typing import Any
 
 from src.ti4.actions.action import PlayerDecision
 from src.ti4.actions.legal_moves import LegalMoveGenerator
+from src.ti4.core.constants import Faction
 from src.ti4.core.game_state import GameState
 from src.ti4.core.player import Player
 
@@ -18,7 +19,7 @@ def test_generate_legal_actions_returns_list() -> None:
     """Test that generate_legal_actions returns a list of actions."""
     generator = LegalMoveGenerator()
     state = GameState()
-    player = Player(id="player1", faction="sol")
+    player = Player(id="player1", faction=Faction.SOL)
 
     actions = generator.generate_legal_actions(state, player.id)
     assert isinstance(actions, list)
@@ -30,7 +31,7 @@ def test_generate_legal_actions_filters_by_game_phase() -> None:
 
     generator = LegalMoveGenerator()
     state = GameState()
-    player = Player(id="player1", faction="sol")
+    player = Player(id="player1", faction=Faction.SOL)
 
     # Should return different actions for different phases
     setup_actions = generator.generate_legal_actions_for_phase(
@@ -43,7 +44,7 @@ def test_generate_legal_actions_empty_when_no_legal_moves() -> None:
     """Test that empty list is returned when no legal moves are available."""
     generator = LegalMoveGenerator()
     state = GameState()
-    player = Player(id="player1", faction="sol")
+    player = Player(id="player1", faction=Faction.SOL)
 
     # In a basic state with no actions available, should return empty list
     actions = generator.generate_legal_actions(state, player.id)
@@ -65,7 +66,7 @@ def test_generate_legal_actions_integrates_with_validation_engine() -> None:
 
     generator = LegalMoveGenerator()
     state = GameState()
-    player = Player(id="player1", faction="sol")
+    player = Player(id="player1", faction=Faction.SOL)
 
     # Create a mock action for testing
     class TestAction(PlayerDecision):
@@ -97,7 +98,7 @@ def test_filter_legal_actions_handles_empty_list() -> None:
     """Test that filter_legal_actions handles empty input gracefully."""
     generator = LegalMoveGenerator()
     state = GameState()
-    player = Player(id="player1", faction="sol")
+    player = Player(id="player1", faction=Faction.SOL)
 
     # Should handle empty list gracefully
     legal_actions = generator.filter_legal_actions([], state, player.id)

@@ -77,9 +77,16 @@ def test_end_to_end_game_simulation() -> None:
 def simulate_complete_game(controller: GameController) -> Player:
     """Simulate a minimal complete game."""
     # Execute a few rounds of strategy and action phases
-    for _round_num in range(2):  # Simulate 2 rounds
-        # Strategy phase
-        controller.start_strategy_phase()
+    for round_num in range(2):  # Simulate 2 rounds
+        # Strategy phase (first round starts from SETUP, subsequent rounds need proper transitions)
+        if round_num == 0:
+            controller.start_strategy_phase()
+        else:
+            # For subsequent rounds, need to go through STATUS and AGENDA phases
+            controller.advance_to_phase(GamePhase.STATUS)
+            controller.advance_to_phase(GamePhase.AGENDA)
+            controller.advance_to_phase(GamePhase.STRATEGY)
+
         available_cards = controller.get_available_strategy_cards()
         players = controller.get_turn_order()
 

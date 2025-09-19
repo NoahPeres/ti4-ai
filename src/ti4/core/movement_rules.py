@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional
 
+from .constants import Technology
 from .galaxy import Galaxy
 from .hex_coordinate import HexCoordinate
 from .unit import Unit
@@ -16,7 +17,7 @@ class MovementContext:
     unit: Unit
     from_coordinate: HexCoordinate
     to_coordinate: HexCoordinate
-    player_technologies: set[str]
+    player_technologies: set[Technology]
     galaxy: Galaxy
     path: Optional[list[HexCoordinate]] = None
 
@@ -30,7 +31,7 @@ class MovementRule(ABC):
         pass
 
     @abstractmethod
-    def get_movement_range(self, unit: Unit, technologies: set[str]) -> int:
+    def get_movement_range(self, unit: Unit, technologies: set[Technology]) -> int:
         """Get the movement range for a unit."""
         pass
 
@@ -44,7 +45,7 @@ class BasicMovementRule(MovementRule):
         max_range = self.get_movement_range(context.unit, context.player_technologies)
         return distance <= max_range
 
-    def get_movement_range(self, unit: Unit, technologies: set[str]) -> int:
+    def get_movement_range(self, unit: Unit, technologies: set[Technology]) -> int:
         """Get basic movement range."""
         return unit.get_movement()
 
@@ -58,10 +59,10 @@ class GravityDriveRule(MovementRule):
         max_range = self.get_movement_range(context.unit, context.player_technologies)
         return distance <= max_range
 
-    def get_movement_range(self, unit: Unit, technologies: set[str]) -> int:
+    def get_movement_range(self, unit: Unit, technologies: set[Technology]) -> int:
         """Gravity drive adds +1 to movement range."""
         base_movement = unit.get_movement()
-        if "gravity_drive" in technologies:
+        if Technology.GRAVITY_DRIVE in technologies:
             return base_movement + 1
         return base_movement
 
@@ -75,7 +76,7 @@ class AnomalyRule(MovementRule):
         # For now, simplified implementation
         return True
 
-    def get_movement_range(self, unit: Unit, technologies: set[str]) -> int:
+    def get_movement_range(self, unit: Unit, technologies: set[Technology]) -> int:
         """Anomalies don't change movement range."""
         return unit.get_movement()
 
@@ -103,7 +104,7 @@ class MovementRuleEngine:
         )
         return distance <= max_range
 
-    def get_max_movement_range(self, unit: Unit, technologies: set[str]) -> int:
+    def get_max_movement_range(self, unit: Unit, technologies: set[Technology]) -> int:
         """Get the maximum movement range considering all rules."""
         # Take the maximum range from all applicable rules
         return max(rule.get_movement_range(unit, technologies) for rule in self.rules)

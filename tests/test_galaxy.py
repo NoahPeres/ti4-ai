@@ -11,10 +11,10 @@ class TestGalaxy:
         assert galaxy is not None
 
     def test_galaxy_has_systems_dict(self) -> None:
-        """Test that galaxy has a systems dictionary."""
+        """Test that galaxy has a system_coordinates dictionary."""
         galaxy = Galaxy()
-        assert hasattr(galaxy, "systems")
-        assert isinstance(galaxy.systems, dict)
+        assert hasattr(galaxy, "system_coordinates")
+        assert isinstance(galaxy.system_coordinates, dict)
 
     def test_place_system_at_coordinate(self) -> None:
         """Test placing a system at a hex coordinate."""
@@ -22,5 +22,5 @@ class TestGalaxy:
         coord = HexCoordinate(q=0, r=0)
         system_id = "test_system"
         galaxy.place_system(coord, system_id)
-        assert coord in galaxy.systems
-        assert galaxy.systems[coord] == system_id
+        assert system_id in galaxy.system_coordinates
+        assert galaxy.system_coordinates[system_id] == coord

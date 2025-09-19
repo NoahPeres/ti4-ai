@@ -1,8 +1,9 @@
-"""Tests for event system integration with game actions."""
+"""Test event integration with commands."""
 
 from unittest.mock import Mock
 
 from src.ti4.commands.movement import MovementCommand
+from src.ti4.core.constants import Faction
 from src.ti4.core.events import GameEventBus, PhaseChangedEvent, UnitMovedEvent
 from src.ti4.core.game_controller import GameController
 from src.ti4.core.game_phase import GamePhase
@@ -15,8 +16,7 @@ class TestMovementEventIntegration:
     """Test event publishing in movement commands."""
 
     def test_movement_command_publishes_unit_moved_event(self) -> None:
-        """Test that executing a movement command publishes a UnitMovedEvent."""
-        # Setup
+        """Test that movement commands publish unit moved events."""
         event_bus = GameEventBus()
         observer = Mock()
         event_bus.subscribe("unit_moved", observer)
@@ -67,9 +67,9 @@ class TestGameControllerEventIntegration:
         """Test that changing game phase publishes a PhaseChangedEvent."""
         # Setup
         players = [
-            Player("player_1", "sol"),
-            Player("player_2", "xxcha"),
-            Player("player_3", "hacan"),
+            Player("player_1", Faction.SOL),
+            Player("player_2", Faction.XXCHA),
+            Player("player_3", Faction.HACAN),
         ]
         controller = GameController(players)
 
@@ -93,9 +93,9 @@ class TestGameControllerEventIntegration:
     def test_game_controller_without_event_bus_still_works(self) -> None:
         """Test that game controller works without event bus for backward compatibility."""
         players = [
-            Player("player_1", "sol"),
-            Player("player_2", "xxcha"),
-            Player("player_3", "hacan"),
+            Player("player_1", Faction.SOL),
+            Player("player_2", Faction.XXCHA),
+            Player("player_3", Faction.HACAN),
         ]
         controller = GameController(players)
 
@@ -120,9 +120,9 @@ class TestEventBusIntegration:
 
         # Setup game controller
         players = [
-            Player("player_1", "sol"),
-            Player("player_2", "xxcha"),
-            Player("player_3", "hacan"),
+            Player("player_1", Faction.SOL),
+            Player("player_2", Faction.XXCHA),
+            Player("player_3", Faction.HACAN),
         ]
         controller = GameController(players)
         controller.set_event_bus(event_bus)

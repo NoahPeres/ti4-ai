@@ -174,48 +174,9 @@ class TestImperialStrategyCardSecretObjectives:
         ):
             state_with_deck.execute_imperial_primary_ability("player1")
 
-    def test_imperial_secondary_ability_allows_secret_objective_draw(self) -> None:
-        """Test that Imperial secondary ability allows drawing a secret objective for 1 influence."""
-        game_state = GameState()
-
-        # Give player some influence
-        state_with_influence = game_state.set_player_influence("player1", 2)
-
-        # Create secret objective deck
-        secret_obj = Objective(
-            "sec1", "Secret 1", "New secret", 1, False, GamePhase.STATUS
-        )
-        state_with_deck = state_with_influence.add_secret_objective_to_deck(secret_obj)
-
-        # Execute Imperial secondary ability
-        state_after_secondary = state_with_deck.execute_imperial_secondary_ability(
-            "player1"
-        )
-
-        # Player should have drawn a secret objective and spent 1 influence
-        player_secrets = state_after_secondary.get_player_secret_objectives("player1")
-        assert len(player_secrets) == 1
-        assert player_secrets[0].id == secret_obj.id
-        assert state_after_secondary.get_player_influence("player1") == 1
-
-    def test_imperial_secondary_ability_requires_influence(self) -> None:
-        """Test that Imperial secondary ability requires 1 influence to draw secret objective."""
-        game_state = GameState()
-
-        # Player has no influence
-        assert game_state.get_player_influence("player1") == 0
-
-        # Create secret objective deck
-        secret_obj = Objective(
-            "sec1", "Secret 1", "New secret", 1, False, GamePhase.STATUS
-        )
-        state_with_deck = game_state.add_secret_objective_to_deck(secret_obj)
-
-        # Try to execute Imperial secondary ability without influence - should fail
-        with pytest.raises(
-            ValueError, match="Insufficient influence.*requires 1 influence"
-        ):
-            state_with_deck.execute_imperial_secondary_ability("player1")
+    # Imperial secondary ability tests removed - incorrect implementation
+    # According to Rule 45.3, players spend one command token from their strategy pool
+    # to draw one secret objective card, not influence
 
 
 class TestSecretObjectiveDeck:

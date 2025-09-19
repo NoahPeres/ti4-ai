@@ -98,3 +98,21 @@ class CombatError(TI4GameError):
     """Raised when combat-related errors occur."""
 
     pass
+
+
+class StrategyCardError(TI4GameError):
+    """Raised when strategy card-related errors occur."""
+
+    pass
+
+
+class StrategyCardValidationError(StrategyCardError):
+    """Raised when strategy card validation fails."""
+
+    pass
+
+
+class StrategyCardStateError(StrategyCardError):
+    """Raised when strategy card state is inconsistent."""
+
+    pass

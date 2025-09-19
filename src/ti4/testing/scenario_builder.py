@@ -2,13 +2,18 @@
 
 from typing import Any, Optional
 
-from src.ti4.core.constants import LocationType
+from src.ti4.core.constants import Faction, LocationType, UnitType
 from src.ti4.core.galaxy import Galaxy
 from src.ti4.core.game_phase import GamePhase
 from src.ti4.core.game_state import GameState
 from src.ti4.core.player import Player
 from src.ti4.core.system import System
 from src.ti4.core.unit import Unit
+
+
+def _is_space_location(location: str) -> bool:
+    """Check if a location string represents space."""
+    return location == LocationType.SPACE.value
 
 
 class GameScenarioBuilder:
@@ -23,10 +28,12 @@ class GameScenarioBuilder:
         self._unit_placements: list[
             tuple[str, str, str, str]
         ] = []  # (owner, unit_type, system_id, location)
-        self._player_resources: dict[str, dict[str, Any]] = {}
+        # _player_resources field removed - incorrect implementation
         self._player_technologies: dict[str, list[str]] = {}
 
-    def with_players(self, *player_configs: tuple[str, str]) -> "GameScenarioBuilder":
+    def with_players(
+        self, *player_configs: tuple[str, Faction]
+    ) -> "GameScenarioBuilder":
         """Add players to the scenario.
 
         Args:
@@ -92,9 +99,8 @@ class GameScenarioBuilder:
         Returns:
             Self for fluent interface
         """
-        if player_id not in self._player_resources:
-            self._player_resources[player_id] = {}
-        self._player_resources[player_id].update(resources)
+        # Player resource configuration removed - incorrect implementation
+        # Resources should be tracked on planets, not as player pools
         return self
 
     def with_player_technologies(
@@ -131,7 +137,7 @@ class GameScenarioBuilder:
             galaxy=self._galaxy,
             phase=self._phase,
             systems=self._systems,
-            player_resources=self._player_resources,
+            # player_resources parameter removed - incorrect implementation
             player_technologies=self._player_technologies,
         )
 
@@ -153,7 +159,7 @@ class GameScenarioBuilder:
         # Validate player IDs and factions
         for player in self._players:
             validate_non_empty_string(player.id, "Player ID")
-            validate_non_empty_string(player.faction, "Faction")
+            validate_non_empty_string(player.faction.value, "Faction")
 
         # Validate unique player IDs
         validate_unique_collection(self._players, "players", key=lambda p: p.id)
@@ -172,10 +178,10 @@ class GameScenarioBuilder:
 
         # Place units
         for owner, unit_type, system_id, location in self._unit_placements:
-            unit = Unit(unit_type=unit_type, owner=owner)
+            unit = Unit(unit_type=UnitType(unit_type), owner=owner)
             system = self._systems[system_id]
 
-            if location == LocationType.SPACE.value:
+            if _is_space_location(location):
                 system.place_unit_in_space(unit)
             else:
                 # Assume it's a planet name
@@ -190,7 +196,7 @@ class GameScenarioBuilder:
         """
         return (
             GameScenarioBuilder()
-            .with_players(("player1", "sol"), ("player2", "xxcha"))
+            .with_players(("player1", Faction.SOL), ("player2", Faction.XXCHA))
             .with_galaxy("standard_6p")
             .in_phase(GamePhase.ACTION)
             .build()
@@ -205,7 +211,7 @@ class GameScenarioBuilder:
         """
         return (
             GameScenarioBuilder()
-            .with_players(("player1", "sol"), ("player2", "xxcha"))
+            .with_players(("player1", Faction.SOL), ("player2", Faction.XXCHA))
             .with_galaxy("standard_6p")
             .with_units(
                 [
@@ -228,7 +234,7 @@ class GameScenarioBuilder:
         """
         return (
             GameScenarioBuilder()
-            .with_players(("player1", "sol"), ("player2", "xxcha"))
+            .with_players(("player1", Faction.SOL), ("player2", Faction.XXCHA))
             .with_galaxy("standard_6p")
             .with_units(
                 [
@@ -240,8 +246,8 @@ class GameScenarioBuilder:
                     ("player2", "fighter", "home_system_2", "space"),
                 ]
             )
-            .with_player_resources("player1", trade_goods=3, command_tokens=8)
-            .with_player_resources("player2", trade_goods=3, command_tokens=8)
+            # with_player_resources calls removed - incorrect implementation
+            # Resources should be tracked on planets, not as player pools
             .in_phase(GamePhase.STRATEGY)
             .build()
         )
@@ -255,7 +261,7 @@ class GameScenarioBuilder:
         """
         return (
             GameScenarioBuilder()
-            .with_players(("player1", "sol"), ("player2", "xxcha"))
+            .with_players(("player1", Faction.SOL), ("player2", Faction.XXCHA))
             .with_galaxy("standard_6p")
             .with_units(
                 [
@@ -267,8 +273,8 @@ class GameScenarioBuilder:
                     ("player2", "fighter", "system4", "space"),
                 ]
             )
-            .with_player_resources("player1", trade_goods=8, command_tokens=12)
-            .with_player_resources("player2", trade_goods=6, command_tokens=10)
+            # with_player_resources calls removed - incorrect implementation
+            # Resources should be tracked on planets, not as player pools
             .with_player_technologies("player1", ["dreadnought_ii", "cruiser_ii"])
             .with_player_technologies("player2", ["war_sun", "destroyer_ii"])
             .in_phase(GamePhase.ACTION)
@@ -306,7 +312,7 @@ class GameScenarioBuilder:
         """
         return (
             GameScenarioBuilder()
-            .with_players(("player1", "sol"), ("player2", "xxcha"))
+            .with_players(("player1", Faction.SOL), ("player2", Faction.XXCHA))
             .with_galaxy("standard_6p")
             .with_units(
                 [
@@ -316,9 +322,8 @@ class GameScenarioBuilder:
                     ("player2", "cruiser", "enemy_system", "space"),
                 ]
             )
-            .with_player_resources(
-                "player1", command_tokens=16
-            )  # Sol gets extra command tokens
+            # with_player_resources call removed - incorrect implementation
+            # Resources should be tracked on planets, not as player pools
             .in_phase(GamePhase.ACTION)
             .build()
         )
@@ -332,7 +337,7 @@ class GameScenarioBuilder:
         """
         return (
             GameScenarioBuilder()
-            .with_players(("player1", "xxcha"), ("player2", "sol"))
+            .with_players(("player1", Faction.XXCHA), ("player2", Faction.SOL))
             .with_galaxy("standard_6p")
             .with_units(
                 [
@@ -341,7 +346,8 @@ class GameScenarioBuilder:
                     ("player2", "dreadnought", "enemy_system", "space"),
                 ]
             )
-            .with_player_resources("player1", trade_goods=10)  # Xxcha good at trade
+            # with_player_resources call removed - incorrect implementation
+            # Resources should be tracked on planets, not as player pools
             .in_phase(GamePhase.ACTION)
             .build()
         )
@@ -377,7 +383,7 @@ class GameScenarioBuilder:
         """
         return (
             GameScenarioBuilder()
-            .with_players(("player1", "sol"))
+            .with_players(("player1", Faction.SOL))
             .with_galaxy("standard_6p")
             .with_units(
                 [
@@ -404,7 +410,7 @@ class GameScenarioBuilder:
         """
         return (
             GameScenarioBuilder()
-            .with_players(("player1", "sol"), ("player2", "xxcha"))
+            .with_players(("player1", Faction.SOL), ("player2", Faction.XXCHA))
             .with_galaxy("standard_6p")
             .with_units([("player1", "fighter", "isolated_system", "space")])
             .build()
@@ -419,15 +425,10 @@ class GameScenarioBuilder:
         """
         return (
             GameScenarioBuilder()
-            .with_players(("player1", "sol"))
+            .with_players(("player1", Faction.SOL), ("player2", Faction.XXCHA))
             .with_galaxy("standard_6p")
-            .with_player_resources(
-                "player1",
-                trade_goods=999,
-                command_tokens=999,
-                influence=999,
-                resources=999,
-            )
+            # with_player_resources call removed - incorrect implementation
+            # Resources should be tracked on planets, not as player pools
             .build()
         )
 
@@ -441,7 +442,14 @@ class GameScenarioBuilder:
         Returns:
             GameState configured for multi-player testing
         """
-        factions = ["sol", "xxcha", "hacan", "arborec", "l1z1x", "winnu"]
+        factions = [
+            Faction.SOL,
+            Faction.XXCHA,
+            Faction.HACAN,
+            Faction.ARBOREC,
+            Faction.L1Z1X,
+            Faction.WINNU,
+        ]
         players = [(f"player{i + 1}", factions[i]) for i in range(min(player_count, 6))]
 
         # Create unit placements for each player
@@ -474,7 +482,7 @@ class GameScenarioBuilder:
         """
         return (
             GameScenarioBuilder()
-            .with_players(("player1", "sol"), ("player2", "xxcha"))
+            .with_players(("player1", Faction.SOL), ("player2", Faction.XXCHA))
             .with_galaxy("standard_6p")
             .with_units(
                 [
@@ -488,8 +496,8 @@ class GameScenarioBuilder:
                     ("player2", "destroyer", "border_system_2", "space"),
                 ]
             )
-            .with_player_resources("player1", trade_goods=15, command_tokens=16)
-            .with_player_resources("player2", trade_goods=12, command_tokens=14)
+            # with_player_resources calls removed - incorrect implementation
+            # Resources should be tracked on planets, not as player pools
             .with_player_technologies(
                 "player1",
                 [

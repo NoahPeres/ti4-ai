@@ -3,6 +3,8 @@
 from dataclasses import dataclass
 from typing import Any, Optional
 
+from .constants import Faction, Technology, UnitType
+
 
 @dataclass(frozen=True)
 class UnitStats:
@@ -16,6 +18,8 @@ class UnitStats:
     sustain_damage: bool = False
     anti_fighter_barrage: bool = False
     space_cannon: bool = False
+    space_cannon_value: Optional[int] = None
+    space_cannon_dice: int = 1
     bombardment: bool = False
     deploy: bool = False
     planetary_shield: bool = False
@@ -34,6 +38,10 @@ class UnitStats:
                 "anti_fighter_barrage", self.anti_fighter_barrage
             ),
             space_cannon=kwargs.get("space_cannon", self.space_cannon),
+            space_cannon_value=kwargs.get(
+                "space_cannon_value", self.space_cannon_value
+            ),
+            space_cannon_dice=kwargs.get("space_cannon_dice", self.space_cannon_dice),
             bombardment=kwargs.get("bombardment", self.bombardment),
             deploy=kwargs.get("deploy", self.deploy),
             planetary_shield=kwargs.get("planetary_shield", self.planetary_shield),
@@ -97,6 +105,8 @@ class UnitStatsProvider:
             movement=0,
             cost=2,
             space_cannon=True,
+            space_cannon_value=6,
+            space_cannon_dice=1,
             planetary_shield=True,
         ),
         "space_dock": UnitStats(
@@ -120,14 +130,20 @@ class UnitStatsProvider:
 
     def get_unit_stats(
         self,
-        unit_type: str,
-        faction: Optional[str] = None,
-        technologies: Optional[set[str]] = None,
+        unit_type: UnitType,
+        faction: Optional[Faction] = None,
+        technologies: Optional[set[Technology]] = None,
     ) -> UnitStats:
         """Get unit statistics with faction and technology modifications."""
         # Convert technologies to frozenset for hashability
-        tech_key = frozenset(technologies) if technologies else frozenset()
-        return self._get_cached_unit_stats(unit_type, faction, tech_key)
+        tech_key = (
+            frozenset(tech.value for tech in technologies)
+            if technologies
+            else frozenset()
+        )
+        return self._get_cached_unit_stats(
+            unit_type.value, faction.value if faction else None, tech_key
+        )
 
     def _get_cached_unit_stats(
         self,
@@ -179,21 +195,25 @@ class UnitStatsProvider:
         )
 
     def register_faction_modifier(
-        self, faction: str, unit_type: str, stats: UnitStats
+        self, faction: Faction, unit_type: UnitType, stats: UnitStats
     ) -> None:
         """Register faction-specific unit modifications."""
-        if faction not in self._faction_modifiers:
-            self._faction_modifiers[faction] = {}
-        self._faction_modifiers[faction][unit_type] = stats
+        faction_key = faction.value
+        unit_type_key = unit_type.value
+        if faction_key not in self._faction_modifiers:
+            self._faction_modifiers[faction_key] = {}
+        self._faction_modifiers[faction_key][unit_type_key] = stats
         # Clear cache when modifiers change (cache removed for now)
         # self._get_cached_unit_stats.cache_clear()
 
     def register_technology_modifier(
-        self, technology: str, unit_type: str, stats: UnitStats
+        self, technology: Technology, unit_type: UnitType, stats: UnitStats
     ) -> None:
         """Register technology-based unit modifications."""
-        if technology not in self._technology_modifiers:
-            self._technology_modifiers[technology] = {}
-        self._technology_modifiers[technology][unit_type] = stats
+        technology_key = technology.value
+        unit_type_key = unit_type.value
+        if technology_key not in self._technology_modifiers:
+            self._technology_modifiers[technology_key] = {}
+        self._technology_modifiers[technology_key][unit_type_key] = stats
         # Clear cache when modifiers change (cache removed for now)
         # self._get_cached_unit_stats.cache_clear()

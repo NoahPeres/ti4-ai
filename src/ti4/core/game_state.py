@@ -10,11 +10,19 @@ from .player import Player
 if TYPE_CHECKING:
     from .galaxy import Galaxy
     from .objective import Objective
+    from .planet import Planet
+    from .strategic_action import StrategyCardType
+    from .strategy_card_coordinator import StrategyCardCoordinator
     from .system import System
+    from .technology import TechnologyCard
 else:
     Galaxy = "Galaxy"
     System = "System"
     Objective = "Objective"
+    Planet = "Planet"
+    StrategyCardType = "StrategyCardType"
+    StrategyCardCoordinator = "StrategyCardCoordinator"
+    TechnologyCard = "TechnologyCard"
 
 # Victory condition constants
 VICTORY_POINTS_TO_WIN = 10
@@ -29,10 +37,15 @@ class GameState:
     galaxy: Optional[Galaxy] = None
     phase: GamePhase = GamePhase.SETUP
     systems: dict[str, System] = field(default_factory=dict, hash=False)
-    player_resources: dict[str, dict[str, Any]] = field(
+    # player_resources field removed - incorrect implementation
+    # Resources should be tracked on planets per Rules 47 and 75
+    player_technologies: dict[str, list[str]] = field(default_factory=dict, hash=False)
+    # Player planets (Rule 34)
+    player_planets: dict[str, list["Planet"]] = field(default_factory=dict, hash=False)
+    # Player technology cards (Rule 34)
+    player_technology_cards: dict[str, list["TechnologyCard"]] = field(
         default_factory=dict, hash=False
     )
-    player_technologies: dict[str, list[str]] = field(default_factory=dict, hash=False)
     victory_points: dict[str, int] = field(default_factory=dict, hash=False)
     completed_objectives: dict[str, list[str]] = field(default_factory=dict, hash=False)
 
@@ -51,9 +64,19 @@ class GameState:
     secret_objective_deck: list[Objective] = field(
         default_factory=list, hash=False
     )  # Deck of unassigned secret objectives
-    player_influence: dict[str, int] = field(
+    # player_influence field removed - incorrect implementation
+    # Influence should be tracked on planets per Rules 47 and 75
+
+    # Strategy card system (Rule 83)
+    strategy_card_assignments: dict[str, "StrategyCardType"] = field(
         default_factory=dict, hash=False
-    )  # player_id -> influence_amount
+    )  # player_id -> strategy_card
+    exhausted_strategy_cards: set["StrategyCardType"] = field(
+        default_factory=set, hash=False
+    )  # Set of exhausted strategy cards
+    strategy_card_coordinator: Optional["StrategyCardCoordinator"] = field(
+        default=None, hash=False
+    )  # Optional strategy card coordinator
 
     def get_victory_points(self, player_id: str) -> int:
         """Get the victory points for a player."""
@@ -108,8 +131,14 @@ class GameState:
             galaxy=self.galaxy,
             phase=self.phase,
             systems=self.systems,
-            player_resources=self.player_resources,
-            player_technologies=self.player_technologies,
+            # player_resources parameter removed - incorrect implementation
+            player_technologies=kwargs.get(
+                "player_technologies", self.player_technologies
+            ),
+            player_planets=kwargs.get("player_planets", self.player_planets),
+            player_technology_cards=kwargs.get(
+                "player_technology_cards", self.player_technology_cards
+            ),
             victory_points=kwargs.get("victory_points", self.victory_points),
             completed_objectives=kwargs.get(
                 "completed_objectives", self.completed_objectives
@@ -124,7 +153,16 @@ class GameState:
             secret_objective_deck=kwargs.get(
                 "secret_objective_deck", self.secret_objective_deck
             ),
-            player_influence=kwargs.get("player_influence", self.player_influence),
+            # player_influence parameter removed - incorrect implementation
+            strategy_card_assignments=kwargs.get(
+                "strategy_card_assignments", self.strategy_card_assignments
+            ),
+            exhausted_strategy_cards=kwargs.get(
+                "exhausted_strategy_cards", self.exhausted_strategy_cards
+            ),
+            strategy_card_coordinator=kwargs.get(
+                "strategy_card_coordinator", self.strategy_card_coordinator
+            ),
         )
 
     def is_valid(self) -> bool:
@@ -451,41 +489,52 @@ class GameState:
         new_state = self._create_new_state(secret_objective_deck=new_deck)
         return new_state.assign_secret_objective(player_id, drawn_objective)
 
-    def execute_imperial_secondary_ability(self, player_id: str) -> "GameState":
-        """Execute Imperial strategy card secondary ability - spend 1 influence to draw a secret objective."""
-        player_influence = self.get_player_influence(player_id)
-        if player_influence < 1:
-            raise ValueError(
-                f"Insufficient influence - requires 1 influence, player {player_id} has {player_influence}"
-            )
+    # Imperial secondary ability removed - was incorrectly implemented
+    # According to Rule 45.3, players spend one command token from their strategy pool
+    # to draw one secret objective card, not influence
 
-        # Spend 1 influence
-        new_state = self.spend_player_influence(player_id, 1)
+    # Player influence/resource tracking removed - incorrect implementation
+    # According to Rules 47 and 75, influence and resources are planet stats, not player stats
+    # Players spend influence/resources by exhausting planet cards, not from player pools
 
-        # Draw secret objective
-        return new_state.execute_imperial_primary_ability(player_id)
+    def add_player(self, player: "Player") -> "GameState":
+        """Add a player to the game."""
+        new_players = self.players.copy()
+        new_players.append(player)
 
-    # Player Influence Management
+        # Initialize player-specific tracking
+        # Player resource tracking removed - incorrect implementation
+        new_player_technologies = self.player_technologies.copy()
+        new_victory_points = self.victory_points.copy()
+        new_completed_objectives = self.completed_objectives.copy()
+        new_status_phase_scoring = self.status_phase_scoring.copy()
+        new_combat_scoring = self.combat_scoring.copy()
+        new_player_secret_objectives = self.player_secret_objectives.copy()
+        # Player influence tracking removed - incorrect implementation
 
-    def get_player_influence(self, player_id: str) -> int:
-        """Get player's influence amount."""
-        return self.player_influence.get(player_id, 0)
+        # Initialize empty tracking for new player
+        # Player resource tracking removed - incorrect implementation
+        # Resources should be tracked on planets, not as player pools
+        new_player_technologies[player.id] = []
+        new_victory_points[player.id] = 0
+        new_completed_objectives[player.id] = []
+        new_status_phase_scoring[player.id] = {"public": 0, "secret": 0}
+        new_combat_scoring[player.id] = []
+        new_player_secret_objectives[player.id] = []
+        # Player influence tracking removed - incorrect implementation
+        # Influence should be tracked on planets per Rules 47 and 75
 
-    def set_player_influence(self, player_id: str, amount: int) -> "GameState":
-        """Set player's influence amount."""
-        new_influence = self.player_influence.copy()
-        new_influence[player_id] = amount
-        return self._create_new_state(player_influence=new_influence)
-
-    def spend_player_influence(self, player_id: str, amount: int) -> "GameState":
-        """Spend player influence."""
-        current_influence = self.get_player_influence(player_id)
-        if current_influence < amount:
-            raise ValueError(
-                f"Insufficient influence - requires {amount}, player {player_id} has {current_influence}"
-            )
-
-        return self.set_player_influence(player_id, current_influence - amount)
+        return self._create_new_state(
+            players=new_players,
+            # player_resources parameter removed - incorrect implementation
+            player_technologies=new_player_technologies,
+            victory_points=new_victory_points,
+            completed_objectives=new_completed_objectives,
+            status_phase_scoring=new_status_phase_scoring,
+            combat_scoring=new_combat_scoring,
+            player_secret_objectives=new_player_secret_objectives,
+            # player_influence parameter removed - incorrect implementation
+        )
 
     def eliminate_player(self, player_id: str) -> "GameState":
         """Eliminate a player from the game, removing their secret objectives."""
@@ -498,3 +547,225 @@ class GameState:
         return self._create_new_state(
             player_secret_objectives=new_player_secret_objectives
         )
+
+    # Strategy Card Management Methods (Rule 83)
+
+    def assign_strategy_card(
+        self, player_id: str, strategy_card: "StrategyCardType"
+    ) -> "GameState":
+        """Assign a strategy card to a player.
+
+        Args:
+            player_id: The player to assign the card to
+            strategy_card: The strategy card to assign
+
+        Returns:
+            New GameState with the strategy card assigned
+
+        Raises:
+            ValueError: If inputs are invalid or card is already assigned
+
+        Requirements: 1.3, 6.2 - Strategy card tracking and state synchronization
+        """
+        # Input validation
+        if player_id is None:
+            raise ValueError("Player ID cannot be None")
+        if not isinstance(player_id, str) or not player_id.strip():
+            raise ValueError("Player ID cannot be empty")
+        if strategy_card is None:
+            raise ValueError("Strategy card cannot be None")
+
+        # Check if card is already assigned to another player
+        for existing_player, existing_card in self.strategy_card_assignments.items():
+            if existing_card == strategy_card and existing_player != player_id:
+                raise ValueError(
+                    f"Strategy card {strategy_card.value} is already assigned to player {existing_player}"
+                )
+
+        # Create new assignments
+        new_assignments = self.strategy_card_assignments.copy()
+        new_assignments[player_id] = strategy_card
+
+        return self._create_new_state(strategy_card_assignments=new_assignments)
+
+    def exhaust_strategy_card(self, strategy_card: "StrategyCardType") -> "GameState":
+        """Exhaust a strategy card (mark as used).
+
+        Args:
+            strategy_card: The strategy card to exhaust
+
+        Returns:
+            New GameState with the strategy card exhausted
+
+        Raises:
+            ValueError: If strategy card is None
+
+        Requirements: 4.5 - State persistence for card exhaustion
+        """
+        if strategy_card is None:
+            raise ValueError("Strategy card cannot be None")
+
+        new_exhausted_cards = self.exhausted_strategy_cards.copy()
+        new_exhausted_cards.add(strategy_card)
+
+        return self._create_new_state(exhausted_strategy_cards=new_exhausted_cards)
+
+    def ready_strategy_card(self, strategy_card: "StrategyCardType") -> "GameState":
+        """Ready a strategy card (mark as available for use).
+
+        Args:
+            strategy_card: The strategy card to ready
+
+        Returns:
+            New GameState with the strategy card readied
+
+        Requirements: 4.5, 10.2 - State persistence and round management
+        """
+        new_exhausted_cards = self.exhausted_strategy_cards.copy()
+        new_exhausted_cards.discard(strategy_card)
+
+        return self._create_new_state(exhausted_strategy_cards=new_exhausted_cards)
+
+    def ready_all_strategy_cards(self) -> "GameState":
+        """Ready all strategy cards for the next round.
+
+        Returns:
+            New GameState with all strategy cards readied
+
+        Requirements: 10.2 - Round management state tracking
+        """
+        return self._create_new_state(exhausted_strategy_cards=set())
+
+    def clear_strategy_card_assignments(self) -> "GameState":
+        """Clear all strategy card assignments for round reset.
+
+        Returns:
+            New GameState with no strategy card assignments
+
+        Requirements: 10.2 - Round management state tracking
+        """
+        return self._create_new_state(strategy_card_assignments={})
+
+    def synchronize_with_coordinator(
+        self, coordinator: "StrategyCardCoordinator"
+    ) -> "GameState":
+        """Synchronize GameState with StrategyCardCoordinator.
+
+        Args:
+            coordinator: The StrategyCardCoordinator to synchronize with
+
+        Returns:
+            New GameState synchronized with coordinator state
+
+        Requirements: 6.2 - State synchronization with StrategyCardCoordinator
+        """
+        # Import here to avoid circular imports
+        from .strategy_card_coordinator import StrategyCardCoordinator
+
+        if not isinstance(coordinator, StrategyCardCoordinator):
+            raise ValueError("Coordinator must be a StrategyCardCoordinator instance")
+
+        # Get assignments directly from coordinator's internal state
+        new_assignments = coordinator._card_assignments.copy()
+
+        # Get exhausted cards from coordinator
+        new_exhausted_cards = set()
+        for player_id, card in new_assignments.items():
+            if coordinator.is_strategy_card_exhausted(player_id, card):
+                new_exhausted_cards.add(card)
+
+        return self._create_new_state(
+            strategy_card_assignments=new_assignments,
+            exhausted_strategy_cards=new_exhausted_cards,
+        )
+
+    def add_player_planet(self, player_id: str, planet: "Planet") -> "GameState":
+        """Add a planet to a player's control.
+
+        Args:
+            player_id: The player ID
+            planet: The planet to add
+
+        Returns:
+            New GameState with the planet added to the player
+        """
+        new_player_planets = {
+            pid: planets.copy() for pid, planets in self.player_planets.items()
+        }
+
+        if player_id not in new_player_planets:
+            new_player_planets[player_id] = []
+
+        new_player_planets[player_id].append(planet)
+
+        return self._create_new_state(player_planets=new_player_planets)
+
+    def get_player_planets(self, player_id: str) -> list["Planet"]:
+        """Get all planets controlled by a player.
+
+        Args:
+            player_id: The player ID
+
+        Returns:
+            List of planets controlled by the player
+        """
+        return self.player_planets.get(player_id, [])
+
+    def add_player_technology_card(
+        self, player_id: str, tech_card: "TechnologyCard"
+    ) -> "GameState":
+        """Add a technology card to a player.
+
+        Args:
+            player_id: The player ID
+            tech_card: The technology card to add
+
+        Returns:
+            New GameState with the technology card added to the player
+        """
+        new_player_tech_cards = {
+            pid: cards.copy() for pid, cards in self.player_technology_cards.items()
+        }
+
+        if player_id not in new_player_tech_cards:
+            new_player_tech_cards[player_id] = []
+
+        new_player_tech_cards[player_id].append(tech_card)
+
+        return self._create_new_state(player_technology_cards=new_player_tech_cards)
+
+    def get_player_technology_cards(self, player_id: str) -> list["TechnologyCard"]:
+        """Get all technology cards owned by a player.
+
+        Args:
+            player_id: The player ID
+
+        Returns:
+            List of technology cards owned by the player
+        """
+        return self.player_technology_cards.get(player_id, [])
+
+    def add_player_technology(
+        self, player_id: str, tech_card: "TechnologyCard"
+    ) -> "GameState":
+        """Add a technology card to a player (alias for add_player_technology_card).
+
+        Args:
+            player_id: The player ID
+            tech_card: The technology card to add
+
+        Returns:
+            New GameState with the technology card added to the player
+        """
+        return self.add_player_technology_card(player_id, tech_card)
+
+    def get_player_technologies(self, player_id: str) -> list[str]:
+        """Get all technology names owned by a player.
+
+        Args:
+            player_id: The player ID
+
+        Returns:
+            List of technology names owned by the player
+        """
+        return self.player_technologies.get(player_id, [])
