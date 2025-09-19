@@ -18,6 +18,44 @@ class System:
         self.space_units: list[Unit] = []  # Units in the space area of the system
         self.wormholes: list[str] = []  # List of wormhole types in this system
         self.fleets: list[Fleet] = []  # Fleets in this system
+        self.command_tokens: dict[str, bool] = {}  # Player ID -> has command token
+
+    def place_command_token(self, player_id: str) -> None:
+        """Place a command token for a player in this system (Rule 20.4)."""
+        self.command_tokens[player_id] = True
+
+    def remove_command_token(self, player_id: str) -> None:
+        """Remove a command token for a player from this system."""
+        self.command_tokens.pop(player_id, None)
+
+    def has_command_token(self, player_id: str) -> bool:
+        """Check if a player has a command token in this system."""
+        return self.command_tokens.get(player_id, False)
+
+    def get_players_with_command_tokens(self) -> list[str]:
+        """Get list of players who have command tokens in this system."""
+        return [
+            player_id
+            for player_id, has_token in self.command_tokens.items()
+            if has_token
+        ]
+
+    def has_enemy_ships(self, player_id: str) -> bool:
+        """Check if this system contains ships belonging to other players (Rule 58.4b)."""
+        ship_types = {
+            "carrier",
+            "cruiser",
+            "cruiser_ii",
+            "dreadnought",
+            "destroyer",
+            "flagship",
+            "war_sun",
+        }
+
+        for unit in self.space_units:
+            if unit.owner != player_id and unit.unit_type in ship_types:
+                return True
+        return False
 
     def place_unit_in_space(self, unit: Unit) -> None:
         """Place a unit in the space area of this system."""

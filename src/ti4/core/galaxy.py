@@ -294,3 +294,47 @@ class Galaxy:
                     break
 
         return player_systems
+
+    def find_path(
+        self, start_system_id: str, end_system_id: str, max_distance: int = 10
+    ) -> list[str]:
+        """
+        Find a path between two systems using BFS.
+
+        Args:
+            start_system_id: Starting system ID
+            end_system_id: Destination system ID
+            max_distance: Maximum path length to search
+
+        Returns:
+            List of system IDs representing the path, empty if no path found
+        """
+        if start_system_id == end_system_id:
+            return [start_system_id]
+
+        from collections import deque
+
+        queue = deque([(start_system_id, [start_system_id])])
+        visited = {start_system_id}
+
+        while queue:
+            current_system, path = queue.popleft()
+
+            if len(path) > max_distance:
+                continue
+
+            # Check all systems for adjacency
+            for system_id in self.system_objects.keys():
+                if system_id not in visited and self.are_systems_adjacent(
+                    current_system, system_id
+                ):
+                    new_path = path + [system_id]
+
+                    if system_id == end_system_id:
+                        return new_path
+
+                    if len(new_path) < max_distance:
+                        queue.append((system_id, new_path))
+                        visited.add(system_id)
+
+        return []  # No path found

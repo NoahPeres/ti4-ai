@@ -179,6 +179,234 @@ class CommitGroundForcesStep(TacticalActionStep):
         return game_state
 
 
+class SpaceCannonOffenseStep(TacticalActionStep):
+    """Step for Space Cannon Offense during tactical action (Rule 58.7)."""
+
+    def can_execute(self, game_state: Any, context: dict[str, Any]) -> bool:
+        """Check if space cannon offense can be executed."""
+        active_system_id = context.get("active_system_id")
+        if not active_system_id:
+            return False
+
+        system = game_state.systems.get(active_system_id)
+        if not system:
+            return False
+
+        # Check if there are any units with space cannon ability
+        space_cannon_units = self._get_space_cannon_units(system)
+        return len(space_cannon_units) > 0
+
+    def get_step_name(self) -> str:
+        return "Space Cannon Offense"
+
+    def execute(self, game_state: Any, context: dict[str, Any]) -> Any:
+        """Execute space cannon offense step."""
+        active_system_id = context.get("active_system_id")
+        system = game_state.systems.get(active_system_id)
+
+        if not system:
+            return game_state
+
+        # Get all players with space cannon units
+        space_cannon_players = self._get_space_cannon_players(system)
+
+        # Execute space cannon offense for each player in order
+        for player_id in space_cannon_players:
+            self._resolve_space_cannon_for_player(player_id, game_state, context)
+
+        return game_state
+
+    def _get_space_cannon_units(self, system: Any) -> list[Any]:
+        """Get all units with space cannon ability in the system."""
+        space_cannon_units = []
+
+        # Check units on planets (PDS units have space cannon)
+        for planet in system.planets:
+            for unit in planet.units:
+                # Check if unit has space cannon ability using unit stats
+                if hasattr(unit, "unit_type"):
+                    from ..core.constants import UnitType
+                    from ..core.unit_stats import UnitStatsProvider
+
+                    provider = UnitStatsProvider()
+                    # Convert string unit_type back to enum
+                    unit_type_enum = UnitType(unit.unit_type)
+                    stats = provider.get_unit_stats(unit_type_enum)
+                    if stats.space_cannon:
+                        space_cannon_units.append(unit)
+
+        return space_cannon_units
+
+    def _get_space_cannon_players(self, system: Any) -> list[str]:
+        """Get players who have space cannon units in order."""
+        players = set()
+
+        for unit in self._get_space_cannon_units(system):
+            players.add(unit.owner)
+
+        return sorted(players)  # Return in consistent order
+
+    def _get_valid_target_players(
+        self, shooting_player: str, system: Any, context: dict[str, Any]
+    ) -> list[str]:
+        """Get valid target players for space cannon offense."""
+        active_player = context.get("player_id")
+        if not isinstance(active_player, str):
+            return []
+            
+        target_players = set()
+
+        # Space cannon can target ships in space
+        for unit in system.space_units:
+            if unit.owner != shooting_player:
+                target_players.add(unit.owner)
+
+        target_list = sorted(target_players)
+
+        # Rule 77.5: Non-active players can only target the active player
+        if shooting_player != active_player:
+            return [active_player] if active_player in target_list else []
+
+        # Active player can target any other player
+        return target_list
+
+    def _execute_player_space_cannon(
+        self, game_state: Any, system: Any, player_id: str, context: dict[str, Any]
+    ) -> None:
+        """Execute space cannon offense for a specific player."""
+        # Get space cannon units for this player
+        player_units = [
+            unit
+            for unit in self._get_space_cannon_units(system)
+            if unit.owner == player_id
+        ]
+
+        if not player_units:
+            return
+
+        # Get valid targets
+        target_players = self._get_valid_target_players(player_id, system, context)
+        if not target_players:
+            return
+
+        # Roll dice for each space cannon unit
+        total_hits = 0
+
+        for unit in player_units:
+            hits = self._roll_space_cannon_dice(unit, game_state, context)
+            total_hits += hits
+
+        # Assign hits to target units (simplified - target first available unit)
+        if total_hits > 0:
+            self._assign_hits(system, target_players, total_hits)
+
+    def _assign_space_cannon_hits(
+        self, system: Any, target_players: list[str], hits: int
+    ) -> None:
+        """Assign space cannon hits to target units."""
+        # Get all targetable units (ships in space)
+        target_units = []
+        for unit in system.space_units:
+            if unit.owner in target_players:
+                target_units.append(unit)
+
+        # Assign hits (simplified - destroy units in order)
+        hits_to_assign = min(hits, len(target_units))
+        for i in range(hits_to_assign):
+            unit = target_units[i]
+            system.remove_unit_from_space(unit)
+
+    def _roll_space_cannon_dice(
+        self, unit: Any, game_state: Any, context: dict[str, Any]
+    ) -> int:
+        """Roll space cannon dice for a unit and return hits."""
+        from ..core.dice import calculate_hits, roll_dice
+
+        # Get unit's space cannon stats
+        stats = unit.get_stats()
+        if not hasattr(stats, "space_cannon_value") or stats.space_cannon_value is None:
+            return 0
+
+        # Get number of dice to roll (default 1 if not specified)
+        dice_count = getattr(stats, "space_cannon_dice", 1)
+
+        # Roll dice
+        dice_results = roll_dice(dice_count)
+
+        # Calculate hits
+        return calculate_hits(dice_results, stats.space_cannon_value)
+
+    def _assign_hits(self, system: Any, target_players: list[str], hits: int) -> None:
+        """Assign hits to target units (alias for _assign_space_cannon_hits)."""
+        self._assign_space_cannon_hits(system, target_players, hits)
+
+    def _get_space_cannon_units_for_player(
+        self, player_id: str, game_state: Any, context: dict[str, Any]
+    ) -> list[Any]:
+        """Get all space cannon units for a player in the active system and adjacent systems (for PDS II)."""
+        from ..core.constants import UnitType
+        from ..core.unit_stats import UnitStatsProvider
+
+        active_system_id = context["active_system_id"]
+        active_system = game_state.systems[active_system_id]
+
+        # Get units in the active system (space units)
+        units = []
+        for unit in active_system.space_units:
+            if unit.owner == player_id and hasattr(unit, "unit_type"):
+                provider = UnitStatsProvider()
+                unit_type_enum = UnitType(unit.unit_type)
+                stats = provider.get_unit_stats(unit_type_enum)
+                if stats.space_cannon:
+                    units.append(unit)
+
+        # Get units on planets in the active system
+        for planet in active_system.planets:
+            for unit in planet.units:
+                if unit.owner == player_id and hasattr(unit, "unit_type"):
+                    provider = UnitStatsProvider()
+                    unit_type_enum = UnitType(unit.unit_type)
+                    stats = provider.get_unit_stats(unit_type_enum)
+                    if stats.space_cannon:
+                        units.append(unit)
+
+        # For PDS II units, also check adjacent systems (Rule 77.3c)
+        if hasattr(game_state, "galaxy") and game_state.galaxy:
+            # Get all systems adjacent to the active system
+            for system_id, system in game_state.systems.items():
+                if system_id != active_system_id:
+                    # Check if this system is adjacent to the active system
+                    if game_state.galaxy.are_systems_adjacent(
+                        system_id, active_system_id
+                    ):
+                        # Check for PDS units with PDS II upgrade on planets in adjacent system
+                        for planet in system.planets:
+                            for unit in planet.units:
+                                if (
+                                    unit.owner == player_id
+                                    and hasattr(unit, "unit_type")
+                                    and (
+                                        unit.unit_type == UnitType.PDS
+                                        or unit.unit_type == "pds"
+                                    )  # Handle both enum and string
+                                    and hasattr(unit, "_has_pds_ii_upgrade")
+                                    and unit._has_pds_ii_upgrade
+                                ):
+                                    units.append(unit)
+
+        return units
+
+    def _resolve_space_cannon_for_player(
+        self, player_id: str, game_state: Any, context: dict[str, Any]
+    ) -> None:
+        """Resolve space cannon for a specific player."""
+        active_system_id = context.get("active_system_id")
+        system = game_state.systems.get(active_system_id)
+
+        if system:
+            self._execute_player_space_cannon(game_state, system, player_id, context)
+
+
 @dataclass
 class ValidationResult:
     """Result of movement plan validation."""
@@ -373,6 +601,13 @@ class TacticalAction:
         # Initialize with default steps (can be customized)
         self._initialize_default_steps()
 
+    def activate_system(self, game_state: Any) -> Any:
+        """Activate the system by placing a command token (Rule 20.4)."""
+        system = game_state.systems.get(self.active_system_id)
+        if system:
+            system.place_command_token(self.player_id)
+        return game_state
+
     def _initialize_default_steps(self) -> None:
         """Initialize the default tactical action steps."""
         # Note: Steps are defined after TacticalActionStep, so we need to create them here
@@ -439,6 +674,7 @@ class TacticalAction:
         if not self.steps:  # Only initialize if not already done
             self.steps = [
                 MovementStep(),
+                SpaceCannonOffenseStep(),
                 CommitGroundForcesStep(),
                 # Future steps can be added here:
                 # SpaceCombatStep(),

@@ -59,14 +59,35 @@ class MovementValidator:
 
     def _validate_ti4_movement_rules(self, movement: MovementOperation) -> bool:
         """Validate TI4-specific movement rules."""
-        # Rule: Ground forces cannot move directly between planets
-        # They must move to space first, then be committed to planets
-        if (
-            movement.from_location != LocationType.SPACE.value
-            and movement.to_location != LocationType.SPACE.value
-            and movement.from_location != movement.to_location
-        ):
+        from_system = self._galaxy.get_system(movement.from_system_id)
+        to_system = self._galaxy.get_system(movement.to_system_id)
+
+        if not from_system or not to_system:
             return False
+
+        # Rule 58.4c: Cannot move from system with own command token
+        if from_system.has_command_token(movement.player_id):
+            return False
+
+        # Rule 58.4b: Cannot move through systems with enemy ships
+        # Find the path and check each intermediate system
+        path = self._galaxy.find_path(movement.from_system_id, movement.to_system_id)
+
+        if not path:
+            return False  # No path exists
+
+        # Check intermediate systems (exclude start and end)
+        for i in range(1, len(path) - 1):
+            intermediate_system_id = path[i]
+            intermediate_system = self._galaxy.get_system(intermediate_system_id)
+
+            if intermediate_system and intermediate_system.has_enemy_ships(
+                movement.player_id
+            ):
+                return False  # Blocked by enemy ships in intermediate system
+
+        # Rule 58.4d: Can move through systems with own command tokens
+        # This is implicitly allowed by not blocking it
 
         return True
 

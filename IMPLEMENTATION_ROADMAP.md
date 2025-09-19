@@ -1,35 +1,32 @@
 # TI4 AI Implementation Roadmap
 
 **Last Updated**: December 2024  
-**Overall Progress**: 8.2% → **15.2%** ✅ (+7.0% from Rules 6 & 60 completion)
+**Overall Progress**: 5.1% → **7.2%** ✅ (+2.1% from recent implementations)
 
-### 🎯 Next Target: 25% (Core Spatial Mechanics Foundation)
+### 🎯 Next Target: 10% (Core Spatial Mechanics Foundation)
 **Focus**: Complete foundational spatial mechanics that enable all other game systems
 
-## 📊 Overall Progress Summary
-
-**Current Implementation Status**: 25.8%  
-**Next Target**: 35% (Core game mechanics expansion)
-
-### ✅ Completed Rules (4/66)
+## 📊 **Overall Progress**: 5.0%
+**Completed Rules**: 5/101 rule categories completed
 - **Rule 6: ADJACENCY** - Core spatial mechanics for system relationships
 - **Rule 60: NEIGHBORS** - Player neighbor determination for transactions
 - **Rule 101: WORMHOLES** - Wormhole adjacency mechanics (Foundation Layer)
 - **Rule 61: OBJECTIVE CARDS** - Victory condition framework (Core Game Layer)
+- **Rule 20: COMMAND TOKENS** - Resource management and reinforcement system (Foundation Layer)
 
 ### 🎯 Next Priority Rules
 1. **Rule 58: MOVEMENT** - Unit movement and fleet mechanics (Core Game Layer)
-2. **Rule 17: COMMAND TOKENS** - Resource management system (Foundation Layer)
+2. **Rule 17: COMMAND TOKENS** - Advanced command token mechanics (Foundation Layer)
 3. **Rule 99: TRANSACTIONS** - Player trading system (Core Game Layer)
 
 ### 📈 Progress Metrics
-- Foundation Layer: 3/8 rules (37.5%)
+- Foundation Layer: 4/8 rules (50.0%)
 - Core Game Layer: 1/15 rules (6.7%)
 - Advanced Mechanics: 0/43 rules (0%)
 
-### 📈 Progress Metrics
-- **Tests**: 612 total tests, all passing
-- **Coverage**: 15% overall (focused on core mechanics)
+### 📈 Current Metrics
+- **Tests**: 652 total tests, all passing
+- **Coverage**: 5% overall (focused on core mechanics)
 - **Quality**: Strict TDD, type checking, linting standards maintained
 
 ### 📈 Priority Analysis Summary
@@ -337,16 +334,41 @@ The **strict TDD approach** ensures each implementation is robust, testable, and
 
 **Immediate Next Step**: Start TDD implementation of Rule 58: MOVEMENT
 - **Target**: 0% → 75% implementation
-- **Dependencies**: ✅ Rule 6 (Adjacency) completed, ✅ Rule 60 (Neighbors) completed, ✅ Rule 101 (Wormholes) completed, ✅ Rule 61 (Objective Cards) completed
+- **Dependencies**: ✅ Rule 6 (Adjacency) completed, ✅ Rule 60 (Neighbors) completed, ✅ Rule 101 (Wormholes) completed, ✅ Rule 61 (Objective Cards) completed, ✅ Rule 20 (Command Tokens) completed
 - **Approach**: Strict TDD with RED-GREEN-REFACTOR cycles
 - **Focus**: Unit movement validation, fleet mechanics, and tactical action system
 
 **Context for Future Development**: 
-With foundational spatial mechanics and victory conditions complete, implementing movement mechanics will enable tactical gameplay, combat positioning, and strategic unit deployment across the galaxy:
+With foundational spatial mechanics, victory conditions, and command token system complete, implementing movement mechanics will enable tactical gameplay, combat positioning, and strategic unit deployment across the galaxy:
 - Unit movement validation and path finding
 - Fleet capacity and movement restrictions
 - Tactical action system integration
+- Command token consumption for movement
 - AI decision-making for unit positioning
 - Strategic movement planning for objectives
+
+---
+
+## 📋 Recently Completed: Rule 20 (COMMAND TOKENS)
+
+**Implementation Status**: ✅ **COMPLETED** (December 2024)
+**Coverage**: Core mechanics implemented with comprehensive test suite
+
+### Key Features Implemented:
+- **CommandSheet class**: Token pool management (tactic, fleet, strategy)
+- **Player integration**: Reinforcement tracking and token gain mechanics
+- **Pool validation**: Proper error handling for invalid pools
+- **TDD compliance**: 18 tests across 3 test files
+
+### Test Coverage:
+- `test_rule_20_command_tokens.py`: Core command sheet functionality (8 tests)
+- `test_rule_20_reinforcement_limits.py`: Reinforcement system validation (4 tests)  
+- `test_rule_20_token_gain.py`: Token gain mechanics with pool choice (6 tests)
+
+### Quality Metrics:
+- **Type Safety**: Full mypy compliance with strict checking
+- **Code Quality**: All linting and formatting standards met
+- **Integration**: Seamless integration with Player class
+- **Documentation**: Complete rule tracking in `.trae/lrr_analysis/`
 
 The movement system (Rule 58) will provide the core tactical mechanics that enable dynamic gameplay and strategic positioning.

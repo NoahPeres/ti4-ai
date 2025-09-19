@@ -18,6 +18,8 @@ class UnitStats:
     sustain_damage: bool = False
     anti_fighter_barrage: bool = False
     space_cannon: bool = False
+    space_cannon_value: Optional[int] = None
+    space_cannon_dice: int = 1
     bombardment: bool = False
     deploy: bool = False
     planetary_shield: bool = False
@@ -36,6 +38,10 @@ class UnitStats:
                 "anti_fighter_barrage", self.anti_fighter_barrage
             ),
             space_cannon=kwargs.get("space_cannon", self.space_cannon),
+            space_cannon_value=kwargs.get(
+                "space_cannon_value", self.space_cannon_value
+            ),
+            space_cannon_dice=kwargs.get("space_cannon_dice", self.space_cannon_dice),
             bombardment=kwargs.get("bombardment", self.bombardment),
             deploy=kwargs.get("deploy", self.deploy),
             planetary_shield=kwargs.get("planetary_shield", self.planetary_shield),
@@ -99,6 +105,8 @@ class UnitStatsProvider:
             movement=0,
             cost=2,
             space_cannon=True,
+            space_cannon_value=6,
+            space_cannon_dice=1,
             planetary_shield=True,
         ),
         "space_dock": UnitStats(
