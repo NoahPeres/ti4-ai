@@ -1,9 +1,9 @@
-"""Warfare Strategy Card implementation for TI4.
+"""Diplomacy Strategy Card implementation for TI4.
 
-This module implements the Warfare strategy card following the
+This module implements the Diplomacy strategy card following the
 BaseStrategyCard pattern established for all strategy cards.
 
-LRR Reference: Rule 83 - STRATEGY CARD (Warfare)
+LRR Reference: Rule 83 - STRATEGY CARD (Diplomacy)
 """
 
 from typing import TYPE_CHECKING, Any, Optional
@@ -15,34 +15,34 @@ if TYPE_CHECKING:
     from .game_state import GameState
 
 
-class WarfareStrategyCard(BaseStrategyCard):
-    """Implementation of the Warfare strategy card.
+class DiplomacyStrategyCard(BaseStrategyCard):
+    """Implementation of the Diplomacy strategy card.
 
-    LRR Reference: Rule 83 - The "Warfare" strategy card.
-    This card's initiative value is "6."
+    LRR Reference: Rule 83 - The "Diplomacy" strategy card.
+    This card's initiative value is "2."
     """
 
     def __init__(self) -> None:
-        """Initialize the Warfare strategy card."""
+        """Initialize the Diplomacy strategy card."""
         pass
 
     def get_card_type(self) -> StrategyCardType:
         """Get the strategy card type.
 
         Returns:
-            StrategyCardType.WARFARE
+            StrategyCardType.DIPLOMACY
         """
-        return StrategyCardType.WARFARE
+        return StrategyCardType.DIPLOMACY
 
     def get_initiative_value(self) -> int:
-        """Get the initiative value of the Warfare strategy card.
+        """Get the initiative value of the Diplomacy strategy card.
 
         Returns:
-            The initiative value (6)
+            The initiative value (2)
 
-        LRR Reference: Rule 83 - Warfare has initiative value "6"
+        LRR Reference: Rule 83 - Diplomacy has initiative value "2"
         """
-        return 6
+        return 2
 
     def execute_primary_ability(
         self,
@@ -50,7 +50,7 @@ class WarfareStrategyCard(BaseStrategyCard):
         game_state: Optional["GameState"] = None,
         **kwargs: Any,
     ) -> StrategyCardAbilityResult:
-        """Execute the primary ability of the Warfare strategy card.
+        """Execute the primary ability of the Diplomacy strategy card.
 
         Args:
             player_id: The active player executing the primary ability
@@ -60,14 +60,14 @@ class WarfareStrategyCard(BaseStrategyCard):
         Returns:
             Result of the primary ability execution
 
-        Note: Specific Warfare abilities require manual confirmation
+        Note: Specific Diplomacy abilities require manual confirmation
         per manual_confirmation_protocol.md
         """
         # Placeholder implementation - specific abilities need user confirmation
         return StrategyCardAbilityResult(
             success=True,
             player_id=player_id,
-            error_message="Warfare primary ability implementation requires user confirmation of specific effects",
+            error_message="Diplomacy primary ability implementation requires user confirmation of specific effects",
         )
 
     def execute_secondary_ability(
@@ -76,7 +76,7 @@ class WarfareStrategyCard(BaseStrategyCard):
         game_state: Optional["GameState"] = None,
         **kwargs: Any,
     ) -> StrategyCardAbilityResult:
-        """Execute the secondary ability of the Warfare strategy card.
+        """Execute the secondary ability of the Diplomacy strategy card.
 
         Args:
             player_id: The player executing the secondary ability
@@ -86,12 +86,12 @@ class WarfareStrategyCard(BaseStrategyCard):
         Returns:
             Result of the secondary ability execution
 
-        Note: Specific Warfare abilities require manual confirmation
+        Note: Specific Diplomacy abilities require manual confirmation
         per manual_confirmation_protocol.md
         """
         # Placeholder implementation - specific abilities need user confirmation
         return StrategyCardAbilityResult(
             success=True,
             player_id=player_id,
-            error_message="Warfare secondary ability implementation requires user confirmation of specific effects",
+            error_message="Diplomacy secondary ability implementation requires user confirmation of specific effects",
         )

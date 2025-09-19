@@ -96,7 +96,7 @@ class TestRule83StrategyPhaseCardSelection:
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
 
-        speaker_order = ["player1", "player2"]
+        speaker_order = ["player1", "player2", "player3"]
         coordinator.start_strategy_phase_selection(speaker_order)
 
         # Player 1 selects Leadership
@@ -146,7 +146,7 @@ class TestRule83StrategyPhaseCardSelection:
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
 
-        speaker_order = ["player1", "player2"]
+        speaker_order = ["player1", "player2", "player3"]
         coordinator.start_strategy_phase_selection(speaker_order)
 
         # Initially player has no card

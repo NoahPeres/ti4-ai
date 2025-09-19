@@ -10,11 +10,15 @@ from .player import Player
 if TYPE_CHECKING:
     from .galaxy import Galaxy
     from .objective import Objective
+    from .strategic_action import StrategyCardType
+    from .strategy_card_coordinator import StrategyCardCoordinator
     from .system import System
 else:
     Galaxy = "Galaxy"
     System = "System"
     Objective = "Objective"
+    StrategyCardType = "StrategyCardType"
+    StrategyCardCoordinator = "StrategyCardCoordinator"
 
 # Victory condition constants
 VICTORY_POINTS_TO_WIN = 10
@@ -52,6 +56,14 @@ class GameState:
     )  # Deck of unassigned secret objectives
     # player_influence field removed - incorrect implementation
     # Influence should be tracked on planets per Rules 47 and 75
+
+    # Strategy card system (Rule 83)
+    strategy_card_assignments: dict[str, "StrategyCardType"] = field(
+        default_factory=dict, hash=False
+    )  # player_id -> strategy_card
+    exhausted_strategy_cards: set["StrategyCardType"] = field(
+        default_factory=set, hash=False
+    )  # Set of exhausted strategy cards
 
     def get_victory_points(self, player_id: str) -> int:
         """Get the victory points for a player."""
@@ -123,6 +135,12 @@ class GameState:
                 "secret_objective_deck", self.secret_objective_deck
             ),
             # player_influence parameter removed - incorrect implementation
+            strategy_card_assignments=kwargs.get(
+                "strategy_card_assignments", self.strategy_card_assignments
+            ),
+            exhausted_strategy_cards=kwargs.get(
+                "exhausted_strategy_cards", self.exhausted_strategy_cards
+            ),
         )
 
     def is_valid(self) -> bool:
@@ -506,4 +524,135 @@ class GameState:
 
         return self._create_new_state(
             player_secret_objectives=new_player_secret_objectives
+        )
+
+    # Strategy Card Management Methods (Rule 83)
+
+    def assign_strategy_card(
+        self, player_id: str, strategy_card: "StrategyCardType"
+    ) -> "GameState":
+        """Assign a strategy card to a player.
+
+        Args:
+            player_id: The player to assign the card to
+            strategy_card: The strategy card to assign
+
+        Returns:
+            New GameState with the strategy card assigned
+
+        Raises:
+            ValueError: If inputs are invalid or card is already assigned
+
+        Requirements: 1.3, 6.2 - Strategy card tracking and state synchronization
+        """
+        # Input validation
+        if player_id is None:
+            raise ValueError("Player ID cannot be None")
+        if not isinstance(player_id, str) or not player_id.strip():
+            raise ValueError("Player ID cannot be empty")
+        if strategy_card is None:
+            raise ValueError("Strategy card cannot be None")
+
+        # Check if card is already assigned to another player
+        for existing_player, existing_card in self.strategy_card_assignments.items():
+            if existing_card == strategy_card and existing_player != player_id:
+                raise ValueError(
+                    f"Strategy card {strategy_card.value} is already assigned to player {existing_player}"
+                )
+
+        # Create new assignments
+        new_assignments = self.strategy_card_assignments.copy()
+        new_assignments[player_id] = strategy_card
+
+        return self._create_new_state(strategy_card_assignments=new_assignments)
+
+    def exhaust_strategy_card(self, strategy_card: "StrategyCardType") -> "GameState":
+        """Exhaust a strategy card (mark as used).
+
+        Args:
+            strategy_card: The strategy card to exhaust
+
+        Returns:
+            New GameState with the strategy card exhausted
+
+        Raises:
+            ValueError: If strategy card is None
+
+        Requirements: 4.5 - State persistence for card exhaustion
+        """
+        if strategy_card is None:
+            raise ValueError("Strategy card cannot be None")
+
+        new_exhausted_cards = self.exhausted_strategy_cards.copy()
+        new_exhausted_cards.add(strategy_card)
+
+        return self._create_new_state(exhausted_strategy_cards=new_exhausted_cards)
+
+    def ready_strategy_card(self, strategy_card: "StrategyCardType") -> "GameState":
+        """Ready a strategy card (mark as available for use).
+
+        Args:
+            strategy_card: The strategy card to ready
+
+        Returns:
+            New GameState with the strategy card readied
+
+        Requirements: 4.5, 10.2 - State persistence and round management
+        """
+        new_exhausted_cards = self.exhausted_strategy_cards.copy()
+        new_exhausted_cards.discard(strategy_card)
+
+        return self._create_new_state(exhausted_strategy_cards=new_exhausted_cards)
+
+    def ready_all_strategy_cards(self) -> "GameState":
+        """Ready all strategy cards for the next round.
+
+        Returns:
+            New GameState with all strategy cards readied
+
+        Requirements: 10.2 - Round management state tracking
+        """
+        return self._create_new_state(exhausted_strategy_cards=set())
+
+    def clear_strategy_card_assignments(self) -> "GameState":
+        """Clear all strategy card assignments for round reset.
+
+        Returns:
+            New GameState with no strategy card assignments
+
+        Requirements: 10.2 - Round management state tracking
+        """
+        return self._create_new_state(strategy_card_assignments={})
+
+    def synchronize_with_coordinator(
+        self, coordinator: "StrategyCardCoordinator"
+    ) -> "GameState":
+        """Synchronize GameState with StrategyCardCoordinator.
+
+        Args:
+            coordinator: The StrategyCardCoordinator to synchronize with
+
+        Returns:
+            New GameState synchronized with coordinator state
+
+        Requirements: 6.2 - State synchronization with StrategyCardCoordinator
+        """
+        # Import here to avoid circular imports
+        from .strategy_card_coordinator import StrategyCardCoordinator
+
+        if not isinstance(coordinator, StrategyCardCoordinator):
+            raise ValueError("Coordinator must be a StrategyCardCoordinator instance")
+
+        # Get assignments directly from coordinator's internal state
+        new_assignments = coordinator._card_assignments.copy()
+
+        # Get exhausted cards from coordinator
+        new_exhausted_cards = set()
+        for player_id, card in new_assignments.items():
+            if coordinator.is_strategy_card_exhausted(player_id, card):
+                new_exhausted_cards.add(card)
+
+        return self._create_new_state(
+            strategy_card_assignments=new_assignments,
+            exhausted_strategy_cards=new_exhausted_cards,
         )

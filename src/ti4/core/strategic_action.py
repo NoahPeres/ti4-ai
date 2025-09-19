@@ -6,7 +6,7 @@ Handles strategy card activation, primary/secondary ability resolution, and turn
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Any, Optional, Union
 
 if TYPE_CHECKING:
     from .strategy_card_coordinator import StrategyCardCoordinator
@@ -102,9 +102,9 @@ class StrategicActionManager:
         self._current_activation: Optional[str] = None  # Currently activated card
         self._secondary_resolution_order: list[str] = []
         self._secondary_resolution_index: int = 0
-        
+
         # Strategy card coordinator integration (Rule 83)
-        self._strategy_card_coordinator: Optional["StrategyCardCoordinator"] = None
+        self._strategy_card_coordinator: Optional[StrategyCardCoordinator] = None
 
     def set_action_phase(self, action_phase: bool) -> None:
         """Set whether the game is in action phase.
@@ -381,3 +381,161 @@ class StrategicActionManager:
             secondary_order.append(self._player_order[next_index])
 
         return secondary_order
+
+    def _convert_to_strategy_card_type(
+        self, card: Union[str, StrategyCardType]
+    ) -> Optional[StrategyCardType]:
+        """Convert a card name or type to StrategyCardType enum.
+
+        Args:
+            card: The card name (string) or StrategyCardType enum
+
+        Returns:
+            StrategyCardType enum if conversion successful, None otherwise
+        """
+        if card is None:
+            return None
+
+        try:
+            return card if isinstance(card, StrategyCardType) else StrategyCardType(card)
+        except (ValueError, AttributeError):
+            return None
+
+    def can_activate_strategy_card_via_coordinator(
+        self, player_id: str, card: Union[str, StrategyCardType]
+    ) -> bool:
+        """Check if a player can activate a strategy card via coordinator.
+
+        Args:
+            player_id: The player attempting activation
+            card: The name or type of the strategy card
+
+        Returns:
+            True if activation is allowed, False otherwise
+
+        Requirements: 4.2, 6.2 - Integration with strategy card coordinator
+        """
+        # Input validation
+        if not player_id or card is None:
+            return False
+
+        if self._strategy_card_coordinator is None:
+            return False
+
+        # Convert to StrategyCardType
+        card_type = self._convert_to_strategy_card_type(card)
+        if card_type is None:
+            return False
+
+        return self._strategy_card_coordinator.can_use_primary_ability(
+            player_id, card_type
+        )
+
+    def activate_strategy_card_via_coordinator(
+        self, player_id: str, card: Union[str, StrategyCardType]
+    ) -> StrategicActionResult:
+        """Activate a strategy card via coordinator integration.
+
+        This method integrates with the strategy card coordinator to validate
+        and execute strategic actions, ensuring proper card exhaustion.
+
+        Args:
+            player_id: The player activating the card
+            card: The name or type of the strategy card to activate
+
+        Returns:
+            StrategicActionResult indicating success or failure
+
+        Requirements: 6.3 - Card exhaustion during strategic action resolution
+        """
+        # Convert to StrategyCardType
+        card_type = self._convert_to_strategy_card_type(card)
+        if card_type is None:
+            return StrategicActionResult(
+                success=False,
+                error_message=f"Invalid strategy card: {card}",
+            )
+
+        # Validate activation via coordinator
+        if not self.can_activate_strategy_card_via_coordinator(player_id, card_type):
+            return StrategicActionResult(
+                success=False,
+                error_message=f"Cannot activate strategy card '{card_type.value}' for player '{player_id}' via coordinator",
+            )
+
+        # Rule 82.1: Must be in action phase
+        if not self._action_phase:
+            return StrategicActionResult(
+                success=False,
+                error_message="Cannot activate strategy card outside of action phase",
+            )
+
+        # Exhaust the card via coordinator
+        if self._strategy_card_coordinator is not None:
+            self._strategy_card_coordinator.exhaust_strategy_card(player_id, card_type)
+
+        # Rule 82.2: Resolve primary ability and set up secondary ability resolution
+        secondary_order = self._get_secondary_ability_order(player_id)
+
+        return StrategicActionResult(
+            success=True,
+            resolving_player=player_id,
+            primary_ability_resolved=True,
+            secondary_abilities_offered=True,
+            secondary_ability_order=secondary_order,
+        )
+
+    def set_strategy_card_coordinator(self, coordinator: "StrategyCardCoordinator") -> None:
+        """Set the strategy card coordinator for integration.
+        
+        Args:
+            coordinator: The strategy card coordinator to integrate with
+            
+        Requirements: 6.1, 6.2 - Integration with strategic action system
+        """
+        self._strategy_card_coordinator = coordinator
+
+    def execute_strategic_action(self, player_id: str, game_state: Any) -> StrategicActionResult:
+        """Execute a strategic action for a player.
+        
+        Args:
+            player_id: The player executing the strategic action
+            game_state: Current game state
+            
+        Returns:
+            Result of the strategic action execution
+            
+        Requirements: 6.1 - Integration with strategic action system
+        """
+        # Basic validation
+        if not player_id:
+            return StrategicActionResult(
+                success=False,
+                error_message="Player ID cannot be empty"
+            )
+        
+        # If coordinator is available, use it for validation
+        if self._strategy_card_coordinator is not None:
+            # Get player's strategy card
+            player_card = self._strategy_card_coordinator.get_player_strategy_card(player_id)
+            if player_card is None:
+                return StrategicActionResult(
+                    success=False,
+                    error_message=f"Player {player_id} has no strategy card assigned"
+                )
+            
+            # Check if card can be activated
+            if not self._strategy_card_coordinator.can_use_primary_ability(player_id, player_card):
+                return StrategicActionResult(
+                    success=False,
+                    error_message=f"Player {player_id} cannot use primary ability of {player_card}"
+                )
+            
+            # Activate via coordinator
+            return self.activate_strategy_card_via_coordinator(player_id, player_card)
+        
+        # Fallback for backward compatibility
+        return StrategicActionResult(
+            success=False,
+            error_message="No strategy card coordinator available"
+        )

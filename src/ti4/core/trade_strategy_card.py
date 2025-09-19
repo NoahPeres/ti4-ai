@@ -1,9 +1,9 @@
-"""Warfare Strategy Card implementation for TI4.
+"""Trade Strategy Card implementation for TI4.
 
-This module implements the Warfare strategy card following the
+This module implements the Trade strategy card following the
 BaseStrategyCard pattern established for all strategy cards.
 
-LRR Reference: Rule 83 - STRATEGY CARD (Warfare)
+LRR Reference: Rule 83 - STRATEGY CARD (Trade)
 """
 
 from typing import TYPE_CHECKING, Any, Optional
@@ -15,34 +15,34 @@ if TYPE_CHECKING:
     from .game_state import GameState
 
 
-class WarfareStrategyCard(BaseStrategyCard):
-    """Implementation of the Warfare strategy card.
+class TradeStrategyCard(BaseStrategyCard):
+    """Implementation of the Trade strategy card.
 
-    LRR Reference: Rule 83 - The "Warfare" strategy card.
-    This card's initiative value is "6."
+    LRR Reference: Rule 83 - The "Trade" strategy card.
+    This card's initiative value is "5."
     """
 
     def __init__(self) -> None:
-        """Initialize the Warfare strategy card."""
+        """Initialize the Trade strategy card."""
         pass
 
     def get_card_type(self) -> StrategyCardType:
         """Get the strategy card type.
 
         Returns:
-            StrategyCardType.WARFARE
+            StrategyCardType.TRADE
         """
-        return StrategyCardType.WARFARE
+        return StrategyCardType.TRADE
 
     def get_initiative_value(self) -> int:
-        """Get the initiative value of the Warfare strategy card.
+        """Get the initiative value of the Trade strategy card.
 
         Returns:
-            The initiative value (6)
+            The initiative value (5)
 
-        LRR Reference: Rule 83 - Warfare has initiative value "6"
+        LRR Reference: Rule 83 - Trade has initiative value "5"
         """
-        return 6
+        return 5
 
     def execute_primary_ability(
         self,
@@ -50,7 +50,7 @@ class WarfareStrategyCard(BaseStrategyCard):
         game_state: Optional["GameState"] = None,
         **kwargs: Any,
     ) -> StrategyCardAbilityResult:
-        """Execute the primary ability of the Warfare strategy card.
+        """Execute the primary ability of the Trade strategy card.
 
         Args:
             player_id: The active player executing the primary ability
@@ -60,14 +60,14 @@ class WarfareStrategyCard(BaseStrategyCard):
         Returns:
             Result of the primary ability execution
 
-        Note: Specific Warfare abilities require manual confirmation
+        Note: Specific Trade abilities require manual confirmation
         per manual_confirmation_protocol.md
         """
         # Placeholder implementation - specific abilities need user confirmation
         return StrategyCardAbilityResult(
             success=True,
             player_id=player_id,
-            error_message="Warfare primary ability implementation requires user confirmation of specific effects",
+            error_message="Trade primary ability implementation requires user confirmation of specific effects",
         )
 
     def execute_secondary_ability(
@@ -76,7 +76,7 @@ class WarfareStrategyCard(BaseStrategyCard):
         game_state: Optional["GameState"] = None,
         **kwargs: Any,
     ) -> StrategyCardAbilityResult:
-        """Execute the secondary ability of the Warfare strategy card.
+        """Execute the secondary ability of the Trade strategy card.
 
         Args:
             player_id: The player executing the secondary ability
@@ -86,12 +86,12 @@ class WarfareStrategyCard(BaseStrategyCard):
         Returns:
             Result of the secondary ability execution
 
-        Note: Specific Warfare abilities require manual confirmation
+        Note: Specific Trade abilities require manual confirmation
         per manual_confirmation_protocol.md
         """
         # Placeholder implementation - specific abilities need user confirmation
         return StrategyCardAbilityResult(
             success=True,
             player_id=player_id,
-            error_message="Warfare secondary ability implementation requires user confirmation of specific effects",
+            error_message="Trade secondary ability implementation requires user confirmation of specific effects",
         )

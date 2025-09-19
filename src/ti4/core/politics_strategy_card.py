@@ -1,9 +1,9 @@
-"""Warfare Strategy Card implementation for TI4.
+"""Politics Strategy Card implementation for TI4.
 
-This module implements the Warfare strategy card following the
+This module implements the Politics strategy card following the
 BaseStrategyCard pattern established for all strategy cards.
 
-LRR Reference: Rule 83 - STRATEGY CARD (Warfare)
+LRR Reference: Rule 83 - STRATEGY CARD (Politics)
 """
 
 from typing import TYPE_CHECKING, Any, Optional
@@ -15,34 +15,34 @@ if TYPE_CHECKING:
     from .game_state import GameState
 
 
-class WarfareStrategyCard(BaseStrategyCard):
-    """Implementation of the Warfare strategy card.
+class PoliticsStrategyCard(BaseStrategyCard):
+    """Implementation of the Politics strategy card.
 
-    LRR Reference: Rule 83 - The "Warfare" strategy card.
-    This card's initiative value is "6."
+    LRR Reference: Rule 83 - The "Politics" strategy card.
+    This card's initiative value is "3."
     """
 
     def __init__(self) -> None:
-        """Initialize the Warfare strategy card."""
+        """Initialize the Politics strategy card."""
         pass
 
     def get_card_type(self) -> StrategyCardType:
         """Get the strategy card type.
 
         Returns:
-            StrategyCardType.WARFARE
+            StrategyCardType.POLITICS
         """
-        return StrategyCardType.WARFARE
+        return StrategyCardType.POLITICS
 
     def get_initiative_value(self) -> int:
-        """Get the initiative value of the Warfare strategy card.
+        """Get the initiative value of the Politics strategy card.
 
         Returns:
-            The initiative value (6)
+            The initiative value (3)
 
-        LRR Reference: Rule 83 - Warfare has initiative value "6"
+        LRR Reference: Rule 83 - Politics has initiative value "3"
         """
-        return 6
+        return 3
 
     def execute_primary_ability(
         self,
@@ -50,7 +50,7 @@ class WarfareStrategyCard(BaseStrategyCard):
         game_state: Optional["GameState"] = None,
         **kwargs: Any,
     ) -> StrategyCardAbilityResult:
-        """Execute the primary ability of the Warfare strategy card.
+        """Execute the primary ability of the Politics strategy card.
 
         Args:
             player_id: The active player executing the primary ability
@@ -60,14 +60,14 @@ class WarfareStrategyCard(BaseStrategyCard):
         Returns:
             Result of the primary ability execution
 
-        Note: Specific Warfare abilities require manual confirmation
+        Note: Specific Politics abilities require manual confirmation
         per manual_confirmation_protocol.md
         """
         # Placeholder implementation - specific abilities need user confirmation
         return StrategyCardAbilityResult(
             success=True,
             player_id=player_id,
-            error_message="Warfare primary ability implementation requires user confirmation of specific effects",
+            error_message="Politics primary ability implementation requires user confirmation of specific effects",
         )
 
     def execute_secondary_ability(
@@ -76,7 +76,7 @@ class WarfareStrategyCard(BaseStrategyCard):
         game_state: Optional["GameState"] = None,
         **kwargs: Any,
     ) -> StrategyCardAbilityResult:
-        """Execute the secondary ability of the Warfare strategy card.
+        """Execute the secondary ability of the Politics strategy card.
 
         Args:
             player_id: The player executing the secondary ability
@@ -86,12 +86,12 @@ class WarfareStrategyCard(BaseStrategyCard):
         Returns:
             Result of the secondary ability execution
 
-        Note: Specific Warfare abilities require manual confirmation
+        Note: Specific Politics abilities require manual confirmation
         per manual_confirmation_protocol.md
         """
         # Placeholder implementation - specific abilities need user confirmation
         return StrategyCardAbilityResult(
             success=True,
             player_id=player_id,
-            error_message="Warfare secondary ability implementation requires user confirmation of specific effects",
+            error_message="Politics secondary ability implementation requires user confirmation of specific effects",
         )
