@@ -49,14 +49,20 @@ class TestRule82StrategyCardActivation:
         strategic_action_manager = StrategicActionManager()
 
         # Create a strategy card and assign it to player
-        warfare_card = StrategyCard(StrategyCardType.WARFARE, primary_ability="Move units", secondary_ability="Build units")
+        warfare_card = StrategyCard(
+            StrategyCardType.WARFARE,
+            primary_ability="Move units",
+            secondary_ability="Build units",
+        )
         strategic_action_manager.assign_strategy_card("player1", warfare_card)
 
         # Set action phase
         strategic_action_manager.set_action_phase(True)
 
         # Verify player can activate the strategy card
-        assert strategic_action_manager.can_activate_strategy_card("player1", StrategyCardType.WARFARE)
+        assert strategic_action_manager.can_activate_strategy_card(
+            "player1", StrategyCardType.WARFARE
+        )
 
     def test_cannot_activate_exhausted_strategy_card(self) -> None:
         """Test that players cannot activate exhausted strategy cards.
@@ -74,15 +80,23 @@ class TestRule82StrategyCardActivation:
         strategic_action_manager = StrategicActionManager()
 
         # Create and assign strategy card
-        warfare_card = StrategyCard(StrategyCardType.WARFARE, primary_ability="Move units", secondary_ability="Build units")
+        warfare_card = StrategyCard(
+            StrategyCardType.WARFARE,
+            primary_ability="Move units",
+            secondary_ability="Build units",
+        )
         strategic_action_manager.assign_strategy_card("player1", warfare_card)
         strategic_action_manager.set_action_phase(True)
 
         # Exhaust the strategy card
-        strategic_action_manager.exhaust_strategy_card("player1", StrategyCardType.WARFARE)
+        strategic_action_manager.exhaust_strategy_card(
+            "player1", StrategyCardType.WARFARE
+        )
 
         # Verify player cannot activate exhausted card
-        assert not strategic_action_manager.can_activate_strategy_card("player1", StrategyCardType.WARFARE)
+        assert not strategic_action_manager.can_activate_strategy_card(
+            "player1", StrategyCardType.WARFARE
+        )
 
     def test_strategy_card_exhausted_after_activation(self) -> None:
         """Test that strategy cards are exhausted after activation.
@@ -100,18 +114,26 @@ class TestRule82StrategyCardActivation:
         strategic_action_manager = StrategicActionManager()
 
         # Create and assign strategy card
-        warfare_card = StrategyCard(StrategyCardType.WARFARE, primary_ability="Move units", secondary_ability="Build units")
+        warfare_card = StrategyCard(
+            StrategyCardType.WARFARE,
+            primary_ability="Move units",
+            secondary_ability="Build units",
+        )
         strategic_action_manager.assign_strategy_card("player1", warfare_card)
         strategic_action_manager.set_action_phase(True)
 
         # Activate the strategy card
-        result = strategic_action_manager.activate_strategy_card("player1", StrategyCardType.WARFARE)
+        result = strategic_action_manager.activate_strategy_card(
+            "player1", StrategyCardType.WARFARE
+        )
 
         # Verify activation was successful
         assert result.success
 
         # Verify card is now exhausted
-        assert strategic_action_manager.is_strategy_card_exhausted("player1", StrategyCardType.WARFARE)
+        assert strategic_action_manager.is_strategy_card_exhausted(
+            "player1", StrategyCardType.WARFARE
+        )
 
 
 class TestRule82AbilityResolution:
@@ -133,12 +155,18 @@ class TestRule82AbilityResolution:
         strategic_action_manager = StrategicActionManager()
 
         # Create and assign strategy card
-        warfare_card = StrategyCard(StrategyCardType.WARFARE, primary_ability="Move units", secondary_ability="Build units")
+        warfare_card = StrategyCard(
+            StrategyCardType.WARFARE,
+            primary_ability="Move units",
+            secondary_ability="Build units",
+        )
         strategic_action_manager.assign_strategy_card("player1", warfare_card)
         strategic_action_manager.set_action_phase(True)
 
         # Activate the strategy card
-        result = strategic_action_manager.activate_strategy_card("player1", StrategyCardType.WARFARE)
+        result = strategic_action_manager.activate_strategy_card(
+            "player1", StrategyCardType.WARFARE
+        )
 
         # Verify primary ability was resolved
         assert result.success
@@ -162,19 +190,31 @@ class TestRule82AbilityResolution:
         strategic_action_manager = StrategicActionManager()
 
         # Set up player order (clockwise)
-        strategic_action_manager.set_player_order(["player1", "player2", "player3", "player4"])
+        strategic_action_manager.set_player_order(
+            ["player1", "player2", "player3", "player4"]
+        )
 
         # Create and assign strategy card to player1
-        warfare_card = StrategyCard(StrategyCardType.WARFARE, primary_ability="Move units", secondary_ability="Build units")
+        warfare_card = StrategyCard(
+            StrategyCardType.WARFARE,
+            primary_ability="Move units",
+            secondary_ability="Build units",
+        )
         strategic_action_manager.assign_strategy_card("player1", warfare_card)
         strategic_action_manager.set_action_phase(True)
 
         # Activate the strategy card
-        result = strategic_action_manager.activate_strategy_card("player1", StrategyCardType.WARFARE)
+        result = strategic_action_manager.activate_strategy_card(
+            "player1", StrategyCardType.WARFARE
+        )
 
         # Verify secondary abilities are offered in correct order
         assert result.success
-        expected_secondary_order = ["player2", "player3", "player4"]  # Clockwise from player1
+        expected_secondary_order = [
+            "player2",
+            "player3",
+            "player4",
+        ]  # Clockwise from player1
         assert result.secondary_ability_order == expected_secondary_order
 
     def test_secondary_ability_resolution_optional(self) -> None:
@@ -193,19 +233,29 @@ class TestRule82AbilityResolution:
         strategic_action_manager.set_player_order(["player1", "player2", "player3"])
 
         # Create and assign strategy card
-        warfare_card = StrategyCard(StrategyCardType.WARFARE, primary_ability="Move units", secondary_ability="Build units")
+        warfare_card = StrategyCard(
+            StrategyCardType.WARFARE,
+            primary_ability="Move units",
+            secondary_ability="Build units",
+        )
         strategic_action_manager.assign_strategy_card("player1", warfare_card)
         strategic_action_manager.set_action_phase(True)
 
         # Activate strategy card
-        strategic_action_manager.activate_strategy_card("player1", StrategyCardType.WARFARE)
+        strategic_action_manager.activate_strategy_card(
+            "player1", StrategyCardType.WARFARE
+        )
 
         # Player2 chooses to resolve secondary ability
-        result2 = strategic_action_manager.resolve_secondary_ability("player2", StrategyCardType.WARFARE)
+        result2 = strategic_action_manager.resolve_secondary_ability(
+            "player2", StrategyCardType.WARFARE
+        )
         assert result2.success
 
         # Player3 chooses not to resolve secondary ability
-        result3 = strategic_action_manager.skip_secondary_ability("player3", StrategyCardType.WARFARE)
+        result3 = strategic_action_manager.skip_secondary_ability(
+            "player3", StrategyCardType.WARFARE
+        )
         assert result3.success
 
 
@@ -228,19 +278,31 @@ class TestRule82TurnContinuation:
         strategic_action_manager = StrategicActionManager()
 
         # Assign multiple strategy cards to player
-        warfare_card = StrategyCard(StrategyCardType.WARFARE, primary_ability="Move units", secondary_ability="Build units")
-        diplomacy_card = StrategyCard(StrategyCardType.DIPLOMACY, primary_ability="Refresh planets", secondary_ability="Ready planets")
+        warfare_card = StrategyCard(
+            StrategyCardType.WARFARE,
+            primary_ability="Move units",
+            secondary_ability="Build units",
+        )
+        diplomacy_card = StrategyCard(
+            StrategyCardType.DIPLOMACY,
+            primary_ability="Refresh planets",
+            secondary_ability="Ready planets",
+        )
 
         strategic_action_manager.assign_strategy_card("player1", warfare_card)
         strategic_action_manager.assign_strategy_card("player1", diplomacy_card)
         strategic_action_manager.set_action_phase(True)
 
         # Activate one strategy card
-        strategic_action_manager.activate_strategy_card("player1", StrategyCardType.WARFARE)
+        strategic_action_manager.activate_strategy_card(
+            "player1", StrategyCardType.WARFARE
+        )
 
         # Verify player can continue turn (has unexhausted diplomacy card)
         assert strategic_action_manager.can_continue_turn("player1")
-        assert strategic_action_manager.can_activate_strategy_card("player1", StrategyCardType.DIPLOMACY)
+        assert strategic_action_manager.can_activate_strategy_card(
+            "player1", StrategyCardType.DIPLOMACY
+        )
 
     def test_must_pass_when_all_cards_exhausted(self) -> None:
         """Test that players must pass when all strategy cards are exhausted.
@@ -258,12 +320,18 @@ class TestRule82TurnContinuation:
         strategic_action_manager = StrategicActionManager()
 
         # Assign strategy card to player
-        warfare_card = StrategyCard(StrategyCardType.WARFARE, primary_ability="Move units", secondary_ability="Build units")
+        warfare_card = StrategyCard(
+            StrategyCardType.WARFARE,
+            primary_ability="Move units",
+            secondary_ability="Build units",
+        )
         strategic_action_manager.assign_strategy_card("player1", warfare_card)
         strategic_action_manager.set_action_phase(True)
 
         # Activate the only strategy card
-        strategic_action_manager.activate_strategy_card("player1", StrategyCardType.WARFARE)
+        strategic_action_manager.activate_strategy_card(
+            "player1", StrategyCardType.WARFARE
+        )
 
         # Verify player must pass (no unexhausted cards)
         assert not strategic_action_manager.can_continue_turn("player1")
@@ -308,12 +376,18 @@ class TestRule82ComponentActionIntegration:
         strategic_action_manager.set_player_order(["player1", "player2", "player3"])
 
         # Create and assign strategy card
-        warfare_card = StrategyCard(StrategyCardType.WARFARE, primary_ability="Move units", secondary_ability="Build units")
+        warfare_card = StrategyCard(
+            StrategyCardType.WARFARE,
+            primary_ability="Move units",
+            secondary_ability="Build units",
+        )
         strategic_action_manager.assign_strategy_card("player1", warfare_card)
         strategic_action_manager.set_action_phase(True)
 
         # Activate strategy card via component action (not strategic action)
-        result = strategic_action_manager.activate_strategy_card_via_component_action("player1", StrategyCardType.WARFARE)
+        result = strategic_action_manager.activate_strategy_card_via_component_action(
+            "player1", StrategyCardType.WARFARE
+        )
 
         # Verify secondary abilities are still offered
         assert result.success
@@ -336,7 +410,9 @@ class TestRule82InputValidation:
         strategic_action_manager = StrategicActionManager()
 
         # Test empty player ID in various methods
-        assert not strategic_action_manager.can_activate_strategy_card("", StrategyCardType.WARFARE)
+        assert not strategic_action_manager.can_activate_strategy_card(
+            "", StrategyCardType.WARFARE
+        )
         assert not strategic_action_manager.can_continue_turn("")
         assert strategic_action_manager.must_pass("")
 
@@ -345,7 +421,9 @@ class TestRule82InputValidation:
             strategic_action_manager.assign_strategy_card("player1", None)
 
         # Test empty player ID assignment
-        warfare_card = StrategyCard(StrategyCardType.WARFARE, "Move units", "Build units")
+        warfare_card = StrategyCard(
+            StrategyCardType.WARFARE, "Move units", "Build units"
+        )
         with pytest.raises(ValueError, match="Player ID cannot be empty"):
             strategic_action_manager.assign_strategy_card("", warfare_card)
 
@@ -386,16 +464,22 @@ class TestRule82StrategyCardEnum:
         )
 
         strategic_action_manager = StrategicActionManager()
-        warfare_card = StrategyCard(StrategyCardType.WARFARE, "Move units", "Build units")
+        warfare_card = StrategyCard(
+            StrategyCardType.WARFARE, "Move units", "Build units"
+        )
         strategic_action_manager.assign_strategy_card("player1", warfare_card)
         strategic_action_manager.set_action_phase(True)
 
         # Test with enum
-        assert strategic_action_manager.can_activate_strategy_card("player1", StrategyCardType.WARFARE)
+        assert strategic_action_manager.can_activate_strategy_card(
+            "player1", StrategyCardType.WARFARE
+        )
 
         # Test with string
         assert strategic_action_manager.can_activate_strategy_card("player1", "warfare")
 
         # Test exhaustion with both
-        strategic_action_manager.exhaust_strategy_card("player1", StrategyCardType.WARFARE)
+        strategic_action_manager.exhaust_strategy_card(
+            "player1", StrategyCardType.WARFARE
+        )
         assert strategic_action_manager.is_strategy_card_exhausted("player1", "warfare")

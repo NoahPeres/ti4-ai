@@ -14,6 +14,7 @@ class StrategyCardType(Enum):
 
     Provides type safety and validation for strategy card names.
     """
+
     LEADERSHIP = "leadership"
     DIPLOMACY = "diplomacy"
     POLITICS = "politics"
@@ -30,6 +31,7 @@ class StrategyCard:
 
     Contains the card's name and ability descriptions.
     """
+
     card_type: StrategyCardType
     primary_ability: str
     secondary_ability: str
@@ -52,6 +54,7 @@ class StrategyCard:
 @dataclass
 class StrategicActionResult:
     """Result of a strategic action activation."""
+
     success: bool
     resolving_player: Optional[str] = None
     primary_ability_resolved: bool = False
@@ -63,6 +66,7 @@ class StrategicActionResult:
 @dataclass
 class SecondaryAbilityResult:
     """Result of a secondary ability resolution attempt."""
+
     success: bool
     player: Optional[str] = None
     resolved: bool = False
@@ -134,7 +138,9 @@ class StrategicActionManager:
 
         self._player_strategy_cards[player_id][strategy_card.name] = strategy_card
 
-    def can_activate_strategy_card(self, player_id: str, card_name: Union[str, StrategyCardType]) -> bool:
+    def can_activate_strategy_card(
+        self, player_id: str, card_name: Union[str, StrategyCardType]
+    ) -> bool:
         """Check if a player can activate a specific strategy card.
 
         Args:
@@ -148,7 +154,9 @@ class StrategicActionManager:
             return False
 
         # Convert StrategyCardType to string if needed
-        card_name_str = card_name.value if isinstance(card_name, StrategyCardType) else card_name
+        card_name_str = (
+            card_name.value if isinstance(card_name, StrategyCardType) else card_name
+        )
 
         # Rule 82.1: Must be in action phase
         if not self._action_phase:
@@ -165,7 +173,9 @@ class StrategicActionManager:
         card = self._player_strategy_cards[player_id][card_name_str]
         return not card.exhausted
 
-    def activate_strategy_card(self, player_id: str, card_name: Union[str, StrategyCardType]) -> StrategicActionResult:
+    def activate_strategy_card(
+        self, player_id: str, card_name: Union[str, StrategyCardType]
+    ) -> StrategicActionResult:
         """Activate a strategy card and resolve its primary ability.
 
         Args:
@@ -176,13 +186,15 @@ class StrategicActionManager:
             StrategicActionResult indicating success or failure
         """
         # Convert StrategyCardType to string if needed
-        card_name_str = card_name.value if isinstance(card_name, StrategyCardType) else card_name
+        card_name_str = (
+            card_name.value if isinstance(card_name, StrategyCardType) else card_name
+        )
 
         # Validate activation
         if not self.can_activate_strategy_card(player_id, card_name_str):
             return StrategicActionResult(
                 success=False,
-                error_message=f"Cannot activate strategy card '{card_name_str}' for player '{player_id}'"
+                error_message=f"Cannot activate strategy card '{card_name_str}' for player '{player_id}'",
             )
 
         # Get the strategy card
@@ -200,7 +212,7 @@ class StrategicActionManager:
             resolving_player=player_id,
             primary_ability_resolved=True,
             secondary_abilities_offered=True,
-            secondary_ability_order=secondary_order
+            secondary_ability_order=secondary_order,
         )
 
     def activate_strategy_card_via_component_action(
@@ -221,7 +233,9 @@ class StrategicActionManager:
             result.secondary_abilities_offered = True
         return result
 
-    def exhaust_strategy_card(self, player_id: str, card_name: Union[str, StrategyCardType]) -> None:
+    def exhaust_strategy_card(
+        self, player_id: str, card_name: Union[str, StrategyCardType]
+    ) -> None:
         """Manually exhaust a strategy card.
 
         Args:
@@ -229,13 +243,19 @@ class StrategicActionManager:
             card_name: The name or type of the strategy card to exhaust
         """
         # Convert StrategyCardType to string if needed
-        card_name_str = card_name.value if isinstance(card_name, StrategyCardType) else card_name
+        card_name_str = (
+            card_name.value if isinstance(card_name, StrategyCardType) else card_name
+        )
 
-        if (player_id in self._player_strategy_cards and
-            card_name_str in self._player_strategy_cards[player_id]):
+        if (
+            player_id in self._player_strategy_cards
+            and card_name_str in self._player_strategy_cards[player_id]
+        ):
             self._player_strategy_cards[player_id][card_name_str].exhaust()
 
-    def is_strategy_card_exhausted(self, player_id: str, card_name: Union[str, StrategyCardType]) -> bool:
+    def is_strategy_card_exhausted(
+        self, player_id: str, card_name: Union[str, StrategyCardType]
+    ) -> bool:
         """Check if a strategy card is exhausted.
 
         Args:
@@ -246,14 +266,20 @@ class StrategicActionManager:
             True if the card is exhausted, False otherwise
         """
         # Convert StrategyCardType to string if needed
-        card_name_str = card_name.value if isinstance(card_name, StrategyCardType) else card_name
+        card_name_str = (
+            card_name.value if isinstance(card_name, StrategyCardType) else card_name
+        )
 
-        if (player_id in self._player_strategy_cards and
-            card_name_str in self._player_strategy_cards[player_id]):
+        if (
+            player_id in self._player_strategy_cards
+            and card_name_str in self._player_strategy_cards[player_id]
+        ):
             return self._player_strategy_cards[player_id][card_name_str].exhausted
         return True  # Non-existent cards are considered "exhausted"
 
-    def resolve_secondary_ability(self, player_id: str, card_name: Union[str, StrategyCardType]) -> SecondaryAbilityResult:
+    def resolve_secondary_ability(
+        self, player_id: str, card_name: Union[str, StrategyCardType]
+    ) -> SecondaryAbilityResult:
         """Resolve a secondary ability for a player.
 
         Args:
@@ -265,18 +291,16 @@ class StrategicActionManager:
         """
         if not player_id:
             return SecondaryAbilityResult(
-                success=False,
-                error_message="Player ID cannot be empty"
+                success=False, error_message="Player ID cannot be empty"
             )
 
         return SecondaryAbilityResult(
-            success=True,
-            player=player_id,
-            resolved=True,
-            skipped=False
+            success=True, player=player_id, resolved=True, skipped=False
         )
 
-    def skip_secondary_ability(self, player_id: str, card_name: Union[str, StrategyCardType]) -> SecondaryAbilityResult:
+    def skip_secondary_ability(
+        self, player_id: str, card_name: Union[str, StrategyCardType]
+    ) -> SecondaryAbilityResult:
         """Skip a secondary ability for a player.
 
         Args:
@@ -288,15 +312,11 @@ class StrategicActionManager:
         """
         if not player_id:
             return SecondaryAbilityResult(
-                success=False,
-                error_message="Player ID cannot be empty"
+                success=False, error_message="Player ID cannot be empty"
             )
 
         return SecondaryAbilityResult(
-            success=True,
-            player=player_id,
-            resolved=False,
-            skipped=True
+            success=True, player=player_id, resolved=False, skipped=True
         )
 
     def can_continue_turn(self, player_id: str) -> bool:

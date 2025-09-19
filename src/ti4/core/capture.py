@@ -98,6 +98,39 @@ class CaptureManager:
         """
         return unit not in self._captured_units
 
+    def is_unit_captured(self, unit: Unit) -> bool:
+        """Check if a unit is currently captured.
+
+        Args:
+            unit: The unit to check
+
+        Returns:
+            True if the unit is captured, False otherwise
+        """
+        return unit in self._captured_units
+
+    def get_captured_units_by_owner(
+        self, original_owner: str, capturing_player: str
+    ) -> list[Unit]:
+        """Get captured units belonging to a specific original owner held by a capturing player.
+
+        Args:
+            original_owner: The original owner of the units
+            capturing_player: The player who captured the units
+
+        Returns:
+            List of captured units belonging to original_owner held by capturing_player
+        """
+        captured_units = []
+
+        # Check faction sheet units
+        faction_units = self.get_faction_sheet_units(capturing_player)
+        for unit in faction_units:
+            if unit.owner == original_owner:
+                captured_units.append(unit)
+
+        return captured_units
+
     def return_unit(self, unit: Unit, returning_player: str) -> None:
         """Return a captured unit to its original owner.
 
