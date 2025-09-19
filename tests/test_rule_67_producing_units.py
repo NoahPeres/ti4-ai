@@ -12,8 +12,13 @@ Rule 67 Sub-rules tested:
 - 67.6: Ship production restriction - cannot produce ships with enemy ships
 """
 
+from src.ti4.core.blockade import BlockadeManager
 from src.ti4.core.constants import UnitType
+from src.ti4.core.galaxy import Galaxy
+from src.ti4.core.hex_coordinate import HexCoordinate
+from src.ti4.core.planet import Planet
 from src.ti4.core.production import ProductionManager
+from src.ti4.core.system import System
 from src.ti4.core.unit import Unit
 
 
@@ -129,11 +134,6 @@ class TestRule67ShipProductionRestriction:
         LRR Reference: Rule 67.6 - "Cannot produce ships in system containing
         other players' ships"
         """
-        from src.ti4.core.galaxy import Galaxy
-        from src.ti4.core.hex_coordinate import HexCoordinate
-        from src.ti4.core.planet import Planet
-        from src.ti4.core.system import System
-
         manager = ProductionManager()
 
         # Create galaxy and system with enemy ships
@@ -164,11 +164,6 @@ class TestRule67ShipProductionRestriction:
 
         LRR Reference: Rule 67.6 - Restriction only applies when enemy ships present
         """
-        from src.ti4.core.galaxy import Galaxy
-        from src.ti4.core.hex_coordinate import HexCoordinate
-        from src.ti4.core.planet import Planet
-        from src.ti4.core.system import System
-
         manager = ProductionManager()
 
         # Create galaxy and system without enemy ships
@@ -256,12 +251,6 @@ class TestRule67Integration:
         - Rule 67.5: Reinforcement limits
         - Rule 67.6: Ship production restrictions
         """
-        from src.ti4.core.galaxy import Galaxy
-        from src.ti4.core.hex_coordinate import HexCoordinate
-        from src.ti4.core.planet import Planet
-        from src.ti4.core.system import System
-        from src.ti4.core.unit import Unit
-
         manager = ProductionManager()
 
         # Create system without enemy ships
@@ -305,12 +294,6 @@ class TestRule67BlockadeIntegration:
 
         LRR Reference: Rule 67.6 + Rule 14.1 - Production restrictions with blockade integration
         """
-        from src.ti4.core.blockade import BlockadeManager
-        from src.ti4.core.galaxy import Galaxy
-        from src.ti4.core.hex_coordinate import HexCoordinate
-        from src.ti4.core.planet import Planet
-        from src.ti4.core.system import System
-
         manager = ProductionManager()
 
         # Create galaxy and system with blockaded space dock
@@ -346,12 +329,6 @@ class TestRule67BlockadeIntegration:
 
         LRR Reference: Rule 67.6 + Rule 14.1 - Production allowed when not blockaded
         """
-        from src.ti4.core.blockade import BlockadeManager
-        from src.ti4.core.galaxy import Galaxy
-        from src.ti4.core.hex_coordinate import HexCoordinate
-        from src.ti4.core.planet import Planet
-        from src.ti4.core.system import System
-
         manager = ProductionManager()
 
         # Create galaxy and system without blockade
