@@ -6,7 +6,10 @@ Handles strategy card activation, primary/secondary ability resolution, and turn
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
+
+if TYPE_CHECKING:
+    from .strategy_card_coordinator import StrategyCardCoordinator
 
 
 class StrategyCardType(Enum):
@@ -99,6 +102,9 @@ class StrategicActionManager:
         self._current_activation: Optional[str] = None  # Currently activated card
         self._secondary_resolution_order: list[str] = []
         self._secondary_resolution_index: int = 0
+        
+        # Strategy card coordinator integration (Rule 83)
+        self._strategy_card_coordinator: Optional["StrategyCardCoordinator"] = None
 
     def set_action_phase(self, action_phase: bool) -> None:
         """Set whether the game is in action phase.
