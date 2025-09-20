@@ -372,7 +372,9 @@ class TestRule68ArborecRestriction:
             MockPlanet.PLANET_A.value, resources=1, influence=1
         )  # Production = 1 + 2 = 3
         arborec_space_dock = Unit(
-            unit_type=UnitType.SPACE_DOCK, owner=Faction.ARBOREC.value
+            unit_type=UnitType.SPACE_DOCK,
+            owner=MockPlayer.PLAYER_1.value,
+            faction=Faction.ARBOREC,
         )
 
         # Should not be able to produce infantry with Arborec space dock

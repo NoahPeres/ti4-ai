@@ -6,7 +6,7 @@ Handles production values, combined production, placement rules, and special cas
 
 from typing import TYPE_CHECKING, Optional
 
-from .constants import UnitType
+from .constants import Faction, UnitType
 
 if TYPE_CHECKING:
     from .blockade import BlockadeManager
@@ -131,7 +131,7 @@ class ProductionAbilityManager:
         # Check Arborec space dock infantry restriction
         if (
             producing_unit.unit_type == UnitType.SPACE_DOCK
-            and producing_unit.owner == "arborec"
+            and producing_unit.faction == Faction.ARBOREC
             and UnitType.INFANTRY in units_to_produce
         ):
             # Rule 68.1d: Arborec space docks cannot produce infantry

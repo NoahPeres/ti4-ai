@@ -80,6 +80,13 @@ class GameState:
     # Rule 98.2a: Victory points to win (10 for standard, 14 for variant)
     victory_points_to_win: int = VICTORY_POINTS_TO_WIN
 
+    def __post_init__(self) -> None:
+        """Validate game state invariants after initialization."""
+        if self.victory_points_to_win <= 0:
+            raise ValueError(
+                f"victory_points_to_win must be positive, got {self.victory_points_to_win}"
+            )
+
     def get_victory_points(self, player_id: str) -> int:
         """Get the victory points for a player."""
         return self.victory_points.get(player_id, 0)
@@ -189,17 +196,28 @@ class GameState:
                     self.strategy_card_coordinator.get_action_phase_initiative_order()
                 )
         elif self.strategy_card_assignments:
-            # Sort by strategy card initiative numbers
+            # Sort by strategy card initiative numbers, including all players
             from .strategy_cards.coordinator import STRATEGY_CARD_INITIATIVE_NUMBERS
 
-            player_initiatives = [
-                (
-                    player_id,
-                    STRATEGY_CARD_INITIATIVE_NUMBERS.get(card.value.lower(), 999),
-                )
-                for player_id, card in self.strategy_card_assignments.items()
-            ]
-            player_initiatives.sort(key=lambda x: x[1])
+            # Create list of all players with their initiative values
+            all_player_ids = [player.id for player in self.players]
+            player_initiatives = []
+
+            for player_id in all_player_ids:
+                if player_id in self.strategy_card_assignments:
+                    # Player has a strategy card - use its initiative number
+                    card = self.strategy_card_assignments[player_id]
+                    initiative_num = STRATEGY_CARD_INITIATIVE_NUMBERS.get(
+                        card.value.lower(), 999
+                    )
+                else:
+                    # Player has no strategy card - use high initiative number (999)
+                    initiative_num = 999
+
+                player_initiatives.append((player_id, initiative_num))
+
+            # Sort by initiative number, with stable ordering for ties
+            player_initiatives.sort(key=lambda x: (x[1], all_player_ids.index(x[0])))
             initiative_order = [player_id for player_id, _ in player_initiatives]
         else:
             # Fallback to players list order

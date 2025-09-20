@@ -483,6 +483,7 @@ class StrategyCardCoordinator:
         """Get initiative order for status phase.
 
         Returns player IDs in initiative order based on their strategy card numbers.
+        If no strategy cards are assigned, falls back to speaker order as per LRR 98.7.
         This method provides the initiative order specifically for status phase use.
 
         Returns:
@@ -490,7 +491,12 @@ class StrategyCardCoordinator:
 
         Requirements: 3.3, 3.5 - Initiative order returns player IDs in correct sequence,
         calculated from current card assignments
+        LRR 98.7 - Falls back to speaker order when no strategy cards are assigned
         """
+        # If no strategy cards are assigned, use speaker order (LRR 98.7)
+        if not self._card_assignments:
+            return self._speaker_order.copy()
+
         return self._get_current_initiative_order()
 
     def _get_current_initiative_order(self) -> list[str]:

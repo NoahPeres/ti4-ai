@@ -17,13 +17,15 @@ a If the players are using the 14-space side of the victory point track, the gam
 a A player's control token must always be on the space of the victory point track that shows a number that matches the number of victory points that player has gained during the game. A player cannot have more than 10 victory points.
 98.5 If an ability refers to the player with the "most" or "fewest" victory points, and more than one player is tied in that respect, the effect applies to all of the tied players.
 98.6 If a player gains a victory point from a law, and that law is discarded, that player does not lose that victory point.
-98.7 The game ends immediately when one player has 10 victory points. If multiple players would simultaneously gain their 10th victory point, the player who is earliest in initiative order among those players is the winner; if this occurs when players are scoring during the Status Phase, resolve initiative order for that phase.
+98.7 The game ends immediately when one player has 10 victory points. If multiple players would simultaneously gain their 10th victory point, the player who is earliest in initiative order among those players is the winner; if this occurs when players do not have strategy cards, the player who is nearest the speaker (including the speaker) in clockwise order is the winner.
 ```
 
 ## Tie-Breaking Documentation
-**Current Implementation**: The tie-breaking logic for simultaneous victories uses the initiative order from the current game phase. When multiple players would reach 10 victory points simultaneously during the Status Phase, the system resolves initiative order for that specific phase as specified in rule 98.7.
+**Current Implementation**: The tie-breaking logic for simultaneous victories uses the initiative order from the current game phase. When multiple players would reach 10 victory points simultaneously during the Status Phase, the system resolves initiative order for that specific phase as specified in rule 98.7. If no strategy cards are assigned, the system falls back to speaker order (clockwise from the speaker) as per LRR 98.7.
 
-**Source**: This implementation follows the exact wording in LRR 98.7 which states "if this occurs when players are scoring during the Status Phase, resolve initiative order for that phase."
+**Source**: This implementation follows the exact wording in LRR 98.7 which states "if this occurs when players do not have strategy cards, the player who is nearest the speaker (including the speaker) in clockwise order is the winner."
+
+**Implementation Status**: ✅ FULLY IMPLEMENTED - Speaker fallback has been implemented in StrategyCardCoordinator.get_status_phase_initiative_order()
 
 ## Sub-Rules Analysis
 
