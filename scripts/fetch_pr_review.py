@@ -38,15 +38,22 @@ class GitHubPRReviewFetcher:
         self.token = token or os.getenv('GITHUB_TOKEN')
         self.base_url = "https://api.github.com"
 
-    def _make_request(self, url: str) -> Any:
-        """Make a request to the GitHub API."""
+    def _headers(self) -> dict[str, str]:
+        """Create standard headers for GitHub API requests."""
         headers = {
             'Accept': 'application/vnd.github+json',
-            'User-Agent': 'TI4-AI-PR-Review-Fetcher/1.0'
+            'User-Agent': 'TI4-AI-PR-Review-Fetcher/1.0',
+            'X-GitHub-Api-Version': '2022-11-28'
         }
-
+        
         if self.token:
             headers['Authorization'] = f'Bearer {self.token}'
+            
+        return headers
+
+    def _make_request(self, url: str) -> Any:
+        """Make a request to the GitHub API."""
+        headers = self._headers()
 
         try:
             request = Request(url, headers=headers)
@@ -76,18 +83,17 @@ class GitHubPRReviewFetcher:
         current_url = url
 
         while current_url:
-            headers = {
-                'Accept': 'application/vnd.github+json',
-                'User-Agent': 'TI4-AI-PR-Review-Fetcher/1.0'
-            }
-
-            if self.token:
-                headers['Authorization'] = f'token {self.token}'
+            headers = self._headers()
 
             try:
                 request = Request(current_url, headers=headers)
-                with urlopen(request) as response:
+                with urlopen(request, timeout=15) as response:
                     data = json.loads(response.read().decode('utf-8'))
+                    
+                    # Guard against non-list payloads
+                    if not isinstance(data, list):
+                        raise ValueError(f"Expected list response from GitHub API, got {type(data).__name__}")
+                    
                     all_results.extend(data)
 
                     # Parse Link header for next page
@@ -174,22 +180,8 @@ class GitHubPRReviewFetcher:
         Returns:
             List of review comment objects
         """
-        all_comments = []
-        page = 1
-        per_page = 100
-
-        while True:
-            url = f"{self.base_url}/repos/{self.repo}/pulls/{pr_number}/reviews/{review_id}/comments?per_page={per_page}&page={page}"
-            comments = self._make_request(url)
-
-            if not comments or len(comments) < per_page:
-                all_comments.extend(comments)
-                break
-
-            all_comments.extend(comments)
-            page += 1
-
-        return all_comments
+        url = f"{self.base_url}/repos/{self.repo}/pulls/{pr_number}/reviews/{review_id}/comments?per_page=100"
+        return self._get_all_pages(url)
 
     def format_review_summary(self, review: dict[str, Any], include_comments: bool = True) -> str:
         """
@@ -232,7 +224,9 @@ class GitHubPRReviewFetcher:
                         for i, comment in enumerate(comments, 1):
                             summary.append(f"Comment {i}:")
                             summary.append(f"  File: {comment.get('path', 'Unknown')}")
-                            summary.append(f"  Line: {comment.get('line', 'Unknown')}")
+                            # Try to get line number with fallback
+                            line_num = comment.get('line') or comment.get('original_line') or comment.get('position', 'Unknown')
+                            summary.append(f"  Line: {line_num}")
                             summary.append(f"  Body: {comment.get('body', 'No content')}")
                             summary.append("")
             except Exception as e:
@@ -261,7 +255,7 @@ def detect_repo_from_git() -> Optional[str]:
             ['git', 'remote', 'get-url', 'origin'],
             capture_output=True,
             text=True,
-            cwd=os.path.dirname(os.path.abspath(__file__))
+            cwd=os.getcwd()
         )
         if result.returncode == 0:
             url = result.stdout.strip()
