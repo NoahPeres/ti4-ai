@@ -9,7 +9,7 @@
 
 ## 📊 Progress
 **Overall Progress**: 25.9%
-**Completed Rules**: 26/101 rule categories completed
+**Completed Rules**: 26/101
 - **Rule 6: ADJACENCY** - Core spatial mechanics for system relationships
 - **Rule 14: BLOCKADED** - Blockade mechanics for space docks and production restrictions (Foundation Layer) ✅ **COMPLETED**
 - **Rule 17: CAPTURE** - Unit capture mechanics and faction sheet management (Foundation Layer) ✅ **COMPLETED**
@@ -48,8 +48,8 @@
 10. **Rule [TBD]** - Next highest priority rule to be determined 🎯 **NEXT TARGET**
 
 ### 📈 Progress Metrics
-- Foundation Layer: 9 rules completed (Rule 34 added to expand category)
-- Core Game Layer: 13/15 rules (86.7%) 📈 (Rule 78, Rule 83 added)
+- Foundation Layer: 9 rules completed
+- Core Game Layer: 13/15 rules (86.7%)
 - Advanced Mechanics: 0/43 rules (0%)
 
 ### 📈 Current Metrics
