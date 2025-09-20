@@ -50,6 +50,8 @@ class PlanetCard:
 
     def spend_resources(self, amount: int) -> int:
         """Spend resources from this planet card, exhausting it."""
+        if not isinstance(amount, int) or amount <= 0:
+            raise ValueError("Spend amount must be a positive integer")
         if self._exhausted:
             raise ValueError("Cannot spend from exhausted planet card")
         if amount > self.resources:
@@ -62,6 +64,8 @@ class PlanetCard:
 
     def spend_influence(self, amount: int) -> int:
         """Spend influence from this planet card, exhausting it."""
+        if not isinstance(amount, int) or amount <= 0:
+            raise ValueError("Spend amount must be a positive integer")
         if self._exhausted:
             raise ValueError("Cannot spend from exhausted planet card")
         if amount > self.influence:

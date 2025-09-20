@@ -815,11 +815,9 @@ class GameState:
             pid: cards.copy() for pid, cards in self.player_planet_cards.items()
         }
         new_planet_control_mapping = self.planet_control_mapping.copy()
-        new_planet_control_mapping = self.planet_control_mapping.copy()
         new_planet_control_tokens = {
             name: tokens.copy() for name, tokens in self.planet_control_tokens.items()
         }
-        new_planet_control_mapping = self.planet_control_mapping.copy()
 
         # Rule 25.1b: If another player controls it, take from their play area
         if current_controller is not None:
@@ -869,7 +867,8 @@ class GameState:
         # Add to new controller
         if player_id not in new_player_planets:
             new_player_planets[player_id] = []
-        if planet not in new_player_planets[player_id]:
+        # Only add if not already present (by name)
+        if all(p.name != planet.name for p in new_player_planets[player_id]):
             new_player_planets[player_id].append(planet)
 
         # Create new state
@@ -893,6 +892,10 @@ class GameState:
         Returns:
             New GameState with updated control
         """
+        # Validate player exists
+        if not any(player.id == player_id for player in self.players):
+            raise ValueError(f"Player {player_id} does not exist")
+
         current_controller = self.planet_control_mapping.get(planet.name)
         if current_controller != player_id:
             return self  # Player doesn't control this planet
@@ -1149,8 +1152,8 @@ class GameState:
         if player_id not in new_player_planets:
             new_player_planets[player_id] = []
 
-        # Only add if not already present
-        if planet not in new_player_planets[player_id]:
+        # Only add if not already present (by name)
+        if all(p.name != planet.name for p in new_player_planets[player_id]):
             new_player_planets[player_id].append(planet)
 
         return self._create_new_state(player_planets=new_player_planets)
@@ -1259,33 +1262,6 @@ class GameState:
         # Only add if not already present
         if technology not in new_player_technology_cards[player_id]:
             new_player_technology_cards[player_id].append(technology)
-
-        return self._create_new_state(
-            player_technology_cards=new_player_technology_cards
-        )
-
-    def add_player_technology_card(
-        self, player_id: str, technology_card: "TechnologyCard"
-    ) -> "GameState":
-        """Add a technology card to a player's technology cards.
-
-        Args:
-            player_id: The player ID
-            technology_card: The technology card to add
-
-        Returns:
-            New GameState with updated player technology cards
-        """
-        new_player_technology_cards = {
-            pid: cards.copy() for pid, cards in self.player_technology_cards.items()
-        }
-
-        if player_id not in new_player_technology_cards:
-            new_player_technology_cards[player_id] = []
-
-        # Only add if not already present
-        if technology_card not in new_player_technology_cards[player_id]:
-            new_player_technology_cards[player_id].append(technology_card)
 
         return self._create_new_state(
             player_technology_cards=new_player_technology_cards

@@ -265,4 +265,4 @@ logs/
 *~
 
 # Review files
-latest_review.txt
+latest_review*.txt

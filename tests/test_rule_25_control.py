@@ -2,9 +2,10 @@
 
 import pytest
 
-from src.ti4.core.constants import UnitType
+from src.ti4.core.constants import Faction, UnitType
 from src.ti4.core.game_state import GameState
 from src.ti4.core.planet import Planet
+from src.ti4.core.player import Player
 from src.ti4.core.unit import Unit
 
 
@@ -19,7 +20,7 @@ class TestRule25Control:
         that card is exhausted."
         """
         # This test should fail initially - we need planet card system
-        game_state = GameState()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         # Create a planet with a corresponding planet card
         planet = Planet("Test Planet", resources=2, influence=1)
@@ -43,7 +44,7 @@ class TestRule25Control:
         LRR Reference: Rule 25.1a - "If a player is the first player to control a planet,
         they take the planet card from the planet card deck."
         """
-        game_state = GameState()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         # Create a planet and ensure its card is in the deck
         planet = Planet("Deck Planet", resources=3, influence=2)
@@ -68,7 +69,11 @@ class TestRule25Control:
         LRR Reference: Rule 25.1b - "If another player controls that planet, they take
         the planet card from that player's play area."
         """
-        game_state = GameState()
+        game_state = (
+            GameState()
+            .add_player(Player("player1", Faction.SOL))
+            .add_player(Player("player2", Faction.XXCHA))
+        )
 
         # Create a planet
         planet = Planet("Transfer Planet", resources=2, influence=3)
@@ -96,7 +101,11 @@ class TestRule25Control:
         LRR Reference: Rule 25.1c - "If a player is the first player to control a planet,
         they resolve the "Explore" step of a tactical action."
         """
-        game_state = GameState()
+        game_state = (
+            GameState()
+            .add_player(Player("player1", Faction.SOL))
+            .add_player(Player("player2", Faction.XXCHA))
+        )
 
         # Create a planet
         planet = Planet("Explore Planet", resources=1, influence=1)
@@ -118,7 +127,7 @@ class TestRule25Control:
 
         LRR Reference: Rule 25.2 - "A player cannot gain control of a planet they already control."
         """
-        game_state = GameState()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         # Create a planet
         planet = Planet("Already Controlled", resources=2, influence=1)
@@ -138,7 +147,7 @@ class TestRule25Control:
         LRR Reference: Rule 25.3 - "A planet card remains in a player's play area
         as long as they control the planet."
         """
-        game_state = GameState()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         # Create a planet
         planet = Planet("Persistent Planet", resources=2, influence=2)
@@ -162,7 +171,7 @@ class TestRule25Control:
         LRR Reference: Rule 25.4 - "If a player controls a planet that does not contain
         any of their units, they place a control token on that planet."
         """
-        game_state = GameState()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         # Create a planet with no units
         planet = Planet("Token Planet", resources=1, influence=2)
@@ -181,7 +190,11 @@ class TestRule25Control:
         LRR Reference: Rule 25.5 - "If a player does not have units on a planet they control,
         and another player has units on that planet, the player loses control of that planet."
         """
-        game_state = GameState()
+        game_state = (
+            GameState()
+            .add_player(Player("player1", Faction.SOL))
+            .add_player(Player("player2", Faction.XXCHA))
+        )
 
         # Create a planet
         planet = Planet("Contested Planet", resources=2, influence=1)
@@ -212,7 +225,7 @@ class TestRule25Control:
         LRR Reference: Rule 25.7 - "When a player loses control of a planet,
         they remove their control token from that planet."
         """
-        game_state = GameState()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         # Create a planet with no units
         planet = Planet("Token Loss Planet", resources=1, influence=1)

@@ -5,235 +5,149 @@ GITHUB PR REVIEW SUMMARY
 ============================================================
 Reviewer: coderabbitai[bot]
 State: COMMENTED
-Submitted: 2025-09-20T10:04:53Z
-Review ID: 3248971528
+Submitted: 2025-09-20T14:10:17Z
+Review ID: 3249053844
 
 REVIEW BODY:
 ----------------------------------------
-**Actionable comments posted: 3**
-
-> [!CAUTION]
-> Some comments are outside the diff and can’t be posted inline due to platform limitations.
->
->
->
-> <details>
-> <summary>⚠️ Outside diff range comments (1)</summary><blockquote>
->
-> <details>
-> <summary>src/ti4/core/game_state.py (1)</summary><blockquote>
->
-> `1-4`: **Fix: frozen GameState mutates external Planet objects**
->
-> GameState is declared @dataclass(frozen=True) but its methods mutate Planet instances, breaking immutability/snapshot semantics.
->
-> - Evidence (locations): src/ti4/core/game_state.py @dataclass(frozen=True) (line 33); gain_planet_control calls Planet.set_control (see game_state around line ~795 — Planet.set_control defined src/ti4/core/planet.py:22); lose_planet_control assigns planet.controlled_by = None (src/ti4/core/game_state.py:890); external readers/mutators: src/ti4/core/production_ability.py:296 and tests/test_planet.py:25-26.
->
-> Action: either stop mutating Planet objects (clone/return new Planet instances when producing a new GameState) or centralize/own control state inside GameState (use mappings like player_planets/planet_control_tokens) and make Planet immutable.
->
-> </blockquote></details>
->
-> </blockquote></details>
+**Actionable comments posted: 4**
 
 <details>
-<summary>🧹 Nitpick comments (11)</summary><blockquote>
+<summary>🧹 Nitpick comments (7)</summary><blockquote>
 
 <details>
-<summary>.trae/lrr_analysis/executive_summary.md (1)</summary><blockquote>
+<summary>src/ti4/core/game_state.py (5)</summary><blockquote>
 
-`66-76`: **Contradicts codebase status (e.g., Neighbors, Objectives, Wormholes at 0%).**
+`817-823`: **Duplicate assignments to new_planet_control_mapping — remove noise.**
 
-Roadmap and tests indicate these are implemented. Please reconcile the table with reality.
+Same copy performed three times.
 
-</blockquote></details>
-<details>
-<summary>src/ti4/core/strategy_cards/coordinator.py (1)</summary><blockquote>
-
-`166-167`: **Remove unused `_exhausted_cards` field to avoid confusion.**
-
-All exhaustion state is sourced from `_player_card_states`; `_exhausted_cards` is never read.
+Apply:
 
 ```diff
--        self._exhausted_cards: set[StrategyCardType] = set()
-...
--        self._exhausted_cards = set()
-```
-
-
-Also applies to: 874-875
-
-</blockquote></details>
-<details>
-<summary>tests/test_rule_25_control.py (3)</summary><blockquote>
-
-`18-43`: **Assert exploration flag in first-control test.**
-
-You already return `exploration_triggered`; assert it here for tighter coverage.
-
-```diff
--        exploration_triggered, new_state = game_state.gain_planet_control(
-+        exploration_triggered, new_state = game_state.gain_planet_control(
-             "player1", planet
-         )
-+        assert exploration_triggered
+-        new_planet_control_mapping = self.planet_control_mapping.copy()
+-        new_planet_control_mapping = self.planet_control_mapping.copy()
+         new_planet_control_tokens = {
+             name: tokens.copy() for name, tokens in self.planet_control_tokens.items()
+         }
+-        new_planet_control_mapping = self.planet_control_mapping.copy()
++        new_planet_control_mapping = self.planet_control_mapping.copy()
 ```
 
 ---
 
-`183-212`: **Add explicit controller assertions for clarity.**
+`862-874`: **Avoid duplicate planets by object identity; dedupe by name.**
 
-After resolution, also assert `planet.controlled_by == "player2"` to couple board state and card state.
+List membership check uses object identity; use name-based.
 
-```diff
-         assert len(player2_cards) == 1
-         assert player2_cards[0].name == "Contested Planet"
-+        assert planet.controlled_by == "player2"
-```
-
----
-
-`247-259`: **Mark placeholders as skipped to avoid false greens.**
-
-Use `@pytest.mark.skip(reason="pending invasion/exploration mechanics")`.
+Apply:
 
 ```diff
--    def test_control_integration_with_invasion(self) -> None:
-+    @pytest.mark.skip(reason="pending invasion mechanics")
-+    def test_control_integration_with_invasion(self) -> None:
-...
--    def test_control_integration_with_exploration(self) -> None:
-+    @pytest.mark.skip(reason="pending exploration mechanics")
-+    def test_control_integration_with_exploration(self) -> None:
-```
-
-</blockquote></details>
-<details>
-<summary>src/ti4/core/planet_card.py (1)</summary><blockquote>
-
-`9-17`: **Validate inputs for name/resources/influence.**
-
-Prevents invalid cards entering state.
-
-```diff
-     def __init__(
-         self, name: str, resources: int, influence: int, trait: Optional[str] = None
-     ) -> None:
--        self.name = name
-+        if not isinstance(name, str) or not name.strip():
-+            raise ValueError("PlanetCard.name must be a non-empty string")
-+        if not isinstance(resources, int) or resources < 0:
-+            raise ValueError("PlanetCard.resources must be a non-negative int")
-+        if not isinstance(influence, int) or influence < 0:
-+            raise ValueError("PlanetCard.influence must be a non-negative int")
-+        self.name = name
-         self.resources = resources
-         self.influence = influence
-         self.trait = trait
-         self._exhausted = False
-```
-
-</blockquote></details>
-<details>
-<summary>.trae/lrr_analysis/25_control.md (1)</summary><blockquote>
-
-`47-51`: **Test names in docs don’t match code.**
-
-Docs list `test_rule_25_1b_subsequent_control_takes_from_player`; code uses `test_rule_25_1b_control_transfer_takes_from_other_player`. Align names to reduce confusion.
-
-</blockquote></details>
-<details>
-<summary>src/ti4/core/game_state.py (4)</summary><blockquote>
-
-`777-853`: **Keep `player_planets` mapping consistent and avoid in-place planet mutation.**
-
-You mutate `planet` (external) but don’t update `player_planets`. Update both removal/addition; prefer not mutating external objects in-place.
-
-```diff
--        # Update planet control
--        planet.set_control(player_id)
-+        # Update planet control (avoid mutating external instance if tracked elsewhere)
-+        planet.set_control(player_id)
-+
-+        # Maintain player_planets mapping
-+        new_player_planets = {pid: planets.copy() for pid, planets in self.player_planets.items()}
-+        # Remove from previous controller
-+        if planet.controlled_by and planet.controlled_by in new_player_planets:
-+            new_player_planets[planet.controlled_by] = [p for p in new_player_planets[planet.controlled_by] if p.name != planet.name]
-+        # Add to new controller
+-        if player_id not in new_player_planets:
+-            new_player_planets[player_id] = []
+-        if planet not in new_player_planets[player_id]:
+-            new_player_planets[player_id].append(planet)
 +        if player_id not in new_player_planets:
 +            new_player_planets[player_id] = []
 +        if all(p.name != planet.name for p in new_player_planets[player_id]):
 +            new_player_planets[player_id].append(planet)
-...
--        new_state = self._create_new_state(
-+        new_state = self._create_new_state(
-             planet_card_deck=new_planet_card_deck,
-             player_planet_cards=new_player_planet_cards,
-             planet_control_tokens=new_planet_control_tokens,
-+            player_planets=new_player_planets,
-         )
 ```
 
 ---
 
-`854-896`: **Also update `player_planets` on loss.**
+`886-899`: **Add player existence validation in loss API.**
 
-Keep mappings in sync when control is lost.
+Mirror gain validation for symmetry and clearer errors.
+
+Apply:
 
 ```diff
--        # Clear planet control
--        planet.controlled_by = None
-+        # Clear planet control
-+        planet.controlled_by = None
-+
-+        # Update player_planets mapping
-+        new_player_planets = {pid: planets.copy() for pid, planets in self.player_planets.items()}
-+        if player_id in new_player_planets:
-+            new_player_planets[player_id] = [p for p in new_player_planets[player_id] if p.name != planet.name]
-...
+ def lose_planet_control(self, player_id: str, planet: "Planet") -> "GameState":
+     """Handle losing control of a planet according to Rule 25.
+@@
+-        current_controller = self.planet_control_mapping.get(planet.name)
++        if not any(p.id == player_id for p in self.players):
++            raise ValueError(f"Player {player_id} does not exist in the game")
++        current_controller = self.planet_control_mapping.get(planet.name)
+```
+
+---
+
+`1152-1155`: **Use name-based dedupe in add_player_planet.**
+
+Same identity issue as above.
+
+Apply:
+
+```diff
+-        # Only add if not already present
+-        if planet not in new_player_planets[player_id]:
+-            new_player_planets[player_id].append(planet)
++        # Only add if not already present (by name)
++        if all(p.name != planet.name for p in new_player_planets[player_id]):
++            new_player_planets[player_id].append(planet)
+```
+
+---
+
+`1267-1293`: **Duplicate APIs for technology; delegate to one.**
+
+Reduce duplication by making add_player_technology_card an alias.
+
+Apply:
+
+```diff
+ def add_player_technology_card(
+     self, player_id: str, technology_card: "TechnologyCard"
+ ) -> "GameState":
+-    """Add a technology card to a player's technology cards.
++    """Deprecated alias; use add_player_technology().
+
+@@
+-        new_player_technology_cards = {
+-            pid: cards.copy() for pid, cards in self.player_technology_cards.items()
+-        }
+-
+-        if player_id not in new_player_technology_cards:
+-            new_player_technology_cards[player_id] = []
+-
+-        # Only add if not already present
+-        if technology_card not in new_player_technology_cards[player_id]:
+-            new_player_technology_cards[player_id].append(technology_card)
+-
 -        return self._create_new_state(
-+        return self._create_new_state(
-             player_planet_cards=new_player_planet_cards,
-             planet_control_tokens=new_planet_control_tokens,
-+            player_planets=new_player_planets,
-         )
+-            player_technology_cards=new_player_technology_cards
+-        )
++        return self.add_player_technology(player_id, technology_card)
 ```
 
----
+</blockquote></details>
+<details>
+<summary>review_response.md (1)</summary><blockquote>
 
-`612-633`: **Duplicate shuffle methods (`shuffle_secret_objective_deck` vs `shuffle_secret_objectives`).**
+`63-66`: **Specify code fence language for test output block.**
 
-Consolidate to one name; keep the other as a thin alias for backward compatibility.
+Adds syntax hint and silences MD040.
+
+Apply:
 
 ```diff
--    def shuffle_secret_objectives(self) -> "GameState":
--        """Shuffle the secret objective deck.
--
--        Returns:
--            New GameState with shuffled secret objective deck
--        """
--        import random
--
--        new_deck = self.secret_objective_deck.copy()
--        random.shuffle(new_deck)
--        return self._create_new_state(secret_objective_deck=new_deck)
-+    def shuffle_secret_objectives(self) -> "GameState":
-+        """Deprecated alias; use shuffle_secret_objective_deck()."""
-+        return self.shuffle_secret_objective_deck()
+-```
++```text
+ ======================= 1063 passed, 2 skipped in 9.22s ========================
+ ```
 ```
 
+</blockquote></details>
+<details>
+<summary>latest_review.txt (1)</summary><blockquote>
 
-Also applies to: 1117-1127
+`1-9`: **Avoid committing ephemeral review artifacts.**
 
----
-
-`1109-1116`: **Secret objective helpers — minor polish.**
-
-Consider naming consistency: “deck” suffix for all deck-oriented methods.
-
+Consider excluding/auto-generating this report in CI to prevent churn.
 
 
-Also applies to: 1257-1270
+If you want, I can add a .gitattributes/.gitignore update and a CI artifact upload step.
 
 </blockquote></details>
 
@@ -251,17 +165,17 @@ Also applies to: 1257-1270
 <details>
 <summary>📥 Commits</summary>
 
-Reviewing files that changed from the base of the PR and between 1bc070cb716fd754d6a065d31dfef4f937a66765 and 2e8fe37486838a0db4cd9a5357b8a2df25bbd076.
+Reviewing files that changed from the base of the PR and between 2e8fe37486838a0db4cd9a5357b8a2df25bbd076 and 39a0ad181ca811563920b7bc8d65d965e15030db.
 
 </details>
 
 <details>
 <summary>📒 Files selected for processing (7)</summary>
 
-* `.trae/lrr_analysis/25_control.md` (3 hunks)
 * `.trae/lrr_analysis/executive_summary.md` (1 hunks)
-* `IMPLEMENTATION_ROADMAP.md` (2 hunks)
-* `src/ti4/core/game_state.py` (8 hunks)
+* `latest_review.txt` (1 hunks)
+* `review_response.md` (1 hunks)
+* `src/ti4/core/game_state.py` (7 hunks)
 * `src/ti4/core/planet_card.py` (1 hunks)
 * `src/ti4/core/strategy_cards/coordinator.py` (1 hunks)
 * `tests/test_rule_25_control.py` (1 hunks)
@@ -269,150 +183,152 @@ Reviewing files that changed from the base of the PR and between 1bc070cb716fd75
 </details>
 
 <details>
+<summary>🚧 Files skipped from review as they are similar to previous changes (2)</summary>
+
+* tests/test_rule_25_control.py
+* src/ti4/core/strategy_cards/coordinator.py
+
+</details>
+
+<details>
 <summary>🧰 Additional context used</summary>
 
 <details>
-<summary>🧬 Code graph analysis (2)</summary>
+<summary>🧬 Code graph analysis (1)</summary>
 
 <details>
-<summary>tests/test_rule_25_control.py (5)</summary><blockquote>
-
-<details>
-<summary>src/ti4/core/constants.py (1)</summary>
-
-* `UnitType` (6-20)
-
-</details>
-<details>
-<summary>src/ti4/core/game_state.py (8)</summary>
-
-* `GameState` (34-1269)
-* `gain_planet_control` (778-852)
-* `get_player_planet_cards` (937-946)
-* `is_planet_card_in_deck` (948-957)
-* `has_control_token_on_planet` (967-977)
-* `resolve_planet_control_change` (897-935)
-* `lose_planet_control` (854-895)
-* `get_planet_card_deck_size` (959-965)
-
-</details>
-<details>
-<summary>src/ti4/core/planet.py (2)</summary>
-
-* `Planet` (9-90)
-* `place_unit` (24-26)
-
-</details>
-<details>
-<summary>src/ti4/core/unit.py (1)</summary>
-
-* `Unit` (10-191)
-
-</details>
-<details>
-<summary>src/ti4/core/planet_card.py (1)</summary>
-
-* `is_exhausted` (18-20)
-
-</details>
-
-</blockquote></details>
-<details>
-<summary>src/ti4/core/game_state.py (4)</summary><blockquote>
+<summary>src/ti4/core/game_state.py (3)</summary><blockquote>
 
 <details>
 <summary>src/ti4/core/planet_card.py (3)</summary>
 
-* `PlanetCard` (6-81)
-* `is_exhausted` (18-20)
-* `exhaust` (26-30)
+* `PlanetCard` (6-88)
+* `is_exhausted` (25-27)
+* `exhaust` (33-37)
+
+</details>
+<details>
+<summary>src/ti4/core/strategy_cards/coordinator.py (2)</summary>
+
+* `get_player_strategy_card_assignments` (987-995)
+* `get_exhausted_cards` (997-1008)
 
 </details>
 <details>
 <summary>src/ti4/core/planet.py (3)</summary>
 
+* `Planet` (9-90)
 * `is_exhausted` (33-35)
 * `exhaust` (41-45)
-* `set_control` (20-22)
-
-</details>
-<details>
-<summary>src/ti4/core/objective.py (1)</summary>
-
-* `Objective` (13-21)
-
-</details>
-<details>
-<summary>src/ti4/core/strategy_cards/coordinator.py (4)</summary>
-
-* `ready_strategy_card` (601-611)
-* `ready_all_strategy_cards` (613-620)
-* `get_player_strategy_card_assignments` (989-997)
-* `get_exhausted_cards` (999-1010)
 
 </details>
 
 </blockquote></details>
 
-</details>
-
-</details>
-
-<details>
-<summary>🔇 Additional comments (7)</summary><blockquote>
+</details><details>
+<summary>🪛 markdownlint-cli2 (0.18.1)</summary>
 
 <details>
-<summary>src/ti4/core/strategy_cards/coordinator.py (1)</summary><blockquote>
+<summary>review_response.md</summary>
 
-`999-1011`: **New helper `get_exhausted_cards()` is clear and correct.**
+9-9: Emphasis used instead of a heading
 
-Iterates tracked states and returns exhausted set as expected.
-
-</blockquote></details>
-<details>
-<summary>src/ti4/core/game_state.py (4)</summary><blockquote>
-
-`85-91`: **Planet-control state containers added — LGTM.**
-
-Clear separation: deck, per-player hands, and control tokens.
+(MD036, no-emphasis-as-heading)
 
 ---
 
-`311-318`: **Propagation of planet-control fields in `_create_new_state` — LGTM.**
+15-15: Emphasis used instead of a heading
 
-Ensures immutability semantics are preserved.
-
----
-
-`1158-1180`: **Coordinator sync looks correct.**
-
-Assignment/exhaustion mirrored from coordinator; safe no-op guard included.
+(MD036, no-emphasis-as-heading)
 
 ---
 
-`979-1061`: **Nice helpers for planet-card and control-token ops.**
+21-21: Emphasis used instead of a heading
 
-Clear, cohesive, and side-effect scoped.
+(MD036, no-emphasis-as-heading)
 
+---
 
+27-27: Emphasis used instead of a heading
 
-Also applies to: 1063-1084
+(MD036, no-emphasis-as-heading)
+
+---
+
+33-33: Emphasis used instead of a heading
+
+(MD036, no-emphasis-as-heading)
+
+---
+
+39-39: Emphasis used instead of a heading
+
+(MD036, no-emphasis-as-heading)
+
+---
+
+45-45: Emphasis used instead of a heading
+
+(MD036, no-emphasis-as-heading)
+
+---
+
+53-53: Emphasis used instead of a heading
+
+(MD036, no-emphasis-as-heading)
+
+---
+
+64-64: Fenced code blocks should have a language specified
+
+(MD040, fenced-code-language)
+
+</details>
+
+</details>
+
+</details>
+
+<details>
+<summary>🔇 Additional comments (4)</summary><blockquote>
+
+<details>
+<summary>src/ti4/core/planet_card.py (1)</summary><blockquote>
+
+`12-17`: **Constructor validation — good coverage.**
+
+Non-empty name and non-negative ints checks are correct.
 
 </blockquote></details>
 <details>
-<summary>.trae/lrr_analysis/25_control.md (1)</summary><blockquote>
+<summary>src/ti4/core/game_state.py (2)</summary><blockquote>
 
-`86-92`: **Missing tests claimed for Rule 25.6 — add tests or update docs**
+`14-17`: **Import path for coordinator — correct now.**
 
-.thetrae/lrr_analysis/25_control.md (lines 86–92; also 120–133) claims a test `test_rule_25_6_control_loss_through_game_effects` and "additional integration tests", but tests/test_rule_25_control.py contains only tests for 25.1, 25.1a, 25.1b, 25.1c, 25.2, 25.3, 25.4, 25.5, and 25.7 — 25.6 and the integration tests are missing. Add the missing tests or update the markdown to reflect current coverage.
+TYPE_CHECKING path uses strategy_cards.coordinator; aligns with package layout.
+
+---
+
+`974-981`: **Deterministic controller selection — LGTM.**
+
+Initiative-ordered tie-break removes nondeterminism.
 
 </blockquote></details>
 <details>
-<summary>IMPLEMENTATION_ROADMAP.md (1)</summary><blockquote>
+<summary>.trae/lrr_analysis/executive_summary.md (1)</summary><blockquote>
 
-`11-12`: **Roadmap metrics mismatch — verify Rule 25 tests/CI auto-sourcing**
+`3-6`: **Headline metrics contradict roadmap; regenerate or drop until automated.**
 
-rg returned 0 matches for ^def\s+test_rule_25_ in tests, but IMPLEMENTATION_ROADMAP.md (lines 18, 47) claims Rule 25 is 12/12 tests passing. Auto-source these metrics from CI or update the roadmap/test names/locations so automated checks can locate and verify them.
+“107/101 rules” and “3.5%” don’t match IMPLEMENTATION_ROADMAP.md.
+
+
+
+```shell
+#!/bin/bash
+# Cross-check key claims against roadmap
+rg -n "Total Rules Analyzed|Overall Implementation Progress" .trae/lrr_analysis/executive_summary.md
+rg -n "Overall Progress|Completed Rules" IMPLEMENTATION_ROADMAP.md
+```
 
 </blockquote></details>
 
@@ -425,56 +341,31 @@ rg returned 0 matches for ^def\s+test_rule_25_ in tests, but IMPLEMENTATION_ROAD
 DETAILED COMMENTS:
 ----------------------------------------
 Comment 1:
-  File: .trae/lrr_analysis/executive_summary.md
-  Line: 6
-  Body: _⚠️ Potential issue_
-
-<details>
-<summary>🧩 Analysis chain</summary>
-
-**Inconsistent headline metrics (107/101 rules, 3.5%).**
-
-These conflict with the roadmap (28.7%, many rules completed). Regenerate this summary from current sources or remove until automated.
-
----
-
-🏁 Script executed:
-
-```shell
-#!/bin/bash
-# Quick sanity: detect obvious contradictions.
-rg -n "Overall Implementation Progress|Total Rules Analyzed" .trae/lrr_analysis/executive_summary.md
-rg -n "Overall Progress|Completed Rules" IMPLEMENTATION_ROADMAP.md
-```
-
-Length of output: 141
-
----
-
-
-
-</details>
-
-**Inconsistent headline metrics — regenerate or remove executive summary**
-
-.trae/lrr_analysis/executive_summary.md reports "Total Rules Analyzed: 107/101" and "Overall Implementation Progress: 3.5%"; IMPLEMENTATION_ROADMAP.md reports "Completed Rules: 28/101" and "Overall Progress: 28.7%". Regenerate the executive summary from current sources or remove it until the automation is corrected.
-
-<!-- fingerprinting:phantom:medusa:chinchilla -->
-
-<!-- This is an auto-generated comment by CodeRabbit -->
-
-Comment 2:
   File: src/ti4/core/game_state.py
-  Line: 7
+  Line: 116
   Body: _⚠️ Potential issue_
 
-**Wrong type-checking import path for coordinator.**
+**Add player existence validation in control APIs.**
 
-Module lives under `strategy_cards/coordinator.py`. This breaks MyPy/IDE.
+Gain control should reject unknown player IDs (consistency with award_victory_points).
+
+Apply:
 
 ```diff
--    from .strategy_card_coordinator import StrategyCardCoordinator
-+    from .strategy_cards.coordinator import StrategyCardCoordinator
+ def gain_planet_control(
+     self, player_id: str, planet: "Planet"
+ ) -> tuple[bool, "GameState"]:
+     """Handle gaining control of a planet according to Rule 25.
+@@
+-        # Rule 25.2: Cannot gain control of already controlled planet
++        # Validate player exists
++        if not any(p.id == player_id for p in self.players):
++            raise ValueError(f"Player {player_id} does not exist in the game")
++
++        # Rule 25.2: Cannot gain control of already controlled planet
+         current_controller = self.planet_control_mapping.get(planet.name)
+         if current_controller == player_id:
+             raise ValueError("Player already controls this planet")
 ```
 
 <!-- suggestion_start -->
@@ -486,8 +377,30 @@ Module lives under `strategy_cards/coordinator.py`. This breaks MyPy/IDE.
 > Carefully review the code before committing. Ensure that it accurately replaces the highlighted code, contains no missing lines, and has no issues with indentation. Thoroughly test & benchmark the code to ensure it meets the requirements.
 
 ```suggestion
-    from .strategy_cards.coordinator import StrategyCardCoordinator
-    from .system import System
+    def gain_planet_control(
+        self, player_id: str, planet: "Planet"
+    ) -> tuple[bool, "GameState"]:
+        """Handle gaining control of a planet according to Rule 25.
+
+        Args:
+            player_id: The player gaining control
+            planet: The planet being controlled
+
+        Returns:
+            Tuple of (exploration_triggered, new_game_state)
+            exploration_triggered: True if exploration should be triggered (first control)
+
+        Raises:
+            ValueError: If player already controls this planet (Rule 25.2)
+        """
+        # Validate player exists
+        if not any(p.id == player_id for p in self.players):
+            raise ValueError(f"Player {player_id} does not exist in the game")
+
+        # Rule 25.2: Cannot gain control of already controlled planet
+        current_controller = self.planet_control_mapping.get(planet.name)
+        if current_controller == player_id:
+            raise ValueError("Player already controls this planet")
 ```
 
 </details>
@@ -498,53 +411,250 @@ Module lives under `strategy_cards/coordinator.py`. This breaks MyPy/IDE.
 <summary>🤖 Prompt for AI Agents</summary>
 
 ```
-In src/ti4/core/game_state.py around lines 16 to 17, the import path for
-StrategyCardCoordinator is incorrect; update the import to reference the actual
-module location by replacing the current import with from
-..strategy_cards.coordinator import StrategyCardCoordinator (or the appropriate
-relative path consistent with the package layout), ensure package __init__.py
-files allow the relative import, run mypy/IDE recheck, and adjust any other
-imports in the file to use the correct module path.
+In src/ti4/core/game_state.py around lines 785 to 805, the gain_planet_control
+method lacks validation that the supplied player_id exists; add the same player
+existence check used by award_victory_points so unknown player IDs are rejected.
+Specifically, before checking current controller, verify player_id is present in
+self.players (or the canonical player collection on GameState) and raise
+ValueError("Unknown player id") (or a matching error message used elsewhere) if
+not found; keep the existing Rule 25.2 check and return semantics unchanged.
 ```
 
 </details>
 
-<!-- fingerprinting:phantom:medusa:chinchilla -->
+<!-- fingerprinting:phantom:poseidon:chinchilla -->
+
+<!-- This is an auto-generated comment by CodeRabbit -->
+
+Comment 2:
+  File: src/ti4/core/game_state.py
+  Line: 160
+  Body: _⚠️ Potential issue_
+
+**Immutability breach: mutates shared PlanetCard instance across states.**
+
+Exhausting planet_card here mutates the object that also exists in the previous GameState (deck/other player), breaking snapshot semantics of frozen GameState.
+
+Apply:
+
+```diff
+-        if player_id not in new_player_planet_cards:
+-            new_player_planet_cards[player_id] = []
+-        new_player_planet_cards[player_id].append(planet_card)
+-
+-        # Rule 25.1: Card is exhausted when gained
+-        if not planet_card.is_exhausted():
+-            planet_card.exhaust()
++        if player_id not in new_player_planet_cards:
++            new_player_planet_cards[player_id] = []
++        # Create a fresh instance to avoid mutating prior-state references
++        card_copy = type(planet_card)(
++            planet_card.name,
++            planet_card.resources,
++            planet_card.influence,
++            trait=getattr(planet_card, "trait", None),
++        )
++        if not card_copy.is_exhausted():
++            card_copy.exhaust()
++        new_player_planet_cards[player_id].append(card_copy)
+```
+
+<!-- suggestion_start -->
+
+<details>
+<summary>📝 Committable suggestion</summary>
+
+> ‼️ **IMPORTANT**
+> Carefully review the code before committing. Ensure that it accurately replaces the highlighted code, contains no missing lines, and has no issues with indentation. Thoroughly test & benchmark the code to ensure it meets the requirements.
+
+```suggestion
+        # Add to new player's play area
+        if player_id not in new_player_planet_cards:
+            new_player_planet_cards[player_id] = []
+        # Create a fresh instance to avoid mutating prior-state references
+        card_copy = type(planet_card)(
+            planet_card.name,
+            planet_card.resources,
+            planet_card.influence,
+            trait=getattr(planet_card, "trait", None),
+        )
+        if not card_copy.is_exhausted():
+            card_copy.exhaust()
+        new_player_planet_cards[player_id].append(card_copy)
+```
+
+</details>
+
+<!-- suggestion_end -->
+
+<details>
+<summary>🤖 Prompt for AI Agents</summary>
+
+```
+In src/ti4/core/game_state.py around lines 838 to 846, the code exhausts the
+existing planet_card instance which mutates an object shared with the previous
+GameState; instead, create a new PlanetCard instance (via the class's
+copy/clone/factory method or a shallow/deep copy) representing the gained card,
+set/exhaust that new instance, and append the new exhausted instance to
+new_player_planet_cards[player_id] so the original planet_card in the old state
+remains unchanged and snapshot immutability is preserved.
+```
+
+</details>
+
+<!-- fingerprinting:phantom:poseidon:chinchilla -->
 
 <!-- This is an auto-generated comment by CodeRabbit -->
 
 Comment 3:
-  File: src/ti4/core/game_state.py
-  Line: 248
-  Body: _🛠️ Refactor suggestion_
+  File: src/ti4/core/planet_card.py
+  Line: 62
+  Body: _⚠️ Potential issue_
 
-**Deterministic new controller selection when multiple players have units.**
+**Validate spend amount type and positivity; clarify errors.**
 
-Picking `next(iter(set))` is nondeterministic. Use initiative order or player list order.
+Currently allows 0/negative or non-int amounts and raises late. Tighten upfront.
+
+Apply:
 
 ```diff
--                if other_players_with_units:
-+                if other_players_with_units:
-                     # Lose control
-                     new_state = self.lose_planet_control(current_controller, planet)
+ def spend_resources(self, amount: int) -> int:
+-    """Spend resources from this planet card, exhausting it."""
+-    if self._exhausted:
++    """Spend resources from this planet card, exhausting it."""
++    if not isinstance(amount, int) or amount <= 0:
++        raise ValueError("Spend amount must be a positive integer")
++    if self._exhausted:
+         raise ValueError("Cannot spend from exhausted planet card")
+     if amount > self.resources:
+         raise ValueError(
+             f"Cannot spend {amount} resources, planet card only has {self.resources}"
+         )
 
--                    # Rule 25.5a: Player with units gains control
--                    new_controller = next(
--                        iter(other_players_with_units)
--                    )  # Take first player
-+                    # Rule 25.5a: Player with units gains control (deterministic)
-+                    candidates = list(other_players_with_units)
-+                    new_controller = self._sort_players_by_initiative_order(candidates)[0]
-                     _, final_state = new_state.gain_planet_control(
-                         new_controller, planet
-                     )
-                     return final_state
+     self.exhaust()
+     return amount
 ```
 
+<!-- suggestion_start -->
 
-> Committable suggestion skipped: line range outside the PR's diff.
+<details>
+<summary>📝 Committable suggestion</summary>
 
-<!-- fingerprinting:phantom:medusa:chinchilla -->
+> ‼️ **IMPORTANT**
+> Carefully review the code before committing. Ensure that it accurately replaces the highlighted code, contains no missing lines, and has no issues with indentation. Thoroughly test & benchmark the code to ensure it meets the requirements.
+
+```suggestion
+    def spend_resources(self, amount: int) -> int:
+        """Spend resources from this planet card, exhausting it."""
+        if not isinstance(amount, int) or amount <= 0:
+            raise ValueError("Spend amount must be a positive integer")
+        if self._exhausted:
+            raise ValueError("Cannot spend from exhausted planet card")
+        if amount > self.resources:
+            raise ValueError(
+                f"Cannot spend {amount} resources, planet card only has {self.resources}"
+            )
+
+        self.exhaust()
+        return amount
+```
+
+</details>
+
+<!-- suggestion_end -->
+
+<details>
+<summary>🤖 Prompt for AI Agents</summary>
+
+```
+In src/ti4/core/planet_card.py around lines 51 to 62, validate that amount is an
+integer and strictly positive before any other checks: first check
+isinstance(amount, int) and reject bools, raising a TypeError with a clear
+message if not an int; then check amount > 0 and raise a ValueError with a clear
+message if not positive; only after those validations, check for self._exhausted
+and raise the existing ValueError if exhausted; keep the rest of the logic
+(exhaust and return amount) unchanged.
+```
+
+</details>
+
+<!-- fingerprinting:phantom:poseidon:chinchilla -->
+
+<!-- This is an auto-generated comment by CodeRabbit -->
+
+Comment 4:
+  File: src/ti4/core/planet_card.py
+  Line: 74
+  Body: _⚠️ Potential issue_
+
+**Mirror spend validation for influence.**
+
+Same input validation gap as resources.
+
+Apply:
+
+```diff
+ def spend_influence(self, amount: int) -> int:
+-    """Spend influence from this planet card, exhausting it."""
+-    if self._exhausted:
++    """Spend influence from this planet card, exhausting it."""
++    if not isinstance(amount, int) or amount <= 0:
++        raise ValueError("Spend amount must be a positive integer")
++    if self._exhausted:
+         raise ValueError("Cannot spend from exhausted planet card")
+     if amount > self.influence:
+         raise ValueError(
+             f"Cannot spend {amount} influence, planet card only has {self.influence}"
+         )
+
+     self.exhaust()
+     return amount
+```
+
+<!-- suggestion_start -->
+
+<details>
+<summary>📝 Committable suggestion</summary>
+
+> ‼️ **IMPORTANT**
+> Carefully review the code before committing. Ensure that it accurately replaces the highlighted code, contains no missing lines, and has no issues with indentation. Thoroughly test & benchmark the code to ensure it meets the requirements.
+
+```suggestion
+    def spend_influence(self, amount: int) -> int:
+        """Spend influence from this planet card, exhausting it."""
+        if not isinstance(amount, int) or amount <= 0:
+            raise ValueError("Spend amount must be a positive integer")
+        if self._exhausted:
+            raise ValueError("Cannot spend from exhausted planet card")
+        if amount > self.influence:
+            raise ValueError(
+                f"Cannot spend {amount} influence, planet card only has {self.influence}"
+            )
+
+        self.exhaust()
+        return amount
+```
+
+</details>
+
+<!-- suggestion_end -->
+
+<details>
+<summary>🤖 Prompt for AI Agents</summary>
+
+```
+In src/ti4/core/planet_card.py around lines 63 to 74, the spend_influence method
+lacks the same input validation used by the resources counterpart; update it to
+mirror that validation by checking that amount is a positive integer (e.g.,
+amount > 0) and raising a ValueError for non-positive amounts, ensure you still
+check amount <= self.influence and raise the existing ValueError when exceeding
+available influence, then deduct the influence (or otherwise consume it as
+resources does), call self.exhaust(), and return the spent amount.
+```
+
+</details>
+
+<!-- fingerprinting:phantom:poseidon:chinchilla -->
 
 <!-- This is an auto-generated comment by CodeRabbit -->
 
