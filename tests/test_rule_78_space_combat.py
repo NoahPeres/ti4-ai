@@ -255,7 +255,7 @@ class TestSpaceCombatIntegration:
         """Test that tactical action properly triggers space combat when needed."""
         # This should fail initially - tactical action integration not implemented
         with pytest.raises(ImportError):
-            from src.ti4.core.tactical_action import TacticalAction
+            pass
             # This import should fail since tactical action integration isn't implemented yet
 
     def test_space_combat_affects_game_state(self) -> None:
@@ -302,7 +302,7 @@ class TestSpaceCombatAdvancedMechanics:
         # Create systems for retreat test
         active_system = System("active_system")
         retreat_system = System("retreat_system")
-        
+
         # Add ships to active system
         cruiser = Unit(UnitType.CRUISER, "player1")  # Attacker
         destroyer = Unit(UnitType.DESTROYER, "player2")  # Defender
@@ -318,10 +318,10 @@ class TestSpaceCombatAdvancedMechanics:
         # Execute retreat step - defender must retreat to eligible system
         retreat_successful = round_obj.execute_retreat_step(retreat_system)
         assert retreat_successful is True
-        
+
         # Remove the retreated unit from active system manually (in full implementation this would be automatic)
         active_system.space_units = [u for u in active_system.space_units if u.owner != "player2"]
-        
+
         # Defender's ship should be moved to retreat system
         assert len([u for u in active_system.space_units if u.owner == "player2"]) == 0
         assert len([u for u in retreat_system.space_units if u.owner == "player2"]) == 1
@@ -339,7 +339,7 @@ class TestSpaceCombatAdvancedMechanics:
         system.space_units.extend([cruiser1, cruiser2, destroyer1, destroyer2])
 
         combat = SpaceCombat(system, "player1", "player2")
-        round_obj = combat.start_combat()
+        combat.start_combat()
 
         # Simulate partial retreat - only one defender ship retreats
         system.space_units.remove(destroyer1)  # One ship retreats
@@ -347,7 +347,7 @@ class TestSpaceCombatAdvancedMechanics:
 
         # Combat should continue since both players still have ships
         assert combat.should_continue() is True
-        
+
         # Next round should start with "Announce Retreats" step
         if combat.should_continue():
             next_round = combat.next_round()
@@ -371,7 +371,7 @@ class TestSpaceCombatAdvancedMechanics:
 
         # Combat should end since only player1 has ships
         assert combat.should_continue() is False
-        
+
         # Combat should be marked as ended
         result = combat.end_combat()
         assert result.attacker_id == "player1"
@@ -411,7 +411,7 @@ class TestSpaceCombatAdvancedMechanics:
         system.space_units.remove(destroyer)
 
         result = combat.end_combat()
-        
+
         # Attacker should be winner
         assert result.winner == "player1"
         assert result.loser == "player2"
@@ -435,7 +435,7 @@ class TestSpaceCombatAdvancedMechanics:
         system.space_units.remove(cruiser)
 
         result = combat.end_combat()
-        
+
         # Defender should be winner
         assert result.winner == "player2"
         assert result.loser == "player1"
@@ -459,7 +459,7 @@ class TestSpaceCombatAdvancedMechanics:
         system.space_units.clear()
 
         result = combat.end_combat()
-        
+
         # Should be a draw
         assert result.winner is None
         assert result.loser is None

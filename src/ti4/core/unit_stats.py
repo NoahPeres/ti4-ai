@@ -9,12 +9,12 @@ from .constants import Faction, Technology, UnitType
 @dataclass(frozen=True)
 class UnitStats:
     """Represents the statistics of a unit.
-    
+
     Organized into two semantic groups:
     1. Fundamental Unit Properties: Basic stats that define the unit
     2. Unit Abilities: Special capabilities the unit may have
     """
-    
+
     # === FUNDAMENTAL UNIT PROPERTIES ===
     cost: float = 1
     combat_value: Optional[int] = None
@@ -22,7 +22,7 @@ class UnitStats:
     movement: int = 1
     capacity: int = 0
     production: int = 0
-    
+
     # === UNIT ABILITIES ===
     sustain_damage: bool = False
     anti_fighter_barrage: bool = False
