@@ -95,7 +95,7 @@ class TestSpaceCombatResolution:
 
         # Defender should be able to announce retreat first
         assert round_obj.can_defender_announce_retreat() is True
-        
+
         # Attacker should be able to announce retreat when defender has not
         assert round_obj.can_attacker_announce_retreat() is True
 
