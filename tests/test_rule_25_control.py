@@ -1,8 +1,4 @@
-"""Tests for Rule 25: CONTROL.
-
-LRR Reference: Rule 25 - Planet control mechanics including planet card management,
-control tokens, and control transfer between players.
-"""
+"""Tests for Rule 25: Control of Planets"""
 
 import pytest
 
@@ -245,14 +241,16 @@ class TestRule25PlanetCardDeck:
 
 
 class TestRule25Integration:
-    """Test Rule 25 integration with other systems."""
+    """Integration tests for Rule 25 control mechanics."""
 
-    def test_control_integration_with_invasion(self) -> None:
-        """Test that control changes properly during invasion step."""
+    @pytest.mark.skip(reason="Waiting for invasion mechanics to be implemented")
+    def test_control_integration_with_invasion(self):
+        """Test that control changes properly during invasion."""
         # This will be implemented when invasion mechanics are added
         pass
 
-    def test_control_integration_with_exploration(self) -> None:
+    @pytest.mark.skip(reason="Waiting for exploration mechanics to be implemented")
+    def test_control_integration_with_exploration(self):
         """Test that gaining control triggers exploration when appropriate."""
         # This will be implemented when exploration mechanics are added
         pass

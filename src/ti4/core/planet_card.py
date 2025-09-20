@@ -9,6 +9,13 @@ class PlanetCard:
     def __init__(
         self, name: str, resources: int, influence: int, trait: Optional[str] = None
     ) -> None:
+        if not name or not isinstance(name, str):
+            raise ValueError("Planet name must be a non-empty string")
+        if not isinstance(resources, int) or resources < 0:
+            raise ValueError("Resources must be a non-negative integer")
+        if not isinstance(influence, int) or influence < 0:
+            raise ValueError("Influence must be a non-negative integer")
+
         self.name = name
         self.resources = resources
         self.influence = influence

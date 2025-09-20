@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from .planet import Planet
     from .planet_card import PlanetCard
     from .strategic_action import StrategyCardType
-    from .strategy_card_coordinator import StrategyCardCoordinator
+    from .strategy_cards.coordinator import StrategyCardCoordinator
     from .system import System
     from .technology import TechnologyCard
 else:
@@ -88,6 +88,10 @@ class GameState:
         default_factory=dict, hash=False
     )
     planet_control_tokens: dict[str, set[str]] = field(default_factory=dict, hash=False)
+    # Centralized planet control mapping to avoid mutating Planet objects
+    planet_control_mapping: dict[str, Optional[str]] = field(
+        default_factory=dict, hash=False
+    )
 
     def __post_init__(self) -> None:
         """Validate game state invariants after initialization."""
@@ -315,6 +319,9 @@ class GameState:
             ),
             planet_control_tokens=kwargs.get(
                 "planet_control_tokens", self.planet_control_tokens
+            ),
+            planet_control_mapping=kwargs.get(
+                "planet_control_mapping", self.planet_control_mapping
             ),
         )
 
@@ -792,11 +799,12 @@ class GameState:
             ValueError: If player already controls this planet (Rule 25.2)
         """
         # Rule 25.2: Cannot gain control of already controlled planet
-        if planet.controlled_by == player_id:
+        current_controller = self.planet_control_mapping.get(planet.name)
+        if current_controller == player_id:
             raise ValueError("Player already controls this planet")
 
         # Determine if this triggers exploration (Rule 25.1c)
-        was_uncontrolled = planet.controlled_by is None
+        was_uncontrolled = self.planet_control_mapping.get(planet.name) is None
 
         # Handle planet card transfer
         planet_card = self._get_or_create_planet_card(planet)
@@ -806,17 +814,20 @@ class GameState:
         new_player_planet_cards = {
             pid: cards.copy() for pid, cards in self.player_planet_cards.items()
         }
+        new_planet_control_mapping = self.planet_control_mapping.copy()
+        new_planet_control_mapping = self.planet_control_mapping.copy()
         new_planet_control_tokens = {
             name: tokens.copy() for name, tokens in self.planet_control_tokens.items()
         }
+        new_planet_control_mapping = self.planet_control_mapping.copy()
 
         # Rule 25.1b: If another player controls it, take from their play area
-        if planet.controlled_by is not None:
+        if current_controller is not None:
             # Remove from previous player
-            if planet.controlled_by in new_player_planet_cards:
-                new_player_planet_cards[planet.controlled_by] = [
+            if current_controller in new_player_planet_cards:
+                new_player_planet_cards[current_controller] = [
                     card
-                    for card in new_player_planet_cards[planet.controlled_by]
+                    for card in new_player_planet_cards[current_controller]
                     if card.name != planet.name
                 ]
         else:
@@ -833,8 +844,8 @@ class GameState:
         if not planet_card.is_exhausted():
             planet_card.exhaust()
 
-        # Update planet control
-        planet.set_control(player_id)
+        # Update planet control in centralized mapping (don't mutate Planet object)
+        new_planet_control_mapping[planet.name] = player_id
 
         # Rule 25.4: If no units on planet, place control token
         if len(planet.units) == 0:
@@ -842,11 +853,32 @@ class GameState:
                 new_planet_control_tokens[planet.name] = set()
             new_planet_control_tokens[planet.name].add(player_id)
 
+        # Update player_planets mapping for consistency
+        new_player_planets = {
+            pid: planets.copy() for pid, planets in self.player_planets.items()
+        }
+
+        # Remove from previous controller if any
+        if current_controller is not None and current_controller in new_player_planets:
+            new_player_planets[current_controller] = [
+                p
+                for p in new_player_planets[current_controller]
+                if p.name != planet.name
+            ]
+
+        # Add to new controller
+        if player_id not in new_player_planets:
+            new_player_planets[player_id] = []
+        if planet not in new_player_planets[player_id]:
+            new_player_planets[player_id].append(planet)
+
         # Create new state
         new_state = self._create_new_state(
             planet_card_deck=new_planet_card_deck,
             player_planet_cards=new_player_planet_cards,
             planet_control_tokens=new_planet_control_tokens,
+            planet_control_mapping=new_planet_control_mapping,
+            player_planets=new_player_planets,
         )
 
         return was_uncontrolled, new_state
@@ -861,7 +893,8 @@ class GameState:
         Returns:
             New GameState with updated control
         """
-        if planet.controlled_by != player_id:
+        current_controller = self.planet_control_mapping.get(planet.name)
+        if current_controller != player_id:
             return self  # Player doesn't control this planet
 
         # Create new state with updated control tokens and planet cards
@@ -871,6 +904,7 @@ class GameState:
         new_player_planet_cards = {
             pid: cards.copy() for pid, cards in self.player_planet_cards.items()
         }
+        new_planet_control_mapping = self.planet_control_mapping.copy()
 
         # Rule 25.7: Remove control token if present
         if planet.name in new_planet_control_tokens:
@@ -886,12 +920,25 @@ class GameState:
                 if card.name != planet.name
             ]
 
-        # Clear planet control
-        planet.controlled_by = None
+        # Clear planet control in centralized mapping (don't mutate Planet object)
+        new_planet_control_mapping[planet.name] = None
+
+        # Update player_planets mapping for consistency
+        new_player_planets = {
+            pid: planets.copy() for pid, planets in self.player_planets.items()
+        }
+
+        # Remove planet from player's controlled planets
+        if player_id in new_player_planets:
+            new_player_planets[player_id] = [
+                p for p in new_player_planets[player_id] if p.name != planet.name
+            ]
 
         return self._create_new_state(
             player_planet_cards=new_player_planet_cards,
             planet_control_tokens=new_planet_control_tokens,
+            planet_control_mapping=new_planet_control_mapping,
+            player_planets=new_player_planets,
         )
 
     def resolve_planet_control_change(self, planet: "Planet") -> "GameState":
@@ -903,7 +950,8 @@ class GameState:
         Returns:
             New GameState with resolved control changes
         """
-        current_controller = planet.controlled_by
+        # Use centralized mapping instead of planet.controlled_by
+        current_controller = self.planet_control_mapping.get(planet.name)
 
         # Check if current controller has units
         if current_controller:
@@ -923,10 +971,11 @@ class GameState:
                     # Lose control
                     new_state = self.lose_planet_control(current_controller, planet)
 
-                    # Rule 25.5a: Player with units gains control
-                    new_controller = next(
-                        iter(other_players_with_units)
-                    )  # Take first player
+                    # Rule 25.5a: Player with units gains control (deterministic)
+                    candidates = list(other_players_with_units)
+                    new_controller = self._sort_players_by_initiative_order(candidates)[
+                        0
+                    ]
                     _, final_state = new_state.gain_planet_control(
                         new_controller, planet
                     )
@@ -1114,17 +1163,16 @@ class GameState:
         """
         return self.secret_objective_deck.copy()
 
+    # Backward compatibility alias
     def shuffle_secret_objectives(self) -> "GameState":
         """Shuffle the secret objective deck.
+
+        Deprecated: Use shuffle_secret_objective_deck instead.
 
         Returns:
             New GameState with shuffled secret objective deck
         """
-        import random
-
-        new_deck = self.secret_objective_deck.copy()
-        random.shuffle(new_deck)
-        return self._create_new_state(secret_objective_deck=new_deck)
+        return self.shuffle_secret_objective_deck()
 
     def ready_strategy_card(self, card: "StrategyCardType") -> "GameState":
         """Ready a strategy card (remove from exhausted set).

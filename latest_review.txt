@@ -1,35 +1,239 @@
-Latest review for PR #8 in NoahPeres/ti4-ai:
+Latest review for PR #12 in NoahPeres/ti4-ai:
 
 ============================================================
 GITHUB PR REVIEW SUMMARY
 ============================================================
 Reviewer: coderabbitai[bot]
 State: COMMENTED
-Submitted: 2025-09-20T03:49:58Z
-Review ID: 3248170037
+Submitted: 2025-09-20T10:04:53Z
+Review ID: 3248971528
 
 REVIEW BODY:
 ----------------------------------------
-**Actionable comments posted: 0**
+**Actionable comments posted: 3**
+
+> [!CAUTION]
+> Some comments are outside the diff and can’t be posted inline due to platform limitations.
+>
+>
+>
+> <details>
+> <summary>⚠️ Outside diff range comments (1)</summary><blockquote>
+>
+> <details>
+> <summary>src/ti4/core/game_state.py (1)</summary><blockquote>
+>
+> `1-4`: **Fix: frozen GameState mutates external Planet objects**
+>
+> GameState is declared @dataclass(frozen=True) but its methods mutate Planet instances, breaking immutability/snapshot semantics.
+>
+> - Evidence (locations): src/ti4/core/game_state.py @dataclass(frozen=True) (line 33); gain_planet_control calls Planet.set_control (see game_state around line ~795 — Planet.set_control defined src/ti4/core/planet.py:22); lose_planet_control assigns planet.controlled_by = None (src/ti4/core/game_state.py:890); external readers/mutators: src/ti4/core/production_ability.py:296 and tests/test_planet.py:25-26.
+>
+> Action: either stop mutating Planet objects (clone/return new Planet instances when producing a new GameState) or centralize/own control state inside GameState (use mappings like player_planets/planet_control_tokens) and make Planet immutable.
+>
+> </blockquote></details>
+>
+> </blockquote></details>
 
 <details>
-<summary>🧹 Nitpick comments (1)</summary><blockquote>
+<summary>🧹 Nitpick comments (11)</summary><blockquote>
 
 <details>
-<summary>review_response_summary.md (1)</summary><blockquote>
+<summary>.trae/lrr_analysis/executive_summary.md (1)</summary><blockquote>
 
-`9-10`: **Fix markdown emphasis formatting for section headings**
+`66-76`: **Contradicts codebase status (e.g., Neighbors, Objectives, Wormholes at 0%).**
 
-The linting tool correctly identifies these lines as using emphasis instead of proper headings. This affects readability and document structure.
+Roadmap and tests indicate these are implemented. Please reconcile the table with reality.
 
+</blockquote></details>
+<details>
+<summary>src/ti4/core/strategy_cards/coordinator.py (1)</summary><blockquote>
 
+`166-167`: **Remove unused `_exhausted_cards` field to avoid confusion.**
+
+All exhaustion state is sourced from `_player_card_states`; `_exhausted_cards` is never read.
 
 ```diff
--**Authorization Header Fix**
-+## Authorization Header Fix
+-        self._exhausted_cards: set[StrategyCardType] = set()
+...
+-        self._exhausted_cards = set()
 ```
 
-Similarly fix all other emphasized text that should be headings (lines 13, 18, 25, 28, 32, 39).
+
+Also applies to: 874-875
+
+</blockquote></details>
+<details>
+<summary>tests/test_rule_25_control.py (3)</summary><blockquote>
+
+`18-43`: **Assert exploration flag in first-control test.**
+
+You already return `exploration_triggered`; assert it here for tighter coverage.
+
+```diff
+-        exploration_triggered, new_state = game_state.gain_planet_control(
++        exploration_triggered, new_state = game_state.gain_planet_control(
+             "player1", planet
+         )
++        assert exploration_triggered
+```
+
+---
+
+`183-212`: **Add explicit controller assertions for clarity.**
+
+After resolution, also assert `planet.controlled_by == "player2"` to couple board state and card state.
+
+```diff
+         assert len(player2_cards) == 1
+         assert player2_cards[0].name == "Contested Planet"
++        assert planet.controlled_by == "player2"
+```
+
+---
+
+`247-259`: **Mark placeholders as skipped to avoid false greens.**
+
+Use `@pytest.mark.skip(reason="pending invasion/exploration mechanics")`.
+
+```diff
+-    def test_control_integration_with_invasion(self) -> None:
++    @pytest.mark.skip(reason="pending invasion mechanics")
++    def test_control_integration_with_invasion(self) -> None:
+...
+-    def test_control_integration_with_exploration(self) -> None:
++    @pytest.mark.skip(reason="pending exploration mechanics")
++    def test_control_integration_with_exploration(self) -> None:
+```
+
+</blockquote></details>
+<details>
+<summary>src/ti4/core/planet_card.py (1)</summary><blockquote>
+
+`9-17`: **Validate inputs for name/resources/influence.**
+
+Prevents invalid cards entering state.
+
+```diff
+     def __init__(
+         self, name: str, resources: int, influence: int, trait: Optional[str] = None
+     ) -> None:
+-        self.name = name
++        if not isinstance(name, str) or not name.strip():
++            raise ValueError("PlanetCard.name must be a non-empty string")
++        if not isinstance(resources, int) or resources < 0:
++            raise ValueError("PlanetCard.resources must be a non-negative int")
++        if not isinstance(influence, int) or influence < 0:
++            raise ValueError("PlanetCard.influence must be a non-negative int")
++        self.name = name
+         self.resources = resources
+         self.influence = influence
+         self.trait = trait
+         self._exhausted = False
+```
+
+</blockquote></details>
+<details>
+<summary>.trae/lrr_analysis/25_control.md (1)</summary><blockquote>
+
+`47-51`: **Test names in docs don’t match code.**
+
+Docs list `test_rule_25_1b_subsequent_control_takes_from_player`; code uses `test_rule_25_1b_control_transfer_takes_from_other_player`. Align names to reduce confusion.
+
+</blockquote></details>
+<details>
+<summary>src/ti4/core/game_state.py (4)</summary><blockquote>
+
+`777-853`: **Keep `player_planets` mapping consistent and avoid in-place planet mutation.**
+
+You mutate `planet` (external) but don’t update `player_planets`. Update both removal/addition; prefer not mutating external objects in-place.
+
+```diff
+-        # Update planet control
+-        planet.set_control(player_id)
++        # Update planet control (avoid mutating external instance if tracked elsewhere)
++        planet.set_control(player_id)
++
++        # Maintain player_planets mapping
++        new_player_planets = {pid: planets.copy() for pid, planets in self.player_planets.items()}
++        # Remove from previous controller
++        if planet.controlled_by and planet.controlled_by in new_player_planets:
++            new_player_planets[planet.controlled_by] = [p for p in new_player_planets[planet.controlled_by] if p.name != planet.name]
++        # Add to new controller
++        if player_id not in new_player_planets:
++            new_player_planets[player_id] = []
++        if all(p.name != planet.name for p in new_player_planets[player_id]):
++            new_player_planets[player_id].append(planet)
+...
+-        new_state = self._create_new_state(
++        new_state = self._create_new_state(
+             planet_card_deck=new_planet_card_deck,
+             player_planet_cards=new_player_planet_cards,
+             planet_control_tokens=new_planet_control_tokens,
++            player_planets=new_player_planets,
+         )
+```
+
+---
+
+`854-896`: **Also update `player_planets` on loss.**
+
+Keep mappings in sync when control is lost.
+
+```diff
+-        # Clear planet control
+-        planet.controlled_by = None
++        # Clear planet control
++        planet.controlled_by = None
++
++        # Update player_planets mapping
++        new_player_planets = {pid: planets.copy() for pid, planets in self.player_planets.items()}
++        if player_id in new_player_planets:
++            new_player_planets[player_id] = [p for p in new_player_planets[player_id] if p.name != planet.name]
+...
+-        return self._create_new_state(
++        return self._create_new_state(
+             player_planet_cards=new_player_planet_cards,
+             planet_control_tokens=new_planet_control_tokens,
++            player_planets=new_player_planets,
+         )
+```
+
+---
+
+`612-633`: **Duplicate shuffle methods (`shuffle_secret_objective_deck` vs `shuffle_secret_objectives`).**
+
+Consolidate to one name; keep the other as a thin alias for backward compatibility.
+
+```diff
+-    def shuffle_secret_objectives(self) -> "GameState":
+-        """Shuffle the secret objective deck.
+-
+-        Returns:
+-            New GameState with shuffled secret objective deck
+-        """
+-        import random
+-
+-        new_deck = self.secret_objective_deck.copy()
+-        random.shuffle(new_deck)
+-        return self._create_new_state(secret_objective_deck=new_deck)
++    def shuffle_secret_objectives(self) -> "GameState":
++        """Deprecated alias; use shuffle_secret_objective_deck()."""
++        return self.shuffle_secret_objective_deck()
+```
+
+
+Also applies to: 1117-1127
+
+---
+
+`1109-1116`: **Secret objective helpers — minor polish.**
+
+Consider naming consistency: “deck” suffix for all deck-oriented methods.
+
+
+
+Also applies to: 1257-1270
 
 </blockquote></details>
 
@@ -47,18 +251,20 @@ Similarly fix all other emphasized text that should be headings (lines 13, 18, 2
 <details>
 <summary>📥 Commits</summary>
 
-Reviewing files that changed from the base of the PR and between fa07bb062254e4c13c65d0d30ba35b1c6f7144af and c781d3856a2406f7fee4bcd9346fc8ec8ccf2af7.
+Reviewing files that changed from the base of the PR and between 1bc070cb716fd754d6a065d31dfef4f937a66765 and 2e8fe37486838a0db4cd9a5357b8a2df25bbd076.
 
 </details>
 
 <details>
-<summary>📒 Files selected for processing (5)</summary>
+<summary>📒 Files selected for processing (7)</summary>
 
-* `.pre-commit-config.yaml` (1 hunks)
-* `Makefile` (1 hunks)
-* `latest_review.txt` (1 hunks)
-* `review_response_summary.md` (1 hunks)
-* `scripts/fetch_pr_review.py` (1 hunks)
+* `.trae/lrr_analysis/25_control.md` (3 hunks)
+* `.trae/lrr_analysis/executive_summary.md` (1 hunks)
+* `IMPLEMENTATION_ROADMAP.md` (2 hunks)
+* `src/ti4/core/game_state.py` (8 hunks)
+* `src/ti4/core/planet_card.py` (1 hunks)
+* `src/ti4/core/strategy_cards/coordinator.py` (1 hunks)
+* `tests/test_rule_25_control.py` (1 hunks)
 
 </details>
 
@@ -66,215 +272,147 @@ Reviewing files that changed from the base of the PR and between fa07bb062254e4c
 <summary>🧰 Additional context used</summary>
 
 <details>
-<summary>🪛 checkmake (0.2.2)</summary>
+<summary>🧬 Code graph analysis (2)</summary>
 
 <details>
-<summary>Makefile</summary>
+<summary>tests/test_rule_25_control.py (5)</summary><blockquote>
 
-[warning] 68-68: Target body for "clean" exceeds allowed length of 5 (10).
+<details>
+<summary>src/ti4/core/constants.py (1)</summary>
 
-(maxbodylength)
-
-</details>
+* `UnitType` (6-20)
 
 </details>
 <details>
-<summary>🪛 markdownlint-cli2 (0.18.1)</summary>
+<summary>src/ti4/core/game_state.py (8)</summary>
 
-<details>
-<summary>review_response_summary.md</summary>
-
-9-9: Emphasis used instead of a heading
-
-(MD036, no-emphasis-as-heading)
-
----
-
-13-13: Emphasis used instead of a heading
-
-(MD036, no-emphasis-as-heading)
-
----
-
-18-18: Emphasis used instead of a heading
-
-(MD036, no-emphasis-as-heading)
-
----
-
-25-25: Emphasis used instead of a heading
-
-(MD036, no-emphasis-as-heading)
-
----
-
-28-28: Emphasis used instead of a heading
-
-(MD036, no-emphasis-as-heading)
-
----
-
-32-32: Emphasis used instead of a heading
-
-(MD036, no-emphasis-as-heading)
-
----
-
-39-39: Emphasis used instead of a heading
-
-(MD036, no-emphasis-as-heading)
+* `GameState` (34-1269)
+* `gain_planet_control` (778-852)
+* `get_player_planet_cards` (937-946)
+* `is_planet_card_in_deck` (948-957)
+* `has_control_token_on_planet` (967-977)
+* `resolve_planet_control_change` (897-935)
+* `lose_planet_control` (854-895)
+* `get_planet_card_deck_size` (959-965)
 
 </details>
+<details>
+<summary>src/ti4/core/planet.py (2)</summary>
+
+* `Planet` (9-90)
+* `place_unit` (24-26)
 
 </details>
+<details>
+<summary>src/ti4/core/unit.py (1)</summary>
+
+* `Unit` (10-191)
 
 </details>
-
 <details>
-<summary>🔇 Additional comments (21)</summary><blockquote>
+<summary>src/ti4/core/planet_card.py (1)</summary>
 
-<details>
-<summary>review_response_summary.md (2)</summary><blockquote>
+* `is_exhausted` (18-20)
 
-`53-58`: **Summary claims don't align with actual scope of changes**
-
-The summary mentions "All 13 review feedback items" but the AI summary indicates this PR implements major new features like burst-icon mechanics, space combat engine, and unit stats overhaul - not just review feedback fixes.
-
-
-
-This appears to be documentation for a different change set than what's being reviewed in this PR.
-
----
-
-`46-49`: **Update test count in review_response_summary.md**
-
-This PR added tests (tests/test_rule_18_burst_icons.py, tests/test_rule_78_space_combat.py) but the summary still lists "1037 tests" (review_response_summary.md, lines 46–49). The provided verification script failed to compute the total (wargs: command not found; many grep processes terminated by SIGPIPE). Update the total test count and coverage to match the repo or run a corrected local count.
+</details>
 
 </blockquote></details>
 <details>
-<summary>.pre-commit-config.yaml (1)</summary><blockquote>
+<summary>src/ti4/core/game_state.py (4)</summary><blockquote>
 
-`14-15`: **LGTM! Proper commit message validation integration**
+<details>
+<summary>src/ti4/core/planet_card.py (3)</summary>
 
-The addition of `check-commit-message` hook with commit-msg stage correctly enables commit message validation as part of the pre-commit workflow.
+* `PlanetCard` (6-81)
+* `is_exhausted` (18-20)
+* `exhaust` (26-30)
+
+</details>
+<details>
+<summary>src/ti4/core/planet.py (3)</summary>
+
+* `is_exhausted` (33-35)
+* `exhaust` (41-45)
+* `set_control` (20-22)
+
+</details>
+<details>
+<summary>src/ti4/core/objective.py (1)</summary>
+
+* `Objective` (13-21)
+
+</details>
+<details>
+<summary>src/ti4/core/strategy_cards/coordinator.py (4)</summary>
+
+* `ready_strategy_card` (601-611)
+* `ready_all_strategy_cards` (613-620)
+* `get_player_strategy_card_assignments` (989-997)
+* `get_exhausted_cards` (999-1010)
+
+</details>
+
+</blockquote></details>
+
+</details>
+
+</details>
+
+<details>
+<summary>🔇 Additional comments (7)</summary><blockquote>
+
+<details>
+<summary>src/ti4/core/strategy_cards/coordinator.py (1)</summary><blockquote>
+
+`999-1011`: **New helper `get_exhausted_cards()` is clear and correct.**
+
+Iterates tracked states and returns exhausted set as expected.
 
 </blockquote></details>
 <details>
-<summary>Makefile (7)</summary><blockquote>
+<summary>src/ti4/core/game_state.py (4)</summary><blockquote>
 
-`1-2`: **LGTM! Essential shell hardening implemented**
+`85-91`: **Planet-control state containers added — LGTM.**
 
-Adding bash with `-euo pipefail` prevents silent failures and improves error handling across all Make targets - a critical improvement for build reliability.
-
----
-
-`8-9`: **LGTM! Self-documenting help system implemented**
-
-The implementation correctly uses inline comments for automatic help generation, solving the checkmake body length issue while improving maintainability.
+Clear separation: deck, per-player hands, and control tokens.
 
 ---
 
-`25-27`: **LGTM! Unified lint-fix target with formatting**
+`311-318`: **Propagation of planet-control fields in `_create_new_state` — LGTM.**
 
-Combining linting fixes with code formatting in a single target improves developer workflow by providing one-stop fixing.
-
----
-
-`32-33`: **LGTM! DRY principle applied for format checking**
-
-Creating a dedicated `format-check` target eliminates duplication between `check-all` and `quality-gate` targets while maintaining clarity.
+Ensures immutability semantics are preserved.
 
 ---
 
-`49-49`: **LGTM! Security gate properly fails on findings**
+`1158-1180`: **Coordinator sync looks correct.**
 
-The Bandit command now correctly fails on security issues with `-ll -ii` flags for high-severity/high-confidence filtering, addressing the previous review concern.
-
----
-
-`56-57`: **LGTM! Comprehensive pre-commit hook installation**
-
-Installing both standard and commit-msg hooks aligns with the `.pre-commit-config.yaml` changes and provides complete pre-commit integration.
+Assignment/exhaustion mirrored from coordinator; safe no-op guard included.
 
 ---
 
-`59-60`: **LGTM! Pre-commit maintenance automation**
+`979-1061`: **Nice helpers for planet-card and control-token ops.**
 
-The `pre-commit-autoupdate` target enables easy hook version maintenance, improving developer experience and security posture.
+Clear, cohesive, and side-effect scoped.
+
+
+
+Also applies to: 1063-1084
 
 </blockquote></details>
 <details>
-<summary>scripts/fetch_pr_review.py (8)</summary><blockquote>
+<summary>.trae/lrr_analysis/25_control.md (1)</summary><blockquote>
 
-`1-24`: **LGTM! Well-structured CLI with comprehensive documentation**
+`86-92`: **Missing tests claimed for Rule 25.6 — add tests or update docs**
 
-The script provides clear usage instructions, environment variable support, and helpful examples. The import organization and module docstring are excellent.
-
----
-
-`41-52`: **LGTM! Centralized header management resolves duplication**
-
-The `_headers()` method correctly centralizes header creation and uses consistent Bearer token authentication, addressing previous review concerns about header duplication and auth scheme consistency.
-
----
-
-`58-70`: **LGTM! Robust request handling with proper timeout**
-
-The timeout parameter (15 seconds) prevents hanging on network stalls, and the error handling correctly maps HTTP and network errors to meaningful messages.
-
----
-
-`93-96`: **LGTM! Proper payload validation for API responses**
-
-The type guard correctly handles the expectation that paginated endpoints return lists, preventing corruption from unexpected response types.
-
----
-
-`138-139`: **LGTM! Pagination properly implemented**
-
-Using `_get_all_pages()` ensures complete review collection for large PRs, addressing the previous concern about missing reviews beyond the first 100.
-
----
-
-`183-184`: **LGTM! Unified pagination for review comments**
-
-Reusing `_get_all_pages()` eliminates manual pagination code and ensures consistent behavior across all paginated endpoints.
-
----
-
-`227-229`: **LGTM! Robust line number fallback logic**
-
-The fallback logic trying `line`, `original_line`, and `position` fields handles different GitHub API response formats effectively.
-
----
-
-`258-258`: **LGTM! Proper working directory usage**
-
-Using `os.getcwd()` correctly detects the repository from the current working directory, supporting various invocation methods including symlinks.
+.thetrae/lrr_analysis/25_control.md (lines 86–92; also 120–133) claims a test `test_rule_25_6_control_loss_through_game_effects` and "additional integration tests", but tests/test_rule_25_control.py contains only tests for 25.1, 25.1a, 25.1b, 25.1c, 25.2, 25.3, 25.4, 25.5, and 25.7 — 25.6 and the integration tests are missing. Add the missing tests or update the markdown to reflect current coverage.
 
 </blockquote></details>
 <details>
-<summary>latest_review.txt (3)</summary><blockquote>
+<summary>IMPLEMENTATION_ROADMAP.md (1)</summary><blockquote>
 
-`563-609`: **Review comment references non-existent code issues**
+`11-12`: **Roadmap metrics mismatch — verify Rule 25 tests/CI auto-sourcing**
 
-The detailed comment mentions authorization header mismatches and "token" vs "Bearer" schemes (lines 571-574), but examining `scripts/fetch_pr_review.py` shows it already uses Bearer tokens consistently throughout. This appears to be stale review feedback.
-
-
-
-The actual code uses `f'Bearer {self.token}'` consistently in the `_headers()` method.
-
----
-
-`617-657`: **Review comment about missing timeout is outdated**
-
-The comment suggests adding timeout to urlopen calls, but the current code already includes `timeout=15` in both `_make_request` and `_get_all_pages` methods. This review feedback appears to have been already addressed.
-
----
-
-`666-719`: **Review comment about payload validation is resolved**
-
-The comment suggests adding type guards for non-list payloads, but the current code already implements proper validation in lines 94-95 of `_get_all_pages()` with appropriate error handling for unexpected payload types.
+rg returned 0 matches for ^def\s+test_rule_25_ in tests, but IMPLEMENTATION_ROADMAP.md (lines 18, 47) claims Rule 25 is 12/12 tests passing. Auto-source these metrics from CI or update the roadmap/test names/locations so automated checks can locate and verify them.
 
 </blockquote></details>
 
@@ -283,5 +421,131 @@ The comment suggests adding type guards for non-list payloads, but the current c
 </details>
 
 <!-- This is an auto-generated comment by CodeRabbit for review status -->
+
+DETAILED COMMENTS:
+----------------------------------------
+Comment 1:
+  File: .trae/lrr_analysis/executive_summary.md
+  Line: 6
+  Body: _⚠️ Potential issue_
+
+<details>
+<summary>🧩 Analysis chain</summary>
+
+**Inconsistent headline metrics (107/101 rules, 3.5%).**
+
+These conflict with the roadmap (28.7%, many rules completed). Regenerate this summary from current sources or remove until automated.
+
+---
+
+🏁 Script executed:
+
+```shell
+#!/bin/bash
+# Quick sanity: detect obvious contradictions.
+rg -n "Overall Implementation Progress|Total Rules Analyzed" .trae/lrr_analysis/executive_summary.md
+rg -n "Overall Progress|Completed Rules" IMPLEMENTATION_ROADMAP.md
+```
+
+Length of output: 141
+
+---
+
+
+
+</details>
+
+**Inconsistent headline metrics — regenerate or remove executive summary**
+
+.trae/lrr_analysis/executive_summary.md reports "Total Rules Analyzed: 107/101" and "Overall Implementation Progress: 3.5%"; IMPLEMENTATION_ROADMAP.md reports "Completed Rules: 28/101" and "Overall Progress: 28.7%". Regenerate the executive summary from current sources or remove it until the automation is corrected.
+
+<!-- fingerprinting:phantom:medusa:chinchilla -->
+
+<!-- This is an auto-generated comment by CodeRabbit -->
+
+Comment 2:
+  File: src/ti4/core/game_state.py
+  Line: 7
+  Body: _⚠️ Potential issue_
+
+**Wrong type-checking import path for coordinator.**
+
+Module lives under `strategy_cards/coordinator.py`. This breaks MyPy/IDE.
+
+```diff
+-    from .strategy_card_coordinator import StrategyCardCoordinator
++    from .strategy_cards.coordinator import StrategyCardCoordinator
+```
+
+<!-- suggestion_start -->
+
+<details>
+<summary>📝 Committable suggestion</summary>
+
+> ‼️ **IMPORTANT**
+> Carefully review the code before committing. Ensure that it accurately replaces the highlighted code, contains no missing lines, and has no issues with indentation. Thoroughly test & benchmark the code to ensure it meets the requirements.
+
+```suggestion
+    from .strategy_cards.coordinator import StrategyCardCoordinator
+    from .system import System
+```
+
+</details>
+
+<!-- suggestion_end -->
+
+<details>
+<summary>🤖 Prompt for AI Agents</summary>
+
+```
+In src/ti4/core/game_state.py around lines 16 to 17, the import path for
+StrategyCardCoordinator is incorrect; update the import to reference the actual
+module location by replacing the current import with from
+..strategy_cards.coordinator import StrategyCardCoordinator (or the appropriate
+relative path consistent with the package layout), ensure package __init__.py
+files allow the relative import, run mypy/IDE recheck, and adjust any other
+imports in the file to use the correct module path.
+```
+
+</details>
+
+<!-- fingerprinting:phantom:medusa:chinchilla -->
+
+<!-- This is an auto-generated comment by CodeRabbit -->
+
+Comment 3:
+  File: src/ti4/core/game_state.py
+  Line: 248
+  Body: _🛠️ Refactor suggestion_
+
+**Deterministic new controller selection when multiple players have units.**
+
+Picking `next(iter(set))` is nondeterministic. Use initiative order or player list order.
+
+```diff
+-                if other_players_with_units:
++                if other_players_with_units:
+                     # Lose control
+                     new_state = self.lose_planet_control(current_controller, planet)
+
+-                    # Rule 25.5a: Player with units gains control
+-                    new_controller = next(
+-                        iter(other_players_with_units)
+-                    )  # Take first player
++                    # Rule 25.5a: Player with units gains control (deterministic)
++                    candidates = list(other_players_with_units)
++                    new_controller = self._sort_players_by_initiative_order(candidates)[0]
+                     _, final_state = new_state.gain_planet_control(
+                         new_controller, planet
+                     )
+                     return final_state
+```
+
+
+> Committable suggestion skipped: line range outside the PR's diff.
+
+<!-- fingerprinting:phantom:medusa:chinchilla -->
+
+<!-- This is an auto-generated comment by CodeRabbit -->
 
 ============================================================

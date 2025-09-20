@@ -163,7 +163,6 @@ class StrategyCardCoordinator:
         """
         self._strategic_action_manager = strategic_action_manager
         self._card_assignments: dict[str, StrategyCardType] = {}
-        self._exhausted_cards: set[StrategyCardType] = set()
 
         # Strategy phase selection state
         self._strategy_phase_active: bool = False
@@ -871,7 +870,6 @@ class StrategyCardCoordinator:
         self._speaker_order = []
         self._current_selecting_player_index = 0
         self._card_assignments = {}
-        self._exhausted_cards = set()
         self._player_card_states = {}
         self._secondary_ability_participants = {}
 
