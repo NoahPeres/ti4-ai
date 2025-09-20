@@ -4,7 +4,7 @@
 
 ### 1. UnitStatsProvider Key Type Issue
 **Problem**: UnitStatsProvider was using string keys instead of UnitType enum keys
-**Solution**: 
+**Solution**:
 - Replaced all string keys in `BASE_STATS` dictionary with `UnitType` enum values
 - Updated `_get_cached_unit_stats` method to handle string-to-enum conversion for backward compatibility
 

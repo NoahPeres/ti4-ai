@@ -1,10 +1,10 @@
 # Rule 31: DESTROYED - Analysis
 
 ## Category Overview
-**Rule Type:** Core Combat Mechanic  
-**Priority:** HIGH  
-**Status:** PARTIALLY IMPLEMENTED  
-**Complexity:** Medium  
+**Rule Type:** Core Combat Mechanic
+**Priority:** HIGH
+**Status:** PARTIALLY IMPLEMENTED
+**Complexity:** Medium
 
 ## Raw LRR Text
 ```
@@ -25,14 +25,14 @@ RELATED TOPICS: Anti-Fighter Barrage, Bombardment, Space Cannon, Space Combat, S
 - **Description:** Player choice in hit assignment to units
 - **Implementation:** Found in `combat.py` with `assign_hits_by_player_choice()` and validation methods
 
-### 31.2 Removal vs Destruction Distinction  
+### 31.2 Removal vs Destruction Distinction
 - **Status:** NOT IMPLEMENTED
 - **Description:** Distinguishes between destruction (triggers effects) and removal (no triggers)
 - **Gap:** No clear distinction in codebase between removal types
 
 ## Related Topics
 - Anti-Fighter Barrage
-- Bombardment  
+- Bombardment
 - Space Cannon
 - Space Combat
 - Sustain Damage

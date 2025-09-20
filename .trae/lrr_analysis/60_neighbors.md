@@ -5,7 +5,7 @@
 
 ## Raw LRR Text
 ```
-60 NEIGHBORS	
+60 NEIGHBORS
 Two players are neighbors if they both have a unit or control a planet in the same system. They are also neighbors if they both have a unit or control a planet in systems that are adjacent to each other.
 60.1 Players can resolve transactions with their neighbors.
 60.2 Players are neighbors if the adjacency of systems is granted by a wormhole.

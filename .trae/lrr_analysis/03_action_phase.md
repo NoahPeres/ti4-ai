@@ -23,7 +23,7 @@ During the action phase, each player takes a turn in initiative order performing
 
 ### 3.3 - Pass State Behavior
 **Raw LRR Text**: "After a player has passed, they have no further turns and cannot perform additional actions during that action phase."
-**Sub-rules**: 
+**Sub-rules**:
 - "During a turn that a player passes, they can resolve transactions and 'at the start of your turn' abilities."
 - "A player that has passed can still resolve the secondary ability of other players' strategy cards."
 - "It is possible for a player to perform multiple, consecutive actions during an action phase if all other players have passed during that action phase."

@@ -1,10 +1,10 @@
 # Rule 13: ATTACKER
 
 ## Category Overview
-**Rule Type:** Combat Role Definition  
-**Priority:** High  
-**Complexity:** Low  
-**Implementation Status:** Partially Implemented  
+**Rule Type:** Combat Role Definition
+**Priority:** High
+**Complexity:** Low
+**Implementation Status:** Partially Implemented
 
 Rule 13 defines the fundamental combat role assignment in TI4, establishing that the active player is always the attacker during combat situations.
 

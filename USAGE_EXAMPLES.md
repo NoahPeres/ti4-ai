@@ -64,33 +64,33 @@ class BuildStructureCommand(GameCommand):
         self.system_id = system_id
         self.player_id = player_id
         self._undo_data = {}
-    
+
     def can_execute(self, game_state: GameState) -> bool:
         # Check if player has resources and system is controlled
         return self._validate_resources(game_state) and self._validate_control(game_state)
-    
+
     def execute(self, game_state: GameState) -> GameState:
         # Store undo data
         self._undo_data = {
             'previous_resources': game_state.get_player_resources(self.player_id),
             'previous_structures': game_state.get_system_structures(self.system_id)
         }
-        
+
         # Execute the build
         new_state = game_state.copy()
         new_state.add_structure(self.system_id, self.structure_type, self.player_id)
         new_state.deduct_resources(self.player_id, self._get_cost())
-        
+
         return new_state
-    
+
     def undo(self, game_state: GameState) -> GameState:
         # Restore previous state using undo data
         restored_state = game_state.copy()
         restored_state.set_player_resources(self.player_id, self._undo_data['previous_resources'])
         restored_state.set_system_structures(self.system_id, self._undo_data['previous_structures'])
-        
+
         return restored_state
-    
+
     def get_undo_data(self) -> Dict[str, Any]:
         return self._undo_data
 ```
@@ -136,27 +136,27 @@ class VictoryConditionObserver(EventObserver):
     def __init__(self):
         self.victory_points = {}
         self.objectives_completed = {}
-    
+
     def handle_event(self, event: GameEvent) -> None:
         if event.event_type == "objective_completed":
             self._handle_objective_completion(event)
         elif event.event_type == "planet_controlled":
             self._handle_planet_control(event)
-        
+
         # Check for victory after each relevant event
         self._check_victory_conditions(event.game_id)
-    
+
     def _handle_objective_completion(self, event: GameEvent) -> None:
         player_id = event.data['player_id']
         objective_id = event.data['objective_id']
         points = event.data['points']
-        
+
         if player_id not in self.victory_points:
             self.victory_points[player_id] = 0
-        
+
         self.victory_points[player_id] += points
         print(f"Player {player_id} scored {points} points")
-    
+
     def _check_victory_conditions(self, game_id: str) -> None:
         for player_id, points in self.victory_points.items():
             if points >= 10:  # Victory condition
@@ -182,16 +182,16 @@ class GameFlowController:
         self.event_bus = event_bus
         self.event_bus.subscribe("phase_changed", self.handle_phase_change)
         self.event_bus.subscribe("all_players_passed", self.handle_all_passed)
-    
+
     def handle_phase_change(self, event: GameEvent) -> None:
         new_phase = event.data['to_phase']
         game_id = event.game_id
-        
+
         if new_phase == "action":
             self._setup_action_phase(game_id)
         elif new_phase == "status":
             self._setup_status_phase(game_id)
-    
+
     def handle_all_passed(self, event: GameEvent) -> None:
         # Automatically advance to next phase
         next_phase_event = PhaseChangedEvent(
@@ -233,10 +233,10 @@ else:
 class PhaseAwareActionValidator:
     def __init__(self, state_machine: GameStateMachine):
         self.state_machine = state_machine
-    
+
     def validate_action(self, action: GameCommand, game_state: GameState) -> bool:
         current_phase = self.state_machine.current_phase
-        
+
         # Phase-specific validation
         if current_phase == GamePhaseState.STRATEGY:
             return self._validate_strategy_action(action, game_state)
@@ -244,13 +244,13 @@ class PhaseAwareActionValidator:
             return self._validate_action_phase_action(action, game_state)
         elif current_phase == GamePhaseState.STATUS:
             return self._validate_status_action(action, game_state)
-        
+
         return False
-    
+
     def _validate_strategy_action(self, action: GameCommand, game_state: GameState) -> bool:
         # Only allow strategy card selection in strategy phase
         return isinstance(action, StrategyCardSelectionCommand)
-    
+
     def _validate_action_phase_action(self, action: GameCommand, game_state: GameState) -> bool:
         # Allow movement, combat, etc. in action phase
         allowed_actions = [MovementCommand, CombatCommand, BuildCommand]
@@ -323,19 +323,19 @@ class CombatScenarioBuilder(GameScenarioBuilder):
     def with_opposing_fleets(self, system_id: str, fleet1: dict, fleet2: dict) -> 'CombatScenarioBuilder':
         """Add opposing fleets in the same system for combat testing."""
         units = []
-        
+
         # Add fleet 1 units
         for unit_type, count in fleet1.items():
             for _ in range(count):
                 units.append((unit_type, fleet1.get('player', 'player1')))
-        
+
         # Add fleet 2 units
         for unit_type, count in fleet2.items():
             for _ in range(count):
                 units.append((unit_type, fleet2.get('player', 'player2')))
-        
+
         return self.with_units({system_id: units})
-    
+
     def ready_for_combat(self) -> 'CombatScenarioBuilder':
         """Set up the scenario ready for combat resolution."""
         return self.in_phase(GamePhaseState.ACTION)
@@ -370,10 +370,10 @@ def get_legal_moves_cached(game_state: GameState, player_id: str):
 # Manual cache management
 def update_game_state(game_state: GameState, command: GameCommand):
     new_state = command.execute(game_state)
-    
+
     # Invalidate cache for the old state
     cache.invalidate_cache(hash(game_state))
-    
+
     return new_state
 ```
 
@@ -395,7 +395,7 @@ def execute_move_on_game(game_id: str, move_command: MovementCommand):
     def move_operation():
         current_state = game_manager.get_game(game_id)
         return move_command.execute(current_state)
-    
+
     return game_manager.execute_game_operation(game_id, move_operation)
 
 # Execute moves on different games concurrently
@@ -430,32 +430,32 @@ from ti4.core.logging import GameLogger
 class TI4GameSession:
     def __init__(self, game_id: str):
         self.game_id = game_id
-        
+
         # Initialize all components
         self.event_bus = GameEventBus()
         self.command_manager = CommandManager()
         self.state_machine = GameStateMachine()
         self.cache = GameStateCache()
         self.logger = GameLogger(game_id)
-        
+
         # Set up observers
         self._setup_observers()
-        
+
         # Create initial game state
         self.current_state = self._create_initial_state()
-    
+
     def _setup_observers(self):
         # Add logging observer
         logging_observer = LoggingObserver()
         self.event_bus.subscribe("unit_moved", logging_observer.handle_event)
         self.event_bus.subscribe("combat_started", logging_observer.handle_event)
         self.event_bus.subscribe("phase_changed", logging_observer.handle_event)
-        
+
         # Add statistics collector
         stats_collector = StatisticsCollector()
         self.event_bus.subscribe("unit_moved", stats_collector.handle_event)
         self.event_bus.subscribe("combat_resolved", stats_collector.handle_event)
-    
+
     def _create_initial_state(self):
         return (GameScenarioBuilder()
             .with_players(
@@ -466,7 +466,7 @@ class TI4GameSession:
             .with_galaxy("standard_6p")
             .in_phase(GamePhaseState.SETUP)
             .build())
-    
+
     def execute_command(self, command: GameCommand) -> bool:
         try:
             # Validate command can be executed
@@ -476,19 +476,19 @@ class TI4GameSession:
                     {"game_state": self.current_state}
                 )
                 return False
-            
+
             # Execute command
             self.current_state = self.command_manager.execute_command(command, self.current_state)
-            
+
             # Log successful execution
             self.logger.log_command(command, "success")
-            
+
             return True
-            
+
         except Exception as e:
             self.logger.log_error(e, {"command": command, "game_state": self.current_state})
             return False
-    
+
     def undo_last_command(self) -> bool:
         try:
             self.current_state = self.command_manager.undo_last_command(self.current_state)
@@ -497,12 +497,12 @@ class TI4GameSession:
         except Exception as e:
             self.logger.log_error(e, {"operation": "undo"})
             return False
-    
+
     def advance_phase(self, new_phase: GamePhaseState) -> bool:
         if self.state_machine.can_transition_to(new_phase):
             old_phase = self.state_machine.current_phase
             self.state_machine.transition_to(new_phase)
-            
+
             # Publish phase change event
             phase_event = PhaseChangedEvent(
                 game_id=self.game_id,
@@ -510,7 +510,7 @@ class TI4GameSession:
                 to_phase=new_phase
             )
             self.event_bus.publish(phase_event)
-            
+
             return True
         return False
 

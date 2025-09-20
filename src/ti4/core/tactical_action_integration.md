@@ -6,7 +6,7 @@ We maintain TWO complementary tactical action systems:
 
 ### 1. Rule 89 Compliance System (`core/tactical_action.py`)
 **Purpose**: Validate Rule 89 5-step sequence compliance
-**When to Use**: 
+**When to Use**:
 - Validating if a tactical action step is allowed
 - Checking Rule 89.1 activation restrictions
 - Verifying Rule 89.2 movement restrictions

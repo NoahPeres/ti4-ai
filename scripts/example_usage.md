@@ -63,7 +63,7 @@ Review ID: 123456789
 
 REVIEW BODY:
 --------------------------------------------
-Great work on implementing the space combat mechanics! 
+Great work on implementing the space combat mechanics!
 The code looks solid and follows TDD practices well.
 
 A few minor suggestions:

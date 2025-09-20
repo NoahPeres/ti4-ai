@@ -1,9 +1,9 @@
 # Rule 15: BOMBARDMENT (UNIT ABILITY)
 
 ## Category Overview
-**Priority**: High  
-**Implementation Status**: Partially Implemented  
-**Test Coverage**: Basic  
+**Priority**: High
+**Implementation Status**: Partially Implemented
+**Test Coverage**: Basic
 
 Rule 15 defines the bombardment unit ability, which allows ships to destroy ground forces on planets during invasion. This is a critical combat mechanic that affects ground combat outcomes and planetary control strategies.
 
@@ -12,71 +12,71 @@ Rule 15 defines the bombardment unit ability, which allows ships to destroy grou
 ### 15.0 - Core Definition
 **Raw LRR Text**: "A unit with the 'Bombardment' ability may be able to destroy another player's ground forces during an invasion. During the 'Bombardment' step, players perform the following steps:"
 
-**Implementation Status**: Partially Implemented  
-**Priority**: High  
+**Implementation Status**: Partially Implemented
+**Priority**: High
 **Details**: Basic bombardment ability detection exists, but the actual bombardment mechanics and invasion integration are missing.
 
 ### 15.1 - Bombardment Roll Process
 **Raw LRR Text**: "STEP 1- The active player chooses which planet each of their units that has a 'Bombardment' ability will bombard. Then, that player rolls dice for each of those units; this is called a bombardment roll. A hit is produced for each die roll that is equal to or greater than the unit's 'Bombardment' value."
 
-**Implementation Status**: Not Implemented  
-**Priority**: High  
+**Implementation Status**: Not Implemented
+**Priority**: High
 **Details**: Complete bombardment roll system needs implementation including planet targeting, dice rolling, and hit calculation.
 
 ### 15.1a - Ability Presentation
 **Raw LRR Text**: "A unit's 'Bombardment' ability is presented along with a unit's attributes on faction sheets and unit upgrade technology cards."
 
-**Implementation Status**: Implemented  
-**Priority**: Low  
+**Implementation Status**: Implemented
+**Priority**: Low
 **Details**: Unit stats system correctly tracks bombardment ability.
 
 ### 15.1b - Bombardment Value Format
 **Raw LRR Text**: "The 'Bombardment' ability is displayed as 'Bombardment X (xY).' The X is the minimum value needed for a die to produce a hit, and Y is the number of dice rolled. Not all 'Bombardment' abilities have a (Y) value; a bombardment roll for such a unit consists of one die."
 
-**Implementation Status**: Not Implemented  
-**Priority**: Medium  
+**Implementation Status**: Not Implemented
+**Priority**: Medium
 **Details**: Need to implement bombardment value and dice count system.
 
 ### 15.1c - Combat Roll Interaction
 **Raw LRR Text**: "Game effects that reroll, modify, or otherwise affect combat rolls do not affect bombardment rolls."
 
-**Implementation Status**: Not Implemented  
-**Priority**: Medium  
+**Implementation Status**: Not Implemented
+**Priority**: Medium
 **Details**: Bombardment rolls need separate handling from combat rolls.
 
 ### 15.1d - Multi-Planet Bombardment
 **Raw LRR Text**: "Multiple planets in a system may be bombarded, but a player must declare which planet a unit is bombarding before making a bombardment roll."
 
-**Implementation Status**: Not Implemented  
-**Priority**: High  
+**Implementation Status**: Not Implemented
+**Priority**: High
 **Details**: Planet targeting system needs implementation.
 
 ### 15.1e - Faction-Specific Rules
 **Raw LRR Text**: "The L1Z1X's 'Harrow' ability does not affect the L1Z1X player's own ground forces."
 
-**Implementation Status**: Not Implemented  
-**Priority**: Low  
+**Implementation Status**: Not Implemented
+**Priority**: Low
 **Details**: Faction-specific bombardment rules need implementation.
 
 ### 15.1f - Planetary Shield Interaction
 **Raw LRR Text**: "Planets that contain a unit with the 'Planetary Shield' ability cannot be bombarded."
 
-**Implementation Status**: Not Implemented  
-**Priority**: High  
+**Implementation Status**: Not Implemented
+**Priority**: High
 **Details**: Planetary shield bombardment prevention needs implementation.
 
 ### 15.2 - Hit Assignment
 **Raw LRR Text**: "STEP 2- The player who controls the planet that is being bombarded chooses and destroys one of their ground forces on that planet for each hit result the bombardment roll produced."
 
-**Implementation Status**: Not Implemented  
-**Priority**: High  
+**Implementation Status**: Not Implemented
+**Priority**: High
 **Details**: Ground force destruction and hit assignment system needs implementation.
 
 ### 15.2a - Excess Hits
 **Raw LRR Text**: "If a player has to assign more hits than that player has ground forces, the excess hits have no effect."
 
-**Implementation Status**: Not Implemented  
-**Priority**: Medium  
+**Implementation Status**: Not Implemented
+**Priority**: Medium
 **Details**: Hit overflow handling needs implementation.
 
 ## Related Topics

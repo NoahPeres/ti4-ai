@@ -32,11 +32,11 @@ During the "Ground Combat" step of an invasion, if the active player has ground 
 ## Overall Implementation Status
 - **Current State**: Not Started/In Progress/Complete
 - **Estimated Effort**: Small/Medium/Large
-- **Dependencies**: 
-- **Blockers**: 
+- **Dependencies**:
+- **Blockers**:
 
 ## Notes
-- 
+-
 
 ## Related Rules
 - Rule 46: INVASION

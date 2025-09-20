@@ -18,39 +18,39 @@ Systems that contain identical wormholes are adjacent to each other.
 ## Sub-rules Analysis
 
 ### 101.1 - Alpha/Beta Wormhole Adjacency
-**Status**: ✅ IMPLEMENTED  
-**Priority**: COMPLETED  
+**Status**: ✅ IMPLEMENTED
+**Priority**: COMPLETED
 **Details**: Systems with matching wormhole types (alpha-alpha, beta-beta) are adjacent
 - ✅ Core adjacency calculation includes wormhole logic in `Galaxy._check_wormhole_adjacency`
 - ✅ Wormhole type checking implemented in neighbor determination
 - ✅ Full test coverage in `tests/test_rule_101_wormholes.py` and `tests/test_wormhole_adjacency.py`
 - Ready for movement and ability range calculations
 
-### 101.2 - Gamma Wormhole Adjacency  
-**Status**: ✅ IMPLEMENTED  
-**Priority**: COMPLETED  
+### 101.2 - Gamma Wormhole Adjacency
+**Status**: ✅ IMPLEMENTED
+**Priority**: COMPLETED
 **Details**: Gamma wormholes follow same adjacency rules as alpha/beta
 - ✅ Implemented using same wormhole adjacency system
 - ✅ Test coverage confirms gamma wormhole adjacency works correctly
 
 ### 101.3 - Delta Wormhole Adjacency
-**Status**: ✅ IMPLEMENTED  
-**Priority**: COMPLETED  
+**Status**: ✅ IMPLEMENTED
+**Priority**: COMPLETED
 **Details**: Delta wormholes are faction-specific (Ghosts of Creuss)
 - ✅ Delta wormhole adjacency implemented using standard wormhole system
 - ✅ Test coverage confirms delta wormhole adjacency works correctly
 - Note: Faction-specific placement rules may need additional implementation
 
 ### 101.4 - Multiple Wormhole Types
-**Status**: ✅ IMPLEMENTED  
-**Priority**: COMPLETED  
+**Status**: ✅ IMPLEMENTED
+**Priority**: COMPLETED
 **Details**: Systems with multiple wormholes are adjacent to systems with any matching type
 - ✅ Complex adjacency calculation implemented in `Galaxy._check_wormhole_adjacency`
 - ✅ Test coverage confirms multiple wormhole type handling works correctly
 
 ### 101.5 - Wormhole Exclusivity
-**Status**: ✅ IMPLEMENTED  
-**Priority**: COMPLETED  
+**Status**: ✅ IMPLEMENTED
+**Priority**: COMPLETED
 **Details**: Systems are NOT adjacent if they have different wormhole types
 - ✅ Prevents alpha-beta adjacency correctly
 - ✅ Test coverage confirms exclusivity rules work correctly
@@ -69,14 +69,14 @@ Systems that contain identical wormholes are adjacent to each other.
 
 **Test Scenarios Covered**:
 - ✅ Alpha wormhole adjacency validation
-- ✅ Beta wormhole adjacency validation  
+- ✅ Beta wormhole adjacency validation
 - ✅ Gamma/delta wormhole adjacency
 - ✅ Multiple wormhole type handling
 - ✅ Wormhole exclusivity (different types not adjacent)
 - ✅ Cross-wormhole ability range checks
 
 ## Implementation Files
-**Core Files**: 
+**Core Files**:
 - ✅ `src/ti4/core/galaxy.py` - `_check_wormhole_adjacency()` method
 - ✅ `src/ti4/core/system.py` - Wormhole storage and management
 - ✅ Adjacency calculation logic integrated
@@ -108,7 +108,7 @@ Systems that contain identical wormholes are adjacent to each other.
 - [ ] Create comprehensive wormhole adjacency tests
 - [ ] Validate movement through wormholes
 
-### Medium Priority  
+### Medium Priority
 - [ ] Implement gamma/delta wormhole handling
 - [ ] Add multiple wormhole type support
 - [ ] Create wormhole UI indicators
@@ -120,6 +120,6 @@ Systems that contain identical wormholes are adjacent to each other.
 - [ ] Create wormhole interaction documentation
 
 ## Priority Assessment
-**Overall Priority**: High  
-**Implementation Status**: 0% (Not implemented)  
+**Overall Priority**: High
+**Implementation Status**: 0% (Not implemented)
 **Rationale**: Wormholes are fundamental to TI4 gameplay, affecting movement, abilities, and strategic positioning. Complete absence of implementation makes this a critical gap that impacts core game mechanics.

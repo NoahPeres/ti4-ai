@@ -15,22 +15,22 @@ from ..core.game_state import GameState
 
 class GameCommand(ABC):
     """Base interface for all game commands with undo support."""
-    
+
     @abstractmethod
     def execute(self, game_state: GameState) -> GameState:
         """Execute the command and return new game state."""
         pass
-    
+
     @abstractmethod
     def undo(self, game_state: GameState) -> GameState:
         """Undo the command and return previous game state."""
         pass
-    
+
     @abstractmethod
     def get_undo_data(self) -> Dict[str, Any]:
         """Get data needed for undo operation."""
         pass
-    
+
     @abstractmethod
     def can_execute(self, game_state: GameState) -> bool:
         """Check if command can be executed in current state."""
@@ -42,13 +42,13 @@ class GameCommand(ABC):
 ```python
 class CommandManager:
     """Manages command execution, undo, and replay functionality."""
-    
+
     def execute_command(self, command: GameCommand, game_state: GameState) -> GameState:
         """Execute command and store for potential undo."""
-        
+
     def undo_last_command(self, game_state: GameState) -> GameState:
         """Undo the most recent command."""
-        
+
     def replay_commands(self, initial_state: GameState) -> GameState:
         """Replay all commands from initial state."""
 ```
@@ -78,13 +78,13 @@ previous_state = command_manager.undo_last_command(new_state)
 ```python
 class GameEventBus:
     """Central event bus for game event notifications."""
-    
+
     def subscribe(self, event_type: str, observer: Callable) -> None:
         """Subscribe to specific event types."""
-        
+
     def unsubscribe(self, event_type: str, observer: Callable) -> None:
         """Unsubscribe from event types."""
-        
+
     def publish(self, event: GameEvent) -> None:
         """Publish event to all subscribers."""
 ```
@@ -124,19 +124,19 @@ class PhaseChangedEvent:
 ```python
 class LoggingObserver(EventObserver):
     """Observer that logs game events."""
-    
+
     def handle_event(self, event: GameEvent) -> None:
         """Log game events with appropriate detail level."""
 
 class StatisticsCollector(EventObserver):
     """Observer that collects game statistics."""
-    
+
     def handle_event(self, event: GameEvent) -> None:
         """Collect statistics from game events."""
 
 class AITrainingDataCollector(EventObserver):
     """Observer that collects data for AI training."""
-    
+
     def handle_event(self, event: GameEvent) -> None:
         """Collect training data from game events."""
 ```
@@ -171,13 +171,13 @@ event_bus.publish(event)
 ```python
 class GameStateMachine:
     """Manages game phase transitions with validation."""
-    
+
     def can_transition_to(self, new_phase: GamePhaseState) -> bool:
         """Check if transition to new phase is valid."""
-        
+
     def transition_to(self, new_phase: GamePhaseState) -> None:
         """Transition to new phase if valid."""
-        
+
     def get_valid_transitions(self) -> Set[GamePhaseState]:
         """Get all valid transitions from current phase."""
 ```
@@ -202,19 +202,19 @@ else:
 ```python
 class GameScenarioBuilder:
     """Fluent builder for creating complex test scenarios."""
-    
+
     def with_players(self, *player_configs) -> 'GameScenarioBuilder':
         """Add players to the scenario."""
-        
+
     def with_galaxy(self, galaxy_config) -> 'GameScenarioBuilder':
         """Set galaxy configuration."""
-        
+
     def in_phase(self, phase: GamePhaseState) -> 'GameScenarioBuilder':
         """Set the game phase."""
-        
+
     def with_units(self, unit_placements) -> 'GameScenarioBuilder':
         """Place units on the board."""
-        
+
     def build(self) -> GameState:
         """Build the final game state."""
 ```
@@ -244,10 +244,10 @@ game_state = (GameScenarioBuilder()
 ```python
 class GameStateCache:
     """Caches expensive computations for game states."""
-    
+
     def get_legal_moves(self, game_state: GameState, player_id: str) -> List[GameCommand]:
         """Get legal moves for a player, using cache if available."""
-        
+
     def invalidate_cache(self, state_hash: Hashable) -> None:
         """Invalidate cache entries for specific state."""
 ```
@@ -257,13 +257,13 @@ class GameStateCache:
 ```python
 class ConcurrentGameManager:
     """Manages multiple concurrent game instances safely."""
-    
+
     def create_game(self, game_id: str, initial_state: GameState) -> None:
         """Create a new game instance."""
-        
+
     def get_game(self, game_id: str) -> Optional[GameState]:
         """Get current state of a game."""
-        
+
     def execute_game_operation(self, game_id: str, operation: Callable) -> Any:
         """Execute operation on specific game with thread safety."""
 ```
@@ -275,7 +275,7 @@ class ConcurrentGameManager:
 ```python
 class TI4GameError(Exception):
     """Base exception with enhanced context."""
-    
+
     def __init__(self, message: str, context: Dict[str, Any] = None):
         super().__init__(message)
         self.context = context or {}
@@ -293,13 +293,13 @@ class PhaseTransitionError(TI4GameError):
 ```python
 class GameLogger:
     """Enhanced logging with structured data."""
-    
+
     def log_command(self, command: GameCommand, result: str, context: Dict[str, Any] = None):
         """Log command execution with context."""
-        
+
     def log_event(self, event: GameEvent):
         """Log game events."""
-        
+
     def log_error(self, error: Exception, context: Dict[str, Any] = None):
         """Log errors with full context."""
 ```

@@ -26,8 +26,8 @@ The leader sheet is a component that contains slots for leaders and mechs, as we
 ## Overall Implementation Status
 - **Current State**: Not Started/In Progress/Complete
 - **Estimated Effort**: Small/Medium/Large
-- **Dependencies**: 
-- **Blockers**: 
+- **Dependencies**:
+- **Blockers**:
 
 ## Notes
 - Rule 50 has only 3 sub-rules

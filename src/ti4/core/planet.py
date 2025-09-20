@@ -79,3 +79,12 @@ class Planet:
 
         self.exhaust()
         return amount
+
+    # Rule 88.5: Support for ground forces and structures
+    def can_hold_ground_forces(self) -> bool:
+        """Check if ground forces can be placed on this planet (Rule 88.5)."""
+        return True  # All planets can hold ground forces
+
+    def can_hold_structures(self) -> bool:
+        """Check if structures can be placed on this planet (Rule 88.5)."""
+        return True  # All planets can hold structures

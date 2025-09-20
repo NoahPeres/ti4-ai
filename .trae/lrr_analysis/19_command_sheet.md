@@ -1,9 +1,9 @@
 # Rule 19: COMMAND SHEET
 
 ## Category Overview
-**Priority**: HIGH  
-**Implementation Status**: PARTIALLY IMPLEMENTED  
-**Complexity**: MEDIUM  
+**Priority**: HIGH
+**Implementation Status**: PARTIALLY IMPLEMENTED
+**Complexity**: MEDIUM
 
 Rule 19 defines the command sheet structure and its components: strategy pool, tactic pool, fleet pool, trade good area, and quick reference. This is a fundamental player resource management system.
 

@@ -26,8 +26,8 @@ A ground force is a type of unit. All infantry and mech units in the game are gr
 ## Overall Implementation Status
 - **Current State**: Not Started/In Progress/Complete
 - **Estimated Effort**: Small/Medium/Large
-- **Dependencies**: 
-- **Blockers**: 
+- **Dependencies**:
+- **Blockers**:
 
 ## Notes
 - Rule 43 has only 3 sub-rules

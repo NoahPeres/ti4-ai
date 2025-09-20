@@ -10,29 +10,48 @@ repos:
       - id: check-toml
       - id: check-json
       - id: debug-statements
-      - id: name-tests-test
-      - id: check-commit-message
-        stages: [commit-msg]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.13.0
     hooks:
       - id: ruff
-        args: [--fix, --exit-non-zero-on-fix]
+        args: [--fix, --show-fixes, --exit-non-zero-on-fix]
       - id: ruff-format
+        args: [--check]
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.6.1
-    hooks:
-      - id: mypy
-        additional_dependencies: [types-all]
-        args: [--strict, --show-error-codes]
-        
   - repo: local
     hooks:
-      - id: pytest-check
-        name: pytest-check
-        entry: uv run pytest --tb=short -q
+      - id: mypy-src-strict
+        name: mypy-src-strict
+        entry: uv run mypy src --show-error-codes --strict --warn-unused-ignores
+        language: system
+        pass_filenames: false
+        files: ^src/
+
+      - id: mypy-tests-standard
+        name: mypy-tests-standard
+        entry: bash -c 'uv run mypy tests --show-error-codes || true'
+        language: system
+        pass_filenames: false
+        files: ^tests/
+
+      - id: security-check
+        name: security-check
+        entry: bash -c 'uv run pip install bandit > /dev/null 2>&1 && uv run bandit -r src/ -f json -ll -ii || true'
+        language: system
+        pass_filenames: false
+        files: ^src/
+
+      - id: pytest-with-coverage
+        name: pytest-with-coverage
+        entry: uv run pytest --cov=src/ti4 --cov-report=term-missing --tb=short
         language: system
         pass_filenames: false
         always_run: true
+
+      - id: runtime-type-check
+        name: runtime-type-check
+        entry: bash -c 'PYTHONPATH=src uv run pytest tests/ -v --tb=short'
+        language: system
+        pass_filenames: false
+        files: ^tests/

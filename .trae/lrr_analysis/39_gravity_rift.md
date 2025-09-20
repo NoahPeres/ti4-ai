@@ -1,10 +1,10 @@
 # Rule 39: GRAVITY RIFT - Analysis
 
 ## Category Overview
-**Rule Type:** Anomaly/Movement Mechanics  
-**Priority:** MEDIUM  
-**Status:** NOT IMPLEMENTED  
-**Complexity:** Medium  
+**Rule Type:** Anomaly/Movement Mechanics
+**Priority:** MEDIUM
+**Status:** NOT IMPLEMENTED
+**Complexity:** Medium
 
 ## Raw LRR Text
 ```

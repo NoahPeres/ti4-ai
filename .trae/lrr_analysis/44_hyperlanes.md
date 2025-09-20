@@ -20,8 +20,8 @@ Hyperlanes are tiles that are used in some game board setups to create adjacency
 ## Overall Implementation Status
 - **Current State**: Not Started/In Progress/Complete
 - **Estimated Effort**: Small/Medium/Large
-- **Dependencies**: 
-- **Blockers**: 
+- **Dependencies**:
+- **Blockers**:
 
 ## Notes
 - Rule 44 has only 2 sub-rules

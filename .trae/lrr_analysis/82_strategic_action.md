@@ -1,9 +1,9 @@
 # Rule 82: STRATEGIC ACTION
 
 ## Category Overview
-**Priority**: High  
-**Implementation Status**: ✅ **COMPLETED**  
-**Test Coverage**: ✅ **Comprehensive (8 tests)**  
+**Priority**: High
+**Implementation Status**: ✅ **COMPLETED**
+**Test Coverage**: ✅ **Comprehensive (8 tests)**
 
 During the action phase, the active player may perform a strategic action to resolve the primary ability on their strategy card. This is a core game mechanic that drives the strategic flow and player interaction in TI4.
 
@@ -14,22 +14,22 @@ During the action phase, the active player may perform a strategic action to res
 ### 82.1 - Secondary Ability Resolution
 **Raw LRR Text**: "After the active player resolves the primary ability, each other player may resolve that strategy card's secondary ability in clockwise order"
 
-**Implementation Status**: ✅ **COMPLETED**  
-**Priority**: High  
+**Implementation Status**: ✅ **COMPLETED**
+**Priority**: High
 **Details**: Implemented in `StrategicActionManager.execute_secondary_abilities()` with proper clockwise player order and optional participation.
 
 ### 82.2 - Strategy Card Exhaustion
 **Raw LRR Text**: "After all players have had opportunity to resolve secondary ability, active player exhausts their strategy card facedown"
 
-**Implementation Status**: ✅ **COMPLETED**  
-**Priority**: High  
+**Implementation Status**: ✅ **COMPLETED**
+**Priority**: High
 **Details**: Implemented automatic strategy card exhaustion after all secondary abilities are resolved in `StrategicActionManager.execute_strategic_action()`.
 
 ### 82.3 - Ability Resolution Order
 **Raw LRR Text**: "When resolving primary or secondary abilities from a strategy card, player resolves each effect from top to bottom"
 
-**Implementation Status**: ✅ **COMPLETED**  
-**Priority**: Medium  
+**Implementation Status**: ✅ **COMPLETED**
+**Priority**: Medium
 **Details**: Implemented sequential ability resolution with proper ordering in strategy card execution methods.
 
 ## Related Rules

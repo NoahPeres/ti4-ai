@@ -24,7 +24,7 @@ A player can move their ships by resolving a tactical action during the action p
 - **Test Coverage**: ✅ Comprehensive
 - **Priority**: High
 - **Notes**: STEP 1-MOVE SHIPS: A player can move any number of their eligible ships into the active system, obeying specific movement rules.
-- **Test Cases**: 
+- **Test Cases**:
   - `test_ships_must_end_in_active_system` (Rule 58.4a)
   - `test_cannot_move_through_enemy_systems` (Rule 58.4b)
   - `test_cannot_move_from_commanded_system` (Rule 58.4c)
@@ -58,7 +58,7 @@ A player can move their ships by resolving a tactical action during the action p
 - **Test Coverage**: ✅ Comprehensive
 - **Priority**: High
 - **Notes**: STEP 2-SPACE CANNON OFFENSE: After the "Move Ships" step, players can use the "Space Cannon" abilities of their units in the active system.
-- **Test Cases**: 
+- **Test Cases**:
   - `test_space_cannon_after_move_ships`
   - `test_space_cannon_offense.py::TestRule58SpaceCannonOffenseStep::test_space_cannon_offense_after_movement`: Tests that Space Cannon Offense step occurs after Movement step in tactical action sequence
   - `test_space_cannon_offense.py::TestRule58SpaceCannonOffenseStep::test_space_cannon_offense_can_execute_with_space_cannon_units`: Tests that step can execute when space cannon units are present

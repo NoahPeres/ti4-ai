@@ -1,9 +1,9 @@
 # Rule 69: PROMISSORY NOTES
 
 ## Category Overview
-**Priority**: High  
-**Implementation Status**: ✅ **COMPLETED**  
-**Test Coverage**: ✅ **Comprehensive (11 tests)**  
+**Priority**: High
+**Implementation Status**: ✅ **COMPLETED**
+**Test Coverage**: ✅ **Comprehensive (11 tests)**
 
 Each player begins the game with one unique and five generic promissory note cards that can be given to other players. This is a core trading and diplomatic mechanic that enables complex player interactions and strategic agreements.
 
@@ -14,50 +14,50 @@ Each player begins the game with one unique and five generic promissory note car
 ### 69.1 - Card Resolution
 **Raw LRR Text**: "Each promissory note contains timing and ability text; players resolve by following card text"
 
-**Implementation Status**: ✅ **COMPLETED**  
-**Priority**: Medium  
+**Implementation Status**: ✅ **COMPLETED**
+**Priority**: Medium
 **Details**: Framework implemented for card resolution. Specific card abilities can be added as needed.
 
 ### 69.2 - Own Card Restriction
 **Raw LRR Text**: "Players cannot play their own color's or faction's promissory notes"
 
-**Implementation Status**: ✅ **COMPLETED**  
-**Priority**: High  
+**Implementation Status**: ✅ **COMPLETED**
+**Priority**: High
 **Details**: Implemented `can_player_play_note()` method that prevents players from playing their own promissory notes.
 
 ### 69.3 - Card Return Timing
 **Raw LRR Text**: "Promissory notes returned after abilities completely resolved"
 
-**Implementation Status**: ✅ **COMPLETED**  
-**Priority**: High  
+**Implementation Status**: ✅ **COMPLETED**
+**Priority**: High
 **Details**: Implemented `return_note_after_use()` method that removes notes from player hands after use.
 
 ### 69.4 - Reuse After Return
 **Raw LRR Text**: "Returned promissory notes can be given to other players again in future transactions"
 
-**Implementation Status**: ✅ **COMPLETED**  
-**Priority**: High  
+**Implementation Status**: ✅ **COMPLETED**
+**Priority**: High
 **Details**: Implemented availability tracking system that allows returned notes to be reused in future transactions.
 
 ### 69.5 - Transaction Limits
 **Raw LRR Text**: "Maximum one promissory note can be traded per transaction"
 
-**Implementation Status**: ✅ **COMPLETED** (Rule 94)  
-**Priority**: High  
+**Implementation Status**: ✅ **COMPLETED** (Rule 94)
+**Priority**: High
 **Details**: Already implemented in transaction system (Rule 94). TransactionOffer validates max one promissory note per transaction.
 
 ### 69.6 - Hidden Information
 **Raw LRR Text**: "Players should keep promissory note hands hidden"
 
-**Implementation Status**: ✅ **COMPLETED**  
-**Priority**: Medium  
+**Implementation Status**: ✅ **COMPLETED**
+**Priority**: Medium
 **Details**: Implemented separate player hands with `add_note_to_hand()` and `get_player_hand()` methods for hidden information management.
 
 ### 69.7 - Elimination Effects
 **Raw LRR Text**: "When player eliminated, all matching color/faction promissory notes returned to game box"
 
-**Implementation Status**: ✅ **COMPLETED**  
-**Priority**: Medium  
+**Implementation Status**: ✅ **COMPLETED**
+**Priority**: Medium
 **Details**: Implemented `handle_player_elimination()` method that removes all eliminated player's notes from all hands and available pool.
 
 ## Related Rules

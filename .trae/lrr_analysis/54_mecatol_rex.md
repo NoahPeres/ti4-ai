@@ -14,8 +14,8 @@ Mecatol Rex is the planet placed in the center of the game board during setup.
 ## Overall Implementation Status
 - **Current State**: Not Started/In Progress/Complete
 - **Estimated Effort**: Small/Medium/Large
-- **Dependencies**: 
-- **Blockers**: 
+- **Dependencies**:
+- **Blockers**:
 
 ## Notes
 - Rule 54 has only 1 sub-rule

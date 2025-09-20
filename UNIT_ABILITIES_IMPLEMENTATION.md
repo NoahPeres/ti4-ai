@@ -46,7 +46,7 @@ All unit abilities from the TI4 LRR have been implemented in the codebase:
 - **Units**: Dreadnought, War Sun, Mech
 - **Implementation**: `UnitStats.sustain_damage: bool`
 - **Access Method**: `Unit.has_sustain_damage() -> bool`
-- **State Management**: 
+- **State Management**:
   - `Unit.has_sustained_damage: bool` (property)
   - `Unit.sustain_damage()` (method to activate)
   - `Unit.repair_damage()` (method to repair)
@@ -97,7 +97,7 @@ class Unit:
     def has_deploy(self) -> bool
     def has_planetary_shield(self) -> bool
     def get_production(self) -> int
-    
+
     # Sustain damage state management
     def sustain_damage(self) -> None
     def repair_damage(self) -> None

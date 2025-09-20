@@ -1,10 +1,10 @@
 # Rule 18: Combat (Attribute) Analysis
 
 ## Category Overview
-**Rule Type:** Unit Attribute  
-**Priority:** High  
-**Implementation Status:** ✅ Complete  
-**Complexity:** Medium  
+**Rule Type:** Unit Attribute
+**Priority:** High
+**Implementation Status:** ✅ Complete
+**Complexity:** Medium
 **Dependencies:** Space Combat, Ground Combat, Dice Rolling
 
 ## Raw LRR Text
@@ -25,10 +25,10 @@ RELATED TOPICS: Ground Combat, Invasion, Space Combat
 **Test Coverage**: Covered in unit tests
 
 ### 18.1 - Hit Calculation
-**Status**: ✅ Implemented  
+**Status**: ✅ Implemented
 **Description**: During combat, if a unit's combat roll produces a result equal to or greater than its combat value, it produces a hit.
 **Implementation**: `CombatResolver.roll_dice_for_unit()` method handles combat dice rolling
-**Test Coverage**: 
+**Test Coverage**:
 - `test_combat_hit_calculation()` - Basic hit calculation
 - `test_combat_miss_calculation()` - Miss scenarios
 - `test_combat_edge_cases()` - Edge case scenarios
@@ -63,7 +63,7 @@ RELATED TOPICS: Ground Combat, Invasion, Space Combat
 
 ## Integration Points
 - **Space Combat**: Uses Rule 18 for ship combat calculations
-- **Ground Combat**: Uses Rule 18 for ground force combat calculations  
+- **Ground Combat**: Uses Rule 18 for ground force combat calculations
 - **Unit System**: Combat values stored as unit attributes
 - **Dice System**: Integrates with general dice rolling mechanics
 

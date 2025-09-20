@@ -10,7 +10,7 @@ Units that have the "Space Cannon" ability can use it during two different steps
 - **Implementation Status**: ✅ IMPLEMENTED
 - **Test Coverage**: `test_space_cannon_offense_basic`, `test_space_cannon_offense_multiple_units`
 
-### 77.2 - Space Cannon Defense  
+### 77.2 - Space Cannon Defense
 - **Note**: During "Space Cannon Defense" step of tactical action, opponent can use Space Cannon abilities of units in active system
 - **Implementation Status**: ✅ IMPLEMENTED
 - **Test Coverage**: `test_space_cannon_defense_basic`, `test_space_cannon_defense_multiple_units`

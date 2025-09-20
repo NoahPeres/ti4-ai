@@ -20,8 +20,8 @@ A modifier is a number that is applied by an ability to increase or decrease the
 ## Overall Implementation Status
 - **Current State**: Not Started/In Progress/Complete
 - **Estimated Effort**: Small/Medium/Large
-- **Dependencies**: 
-- **Blockers**: 
+- **Dependencies**:
+- **Blockers**:
 
 ## Notes
 - Rule 56 has only 2 sub-rules

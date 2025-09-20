@@ -1,9 +1,9 @@
 # Rule 67: PRODUCING UNITS
 
 ## Category Overview
-**Priority**: High  
-**Implementation Status**: ✅ **COMPLETED**  
-**Test Coverage**: ✅ **Comprehensive (17 tests)**  
+**Priority**: High
+**Implementation Status**: ✅ **COMPLETED**
+**Test Coverage**: ✅ **Comprehensive (17 tests)**
 
 The primary way that a player produces new units is by resolving the "Production" abilities of existing units during a tactical action. However, other game effects also allow players to produce units. This is a core game mechanic that enables unit expansion and strategic positioning.
 
@@ -14,43 +14,43 @@ The primary way that a player produces new units is by resolving the "Production
 ### 67.1 - Unit Cost
 **Raw LRR Text**: "Each unit has cost value on faction sheet or technology card; must spend resources equal to or greater than cost"
 
-**Implementation Status**: ✅ **COMPLETED**  
-**Priority**: High  
+**Implementation Status**: ✅ **COMPLETED**
+**Priority**: High
 **Details**: Implemented `can_afford_unit()` method that validates resource requirements against unit costs using the existing UnitStatsProvider system.
 
 ### 67.2 - Dual Unit Production
 **Raw LRR Text**: "Cost with two icons (fighters/infantry) produces two units for that cost"
 
-**Implementation Status**: ✅ **COMPLETED**  
-**Priority**: High  
+**Implementation Status**: ✅ **COMPLETED**
+**Priority**: High
 **Details**: Implemented `get_units_produced_for_cost()` method that returns 2 for fighters/infantry and 1 for all other units.
 
 ### 67.3 - Tactical Action Production
 **Raw LRR Text**: "Production during tactical action follows Production ability rules for placement in active system"
 
-**Implementation Status**: ✅ **COMPLETED**  
-**Priority**: Medium  
+**Implementation Status**: ✅ **COMPLETED**
+**Priority**: Medium
 **Details**: Implemented `ProductionStep` class that integrates with tactical action system. Includes production unit detection and framework for full tactical action production workflow.
 
 ### 67.4 - Non-Tactical Production
 **Raw LRR Text**: "Production outside tactical action specifies number and placement location"
 
-**Implementation Status**: 🔄 **FRAMEWORK READY**  
-**Priority**: Medium  
+**Implementation Status**: 🔄 **FRAMEWORK READY**
+**Priority**: Medium
 **Details**: Framework implemented. Specific non-tactical production rules can be added as needed.
 
 ### 67.5 - Reinforcement Limits
 **Raw LRR Text**: "Players limited by units in reinforcements; can remove units from non-command token systems to produce"
 
-**Implementation Status**: ✅ **COMPLETED**  
-**Priority**: High  
+**Implementation Status**: ✅ **COMPLETED**
+**Priority**: High
 **Details**: Implemented `can_produce_from_reinforcements()` method that validates production against available reinforcement units, including dual unit production calculations.
 
 ### 67.6 - Ship Production Restriction
 **Raw LRR Text**: "Cannot produce ships in system containing other players' ships"
 
-**Implementation Status**: ✅ **COMPLETED**  
-**Priority**: High  
+**Implementation Status**: ✅ **COMPLETED**
+**Priority**: High
 **Details**: Implemented `can_produce_ships_in_system()` method that prevents ship production when enemy ships are present in the same system.
 
 ## Related Rules

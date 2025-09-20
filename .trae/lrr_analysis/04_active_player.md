@@ -48,13 +48,13 @@ The active player is the player taking a turn during the action phase.
 3. **Test pass state integration** - Add tests for turn cycling with passed players
 - **Current State**: Not Started/In Progress/Complete
 - **Estimated Effort**: Small/Medium/Large
-- **Dependencies**: 
-- **Blockers**: 
+- **Dependencies**:
+- **Blockers**:
 
 ## Notes
-- 
-- 
-- 
+-
+-
+-
 
 ## Related Rules
 - Rule 3: ACTION PHASE
@@ -63,6 +63,6 @@ The active player is the player taking a turn during the action phase.
 - Rule 84: STRATEGIC ACTION
 
 ## Action Items
-- [ ] 
-- [ ] 
+- [ ]
+- [ ]
 - [ ]

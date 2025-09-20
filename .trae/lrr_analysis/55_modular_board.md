@@ -1,10 +1,10 @@
 # Rule 55: MODULAR BOARD
 
 ## Category Overview
-**Rule Type**: Game Setup & Board Mechanics  
-**Complexity**: High  
-**Implementation Priority**: High  
-**Dependencies**: Galaxy System, System Tiles, Hex Coordinates  
+**Rule Type**: Game Setup & Board Mechanics
+**Complexity**: High
+**Implementation Priority**: High
+**Dependencies**: Galaxy System, System Tiles, Hex Coordinates
 
 ## Raw LRR Text
 From `lrr.txt` setup section and related rules:
@@ -20,7 +20,7 @@ From `lrr.txt` setup section and related rules:
 
 **Player Count Configurations**:
 - **THREE-PLAYER**: Six blue and two red tiles per player
-- **FOUR-PLAYER**: Five blue and three red tiles per player  
+- **FOUR-PLAYER**: Five blue and three red tiles per player
 - **FIVE-PLAYER (NO HYPERLANES)**: Four blue and two red tiles per player + speaker places one red
 - **FIVE-PLAYER (HYPERLANES)**: Three blue and two red tiles per player
 - **SIX-PLAYER**: Three blue and two red tiles per player
@@ -190,7 +190,7 @@ From `lrr.txt` setup section and related rules:
 - Hyperlane system: ❌ Missing
 - Token placement: ❌ Missing
 
-**Recommended Focus**: 
+**Recommended Focus**:
 1. Design and implement board setup process for different player counts
 2. Create system tile management system with tile types and properties
 3. Add configuration templates for all supported player counts

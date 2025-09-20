@@ -163,7 +163,7 @@ Next, if the desired game board setup uses hyperlane tiles, gather the following
 ï 16 command tokens
 
 ï 1 faction promissory note
-ï 
+ï
 2 faction technology cards
 ï 3 leader cards
 
@@ -194,7 +194,7 @@ ii. DEAL SYSTEM TILES: Shuffle each pile of system tiles facedown. Then, deal fa
 ï 1 command sheet
 
 ï 1 leader sheet
-ï 
+ï
 33 technology cards
 
 ï 5 promissory notes
@@ -290,7 +290,7 @@ Five-Player SetuP
 
 
 Six-Player SetuP
-  
+
 Six-Player (large galaxy)
 
 Seven-Player
@@ -340,7 +340,7 @@ hyPerlane
 GLOSSARY
 This glossary provides players with detailed rules for Twilight Imperium: Fourth Edition and its Prophecy of Kings expansion, organized by topic. Players are encouraged to use the index on page 38 to find specific topics within the glossary.
 
-1 ABILITIES	
+1 ABILITIES
 Cards and faction sheets each have abilities that players can resolve to trigger various game effects.
 1.1 If information in this Rules Reference contradicts the Learn to Play booklet, the Rules Reference takes precedence.
 1.2 If a card ability contradicts information in the Rules Reference, the card takes precedence. If both the card and the rules can be followed at the same time, they should be.
@@ -397,7 +397,7 @@ a	If an action card contains the word "Action," a player must use a component ac
 ï Deploy
 
 ï Planetary Shield
-ï 
+ï
 Production
 
 ï Space Cannon
@@ -411,7 +411,7 @@ b  Multiple action cards with the same name cannot be played during a single tim
 1.27 If a unit's ability uses the phrase "this system" or "this planet," the ability is referring to the system or planet that contains that unit.
 RELATED TOPICS: Action Cards, Leaders, Promissory Notes, Strategy Card, Technology
 
-2 ACTION CARDS	
+2 ACTION CARDS
 Action cards provide players with various abilities that they can resolve as described on the cards.
 
 
@@ -437,7 +437,7 @@ a	A game effect can increase or decrease the number of cards a player's hand can
 2.8  If an action card is canceled, that card has no effect and is discarded.
 RELATED TOPICS: Abilities, Component Action, Politics, Status Phase
 
-3 ACTION PHASE	
+3 ACTION PHASE
 During the action phase, each player takes a turn in initiative order. During a player's turn, they perform a single action. After each player has taken a turn, player turns begin again in initiative order. This process continues until all players have passed.
 3.1 During a player's turn, they may perform one of the following three types of actions: a strategic action, a tactical action, or a component action.
 3.2  If a player cannot perform an action, they must pass.
@@ -458,14 +458,14 @@ RELATED TOPICS: Component Action, Game Round, Status Phase, Strategic Action, Ta
 
 8
 
-4 ACTIVE PLAYER	
+4 ACTIVE PLAYER
 The active player is the player taking a turn during the action phase.
 4.1	During the action phase, the player who is first in initiative order is the first active player.
 4.2  After the active player takes a turn, the next player in initiative order becomes the active player.
 4.3  After the last player in initiative order takes a turn, the player who is first in initiative order becomes the active player again, and turns begin again in initiative order, ignoring any players who have already passed.
 RELATED TOPICS: Action Phase, Initiative Order
 
-5 ACTIVE SYSTEM	
+5 ACTIVE SYSTEM
 The active system is the system that is activated during a tactical action.
 5.1	When a player performs a tactical action, they activate a system by placing a command token from their tactic pool in that system. That system is the active system.
 5.2  A player cannot activate a system that already contains one of their command tokens.
@@ -473,7 +473,7 @@ The active system is the system that is activated during a tactical action.
 5.4  A system remains the active system for the duration of the tactical action during which it was activated.
 RELATED TOPICS: Movement, Tactical Action
 
-6 ADJACENCY	
+6 ADJACENCY
 Two system tiles are adjacent to each other if any of the tiles' sides are touching each other.
 6.1	A system that has a wormhole is treated as being adjacent to a system that has a matching wormhole.
 6.2  A unit or planet is adjacent to all system tiles that are adjacent to the system tile that contains that unit or planet.
@@ -482,8 +482,8 @@ a	A system is not adjacent to itself.
 6.3  A planet is treated as being adjacent to the system that contains that planet.
 6.4  Systems that are connected by lines drawn across one or more hyperlane tiles are adjacent for all purposes.
 RELATED TOPICS: Hyperlanes, Movement, Neighbors, Wormhole  Nexus, Wormholes
-7 
-AGENDA CARD	
+7
+AGENDA CARD
 Agenda cards represent galactic laws and policies. During each agenda phase, players cast votes for specific outcomes on two agenda cards.
 
 
@@ -518,7 +518,7 @@ RELATED TOPICS: Agenda Phase, Attach, Victory Points
 
 9
 
-8 AGENDA PHASE	
+8 AGENDA PHASE
 During the agenda phase, players can cast votes on agendas that can change the rules of the game.
 8.1	Players skip the agenda phase during the early portion of each game. After the custodians token is removed from Mecatol Rex, the agenda phase is added to each game round. To resolve the agenda phase, players perform the following steps:
 8.2  STEP 1-FIRST AGENDA: Players resolve the first agenda by following these steps in order:
@@ -561,7 +561,7 @@ a	A predicted outcome must be a possible outcome of the revealed agenda.
 b  After resolving the outcome of the agenda, any abilities that were dependent upon predicting the outcome are resolved.
 RELATED TOPICS: Custodians Token, Game Round, Influence
 
-9 ANOMALIES	
+9 ANOMALIES
 An anomaly is a system tile that has unique rules.
 9.1	An anomaly is identified by a red border located on the tile's corners.
 9.2  There are four types of anomalies: asteroid fields, nebulae, supernovas, and gravity rifts.
@@ -573,8 +573,8 @@ a	Some anomalies contain planets; those systems are still anomalies.
 10
 
 9.3  Each type of anomaly is identified by its art, as follows:
-11 
-ASTEROID FIELD	
+11
+ASTEROID FIELD
 An asteroid field is an anomaly that affects movement.
 11.1  A ship cannot move through or into an asteroid field.
 
@@ -601,8 +601,8 @@ Nebula
 
 
 Gravity Rift
-12 
-ATTACH	
+12
+ATTACH
 Some game effects instruct a player to attach a card to a planet card. The attached card modifies that planet card in some way.
 12.1 To attach a card to a planet card, a player places the card with the attach effect partially underneath the planet card.
 12.2 If a player gains or loses control of planet that contains a card with an attach effect, the attached card stays with that planet.
@@ -611,7 +611,7 @@ Some game effects instruct a player to attach a card to a planet card. The attac
 9.5  Abilities can cause a system to be two different anomalies; that system has the properties of both anomalies.
 RELATED TOPICS: Asteroid Field, Gravity Rift, Movement, Nebula, Supernova, System Tiles
 
-10 ANTI-FIGHTER BARRAGE (UNIT ABILITY)	
+10 ANTI-FIGHTER BARRAGE (UNIT ABILITY)
 A unit with the "Anti-Fighter Barrage" ability may be able to destroy an opponent's fighters at the onset of a space battle. During the "Anti-Fighter Barrage" step of the first round of space combat, players perform the following steps:
 10.1 STEP 1-Each player rolls dice for each of their units in the combat that has the "Anti-Fighter Barrage" ability; this is called an anti-fighter barrage roll. A hit is produced for each die roll that is equal to or greater than the unit's anti-fighter barrage value.
 a A unit's "Anti-Fighter Barrage" ability is presented along with a unit's attributes on faction sheets and unit upgrade technology cards.
@@ -628,11 +628,11 @@ b  If a planet card is purged, also purge all cards that are attached to that pl
 12.3 When a card is attached to a planet card, place the corresponding attachment token on that planet on the game board.
 RELATED TOPICS: Agenda Card, Control, Exploration, Planets
 
-13 ATTACKER	
+13 ATTACKER
 During combat, the active player is the attacker.
 RELATED TOPICS: Defender, Invasion, Space Combat
 
-14 BLOCKADED	
+14 BLOCKADED
 A player's unit with "Production" is blockaded if it is in a system that does not contain any of their ships and contains other players' ships.
 14.1 A player cannot use a blockaded unit to produce ships; that player can still use a blockaded unit to produce ground forces.
 14.2 When a player blockades another player's space dock, if the blockaded player has captured any of the blockading player's units, those units are returned to the blockading player's reinforcements.
@@ -643,7 +643,7 @@ RELATED TOPICS: Producing Units, Ships
 
 11
 
-15 BOMBARDMENT (UNIT ABILITY)	
+15 BOMBARDMENT (UNIT ABILITY)
 A unit with the "Bombardment" ability may be able to destroy another player's ground forces during an invasion. During the "Bombardment" step, players perform the following steps:
 15.1 STEP 1- The active player chooses which planet each of their units that has a "Bombardment" ability will bombard. Then, that player rolls dice for each of those units; this is called a bombardment roll. A hit is produced for each die roll that is equal to or greater than the unit's "Bombardment" value.
 a	A unit's "Bombardment" ability is presented along with a unit's attributes on faction sheets and unit upgrade technology cards.
@@ -656,7 +656,7 @@ f Planets that contain a unit with the "Planetary Shield" ability cannot be bomb
 a If a player has to assign more hits than that player has ground forces, the excess hits have no effect.
 RELATED TOPICS: Invasion, Planetary Shield
 
-16 CAPACITY (ATTRIBUTE)	
+16 CAPACITY (ATTRIBUTE)
 Capacity is an attribute of some units that is presented on faction sheets and unit upgrade technology cards.
 16.1 A unit's capacity value indicates the maximum combined number of fighters and ground forces that it can transport.
 16.2 The combined capacity values of a player's ships in a system determine the number of fighters and ground forces that player can have in that system's space area.
@@ -671,7 +671,7 @@ excess units are removed and returned to that player's reinforcements.
 16.4 Fighters and ground forces are not assigned to specific ships, except while they are being transported.
 RELATED TOPICS: Movement, Capacity, Transport
 
-17 CAPTURE	
+17 CAPTURE
 Some abilities instruct a player to capture a unit, preventing the unit's original owner from using it.
 17.1 If a player captures a non-fighter ship or mech, they place it on their faction sheet. When such a unit is returned, it is placed into the reinforcements of the original owner.
 17.2 A captured non-fighter ship or mech is returned under the following circumstances:
@@ -695,13 +695,13 @@ RELATED TOPICS: Blockaded, Fighter Tokens, Ground Combat, Infantry Tokens, Space
 
 12
 
-18 COMBAT (ATTRIBUTE)	
+18 COMBAT (ATTRIBUTE)
 Combat is an attribute of some units that is presented on faction sheets and unit upgrade technology cards.
 18.1 During combat, if a unit's combat roll produces a result equal to or greater than its combat value, it produces a hit.
 18.2 If a unit's combat value contains two or more burst icons, instead of rolling a single die, the player rolls one die for each burst icon when making that unit's combat rolls.
 RELATED TOPICS: Ground Combat, Invasion, Space Combat
 
-19 COMMAND SHEET	
+19 COMMAND SHEET
 Each player has a command she that contains a strategy pool, a tactic pool, a fleet pool, a trade good area, and a quick reference.
 19.1 The pools on the command sheet are where players place their command token Command tokens in a
 player's pools are used by that
@@ -710,7 +710,7 @@ player to perform strategic and tactical actions and to increase the number of s
 19.3 Players who are familiar with the game can hide the quick reference by placing that portion of the command sheet under their faction sheets.
 RELATED TOPICS: Command Tokens, Fleet Pool, Strategic Action, Tactical Action, Trade Goods
 
-20 COMMAND TOKENS	
+20 COMMAND TOKENS
 Command tokens are a currency that players use to perform actions and expand their fleets.
 
 20.1 Each player begins the game with eight tokens on their command sheet: three in their tactic pool, three in their fleet pool, and two in their strategy pool.
@@ -727,7 +727,7 @@ a	A player does not spend a command token to resolve the secondary ability of th
 20.6 If a game effect would place a player's command token in a system where they already have one, they place the token in their reinforcements instead. Any effects that resolve by placing that token are resolved as normal.
 RELATED TOPICS: Fleet Pool, Leadership, Reinforcements, Strategic Action, Tactical Action
 
-21 COMMODITIES	
+21 COMMODITIES
 Commodities represent goods that are plentiful for their own faction and are desired by other factions. A commodity has no inherent game effects, but converts into a trade good if given to or received from another player.
 21.1 Commodities and trade goods are represented by opposite sides of the same token.
 21.2 The commodity value on a player's faction sheet indicates the maximum number of commodities that player can have.
@@ -744,11 +744,11 @@ Commodities represent goods that are plentiful for their own faction and are des
 
 into a trade good by placing it in the trade good area of their command sheet with the trade good side faceup.
 a	That token is no longer a commodity token; it is a trade
-ï 
+ï
 Control Tokens
 
 ï Fighter Tokens
-ï 
+ï
 Trade Good Tokens
 
 ï Infantry Tokens
@@ -762,7 +762,7 @@ c	If a game effect instructs a player to convert a number of their own commoditi
 21.8 Commodity tokens come in values of one and three. A player can swap between these tokens as necessary.
 RELATED TOPICS: Deals, Trade Goods, Transactions
 
-22 COMPONENT ACTION	
+22 COMPONENT ACTION
 A component action is a type of action that a player can perform during their turn of an action phase.
 22.1 Component actions can be found on various game components, including action cards, technology cards, leaders, exploration cards, relics, promissory notes, and faction sheets. Each component action is indicated by an "Action" header.
 22.2 To perform a component action, a player reads the action's text and follows the instructions as described.
@@ -770,7 +770,7 @@ A component action is a type of action that a player can perform during their tu
 22.4 If a component action is canceled, it does not use that player's action.
 RELATED TOPICS: Abilities, Action Cards, Action Phase, Exploration, Leaders, Promissory Notes, Relics, Technology
 
-23 COMPONENT LIMITATIONS	
+23 COMPONENT LIMITATIONS
 If a component type is depleted during the game, players obey the following rules:
 23.1 DICE: Dice are limitless. If a player needs to roll more dice than the game provides, that player should roll as many as possible, record the results, and then reroll dice as necessary.
 
@@ -784,7 +784,7 @@ accompanied by at least one plastic piece of the same type; players can swap inf
 23.5 CARDS: When a deck is depleted, players shuffle the deck's discard pile and place it facedown to create a new deck.
 RELATED TOPICS: Producing Units, Units
 
-24 CONSTRUCTION (STRATEGY CARD)	
+24 CONSTRUCTION (STRATEGY CARD)
 The "Construction" strategy card allows players to construct structures on planets they control. This card's initiative value is "4."
 24.1 During the action phase, if the active player has the "Construction" strategy card, they can perform a strategic action to resolve that card's primary ability.
 24.2 To resolve the primary ability on the "Construction" strategy card, the active player may place either one PDS or one space dock on a planet they control. Then, that player may place an additional PDS on a planet they control.
@@ -802,7 +802,7 @@ b The structures can be placed in any systems, regardless of whether the player 
 a	If a player does not have the unit in their reinforcements, that player can remove a unit from any system that does not contain one of their command tokens and place that unit in their reinforcements. Then, that player must place the unit on the game board as instructed by the effect that is placing the unit.
 RELATED TOPICS: Initiative Order, Strategic Action, Strategy Card, Structures
 
-25 CONTROL	
+25 CONTROL
 Each player begins the game with control of each planet in their home system. During the game, players can gain control of additional planets.
 25.1 When a player gains control of a planet, they take the planet card that corresponds to that planet and place it in their play area; that card is exhausted.
 a	If a player is the first player to control a planet, they take the planet card from the planet card deck.
@@ -819,7 +819,7 @@ b  During the invasion step of a tactical action, control is determined during t
 25.7 If a player loses control of a planet that contains their control token, they remove their control token from the planet.
 RELATED TOPICS: Attach, Exhausted, Invasion, Planets
 
-26 COST (ATTRIBUTE)	
+26 COST (ATTRIBUTE)
 Cost is an attribute of some units that is presented on faction sheets and unit upgrade technology cards. A unit's cost determines the number of resources a player must spend to produce that unit.
 26.1 To produce a unit, a player must spend a number of resources equal to or greater than the cost of the unit they are producing.
 26.2 If the cost is accompanied by two icons-typically for fighters and ground forces-a player produces two of that unit for that cost.
@@ -828,7 +828,7 @@ Cost is an attribute of some units that is presented on faction sheets and unit 
 a	Structures do not have costs and are usually placed by resolving the "Construction" strategy card.
 RELATED TOPICS: Producing Units, Resources
 
-27 CUSTODIANS TOKEN	
+27 CUSTODIANS TOKEN
 The custodians token begins each game on Mecatol Rex. The token represents the caretakers that safeguard the seat of the empire until such time as the galactic council can be reconvened.
 27.1  Units can move into the system that contains
 Mecatol Rex following normal rules; however, players cannot commit ground forces to land on Mecatol Rex until the custodians token is removed from the planet.
@@ -842,7 +842,7 @@ RELATED TOPICS: Agenda Phase, Influence, Victory Points
 
 15
 
-28 DEALS	
+28 DEALS
 A deal is an agreement between two players that may or may not include a transaction that involves physical components.
 28.1 Players can make deals with each other at any time, even if they are not neighbors. However, deals that include a
 transaction must follow the rules for transactions, including that the players be neighbors.
@@ -852,11 +852,11 @@ a	The results of playing an action card, including the act of successfully resol
 28.4 If the terms of a deal cannot be resolved immediately, it is a non-binding deal. When a deal is non-binding, a player does not have to adhere to any part of the agreement.
 RELATED TOPICS: Promissory Notes, Trade Goods
 
-29 DEFENDER	
+29 DEFENDER
 During either a space or ground combat, the player who is not the active player is the defender.
 RELATED TOPICS: Attacker, Invasion, Nebula, Space Combat
 
-30 DEPLOY	
+30 DEPLOY
 Some units have deploy abilities. Deploy abilities are indicated by the "Deploy" header and provide the means to place specific units on the game board without producing them as normal.
 30.1 A player can use a unit's deploy ability when the ability's conditions are met to place that unit on the game board.
 a	A player does not have to spend resources to deploy a unit unless otherwise specified.
@@ -864,14 +864,14 @@ a	A player does not have to spend resources to deploy a unit unless otherwise sp
 a	If there are no units that have a deploy ability in a player's reinforcements, the deploy ability cannot be used.
 30.3 A unit's deploy ability can be resolved only once per timing window.
 RELATED TOPICS: Abilities, Mechs, Reinforcements,
-31 
-DESTROYED	
+31
+DESTROYED
 Various game effects can cause a unit to be destroyed. When a player's unit is destroyed, it is removed from the game board and returned to their reinforcements.
 31.1 When a player assigns hits that were produced against their units, that player chooses a number of their units to be destroyed equal to the number of hits produced against those units.
 31.2 If a player's unit is removed from the board by a game effect, it is not treated as being destroyed; effects that trigger when a unit is destroyed are not triggered.
 RELATED TOPICS: Anti-Fighter Barrage, Bombardment, Space Cannon, Space Combat, Sustain Damage
 
-32 DIPLOMACY (STRATEGY CARD)	
+32 DIPLOMACY (STRATEGY CARD)
 The "Diplomacy" strategy card can be used to preemptively prevent other players from activating a specific system. It can also be used to ready planets. This card's initiative value is "2."
 32.1 During the action phase, if the active player has the "Diplomacy" strategy card, they can perform a strategic action to resolve that card's primary ability.
 32.2 To resolve the primary ability on the "Diplomacy" strategy card, the active player chooses a system that contains a planet they control other than the Mecatol Rex system; each other player places one command token from their reinforcements in that system. Then, the active player readies any two of their exhausted planets.
@@ -888,7 +888,7 @@ RELATED TOPICS: Active System, Command Tokens, Initiative Order, Planets, Readie
 
 16
 
-33 ELIMINATION	
+33 ELIMINATION
 A player who is eliminated is no longer part of the game.
 33.1 A player is eliminated when they meet all of the following three conditions:
 a	The player has no ground forces on the game board.
@@ -918,7 +918,7 @@ f	If the Mahact Gene-Sorcerers have an eliminated player's command token on thei
 33.11 If a player becomes eliminated, any units they have captured are returned to the reinforcements of their original owners.
 RELATED TOPICS: Agenda Card, Control, Ground Forces, Production, Promissory Notes
 
-34 EXHAUSTED	
+34 EXHAUSTED
 Some cards can be exhausted. A player cannot resolve abilities or spend the resources or influence of an exhausted card.
 34.1 To exhaust a card, a player flips the card facedown.
 
@@ -929,7 +929,7 @@ a	Passive abilities on an exhausted card are still in effect while that card is 
 34.5 After a player performs a strategic action, they exhaust the strategy card that corresponds to that action.
 RELATED TOPICS: Influence, Planets, Resources, Status Phase
 
-35 EXPLORATION	
+35 EXPLORATION
 Planets and some space areas can be explored, yielding varying results determined by the cards drawn from the exploration decks.
 35.1 When a player takes control of a planet that is not already controlled by another player, they explore that planet.
 35.2 When a player explores a planet, they draw and resolve a card from the exploration deck that corresponds to that planet's trait.
@@ -955,7 +955,7 @@ a	Players can resolve the ability of relic fragments that are in their play area
 b  Relic fragments can be exchanged as part of transactions.
 
 RELATED TOPICS: Attach, Control, Planets, Relics
-36 
+36
 FIGHTER TOKENS
 
 36.2 Players can replace their plastic fighters with tokens at any time.
@@ -965,7 +965,7 @@ a	If the player cannot replace the token, the unit is destroyed.
 36.4 Fighter tokens come in values of one and three. A player can swap between these tokens as necessary.
 RELATED TOPICS: Infantry Tokens, Producing Units
 
-37 FLEET POOL	
+37 FLEET POOL
 The fleet pool is an area of a player's command sheet.
 37.1 The number of command tokens in a player's fleet pool indicates the maximum number of non-fighter ships that a player can have in a system.
 a	Units that are on planets or that count against a player's capacity do not count against that player's fleet pool.
@@ -975,7 +975,7 @@ b  Units that are being transported through systems do not count against a playe
 37.4 Players do not spend command tokens from this pool unless a game effect specifically allows it.
 RELATED TOPICS: Capacity, Command Sheet, Command Tokens, Ships, System Tiles
 
-38 FRONTIER TOKENS	
+38 FRONTIER TOKENS
 Frontier tokens can be explored for a variety of game effects.
 38.1 Frontier tokens are placed on the game board during setup. One frontier token is placed in each system that does not contain any planets.
 
@@ -995,14 +995,14 @@ d  A frontier token is placed in the Creuss gate system.
 
 RELATED TOPICS: Exploration
 
-39 GAME BOARD	
+39 GAME BOARD
 The game board consists of all system tiles in play.
 39.1 The game board consists of all system tiles that were placed during setup, even if the sides of those tiles do not touch any other system tiles, such as the Ghosts of Creuss' home system.
 39.2 A system tile is on the edge of the game board if any of its sides are not touching another system tile.
 a	The Ghosts of Creuss home system and the wormhole nexus are on the edge of the game board.
 RELATED TOPICS: System Tiles
 
-40 GAME ROUND	
+40 GAME ROUND
 A game round consists of the following four phases:
 1. Strategy Phase
 2. Action Phase
@@ -1014,7 +1014,7 @@ A game round consists of the following four phases:
 40.3 Abilities that last until the end of a player's turn do not persist for the duration of a game round or into the other phases of that game round. Those effects end at the end of that player's turn, before the next player's turn begins.
 RELATED TOPICS: Action Phase, Agenda Phase, Custodians Token, Status Phase, Strategy Phase
 
-41 GRAVITY RIFT	
+41 GRAVITY RIFT
 A gravity rift is an anomaly that affects movement.
 41.1 A ship that will move out of or through a gravity rift at any time during its movement, applies +1 to its move value.
 a	This can allow a ship to reach the active system from farther away than it normally could.
@@ -1027,7 +1027,7 @@ c	Units that are removed are returned to the player's reinforcements.
 41.4 A system that contains multiple gravity rifts is treated as a single gravity rift.
 RELATED TOPICS: Anomalies, Movement
 
-42 GROUND COMBAT	
+42 GROUND COMBAT
 During the "Ground Combat" step of an invasion, if the active player has ground forces on a planet that contains another player's ground forces, those players resolve a ground combat on that planet. To resolve a ground combat, players perform the following steps:
 42.1 STEP 1-ROLL DICE: Each player rolls one die for each ground force they have on the planet; this is a combat roll. If a unit's combat roll produces a result that is equal to or greater than that unit's combat value, that roll produces a hit.
 a	If a unit's combat value contains two or more burst icons, the player rolls one die for each burst icon instead.
@@ -1044,28 +1044,28 @@ RELATED TOPICS: Invasion, Planets
 
 19
 
-43 GROUND FORCES	
+43 GROUND FORCES
 A ground force is a type of unit. All infantry and mech units in the game are ground forces. Some races have unique infantry units.
 43.1 Ground forces are always on planets, in a space area with ships that have capacity values, or being transported by those ships.
 43.2 Ground forces being transported by a ship are placed in a system's space area along with the ship that is transporting them.
 43.3 There is no limit to the number of ground forces a player can have on a planet.
 RELATED TOPICS: Capacity, Control, Infantry Tokens, Mechs, Transport, Units
 
-44 HYPERLANES	
+44 HYPERLANES
 Hyperlanes are tiles that are used in some game board setups to create adjacency of system tiles that are not touching each other.
 44.1 Systems that are connected by lines drawn across one or more hyperlane tiles are adjacent for all purposes.
 44.2 Hyperlane tiles are not systems. They cannot have units on them and they cannot be targets for effects or abilities.
 RELATED TOPICS: Adjacency, Movement
 
-45 IMPERIAL (STRATEGY CARD)	
+45 IMPERIAL (STRATEGY CARD)
 The "Imperial" strategy card allows players to score victory points and draw secret objectives. This card's initiative value is "8."
 45.1 During the action phase, if the active player has the "Imperial" strategy card, they can perform a strategic action to resolve that card's primary ability.
 45.2 To resolve the primary ability on the "Imperial" strategy card, the active player can score one public objective of their choice if they meet that objective's requirements as described on its card. Then, if the active player controls Mecatol Rex, they gain one victory point; if they do not control Mecatol Rex, they can draw one secret objective card.
 45.3 After the active player resolves the primary ability of the "Imperial" strategy card, each other player, beginning with the player to the left of the active player and proceeding clockwise, may spend one command token from their strategy pool to draw one secret objective card.
 45.4 If a player has more than three secret objective cards after drawing a secret objective, they must choose one of their unscored secret objectives and return it to the secret objective deck. This number includes the secret objective cards in the player's hand and the cards that player has already scored. Then, they shuffle the secret objective deck.
 RELATED TOPICS: Initiative Order, Objective Cards, Strategic Action, Strategy Card
-46 
-INFANTRY TOKENS	
+46
+INFANTRY TOKENS
 An infantry token functions as a plastic infantry unit for all game purposes.
 46.1 When producing an infantry unit, a player can use an infantry token from the supply instead of a plastic piece.
 46.2 Players can replace their plastic infantry with tokens at any time.
@@ -1076,7 +1076,7 @@ a	If that player cannot replace the token, the unit is destroyed.
 46.4 Infantry tokens come in values of one and three. A player can swap between these tokens as necessary.
 RELATED TOPICS: Fighter Tokens, Producing Units
 
-47 INFLUENCE	
+47 INFLUENCE
 Influence represents a planet's political power. Players spend influence to gain command tokens using the "Leadership" strategy card, and the influence values of planets are used to cast votes during the agenda phase.
 47.1 A planet's influence is the rightmost value (surrounded by a blue border) found on the planet's system tile and planet card.
 47.2 A player can spend a planet's influence by exhausting that planet's card.
@@ -1085,7 +1085,7 @@ Influence represents a planet's political power. Players spend influence to gain
 a	Players cannot spend trade goods to cast votes during the agenda phase.
 RELATED TOPICS: Agenda Phase, Exhausted, Leadership
 
-48 INITIATIVE ORDER	
+48 INITIATIVE ORDER
 Initiative order is the order in which players resolve steps of the action and status phases.
 48.1 Initiative order is determined by the initiative numbers on strategy cards.
 a	A player who has the Naalu "0" token has the initiative number 0.
@@ -1099,7 +1099,7 @@ a	Only strategy cards that were chosen during the strategy phase are used when d
 48.3 When playing with three or four players, a player's initiative is determined only by their lowest-numbered strategy card.
 RELATED TOPICS: Action Phase, Strategy Card, Status Phase
 
-49 INVASION	
+49 INVASION
 Invasion is a step of the tactical action during which the active player can land ground forces on planets to gain control of those planets.
 To resolve an invasion, players perform the following steps:
 49.1 STEP 1-BOMBARDMENT: The active player may use the "Bombardment" ability of any of their units in the active system.
@@ -1120,7 +1120,7 @@ c	A player cannot gain control of a planet they already control.
 d  If there was a combat, and all units belonging to both players were destroyed, the player who was the defender retains control of the planet and places one of their control tokens on the planet.
 RELATED TOPICS: Bombardment, Combat, Control, Ground Combat, Ground Forces, Opponent, PDS, Planets
 
-50 LEADER SHEET	
+50 LEADER SHEET
 Each player has a leader sheet that contains slots for their faction's three leader cards as well as their faction's mech unit card.
 50.1 The leader slots of the leader sheet are where players place their three leader cards during setup. Each slot displays the name of the type of leader that is placed in that slot (agent, commander,
 and hero) as well as a symbol in the upper-right that helps players quickly determine which side of those leaders begins the game faceup.
@@ -1129,7 +1129,7 @@ a	The sides of the leader cards that display one (agent), two (commander), or th
 50.3 Players who are familiar with the game can hide the quick reference by placing that portion of the leader sheet under their faction sheets.
 RELATED TOPICS: Leaders, Mechs
 
-51 LEADERS	
+51 LEADERS
 Each player has several faction-specific leader cards that represent characters with unique abilities.
 51.1 Each faction has three leaders; one agent, one commander, and one hero.
 a	The Nomad's "The Company" faction ability grants them two additional agents, for a total of five leaders.
@@ -1160,8 +1160,8 @@ a	A commander's owner can still use their commander's ability, even if another p
 
 51.9  HEROES
 51.10 A hero needs to be unlocked to use their
-52 
-LEADERSHIP (STRATEGY CARD)	
+52
+LEADERSHIP (STRATEGY CARD)
 The "Leadership" strategy card allows players to gain command tokens. This card's initiative value is "1."
 52.1 During the action phase, if the active player has the "Leadership" strategy card, they can perform a strategic action to resolve that card's primary ability.
 52.2 To resolve the primary ability on the "Leadership" strategy card, the active player gains three command tokens. Then, that player can spend any amount of their influence to gain one command token for every three influence they spend.
@@ -1169,7 +1169,7 @@ The "Leadership" strategy card allows players to gain command tokens. This card'
 52.4 When a player gains command tokens, that player places each token on their command sheet in the pool of their choice.
 RELATED TOPICS: Command Sheet, Command Tokens, Influence, Initiative Order, Strategic Action, Strategy Card
 
-53 LEGENDARY PLANETS	
+53 LEGENDARY PLANETS
 Legendary planets grant the player that controls them unique, planet-specific abilitie
 53.1 A legendary planet is indicated by the legendary planet icon.
 53.2 When a player gains control of a legendary planet, they also place its
@@ -1205,7 +1205,7 @@ ability card, it remains exhausted.
 53.4 If a legendary planet's planet card is purged, its corresponding legendary planet ability card is also purged.
 RELATED TOPICS: Planets
 
-54 MECATOL REX	
+54 MECATOL REX
 Mecatol Rex is the planet placed in the center of the game board during setup.
 54.1 During setup, the custodians token is placed on Mecatol Rex. This token prevents a player from committing ground forces to land on the planet unless they spend six influence to remove the token.
 RELATED TOPICS: Custodians Token
@@ -1214,7 +1214,7 @@ RELATED TOPICS: Custodians Token
 
 22
 
-55 MECHS	
+55 MECHS
 Mechs are unique, faction-specific heavy ground forces.
 55.1 Mechs are a type of ground force and can be transported and participate in ground combat.
 55.2 Each player begins with their mech unit card in play on their leader sheet and can produce mechs for the cost presented on the card.
@@ -1223,18 +1223,18 @@ Mechs are unique, faction-specific heavy ground forces.
 
 RELATED TOPICS: Deploy, Ground Combat, Ground Forces, Producing Units, Units,
 
-56 MODIFIERS	
+56 MODIFIERS
 A modifier is a number that is applied by an ability to increase or decrease the attribute values of a unit or the results of a die roll.
 56.1 A modifier is always preceded by the word "apply" followed by a numerical value.
 56.2 A modifier value preceded by a "+" is added to the attribute or result being modified; a modifier value preceded by a "-" is subtracted from the attribute or result being modified.
 RELATED TOPICS: Combat, Cost, Move
 
-57 MOVE (ATTRIBUTE)	
+57 MOVE (ATTRIBUTE)
 Move is an attribute of some units that is presented on faction sheets and unit upgrade technology cards.
 57.1 A unit's move value indicates the distance from its current system that it can move during the "Movement" step of a tactical action.
 RELATED TOPICS: Movement, Tactical Action
 
-58 MOVEMENT	
+58 MOVEMENT
 A player can move their ships by resolving a tactical action during the action phase. Additionally, some abilities can move a unit outside of the tactical action.
 
 58.2 TACTICAL ACTION MOVEMENT
@@ -1258,7 +1258,7 @@ Ships" step, players can use the "Space Cannon" abilities of their units in the 
 58.9 If an ability moves a unit outside of the "Movement" step of a tactical action, players follow the rules specified by that ability; neither a unit's move value nor the rules specified above apply.
 RELATED TOPICS: Action Phase, Active System, Capacity, Space Cannon, Tactical Action, Transport
 
-59 NEBULA	
+59 NEBULA
 A nebula is an anomaly that affects movement and combat.
 59.1  A ship can only move into a nebula if it is the active system.
 
@@ -1275,7 +1275,7 @@ RELATED TOPICS: Anomalies
 
 23
 
-60 NEIGHBORS	
+60 NEIGHBORS
 Two players are neighbors if they both have a unit or control a planet in the same system. They are also neighbors if they both have a unit or control a planet in systems that are adjacent to each other.
 60.1 Players can resolve transactions with their neighbors.
 
@@ -1283,7 +1283,7 @@ Two players are neighbors if they both have a unit or control a planet in the sa
 60.3 Players are neighbors with the Ghosts of Creuss if the Ghosts of Creuss' "Quantum Entanglement" faction ability is causing adjacency from the perspective of the Ghosts of Creuss player.
 RELATED TOPICS: Promissory Notes, Transactions
 
-61 OBJECTIVE CARDS	
+61 OBJECTIVE CARDS
 Players can score objectives to gain victory points.
 61.1 There are two types of objective cards: public objectives and secret objectives.
 a	Each public objective has a "I" or "II" on the back of its card; all other objectives are secret objectives.
@@ -1343,7 +1343,7 @@ primary or secondary ability of the "Imperial" strategy card.
 
 RELATED TOPICS: Action Phase, Agenda Phase, Imperial, Status Phase, Victory Points
 
-62 OPPONENT	
+62 OPPONENT
 During combat, a player's opponent is the other player that either
 
 64.4 Some planets have a technology specialty, which allows those planets to be exhausted to satisfy a prerequisite when researching technology.
@@ -1358,7 +1358,7 @@ Planet Icon
 62.1 Players who do not have units on either side of a combat are not opponents. Those players cannot use abilities or have abilities used against them that are used against an opponent.
 RELATED TOPICS: Ground Combat, Invasion, Space Combat
 
-63 PDS	
+63 PDS
 A PDS (planetary defense system) is a structure that allows a player to defend their territory against invading forces.
 63.1  Each PDS has the "Space Cannon" ability.
 
@@ -1367,7 +1367,7 @@ A PDS (planetary defense system) is a structure that allows a player to defend t
 63.4 If a player's PDS is ever on a planet that does not contain any of their own ground forces and contains a unit that belongs to another player, that PDS is destroyed.
 RELATED TOPICS: Structures, Space Cannon
 
-64 PLANETS	
+64 PLANETS
 Planets provide players with resources and influence. Planets are on system tiles and each has a name, a resource value, and an influence value. Some planets also have traits.
 64.1 A planet's resources are indicated by the value on its planet card and system tile that is surrounded by a yellow triangular border.
 
@@ -1379,7 +1379,7 @@ resource value, influence value, and trait, if it has one. If a player controls 
 64.9 A player cannot spend an exhausted planet's resources or influence.
 RELATED TOPICS: Control, Exhausted, Influence, Legendary Planets, Readied, Resources, System Tiles, Technology
 
-65 PLANETARY SHIELD (UNIT ABILITY)	
+65 PLANETARY SHIELD (UNIT ABILITY)
 Units cannot use the "Bombardment" ability against a planet that contains a unit that has the "Planetary Shield" ability.
 65.1 The "Planetary Shield" ability does not prevent a planet from being affected by the "X-89 Bacterial Weapon" technology.
 65.2 The "Planetary Shield" ability prevents an L1Z1X player from using their "Harrow" faction ability.
@@ -1391,7 +1391,7 @@ RELATED TOPICS: Bombardment
 
 25
 
-66 POLITICS (STRATEGY CARD)	
+66 POLITICS (STRATEGY CARD)
 The "Politics" strategy card allows players to draw action cards. Additionally, the active player chooses a new speaker and looks at cards in the agenda deck. This card's initiative value is "3."
 66.1 During the action phase, if the active player has the "Politics" strategy card, they can perform a strategic action to resolve that card's primary ability.
 66.2 To resolve the primary ability on the "Politics" strategy card, the active player resolves the following effects in order:
@@ -1401,7 +1401,7 @@ iii. The active player secretly looks at the top two cards of the agenda deck. T
 66.3 After the active player resolves the primary ability of the "Politics" strategy card, each other player, beginning with the player to the left of the active player and proceeding clockwise, may spend one command token from their strategy pool to draw two action cards.
 RELATED TOPICS: Action Cards, Agenda Card, Initiative Order, Speaker, Strategy Card, Strategic Action
 
-67 PRODUCING UNITS	
+67 PRODUCING UNITS
 The primary way that a player produces new units is by resolving the "Production" abilities of existing units during a tactical action. However, other game effects also allow players to produce units.
 67.1 Each unit that a player can produce has a cost value presented on its faction sheet or technology card. To produce a unit, a player must spend a number of resources equal to or greater than the cost value of the unit they are producing.
 a Spent resources must come from planets or trade goods that are controlled by the player who is producing the units.
@@ -1425,7 +1425,7 @@ a	Ground forces can still be produced.
 
 RELATED TOPICS: Blockaded, Cost, Fighter Tokens, Infantry Tokens, Production, Space Dock, Tactical Action
 
-68 PRODUCTION (UNIT ABILITY)	
+68 PRODUCTION (UNIT ABILITY)
 During the "Production" step of a tactical action, the active player can resolve the "Production" ability of each of their units that are in the active system to produce units.
 68.1 A unit's "Production" ability, which is presented on a faction sheet or unit upgrade technology card, is always followed by a value. This value is the maximum number of units that this unit can produce.
 a	If the active player has multiple units in the active system that have the "Production" ability, that player can produce a number of units up to the combined total of their units' production values in that system.
@@ -1442,7 +1442,7 @@ d  "Production" value from Arborec space docks cannot be used to produce infantr
 68.4 If a player uses the "Production" ability of a unit in a space area of a system to produce ground forces, those ground forces may either be placed on a planet the player controls in that system or in the space area of that system.
 RELATED TOPICS: Blockaded, Producing Units, Space Dock
 
-69 PROMISSORY NOTES	
+69 PROMISSORY NOTES
 Each player begins the game with one unique and five generic promissory note cards that can be given to other players.
 69.1 Each promissory note contains timing text and ability text. A player can resolve any of their promissory note cards by following the text on the card.
 a	Promissory notes are not mandatory unless otherwise specified.
@@ -1458,15 +1458,15 @@ a	Promissory notes in the play area cannot be traded.
 69.7 If a player is eliminated, all of the promissory notes that match their color or faction are returned to the game box, including those that are in play or owned by other players.
 a	Other players' promissory notes are returned to those players.
 RELATED TOPICS: Abilities, Elimination, Neighbors, Transactions
-70 
-PURGE	
+70
+PURGE
 Purge is a cost that permanently removes a component from the game. If an ability requires that its component is purged, that component can only be used once per game.
 70.1 If an ability instructs a player to purge a component, that component is removed from the game and returned to the box.
 70.2 Purged components cannot be used or otherwise returned to the game by any means.
 70.3 When a player is intructed to purge a component, that component is purged even if its ability was only partially resolved.
 RELATED TOPICS: Abilities
 
-71 READIED	
+71 READIED
 Cards have a readied state, which indicates that a player can exhaust or resolve the abilities on those cards.
 71.1 A card that is readied is placed faceup in a player's play area; a card that is exhausted is placed facedown in a player's area.
 71.2 A player can exhaust a readied planet card to spend resources or influence from that card's planet.
@@ -1479,7 +1479,7 @@ a	That card is later readied during the status phase.
 
 RELATED TOPICS: Abilities, Exhausted, Status Phase
 
-72 REINFORCEMENTS	
+72 REINFORCEMENTS
 A player's reinforcements is that player's personal supply of units and command tokens that are not on the game board or otherwise in use.
 72.1  The components in a player's reinforcements are limited.
 
@@ -1490,7 +1490,7 @@ RELATED TOPICS: Command Tokens, Component Limitations, Units
 
 27
 
-73 RELICS	
+73 RELICS
 Relics are powerful artifacts with unique abilities.
 73.1 Players can use the abilities of hazardous, cultural, and industrial relic fragments
 in their play area to draw cards from the relic deck.
@@ -1503,14 +1503,14 @@ a	If there are no cards in the relic deck, they do not gain a relic.
 
 RELATED TOPICS: Exploration, Purge
 
-74 REROLLS	
+74 REROLLS
 Some game effects instruct a player to reroll dice.
 74.1 When a die is rerolled, its new result is used instead of its previous result.
 74.2 The same ability cannot be used to reroll the same die multiple times, but multiple abilities can be used to reroll a single die.
 74.3 Die rerolls must occur after rolling the dice, before other abilities are resolved.
 RELATED TOPICS: Abilities, Action Cards, Ground Combat, Space Combat
 
-75 RESOURCES	
+75 RESOURCES
 Resources represent a planet's material value and industry. Many game effects, such as producing units, require players to spend resources.
 75.1 A planet's resources are the leftmost value that is surrounded by a yellow border on the planet's system tile and planet card.
 75.2 A player spends a planet's resources by exhausting its card.
@@ -1518,8 +1518,8 @@ Resources represent a planet's material value and industry. Many game effects, s
 75.3 A player can spend a trade good as if it were one resource.
 
 RELATED TOPICS: Exhausted, Planets, Producing Units, Trade Goods
-76 
-SHIPS	
+76
+SHIPS
 A ship is a unit type consisting of carriers, cruisers, dreadnoughts, destroyers, fighters, and war suns. Each race also has a unique flagship.
 76.1  Ships are always placed in space.
 
@@ -1528,7 +1528,7 @@ a	Fighters do not count toward the fleet pool limit, and instead count against a
 76.3 Ships can have any number of the following attributes: cost, combat, move, and capacity. These attributes are shown on faction sheets and unit upgrade technology cards.
 RELATED TOPICS: Capacity, Cost, Combat, Fleet Pool, Move, Space Combat, Units
 
-77 SPACE CANNON (UNIT ABILITY)	
+77 SPACE CANNON (UNIT ABILITY)
 A unit that has the "Space Cannon" ability can use it during two different steps of a player's tactical action: after the "Move Ships" substep (Space Cannon Offense) and during an invasion (Space Cannon Defense).
 77.1 A player is not required to be the active player to use their "Space Cannon" ability of their units.
 
@@ -1564,8 +1564,8 @@ d  Game effects that allow the use of "Space Cannon" abilities against ships in 
 77.8 STEP 2-ASSIGN HITS: The active player must choose and destroy one of their ground forces on the planet for each hit the space cannon roll produced.
 a	Hits can only be assigned to units that are on the same planet as the units using the "Space Cannon" ability.
 RELATED TOPICS: Active System, Attacker, Defender, Destroyed, Invasion, Sustain Damage, Movement, Tactical Action
-78 
-SPACE COMBAT	
+78
+SPACE COMBAT
 After resolving the "Space Cannon Offense" step of a tactical action, if two players have ships in the active system, those players must resolve a space combat.
 78.1 If the active player is the only player with ships in the system, they skip the "Space Combat" step of the tactical action and proceeds to the "Invasion" step.
 78.2 If an ability occurs "before combat," it occurs immediately before the "Anti-Fighter Barrage" step.
@@ -1614,7 +1614,7 @@ a  If the winner of the combat has fighters or ground forces
 in the space area of the active system and those units exceed the capacity of that player's ships in that system, that player must choose and remove any excess units.
 RELATED TOPICS: Capacity, Fleet Pool, Opponent, Sustain Damage, Tactical Action, Transport
 
-79 SPACE DOCK	
+79 SPACE DOCK
 A space dock is a structure that allows players to produce units.
 79.1 Each space dock has a "Production" ability that indicates the number of units it can produce.
 79.2 The primary way in which players acquire space docks is by resolving either the primary or secondary abilities of the "Construction" strategy card.
@@ -1623,7 +1623,7 @@ A space dock is a structure that allows players to produce units.
 a	The Clan of Saar's "Floating Factory" faction-specific space dock is destroyed when it is blockaded; that is to say, when it is in a system with another player's ships and none of the Clan of Saar's ships.
 RELATED TOPICS: Construction, Producing Units, Structures
 
-80 SPEAKER	
+80 SPEAKER
 The speaker is the player who has the speaker token.
 80.1 During the strategy phase, the speaker is the first player to choose a strategy card.
 80.2 During the agenda phase, the speaker reveals the top agenda card from the agenda deck before each vote. The speaker is always the last player to vote and decides which outcome to resolve if the outcomes are tied.
@@ -1642,7 +1642,7 @@ The speaker is the player who has the speaker token.
 80.7 If the speaker is eliminated from the game, the speaker token is passed to the player to the speaker's left.
 RELATED TOPICS: Agenda Card, Agenda Phase, Objective Cards, Politics, Strategy Phase
 
-81 STATUS PHASE	
+81 STATUS PHASE
 During the status phase, players score objectives and prepare for the next game round. To resolve the status phase, players perform the following steps:
 81.1 STEP 1-SCORE OBJECTIVES: Following initiative order, each player may score up to one public objective and one secret objective that can be fulfilled during the status phase. To score an objective, a player must fulfill the requirements on the card; if that player does, they gain a number of victory points indicated on the card.
 81.2 STEP 2-REVEAL PUBLIC OBJECTIVE: The speaker reveals an unrevealed public objective card by flipping that card faceup.
@@ -1661,7 +1661,7 @@ b  This step can usually be resolved simultaneously, but if there is a timing co
 81.8 STEP 8-RETURN STRATEGY CARDS: Each player returns their strategy card to the common play area. Then, if a player has removed the custodians token from Mecatol Rex, the game round continues to the agenda phase. Otherwise, a new game round begins with the strategy phase.
 RELATED TOPICS: Action Cards, Agenda Phase, Custodians Token, Command Tokens, Game Round, Objective Cards, Readied, Sustain Damage, Strategy Card, Strategy Phase
 
-82 STRATEGIC ACTION	
+82 STRATEGIC ACTION
 During the action phase, the active player may perform a strategic action to resolve the primary ability on their strategy card.
 82.1 After the active player resolves the primary ability on their strategy card, each other player, beginning with the player to the left of the active player and proceeding clockwise, may resolve that strategy card's secondary ability.
 a	Players do not have to resolve the secondary abilities of the active player's strategy card.
@@ -1670,7 +1670,7 @@ a	During three- and four-player games, a player must resolve the strategic actio
 82.3 When a player is resolving either the primary or secondary abilities from a strategy card, that player resolves each of the ability's effects from top to bottom.
 RELATED TOPICS: Action Phase, Objective Cards, Strategy Card, Victory Points
 
-83 STRATEGY CARD	
+83 STRATEGY CARD
 Strategy cards determine initiative order and provide each player with a powerful ability that they can use one time during the action phase.
 83.1 During the strategy phase, each player chooses a strategy card from the common play area and places it in their play area faceup.
 83.2 Each strategy card has a readied and an exhausted side.
@@ -1694,7 +1694,7 @@ a	Strategy cards in the common play area are available for players to choose dur
 b A strategy card in a player's play area belongs to that player until it is returned to the common play area during the status phase.
 RELATED TOPICS: Construction, Diplomacy, Initiative Order, Imperial, Leadership, Politics, Strategy Phase, Technology (Strategy Card), Trade, Warfare
 
-84 STRATEGY PHASE	
+84 STRATEGY PHASE
 During the strategy phase, each player chooses a strategy card to use during the round.
 To resolve the strategy phase, players perform the following steps:
 84.1 STEP 1-Starting with the speaker and proceeding clockwise, each player chooses one strategy card from the common play area and places it faceup in their play area.
@@ -1707,7 +1707,7 @@ a	During a four- or eight-player game, all strategy cards will be chosen, and th
 Then, players proceed to the action phase.
 RELATED TOPICS: Game Round, Speaker, Strategy Card, Trade Goods
 
-85 STRUCTURES	
+85 STRUCTURES
 A structure is a type of unit. PDS units and space docks are structures.
 85.1  Structures are always placed on planets.
 
@@ -1720,13 +1720,13 @@ a	The Clan of Saar's "Floating Factory" faction-specific space dock is placed in
 85.6 A player cannot place a structure on a planet if it would exceed the maximum number of allowed structures of that type on that planet.
 RELATED TOPICS: Construction, PDS, Units, Space Dock
 
-86 SUPERNOVA	
+86 SUPERNOVA
 A supernova is an anomaly that affects movement.
 86.1  A ship cannot move through or into a supernova.
 
 RELATED TOPICS: Anomalies, Movement
 
-87 SUSTAIN DAMAGE (UNIT ABILITY)	
+87 SUSTAIN DAMAGE (UNIT ABILITY)
 Some units have the "Sustain Damage" ability. Immediately before a player assigns hits to their units, that player can use the "Sustain Damage" ability of any of their units in the active system.
 87.1 For each "Sustain Damage" ability that a player uses, one hit produced by another player's units is canceled. Then, each unit using this ability is placed on its side to indicate that it is damaged.
 87.2 A damaged unit does not have reduced capabilities and is functionally the same as an undamaged unit, except that it cannot use the "Sustain Damage" ability.
@@ -1744,7 +1744,7 @@ dreadnought's "Sustain Damage" ability to cancel a hit from "Anti-Fighter Barrag
 87.6 The Barony of Letnev's "Non-Euclidean Shielding" faction technology allows the Letnev player's units with the "Sustain Damage" ability to cancel up to two hits instead of one.
 RELATED TOPICS: Abilities, Ground Combat, Space Combat
 
-88 SYSTEM TILES	
+88 SYSTEM TILES
 A system tile represents an area of the galaxy. Players place system tiles during setup to create the game board.
 88.1 The back of each system tile is colored green, blue, or red.
 
@@ -1756,7 +1756,7 @@ A system tile represents an area of the galaxy. Players place system tiles durin
 88.7 Double-sided tiles that have lines crossing from one edge to another are hyperlane tiles. Hyperlane tiles are not systems.
 RELATED TOPICS: Adjacency, Anomalies, Planets, Ships, Wormholes
 
-89 TACTICAL ACTION	
+89 TACTICAL ACTION
 The tactical action is the primary method by which players produce units, move ships, and extend their dominion within the galaxy. To perform a tactical action, the active player performs the following steps:
 89.1 STEP 1-ACTIVATION: The active player must activate a system that does not contain one of their command tokens.
 a To activate a system, the active player places a command token from their tactic pool in that system. That system is the active system.
@@ -1774,7 +1774,7 @@ a	If the active player is the only player with ships in the system, they skip th
 a	The active player may do this even if they did not move units or land ground forces during this tactical action.
 RELATED TOPICS: Action Phase, Active System, Anti-Fighter Barrage, Bombardment, Command Sheet, Ground Combat, Invasion, Movement, Producing Units, Transport, Space Cannon, Space Combat
 
-90 TECHNOLOGY	
+90 TECHNOLOGY
 Technology cards allow players to upgrade units and acquire powerful abilities.
 90.1 Each player places any technolo they have gained faceup near the faction sheet. For the duration of
 the game, they own any technology cards they gain and can use the abilities on those cards.
@@ -1841,7 +1841,7 @@ The Nekro Virus faction can use its faction abilities in combination with its tw
 90.22 When a Valefar Assimilator token is on a technology, that technology's color and type count toward objectives.
 RELATED TOPICS: Command Tokens, Exhausted, Initiative Order, Resources, Strategic Action, Strategy Card, Technology (Strategy Card), Unit Upgrades
 
-91 TECHNOLOGY (STRATEGY CARD)	
+91 TECHNOLOGY (STRATEGY CARD)
 The "Technology" strategy card allows players to research new technology. This card's initiative value is "7."
 91.1 During the action phase, if the active player has the "Technology" strategy card, they can perform a strategic action to resolve that card's primary ability.
 91.2 To resolve the primary ability on the "Technology" strategy card, the active player can research one technology of their choice. Then, they may research one additional technology of their choice by spending six resources.
@@ -1849,7 +1849,7 @@ The "Technology" strategy card allows players to research new technology. This c
 spending one command token from their strategy pool and four resources.
 RELATED TOPICS: Initiative Order, Resources, Strategic Action, Strategy Card, Technology
 
-92 TRADE (STRATEGY CARD)	
+92 TRADE (STRATEGY CARD)
 The "Trade" strategy card allows players to gain trade goods and replenish commodities. This card's initiative value is "5."
 92.1 During the action phase, if the active player has the "Trade" strategy card, they can perform a strategic action to resolve that card's primary ability. To resolve the primary ability on the "Trade" strategy card, the active player resolves the following effects in order:
 92.2 STEP 1-The active player gains 3 trade goods.
@@ -1863,7 +1863,7 @@ b  The chosen players can only use the secondary ability once, and they cannot u
 92.5 After the active player resolves the primary ability of the "Trade" strategy card, each other player, beginning with the player to the left of the active player and proceeding clockwise, may spend one command token from their strategy pool to replenish their commodities.
 RELATED TOPICS: Command Tokens, Commodities, Initiative Order, Strategic Action, Strategy Card, Trade Goods
 
-93 TRADE GOODS	
+93 TRADE GOODS
 A trade good represents a player's buying and trading power beyond their planet's raw resources.
 93.1 Trade goods and commodities are represented by opposite sides of the same token.
 93.2 When a player gains a trade good, they take a
@@ -1882,7 +1882,7 @@ a	That token is no longer a commodity token; it is a trade good token.
 93.7 Trade good tokens come in values of one and three. A player can swap between these tokens as necessary.
 RELATED TOPICS: Commodities, Deals, Influence, Resources, Transactions
 
-94 TRANSACTIONS	
+94 TRANSACTIONS
 A transaction is a way for a player to exchange commodities, trade goods, promissory notes, and relic fragments.
 94.1 During the active player's turn, they may resolve up to one transaction with each of their neighbors.
 a	A player can resolve a transaction at any time during their turn, even during a combat.
@@ -1895,7 +1895,7 @@ a	A player can resolve a transaction at any time during their turn, even during 
 a neighbor in exchange for any number of trade goods, commodities, and relic fragments, and up to one promissory note.
 94.3 Players can exchange commodities, trade goods, promissory notes, and relic fragments, but cannot exchange other types of cards or tokens.
 
-96 UNITS	
+96 UNITS
 A unit is represented by a plastic figure.
 96.1 There are three types of units: ships, ground forces, and structures.
 96.2 Each color of plastic comes with the following units:
@@ -1903,7 +1903,7 @@ A unit is represented by a plastic figure.
 a	The Emirates of Hacan can also exchange action cards with other players as part of their transactions.
 94.4 A transaction does not have to be even. A player may exchange components of unequal value or give components without receiving something in return.
 a	The players agree on the terms of the transaction before exchanging any components. After the components are traded, the transaction cannot be undone.
-ï 
+ï
 3 Space Docks
 
 ï 6 PDS units
@@ -1915,7 +1915,7 @@ a	The players agree on the terms of the transaction before exchanging any compon
 ï 2 War Suns
 
 ï 12 Infantry
-ï 
+ï
 10 Fighters
 
 ï 4 Carriers
@@ -1932,7 +1932,7 @@ a	The players agree on the terms of the transaction before exchanging any compon
 a	Players do not need to be neighbors to perform these transactions.
 RELATED TOPICS: Commodities, Deals, Neighbors, Promissory  Notes, Trade Goods
 
-95 TRANSPORT	
+95 TRANSPORT
 When a ship moves, it may transport any combination of fighters and ground forces, but the number of units it transports cannot exceed that ship's capacity value.
 95.1 The ship can pick up and transport fighters and ground forces when it moves. During a tactical action, it can pick up and transport units from the active system, the system it started its movement in, and each system it moves through.
 a	These transported units remain with the transporting ship until it is finished moving.
@@ -1945,7 +1945,7 @@ RELATED TOPICS: Capacity, Invasion, Movement, Tactical Action
 96.3 Units exist either on the game board or in a player's reinforcements.
 RELATED TOPICS: Ground Forces, Ships, Structures
 
-97 UNIT UPGRADES	
+97 UNIT UPGRADES
 A unit upgrade is a type of technology card.
 97.1 Unit upgrades share a name with a unit that is printed on a player's faction sheet, but have a higher roman numeral. For example, a player's "Carrier I" unit is upgraded by the unit upgrade technology "Carrier II."
 a	The Nekro Virus player may upgrade their units with units of the same type (e.g., "dreadnought" or "infantry") even if those unit's names do not match. If the Nekro Virus gains
@@ -1964,7 +1964,7 @@ RELATED TOPICS: Technology
 
 36
 
-98 VICTORY POINTS	
+98 VICTORY POINTS
 The first player to gain 10 victory points wins the game.
 98.1 Players gain victory points in a variety of ways. A common way that a player can gain victory points is by scoring objectives.
 98.2 Each player uses the victory point track to indicate the number of victory points they have gained.
@@ -1979,7 +1979,7 @@ do not have strategy cards, the player who is nearest the speaker (including the
 98.8 If the game ends because the speaker cannot reveal an objective card, the player with the most victory points is the winner. If one or more players are tied for having the most victory points, the tied player who is first in initiative order is the winner.
 RELATED TOPICS: Agenda Card, Imperial, Objective Cards
 
-99 WARFARE (STRATEGY CARD)	
+99 WARFARE (STRATEGY CARD)
 The "Warfare" strategy card allows a player to remove a command token from the board and redistribute their command tokens between their tactic, fleet, and strategy pools. This card's initiative value is "6." During the action phase, if the active player has the "Warfare" strategy card, they can perform a strategic action to resolve that card's primary ability.
 To resolve the primary ability on the "Warfare" strategy card, the active player performs the following steps:
 99.1 STEP 1-The active player removes any one of their command tokens from the game board. Then, that player gains that command token by placing it in a pool of their choice on their command sheet.
@@ -1990,7 +1990,7 @@ a	The command token is not placed in their home system.
 
 RELATED TOPICS: Action Phase, Command Tokens, Initiative Order, Strategy Card, Strategic Action
 
-100 WORMHOLE NEXUS	
+100 WORMHOLE NEXUS
 The wormhole nexus is a system tile where several wormholes converge.
 100.1 The wormhole nexus begins the game in play with its inactive side up.
 a The inactive side of the wormhole nexus contains a gamma wormhole. The active side of the wormhole nexus contains an alpha, beta, and gamma wormhole.
@@ -2002,7 +2002,7 @@ c	The wormhole nexus is on the edge of the game board.
 a	When a ship moves into the wormhole nexus, the nexus becomes active at the end of the "Movement" step.
 RELATED TOPICS: Movement, System Tiles, Wormholes
 
-101 WORMHOLES	
+101 WORMHOLES
 Some systems contain wormholes. Systems that contain identical wormholes are adjacent.
 101.1 There are two basic types of wormholes: alpha and beta.
 

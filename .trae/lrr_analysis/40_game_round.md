@@ -26,11 +26,11 @@ A game round consists of the following four phases: 1. Strategy Phase, 2. Action
 ## Overall Implementation Status
 - **Current State**: Not Started/In Progress/Complete
 - **Estimated Effort**: Small/Medium/Large
-- **Dependencies**: 
-- **Blockers**: 
+- **Dependencies**:
+- **Blockers**:
 
 ## Notes
-- 
+-
 
 ## Related Rules
 - Rule 3: ACTION PHASE

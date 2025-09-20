@@ -49,10 +49,10 @@ All player actions inherit from a base Action class:
 class Action(ABC):
     @abstractmethod
     def is_legal(self, state: GameState, player_id: PlayerId) -> bool
-    
+
     @abstractmethod
     def execute(self, state: GameState, player_id: PlayerId) -> GameState
-    
+
     @abstractmethod
     def get_description(self) -> str
 ```
@@ -64,7 +64,7 @@ Abstract interface that both AI and human players implement:
 class Player(ABC):
     @abstractmethod
     def choose_action(self, state: GameState, legal_actions: List[Action]) -> Action
-    
+
     @abstractmethod
     def make_choice(self, state: GameState, choice_context: ChoiceContext) -> Any
 ```
@@ -79,7 +79,7 @@ class GameController:
         self.players = {p.id: p for p in players}
         self.action_engine = ActionEngine()
         self.rule_engine = RuleEngine()
-    
+
     def play_game(self) -> GameResult:
         while not self._is_game_over():
             self._execute_turn()
@@ -102,7 +102,7 @@ These represent initial thinking that will be refined through implementation:
 
 #### Core Game Concepts
 - **Galaxy**: Hex-based map with systems containing planets and units
-- **Players**: Faction-specific state including resources, technologies, and cards  
+- **Players**: Faction-specific state including resources, technologies, and cards
 - **Units**: Game pieces with type-specific abilities and current status
 - **Actions**: Player decisions that transition game state
 
@@ -164,7 +164,7 @@ Run these commands after ANY code changes:
 # Format all code (REQUIRED)
 uv run ruff format src tests
 
-# Fix linting issues (REQUIRED) 
+# Fix linting issues (REQUIRED)
 uv run ruff check --fix src tests
 
 # Type checking (REQUIRED)
@@ -252,11 +252,11 @@ Using hypothesis library to generate random game states and verify:
 class TestGameState(unittest.TestCase):
     def setUp(self):
         self.initial_state = create_test_game_state()
-    
+
     def test_action_validation(self):
         # Test that invalid actions are rejected
         pass
-    
+
     def test_state_transitions(self):
         # Test that valid actions produce correct new states
         pass
@@ -316,33 +316,33 @@ class TacticalAction:
     def __init__(self, active_system_id: str, player_id: str):
         self.movement_step = MovementStep()
         self.commit_ground_forces_step = CommitGroundForcesStep()
-    
+
     def execute(self, game_state: GameState) -> GameState:
         # Step 1: Execute movement to space area
         state_after_movement = self.movement_step.execute(game_state)
-        
+
         # Step 2: Commit ground forces to planets
         final_state = self.commit_ground_forces_step.execute(state_after_movement)
-        
+
         return final_state
 
 class MovementStep:
     """Handles movement of all units to the active system's space area."""
-    
+
     def validate_movement_plan(self, plan: MovementPlan) -> ValidationResult:
         # Joint validation of entire movement plan
         # - Check capacity requirements
         # - Calculate technology effects (Gravity Drive, etc.)
         # - Validate movement ranges
         pass
-    
+
     def execute(self, game_state: GameState) -> GameState:
         # Move all units to active system's space area
         pass
 
 class CommitGroundForcesStep:
     """Handles commitment of ground forces from space to planets."""
-    
+
     def execute(self, game_state: GameState) -> GameState:
         # Move ground forces from space area to specific planets
         pass

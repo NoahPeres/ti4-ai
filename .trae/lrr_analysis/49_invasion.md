@@ -38,8 +38,8 @@ Invasion is the process of landing ground forces on a planet to gain control of 
 ## Overall Implementation Status
 - **Current State**: Not Started/In Progress/Complete
 - **Estimated Effort**: Small/Medium/Large
-- **Dependencies**: 
-- **Blockers**: 
+- **Dependencies**:
+- **Blockers**:
 
 ## Notes
 - Rule 49 has 5 sub-rules

@@ -1,10 +1,10 @@
 # Rule 12: ATTACH
 
 ## Category Overview
-**Rule Type:** Card Management Mechanic  
-**Priority:** Medium  
-**Complexity:** Medium  
-**Implementation Status:** Not Implemented  
+**Rule Type:** Card Management Mechanic
+**Priority:** Medium
+**Complexity:** Medium
+**Implementation Status:** Not Implemented
 
 Rule 12 defines the mechanics for attaching cards to planet cards, including physical placement, control transfer behavior, and attachment token management on the game board.
 
@@ -22,7 +22,7 @@ Rule 12 defines the mechanics for attaching cards to planet cards, including phy
 
 **Priority:** Medium - Core mechanic for exploration and agenda effects
 
-### 12.2 - Control Transfer Behavior  
+### 12.2 - Control Transfer Behavior
 **Raw LRR Text:**
 > "If a player gains or loses control of planet that contains a card with an attach effect, the attached card stays with that planet."
 

@@ -14,7 +14,7 @@
 - **Priority**: META (documentation principle)
 - **Notes**: This establishes that LRR is authoritative over Learn to Play
 
-### 1.2 Card Ability Precedence  
+### 1.2 Card Ability Precedence
 **Rule**: "If a card ability contradicts information in the Rules Reference, the card takes precedence. If both the card and the rules can be followed at the same time, they should be."
 
 **Implementation Status**: ❌ NOT IMPLEMENTED

@@ -1,10 +1,10 @@
 # Rule 34: EXHAUSTED - Analysis
 
 ## Category Overview
-**Rule Type:** Core Game Mechanic  
-**Priority:** HIGH  
-**Status:** IMPLEMENTED  
-**Complexity:** Medium  
+**Rule Type:** Core Game Mechanic
+**Priority:** HIGH
+**Status:** IMPLEMENTED
+**Complexity:** Medium
 
 ## Raw LRR Text
 ```

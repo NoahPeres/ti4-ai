@@ -7,7 +7,7 @@ This document outlines the comprehensive quality assurance measures implemented 
 Our quality assurance strategy is built on multiple layers of validation:
 
 1. **Static Analysis** - Catch issues before runtime
-2. **Runtime Validation** - Verify types and contracts during execution  
+2. **Runtime Validation** - Verify types and contracts during execution
 3. **Automated Testing** - Comprehensive test coverage
 4. **Continuous Integration** - Automated quality gates
 5. **Pre-commit Hooks** - Prevent bad commits from entering the repository
@@ -83,7 +83,7 @@ def process_game_state(state: GameState) -> ActionResult:
 
 ### Linting Rules (Ruff)
 - `E`: pycodestyle errors
-- `W`: pycodestyle warnings  
+- `W`: pycodestyle warnings
 - `F`: pyflakes
 - `I`: isort (import sorting)
 - `B`: flake8-bugbear

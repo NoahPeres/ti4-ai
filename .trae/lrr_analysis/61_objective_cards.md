@@ -5,7 +5,7 @@
 
 ## Raw LRR Text
 ```
-61 OBJECTIVE CARDS	
+61 OBJECTIVE CARDS
 Players can score objectives to gain victory points.
 61.1 There are two types of objective cards: public objectives and secret objectives.
 a	Each public objective has a "I" or "II" on the back of its card; all other objectives are secret objectives.
