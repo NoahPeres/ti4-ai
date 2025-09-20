@@ -12,7 +12,11 @@ class TestRule98VictoryPoints:
     """Test Rule 98 Victory Points implementation."""
 
     def test_simultaneous_victory_tie_breaking_by_initiative_order(self) -> None:
-        """Test Rule 98.7: Initiative order determines winner when multiple players reach 10 points simultaneously."""
+        """Test Rule 98.7: Initiative order determines winner when multiple players reach 10 points simultaneously.
+
+        Note: Sequential scoring simulates "simultaneous" victory as winner checks are evaluated
+        post-scoring in this engine, modeling end-of-round evaluation semantics.
+        """
         # Create players in specific initiative order
         player1 = Player(id="player1", faction="sol")
         player2 = Player(id="player2", faction="hacan")
@@ -147,7 +151,10 @@ class TestRule98VictoryPoints:
 
         # Test getting players with most victory points (should return both tied players)
         most_vp_players = state3.get_players_with_most_victory_points()
-        assert set(most_vp_players) == {"player1", "player2"}
+        assert most_vp_players == [
+            "player1",
+            "player2",
+        ]  # initiative fallback = players list
 
         # Test getting players with fewest victory points (should return player3)
         fewest_vp_players = state3.get_players_with_fewest_victory_points()
@@ -161,5 +168,5 @@ class TestRule98VictoryPoints:
         most_equal = equal_state.get_players_with_most_victory_points()
         fewest_equal = equal_state.get_players_with_fewest_victory_points()
 
-        assert set(most_equal) == {"player1", "player2", "player3"}
-        assert set(fewest_equal) == {"player1", "player2", "player3"}
+        assert most_equal == ["player1", "player2", "player3"]
+        assert fewest_equal == ["player1", "player2", "player3"]

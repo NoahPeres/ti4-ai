@@ -2,6 +2,7 @@
 
 import pytest
 
+from src.ti4.core.constants import Faction
 from src.ti4.core.exceptions import InvalidPlayerError
 from src.ti4.core.game_controller import GameController
 from src.ti4.core.game_phase import GamePhase
@@ -10,7 +11,16 @@ from src.ti4.core.player import Player
 
 def create_test_players(count=3) -> list[Player]:
     """Create test players for GameController tests."""
-    factions = ["sol", "hacan", "xxcha", "yssaril", "naalu", "barony", "saar", "muaat"]
+    factions = [
+        Faction.SOL,
+        Faction.HACAN,
+        Faction.XXCHA,
+        Faction.YSSARIL,
+        Faction.NAALU,
+        Faction.BARONY,
+        Faction.SAAR,
+        Faction.MUAAT,
+    ]
     return [
         Player(id=f"player{i + 1}", faction=factions[i])
         for i in range(min(count, len(factions)))

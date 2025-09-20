@@ -1,14 +1,14 @@
 # TI4 AI Implementation Roadmap
 
 **Last Updated**: September 2025
-**Overall Progress**: 25.9%
 
 > **Architecture Note**: Transaction system needs PlayerSupply integration for resource validation. See `docs/architecture_notes/player_supply_system.md` for detailed implementation plan.
 
-### 🎯 Next Target: 25% (Advanced Game Mechanics)
+## 🎯 Next Target: 25% (Advanced Game Mechanics)
 **Focus**: Complete advanced mechanics that enable complex strategic gameplay and AI decision-making
 
-## 📊 **Overall Progress**: 25.9%
+## 📊 Progress
+**Overall Progress**: 25.9%
 **Completed Rules**: 26/101 rule categories completed
 - **Rule 6: ADJACENCY** - Core spatial mechanics for system relationships
 - **Rule 14: BLOCKADED** - Blockade mechanics for space docks and production restrictions (Foundation Layer) ✅ **COMPLETED**
@@ -48,12 +48,12 @@
 10. **Rule [TBD]** - Next highest priority rule to be determined 🎯 **NEXT TARGET**
 
 ### 📈 Progress Metrics
-- Foundation Layer: 9/8 rules (112.5%) 🎉 (Rule 34 added)
+- Foundation Layer: 9 rules completed (Rule 34 added to expand category)
 - Core Game Layer: 13/15 rules (86.7%) 📈 (Rule 78, Rule 83 added)
 - Advanced Mechanics: 0/43 rules (0%)
 
 ### 📈 Current Metrics
-- **Tests**: 850+ total tests, all passing (Rule 78: 17 tests, Rule 34: 15 tests, Rule 83: 50+ tests)
+- **Tests**: 1053+ total tests, all passing (Rule 78: 17 tests, Rule 34: 15 tests, Rule 83: 50+ tests)
 - **Coverage**: 29.0% overall (focused on core mechanics)
 - **Quality**: Strict TDD, type checking, linting standards maintained
 

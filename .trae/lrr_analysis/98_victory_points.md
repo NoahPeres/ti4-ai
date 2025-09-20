@@ -17,7 +17,7 @@ a If the players are using the 14-space side of the victory point track, the gam
 a A player's control token must always be on the space of the victory point track that shows a number that matches the number of victory points that player has gained during the game. A player cannot have more than 10 victory points.
 98.5 If an ability refers to the player with the "most" or "fewest" victory points, and more than one player is tied in that respect, the effect applies to all of the tied players.
 98.6 If a player gains a victory point from a law, and that law is discarded, that player does not lose that victory point.
-98.7 The game ends immediately when one player has 10 victory points. If multiple players would simultaneously gain their 10th victory point, the player who is earliest in initiative order among those players is the winner; if this occurs when players
+98.7 The game ends immediately when one player has 10 victory points. If multiple players would simultaneously gain their 10th victory point, the player who is earliest in initiative order among those players is the winner; if this occurs when players are scoring during the Status Phase, resolve initiative order for that phase.
 ```
 
 ## Sub-Rules Analysis
@@ -85,7 +85,7 @@ a A player's control token must always be on the space of the victory point trac
 ## Test References
 
 ### Current Test Coverage
-- `test_victory_conditions.py`: Comprehensive victory point tracking and objective scoring
+- `tests/test_rule_98_victory_points.py`: VP cap enforcement, initiative tie-breaks, 14-point variant, tie helpers
 - `test_game_state.py`: Victory point state management and persistence
 - Various objective tests: Scoring mechanics and point awards
 - Integration tests: Victory condition checking in game flow
@@ -98,7 +98,7 @@ a A player's control token must always be on the space of the victory point trac
 ### Core Implementation
 - `src/ti4/core/game_state.py`: Victory point tracking and win condition checking
 - `src/ti4/core/objective.py`: Objective system for victory point awards
-- `tests/test_victory_conditions.py`: Comprehensive victory point testing
+- `tests/test_rule_98_victory_points.py`: VP cap enforcement, initiative tie-breaks, 14-point variant, tie helpers
 - `src/ti4/core/constants.py`: Victory point constants and thresholds
 
 ### Supporting Files
@@ -118,7 +118,7 @@ a A player's control token must always be on the space of the victory point trac
 
 ### Areas Needing Attention
 - No visual victory point track representation (UI enhancement - not core functionality)
-- No law system integration for persistent victory points (law system not yet implemented)
+- Law system UI/history hooks - Persistence is implemented; add UI/history once the law system is introduced
 
 ## Implementation Complete
 

@@ -94,6 +94,12 @@ class GameState:
         current_points = new_victory_points.get(player_id, 0)
         new_points = current_points + points
 
+        # Guard against negative victory points
+        if new_points < 0:
+            raise ValueError(
+                f"Player {player_id} cannot have negative victory points (attempted: {new_points})"
+            )
+
         # Rule 98.4a: Player cannot have more than maximum victory points
         if new_points > self.victory_points_to_win:
             raise ValueError(
@@ -255,7 +261,7 @@ class GameState:
         """Create a new GameState with updated fields."""
         return GameState(
             game_id=self.game_id,
-            players=self.players,
+            players=kwargs.get("players", self.players),
             galaxy=self.galaxy,
             phase=self.phase,
             systems=self.systems,
@@ -453,6 +459,10 @@ class GameState:
         self, player_id: str, objective: "Objective", current_phase: GamePhase
     ) -> None:
         """Validate all conditions for objective scoring."""
+        # Validate player exists in the game
+        if not any(player.id == player_id for player in self.players):
+            raise ValueError(f"Player {player_id} does not exist in the game")
+
         # Rule 61.19-61.20: Secret objective ownership validation
         if not objective.is_public:
             self._validate_secret_objective_ownership(player_id, objective)

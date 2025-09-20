@@ -10,9 +10,11 @@ Tests the implementation of:
 
 import pytest
 
+from src.ti4.core.constants import Faction
 from src.ti4.core.game_phase import GamePhase
 from src.ti4.core.game_state import GameState
 from src.ti4.core.objective import Objective
+from src.ti4.core.player import Player
 
 
 class TestSecretObjectiveOwnership:
@@ -20,7 +22,11 @@ class TestSecretObjectiveOwnership:
 
     def test_players_can_only_score_owned_secret_objectives(self) -> None:
         """Test that players can only score secret objectives they own."""
-        game_state = GameState()
+        game_state = (
+            GameState()
+            .add_player(Player("player1", Faction.SOL))
+            .add_player(Player("player2", Faction.XXCHA))
+        )
 
         secret_obj = Objective(
             "sec1", "Secret 1", "Player 1's secret", 1, False, GamePhase.STATUS
@@ -44,7 +50,11 @@ class TestSecretObjectiveOwnership:
 
     def test_secret_objectives_are_hidden_from_other_players(self) -> None:
         """Test that secret objectives are hidden from other players."""
-        game_state = GameState()
+        game_state = (
+            GameState()
+            .add_player(Player("player1", Faction.SOL))
+            .add_player(Player("player2", Faction.XXCHA))
+        )
 
         secret_obj1 = Objective(
             "sec1", "Secret 1", "Player 1's secret", 1, False, GamePhase.STATUS
@@ -70,8 +80,8 @@ class TestSecretObjectiveOwnership:
         assert secret_obj1.id not in [obj.id for obj in player2_secrets]
 
     def test_players_can_have_maximum_three_secret_objectives(self) -> None:
-        """Test Rule 61.20: Players can have at most 3 secret objectives."""
-        game_state = GameState()
+        """Test that players can have at most 3 secret objectives (Rule 61.20)."""
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         secret_objectives = [
             Objective(
@@ -104,7 +114,7 @@ class TestSecretObjectiveOwnership:
 
     def test_scoring_secret_objective_removes_it_from_hand(self) -> None:
         """Test that scoring a secret objective removes it from player's hand."""
-        game_state = GameState()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         secret_obj = Objective(
             "sec1", "Secret 1", "Player's secret", 1, False, GamePhase.STATUS
@@ -127,8 +137,8 @@ class TestImperialStrategyCardSecretObjectives:
     """Test Imperial strategy card secret objective mechanics (Rule 45.4)."""
 
     def test_imperial_primary_ability_draws_secret_objective(self) -> None:
-        """Test that Imperial primary ability allows drawing a secret objective."""
-        game_state = GameState()
+        """Test that Imperial primary ability draws a secret objective."""
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         # Create secret objective deck
         secret_obj = Objective(
@@ -148,7 +158,7 @@ class TestImperialStrategyCardSecretObjectives:
 
     def test_imperial_primary_ability_respects_three_objective_limit(self) -> None:
         """Test that Imperial primary ability respects the 3 secret objective limit."""
-        game_state = GameState()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         # Give player 3 secret objectives (at limit)
         secret_objectives = [
@@ -184,12 +194,12 @@ class TestSecretObjectiveDeck:
 
     def test_secret_objective_deck_starts_empty(self) -> None:
         """Test that secret objective deck starts empty."""
-        game_state = GameState()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
         assert game_state.get_secret_objective_deck_size() == 0
 
     def test_can_add_secret_objectives_to_deck(self) -> None:
         """Test adding secret objectives to the deck."""
-        game_state = GameState()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         secret_objectives = [
             Objective(
@@ -205,15 +215,15 @@ class TestSecretObjectiveDeck:
         assert current_state.get_secret_objective_deck_size() == 3
 
     def test_drawing_from_empty_deck_fails(self) -> None:
-        """Test that drawing from empty secret objective deck fails."""
-        game_state = GameState()
+        """Test that drawing from an empty secret objective deck fails."""
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         with pytest.raises(ValueError, match="Secret objective deck is empty"):
             game_state.execute_imperial_primary_ability("player1")
 
     def test_secret_objectives_are_shuffled_in_deck(self) -> None:
-        """Test that secret objectives maintain deck order but can be shuffled."""
-        game_state = GameState()
+        """Test that secret objectives are properly shuffled in the deck."""
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         secret_objectives = [
             Objective(
@@ -239,7 +249,7 @@ class TestSecretObjectiveGameIntegration:
 
     def test_secret_objectives_persist_across_phases(self) -> None:
         """Test that secret objectives persist across game phases."""
-        game_state = GameState()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         secret_obj = Objective(
             "sec1", "Secret 1", "Persistent secret", 1, False, GamePhase.STATUS
@@ -258,7 +268,7 @@ class TestSecretObjectiveGameIntegration:
 
     def test_completed_secret_objectives_count_toward_victory(self) -> None:
         """Test that completed secret objectives count toward victory points."""
-        game_state = GameState()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         # Create high-value secret objective
         secret_obj = Objective(
@@ -275,7 +285,7 @@ class TestSecretObjectiveGameIntegration:
 
     def test_secret_objectives_revealed_when_scored(self) -> None:
         """Test that secret objectives are revealed to all players when scored."""
-        game_state = GameState()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         secret_obj = Objective(
             "sec1", "Secret 1", "Revealed secret", 1, False, GamePhase.STATUS
@@ -300,7 +310,7 @@ class TestSecretObjectiveEdgeCases:
 
     def test_cannot_assign_duplicate_secret_objectives(self) -> None:
         """Test that players cannot receive duplicate secret objectives."""
-        game_state = GameState()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         secret_obj = Objective(
             "sec1", "Secret 1", "Unique secret", 1, False, GamePhase.STATUS
@@ -315,7 +325,7 @@ class TestSecretObjectiveEdgeCases:
 
     def test_secret_objectives_removed_on_player_elimination(self) -> None:
         """Test that secret objectives are removed when player is eliminated."""
-        game_state = GameState()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         secret_obj = Objective(
             "sec1", "Secret 1", "Lost secret", 1, False, GamePhase.STATUS
@@ -333,7 +343,11 @@ class TestSecretObjectiveEdgeCases:
 
     def test_multiple_players_can_have_same_secret_objective_type(self) -> None:
         """Test that multiple players can have the same type of secret objective."""
-        game_state = GameState()
+        game_state = (
+            GameState()
+            .add_player(Player("player1", Faction.SOL))
+            .add_player(Player("player2", Faction.XXCHA))
+        )
 
         # Create identical secret objectives (different instances)
         secret_obj1 = Objective(
