@@ -40,7 +40,7 @@
 6. ✅ **Rule 99: WARFARE STRATEGY CARD** - Command token management (Strategy & Command Layer) - **COMPLETE**
 
 **Next Up:**
-8. **Rule 86: TACTICAL ACTION** - Core action system (Core Game Layer) 🎯 **NEXT TARGET**
+8. **Rule 88: SYSTEM TILES** - Tile classification and board mechanics (Core Game Layer) 🎯 **NEXT TARGET** (15% complete, needs SystemTile class and color classification)
 
 ### 📈 Progress Metrics
 - Foundation Layer: 9/8 rules (112.5%) 🎉 (Rule 34 added)
