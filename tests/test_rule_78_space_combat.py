@@ -82,7 +82,7 @@ class TestSpaceCombatResolution:
         assert round_obj.can_use_anti_fighter_barrage() is True
 
     def test_announce_retreats_step(self) -> None:
-        """Test announce retreats step (Rule 78.3)."""
+        """Test announce retreats step (Rule 78.4)."""
         from src.ti4.core.space_combat import SpaceCombat
 
         system = System("test_system")
@@ -95,8 +95,11 @@ class TestSpaceCombatResolution:
 
         # Defender should be able to announce retreat first
         assert round_obj.can_defender_announce_retreat() is True
+        
+        # Attacker should be able to announce retreat when defender has not
+        assert round_obj.can_attacker_announce_retreat() is True
 
-        # If defender announces retreat, attacker cannot
+        # If defender announces retreat, attacker cannot (Rule 78.4.b)
         round_obj.defender_announces_retreat()
         assert round_obj.can_attacker_announce_retreat() is False
 
@@ -321,11 +324,7 @@ class TestSpaceCombatAdvancedMechanics:
         retreat_successful = round_obj.execute_retreat_step(retreat_system)
         assert retreat_successful is True
 
-        # Remove the retreated unit from active system manually (in full implementation this would be automatic)
-        active_system.space_units = [
-            u for u in active_system.space_units if u.owner != "player2"
-        ]
-
+        # Verify that execute_retreat_step() automatically moved the units
         # Defender's ship should be moved to retreat system
         assert len([u for u in active_system.space_units if u.owner == "player2"]) == 0
         assert len([u for u in retreat_system.space_units if u.owner == "player2"]) == 1

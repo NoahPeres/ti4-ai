@@ -55,8 +55,16 @@ class CombatRound:
         return not self.defender_announced_retreat
 
     def can_attacker_announce_retreat(self) -> bool:
-        """Attacker retreat disabled under base rules; enable via variant if needed."""
-        return False
+        """Attacker can announce retreat if defender hasn't announced and eligible system exists.
+        
+        Per LRR 78.4.b: If defender announces retreat, attacker cannot announce retreat.
+        Per LRR 78.4.c: Player cannot announce retreat without eligible system.
+        
+        Note: This method only checks the defender announcement flag. 
+        Retreat eligibility validation (adjacency, ownership, command tokens) 
+        should be implemented in the calling code per rules 78.4c and 78.7.
+        """
+        return not self.defender_announced_retreat
 
     def defender_announces_retreat(self) -> None:
         """Defender announces retreat."""

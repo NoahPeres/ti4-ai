@@ -53,7 +53,7 @@ strict-check:
 
 security-check:
 	@echo "Running security analysis..."
-	uvx bandit -r src/ -f json || echo "Security issues found - review above"
+	uvx bandit -r src/ -f json -ll -ii
 
 runtime-check:
 	@echo "Running tests with runtime type checking..."

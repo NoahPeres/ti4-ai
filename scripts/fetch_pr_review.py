@@ -62,6 +62,63 @@ class GitHubPRReviewFetcher:
         except URLError as e:
             raise ValueError(f"Network error: {e.reason}")
     
+    def _get_all_pages(self, url: str) -> List[Dict[str, Any]]:
+        """
+        Fetch all pages of results from a paginated GitHub API endpoint.
+        
+        Args:
+            url: Initial URL to fetch
+            
+        Returns:
+            Combined list of all results from all pages
+        """
+        all_results = []
+        current_url = url
+        
+        while current_url:
+            headers = {
+                'Accept': 'application/vnd.github+json',
+                'User-Agent': 'TI4-AI-PR-Review-Fetcher/1.0'
+            }
+            
+            if self.token:
+                headers['Authorization'] = f'token {self.token}'
+            
+            try:
+                request = Request(current_url, headers=headers)
+                with urlopen(request) as response:
+                    data = json.loads(response.read().decode('utf-8'))
+                    all_results.extend(data)
+                    
+                    # Parse Link header for next page
+                    link_header = response.headers.get('Link', '')
+                    current_url = None
+                    
+                    if link_header:
+                        # Parse Link header: <url>; rel="next", <url>; rel="last"
+                        links = {}
+                        for link in link_header.split(','):
+                            link = link.strip()
+                            if '; rel=' in link:
+                                url_part, rel_part = link.split('; rel=', 1)
+                                url_clean = url_part.strip('<>')
+                                rel_clean = rel_part.strip('"')
+                                links[rel_clean] = url_clean
+                        
+                        current_url = links.get('next')
+                        
+            except HTTPError as e:
+                if e.code == 404:
+                    raise ValueError(f"Resource not found: {current_url}")
+                elif e.code == 403:
+                    raise ValueError("API rate limit exceeded or insufficient permissions")
+                else:
+                    raise ValueError(f"HTTP error {e.code}: {e.reason}")
+            except URLError as e:
+                raise ValueError(f"Network error: {e.reason}")
+        
+        return all_results
+
     def get_pr_reviews(self, pr_number: int) -> List[Dict[str, Any]]:
         """
         Fetch all reviews for a given PR number.
@@ -73,7 +130,7 @@ class GitHubPRReviewFetcher:
             List of review objects from GitHub API
         """
         url = f"{self.base_url}/repos/{self.repo}/pulls/{pr_number}/reviews?per_page=100"
-        return self._make_request(url)
+        return self._get_all_pages(url)
     
     def _parse_timestamp(self, ts: Optional[str]) -> datetime:
         """Parse GitHub timestamp string to datetime object."""
@@ -117,8 +174,22 @@ class GitHubPRReviewFetcher:
         Returns:
             List of review comment objects
         """
-        url = f"{self.base_url}/repos/{self.repo}/pulls/{pr_number}/reviews/{review_id}/comments?per_page=100"
-        return self._make_request(url)
+        all_comments = []
+        page = 1
+        per_page = 100
+        
+        while True:
+            url = f"{self.base_url}/repos/{self.repo}/pulls/{pr_number}/reviews/{review_id}/comments?per_page={per_page}&page={page}"
+            comments = self._make_request(url)
+            
+            if not comments or len(comments) < per_page:
+                all_comments.extend(comments)
+                break
+            
+            all_comments.extend(comments)
+            page += 1
+        
+        return all_comments
     
     def format_review_summary(self, review: Dict[str, Any], include_comments: bool = True) -> str:
         """

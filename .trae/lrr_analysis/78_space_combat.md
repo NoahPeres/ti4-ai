@@ -75,11 +75,10 @@ Space combat is a complex system involving multiple phases and steps. This analy
 
 ### Rule 78.3: Announce Retreats Step
 **Status**: ✅ Implemented
-**Description**: At the start of each combat round, the defender may announce retreat.
-**Implementation Note**: The current code implementation includes `can_attacker_announce_retreat()` and `attacker_announces_retreat()` methods, but per LRR 78.4.b, attacker retreat is only allowed if the defender has not announced retreat. The current implementation correctly returns `False` for `can_attacker_announce_retreat()` under base rules, maintaining consistency with the LRR.
+**Description**: At the start of each combat round, players may announce retreat, beginning with the defender.
+**Implementation Note**: The attacker may announce retreat only if the defender has not announced and an eligible system exists. Per LRR 78.4.b, if the defender announces retreat, the attacker cannot announce retreat during that combat round. Per LRR 78.4.c, a player cannot announce retreat without at least one eligible system.
 **Test Cases**:
-- `test_announce_retreats_step()` - Verifies defender can announce retreat at round start
-- `test_attacker_cannot_announce_retreat()` - Verifies only defender can announce retreat
+- `test_announce_retreats_step()` - Verifies both attacker and defender retreat announcement scenarios
 
 ### Rule 78.5: Roll Dice Step  
 **Status**: ✅ Implemented
