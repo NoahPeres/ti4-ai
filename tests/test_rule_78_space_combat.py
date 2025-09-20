@@ -5,7 +5,6 @@ After resolving the "Space Cannon Offense" step of a tactical action,
 if two players have ships in the active system, those players must resolve a space combat.
 """
 
-
 import pytest
 
 from src.ti4.core.combat import CombatDetector
@@ -258,6 +257,7 @@ class TestSpaceCombatIntegration:
             from src.ti4.actions.tactical_action import (
                 TacticalAction,  # This import should fail
             )
+
             TacticalAction()  # This should not be reached
 
     def test_space_combat_affects_game_state(self) -> None:
@@ -322,7 +322,9 @@ class TestSpaceCombatAdvancedMechanics:
         assert retreat_successful is True
 
         # Remove the retreated unit from active system manually (in full implementation this would be automatic)
-        active_system.space_units = [u for u in active_system.space_units if u.owner != "player2"]
+        active_system.space_units = [
+            u for u in active_system.space_units if u.owner != "player2"
+        ]
 
         # Defender's ship should be moved to retreat system
         assert len([u for u in active_system.space_units if u.owner == "player2"]) == 0

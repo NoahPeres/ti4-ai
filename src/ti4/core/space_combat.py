@@ -28,6 +28,7 @@ class CombatStep(Enum):
 @dataclass
 class CombatRound:
     """Represents a single round of space combat."""
+
     round_number: int
     current_step: CombatStep
     attacker_id: str
@@ -45,7 +46,8 @@ class CombatRound:
         if self.round_number != 1:
             return False
         return any(
-            u.has_anti_fighter_barrage() for u in (self.attacker_units + self.defender_units)
+            u.has_anti_fighter_barrage()
+            for u in (self.attacker_units + self.defender_units)
         )
 
     def can_defender_announce_retreat(self) -> bool:
@@ -73,7 +75,9 @@ class CombatRound:
         """
         if self.defender_announced_retreat:
             # Move defender units to retreat system
-            retreating_units = [u for u in self.defender_units if u.owner == self.defender_id]
+            retreating_units = [
+                u for u in self.defender_units if u.owner == self.defender_id
+            ]
             for unit in retreating_units:
                 if unit in self.defender_units:
                     self.defender_units.remove(unit)
@@ -83,7 +87,9 @@ class CombatRound:
             return True
         elif self.attacker_announced_retreat:
             # Move attacker units to retreat system
-            retreating_units = [u for u in self.attacker_units if u.owner == self.attacker_id]
+            retreating_units = [
+                u for u in self.attacker_units if u.owner == self.attacker_id
+            ]
             for unit in retreating_units:
                 if unit in self.attacker_units:
                     self.attacker_units.remove(unit)
@@ -95,13 +101,17 @@ class CombatRound:
     def get_attacker_dice_count(self) -> int:
         """Total dice from attacker units."""
         return sum(
-            u.get_combat_dice() for u in self.attacker_units if u.get_combat_value() is not None
+            u.get_combat_dice()
+            for u in self.attacker_units
+            if u.get_combat_value() is not None
         )
 
     def get_defender_dice_count(self) -> int:
         """Total dice from defender units."""
         return sum(
-            u.get_combat_dice() for u in self.defender_units if u.get_combat_value() is not None
+            u.get_combat_dice()
+            for u in self.defender_units
+            if u.get_combat_value() is not None
         )
 
     def assign_hits_to_attacker(self, hits: int) -> None:
@@ -116,6 +126,7 @@ class CombatRound:
 @dataclass
 class SpaceCombatResult:
     """Result of a space combat."""
+
     attacker_id: str
     defender_id: str
     attacker_units: list[Unit]

@@ -135,7 +135,9 @@ class TestUnitAbilities:
         """Test that units with production ability return correct values."""
         # Units without production (space dock production is dynamic based on planet resources)
         space_dock = Unit(unit_type=UnitType.SPACE_DOCK, owner="player1")
-        assert space_dock.get_production() == 0  # Base production is 0, actual production is planet resources + 2
+        assert (
+            space_dock.get_production() == 0
+        )  # Base production is 0, actual production is planet resources + 2
 
         fighter = Unit(unit_type=UnitType.FIGHTER, owner="player1")
         assert fighter.get_production() == 0

@@ -32,7 +32,9 @@ class UnitStats:
     space_cannon: bool = False
     space_cannon_value: Optional[int] = None
     space_cannon_dice: int = 1
-    has_production: bool = False  # Whether unit has production ability (separate from production value)
+    has_production: bool = (
+        False  # Whether unit has production ability (separate from production value)
+    )
 
     def with_modifications(self, **kwargs: Any) -> "UnitStats":
         """Create a new UnitStats with modifications."""
@@ -222,7 +224,9 @@ class UnitStatsProvider:
             space_cannon_value=modifications.space_cannon_value
             if modifications.space_cannon_value is not None
             else base.space_cannon_value,
-            space_cannon_dice=max(0, base.space_cannon_dice + modifications.space_cannon_dice),
+            space_cannon_dice=max(
+                0, base.space_cannon_dice + modifications.space_cannon_dice
+            ),
             has_production=base.has_production or modifications.has_production,
         )
 
