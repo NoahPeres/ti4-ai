@@ -1,4 +1,4 @@
-.PHONY: help install test lint format ruff-format type-check check-all clean dev-setup strict-check security-check runtime-check quality-gate pre-commit-install
+.PHONY: help install test lint lint-fix format ruff-format type-check check-all clean dev-setup strict-check security-check runtime-check quality-gate pre-commit-install
 
 help:
 	@echo "Available commands:"
@@ -6,6 +6,7 @@ help:
 	@echo "  dev-setup        Set up development environment with uv"
 	@echo "  test             Run tests with coverage"
 	@echo "  lint             Run linting checks"
+	@echo "  lint-fix         Run linting checks and automatically fix issues"
 	@echo "  format           Format code with ruff"
 	@echo "  type-check       Run type checking with mypy"
 	@echo "  strict-check     Run mypy with strictest settings (no type ignores allowed)"
@@ -29,6 +30,9 @@ test:
 
 lint:
 	uv run ruff check src tests --show-fixes
+
+lint-fix:
+	uv run ruff check src tests --fix
 
 format:
 	uv run ruff format src tests

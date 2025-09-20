@@ -174,9 +174,9 @@ class UnitStatsProvider:
         # Convert string unit_type to enum for lookup
         try:
             unit_type_enum = UnitType(unit_type)
-        except ValueError:
-            raise ValueError(f"Unknown unit type: {unit_type}")
-            
+        except ValueError as err:
+            raise ValueError(f"Unknown unit type: {unit_type}") from err
+
         base_stats = self.BASE_STATS.get(unit_type_enum)
         if base_stats is None:
             raise ValueError(f"Unknown unit type: {unit_type}")
@@ -207,8 +207,8 @@ class UnitStatsProvider:
             combat_value=modifications.combat_value
             if modifications.combat_value is not None
             else base.combat_value,
-            combat_dice=base.combat_dice + modifications.combat_dice,
-            movement=base.movement + modifications.movement,
+            combat_dice=max(0, base.combat_dice + modifications.combat_dice),
+            movement=max(0, base.movement + modifications.movement),
             capacity=base.capacity + modifications.capacity,
             production=base.production + modifications.production,
             # Unit abilities
@@ -222,7 +222,8 @@ class UnitStatsProvider:
             space_cannon_value=modifications.space_cannon_value
             if modifications.space_cannon_value is not None
             else base.space_cannon_value,
-            space_cannon_dice=base.space_cannon_dice + modifications.space_cannon_dice,
+            space_cannon_dice=max(0, base.space_cannon_dice + modifications.space_cannon_dice),
+            has_production=base.has_production or modifications.has_production,
         )
 
     def register_faction_modifier(

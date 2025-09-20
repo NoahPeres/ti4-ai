@@ -8,7 +8,7 @@
 **Dependencies:** Space Combat, Ground Combat, Dice Rolling
 
 ## Raw LRR Text
-```
+```text
 18 COMBAT (ATTRIBUTE)	
 Combat is an attribute of some units that is presented on faction sheets and unit upgrade technology cards.
 18.1 During combat, if a unit's combat roll produces a result equal to or greater than its combat value, it produces a hit.

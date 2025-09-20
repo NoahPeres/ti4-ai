@@ -37,7 +37,7 @@ class GitHubPRReviewFetcher:
         self.token = token or os.getenv('GITHUB_TOKEN')
         self.base_url = "https://api.github.com"
         
-    def _make_request(self, url: str) -> Dict[str, Any]:
+    def _make_request(self, url: str) -> Any:
         """Make a request to the GitHub API."""
         headers = {
             'Accept': 'application/vnd.github.v3+json',
@@ -49,7 +49,7 @@ class GitHubPRReviewFetcher:
             
         try:
             request = Request(url, headers=headers)
-            with urlopen(request) as response:
+            with urlopen(request, timeout=15) as response:
                 return json.loads(response.read().decode('utf-8'))
         except HTTPError as e:
             if e.code == 404:
@@ -71,7 +71,7 @@ class GitHubPRReviewFetcher:
         Returns:
             List of review objects from GitHub API
         """
-        url = f"{self.base_url}/repos/{self.repo}/pulls/{pr_number}/reviews"
+        url = f"{self.base_url}/repos/{self.repo}/pulls/{pr_number}/reviews?per_page=100"
         return self._make_request(url)
     
     def get_latest_review(self, pr_number: int) -> Optional[Dict[str, Any]]:
@@ -89,7 +89,10 @@ class GitHubPRReviewFetcher:
             return None
             
         # Sort by submitted_at timestamp to get the latest
-        reviews.sort(key=lambda x: x.get('submitted_at', ''), reverse=True)
+        reviews.sort(
+            key=lambda x: x.get('submitted_at') or x.get('created_at') or '',
+            reverse=True
+        )
         return reviews[0]
     
     def get_review_comments(self, pr_number: int, review_id: int) -> List[Dict[str, Any]]:
