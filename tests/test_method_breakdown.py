@@ -3,6 +3,7 @@
 from typing import Any
 from unittest.mock import Mock, patch
 
+from src.ti4.core.constants import Faction
 from src.ti4.core.events import CombatStartedEvent, PhaseChangedEvent, UnitMovedEvent
 from src.ti4.core.observers import AITrainingDataCollector, LoggingObserver
 from src.ti4.testing.scenario_builder import GameScenarioBuilder
@@ -182,11 +183,15 @@ class TestScenarioBuilderMethodBreakdown:
     def test_faction_specific_scenario_with_dictionary_dispatch(self) -> None:
         """Test that faction-specific scenarios work with dictionary dispatch."""
         # Test Sol scenario
-        sol_scenario = GameScenarioBuilder.create_faction_specific_scenario("sol")
+        sol_scenario = GameScenarioBuilder.create_faction_specific_scenario(
+            Faction.SOL.value
+        )
         assert sol_scenario is not None
 
         # Test Xxcha scenario
-        xxcha_scenario = GameScenarioBuilder.create_faction_specific_scenario("xxcha")
+        xxcha_scenario = GameScenarioBuilder.create_faction_specific_scenario(
+            Faction.XXCHA.value
+        )
         assert xxcha_scenario is not None
 
         # Test unknown faction (should return default)

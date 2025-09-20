@@ -131,7 +131,7 @@ class ProductionAbilityManager:
         # Check Arborec space dock infantry restriction
         if (
             producing_unit.unit_type == UnitType.SPACE_DOCK
-            and producing_unit.owner == "Arborec"
+            and producing_unit.owner == "arborec"
             and UnitType.INFANTRY in units_to_produce
         ):
             # Rule 68.1d: Arborec space docks cannot produce infantry

@@ -20,6 +20,11 @@ a A player's control token must always be on the space of the victory point trac
 98.7 The game ends immediately when one player has 10 victory points. If multiple players would simultaneously gain their 10th victory point, the player who is earliest in initiative order among those players is the winner; if this occurs when players are scoring during the Status Phase, resolve initiative order for that phase.
 ```
 
+## Tie-Breaking Documentation
+**Current Implementation**: The tie-breaking logic for simultaneous victories uses the initiative order from the current game phase. When multiple players would reach 10 victory points simultaneously during the Status Phase, the system resolves initiative order for that specific phase as specified in rule 98.7.
+
+**Source**: This implementation follows the exact wording in LRR 98.7 which states "if this occurs when players are scoring during the Status Phase, resolve initiative order for that phase."
+
 ## Sub-Rules Analysis
 
 ### 98.1 - Victory Point Sources ✅ IMPLEMENTED

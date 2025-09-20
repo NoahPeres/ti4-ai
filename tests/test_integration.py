@@ -3,7 +3,7 @@
 from typing import Any, Optional
 
 from src.ti4.core.combat import CombatDetector
-from src.ti4.core.constants import Technology, UnitType
+from src.ti4.core.constants import Faction, Technology, UnitType
 from src.ti4.core.fleet import Fleet, FleetCapacityValidator
 from src.ti4.core.galaxy import Galaxy
 from src.ti4.core.hex_coordinate import HexCoordinate
@@ -180,17 +180,19 @@ class TestTI4Integration:
     def test_faction_specific_abilities(self) -> None:
         """Test faction-specific unit abilities and modifications."""
         # Test Sol faction infantry (should have improved combat)
-        sol_infantry = Unit(unit_type=UnitType.INFANTRY, owner="player1", faction="sol")
+        sol_infantry = Unit(
+            unit_type=UnitType.INFANTRY, owner="player1", faction=Faction.SOL
+        )
 
         # Test Barony units (should have combat bonuses)
         barony_cruiser = Unit(
-            unit_type=UnitType.CRUISER, owner="player2", faction="barony"
+            unit_type=UnitType.CRUISER, owner="player2", faction=Faction.BARONY
         )
 
         # Test that faction-specific modifications are applied
         # This would depend on the specific faction implementation
-        assert sol_infantry.faction.value == "sol"
-        assert barony_cruiser.faction.value == "barony"
+        assert sol_infantry.faction.value == Faction.SOL.value
+        assert barony_cruiser.faction.value == Faction.BARONY.value
 
         # Test that units maintain their base functionality
         assert sol_infantry.unit_type == UnitType.INFANTRY

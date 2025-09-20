@@ -128,35 +128,9 @@ class GameState:
         if not winners:
             return None
 
-        # Get initiative order from StrategyCardCoordinator if available
-        if self.strategy_card_coordinator:
-            initiative_order = (
-                self.strategy_card_coordinator.get_action_phase_initiative_order()
-            )
-        elif self.strategy_card_assignments:
-            # Sort by strategy card initiative numbers
-            from .strategy_cards.coordinator import STRATEGY_CARD_INITIATIVE_NUMBERS
-
-            player_initiatives = [
-                (
-                    player_id,
-                    STRATEGY_CARD_INITIATIVE_NUMBERS.get(card.value.lower(), 999),
-                )
-                for player_id, card in self.strategy_card_assignments.items()
-            ]
-            player_initiatives.sort(key=lambda x: x[1])
-            initiative_order = [player_id for player_id, _ in player_initiatives]
-        else:
-            # Fallback to players list order
-            initiative_order = [player.id for player in self.players]
-
-        # Return the first winner in initiative order
-        for player_id in initiative_order:
-            if player_id in winners:
-                return player_id
-
-        # Fallback to first winner found (shouldn't happen with proper player order)
-        return winners[0]
+        # Use the helper method to sort winners by initiative order
+        sorted_winners = self._sort_players_by_initiative_order(winners)
+        return sorted_winners[0] if sorted_winners else winners[0]
 
     def get_players_with_most_victory_points(self) -> list[str]:
         """Get all players tied for the most victory points (Rule 98.5).
@@ -198,15 +172,22 @@ class GameState:
         """Sort a list of player IDs by initiative order.
 
         Uses the same logic as get_winner() to determine initiative order.
+        For STATUS phase, uses status phase initiative order as per Rule 98.7.
         """
         if not player_ids:
             return []
 
         # Get initiative order from StrategyCardCoordinator if available
         if self.strategy_card_coordinator:
-            initiative_order = (
-                self.strategy_card_coordinator.get_action_phase_initiative_order()
-            )
+            # Use status phase initiative order when in STATUS phase (Rule 98.7)
+            if self.phase == GamePhase.STATUS:
+                initiative_order = (
+                    self.strategy_card_coordinator.get_status_phase_initiative_order()
+                )
+            else:
+                initiative_order = (
+                    self.strategy_card_coordinator.get_action_phase_initiative_order()
+                )
         elif self.strategy_card_assignments:
             # Sort by strategy card initiative numbers
             from .strategy_cards.coordinator import STRATEGY_CARD_INITIATIVE_NUMBERS

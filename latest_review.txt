@@ -1,208 +1,35 @@
-Latest review for PR #11 in NoahPeres/ti4-ai:
+Latest review for PR #8 in NoahPeres/ti4-ai:
 
 ============================================================
 GITHUB PR REVIEW SUMMARY
 ============================================================
 Reviewer: coderabbitai[bot]
 State: COMMENTED
-Submitted: 2025-09-20T06:11:28Z
-Review ID: 3248541977
+Submitted: 2025-09-20T03:49:58Z
+Review ID: 3248170037
 
 REVIEW BODY:
 ----------------------------------------
 **Actionable comments posted: 0**
 
 <details>
-<summary>🧹 Nitpick comments (15)</summary><blockquote>
+<summary>🧹 Nitpick comments (1)</summary><blockquote>
 
 <details>
-<summary>review_response.md (1)</summary><blockquote>
+<summary>review_response_summary.md (1)</summary><blockquote>
 
-`84-90`: **Minor markdownlint nits.**
+`9-10`: **Fix markdown emphasis formatting for section headings**
 
-Avoid trailing punctuation in headings (MD026) and spaces inside emphasis (MD037) if any remain after reformatting.
-
-
-
-Also applies to: 90-99
-
-</blockquote></details>
-<details>
-<summary>latest_review_pr11.txt (1)</summary><blockquote>
-
-`27-71`: **Keep logs immutable; optional heading tidy.**
-
-As this appears to be auto-generated review logs, avoid editing content. If you do want to lint it, normalize heading levels (MD001), but consider leaving as-is for traceability.
+The linting tool correctly identifies these lines as using emphasis instead of proper headings. This affects readability and document structure.
 
 
-
-
-Also applies to: 77-109, 193-231
-
-</blockquote></details>
-<details>
-<summary>IMPLEMENTATION_ROADMAP.md (3)</summary><blockquote>
-
-`3-5`: **Duplicate “Overall Progress”; unify single source of truth.**
-
-You have progress at the top and again as a header. Keep one and reference it throughout.
 
 ```diff
--## 📊 **Overall Progress**: 25.9%
--**Completed Rules**: 26/101 rule categories completed
-+## 📊 Progress
-+**Overall Progress**: 25.9%
-+**Completed Rules**: 26/101
+-**Authorization Header Fix**
++## Authorization Header Fix
 ```
 
-
-Also applies to: 11-12
-
----
-
-`50-56`: **Out-of-sync metrics.**
-
-“850+ tests” conflicts with other docs (1053). Consider sourcing from CI artifacts to prevent drift.
-
-
-I can suggest a CI job that writes totals to a JSON for docs to include if helpful.
-
----
-
-`51-54`: **“9/8 rules (112.5%)” phrasing is confusing.**
-
-If a category expanded, annotate it; otherwise adjust denominator.
-
-</blockquote></details>
-<details>
-<summary>tests/test_rule_98_victory_points.py (4)</summary><blockquote>
-
-`14-23`: **Sequential scoring simulates “simultaneous”; add note.**
-
-Given winner checks are evaluated post-scoring in this engine, consider adding a comment clarifying that the test models the end-of-round evaluation semantics.
-
----
-
-`148-154`: **Assert deterministic order (most VP).**
-
-Helpers return initiative-ordered lists; assert list equality to lock order.
-
-```diff
--        most_vp_players = state3.get_players_with_most_victory_points()
--        assert set(most_vp_players) == {"player1", "player2"}
-+        most_vp_players = state3.get_players_with_most_victory_points()
-+        assert most_vp_players == ["player1", "player2"]  # initiative fallback = players list
-```
-
----
-
-`161-166`: **Assert deterministic order (fewest VP, all tied).**
-
-Likewise, assert list equality to lock initiative ordering.
-
-```diff
--        assert set(most_equal) == {"player1", "player2", "player3"}
--        assert set(fewest_equal) == {"player1", "player2", "player3"}
-+        assert most_equal == ["player1", "player2", "player3"]
-+        assert fewest_equal == ["player1", "player2", "player3"]
-```
-
----
-
-`17-19`: **Type hint consistency for Player.faction.**
-
-If faction is an enum, prefer using it in tests to keep strict type checks clean, or annotate tests as intentionally using strings.
-
-
-
-
-Also applies to: 79-83, 100-102, 123-125, 137-141
-
-</blockquote></details>
-<details>
-<summary>.trae/lrr_analysis/98_victory_points.md (3)</summary><blockquote>
-
-`10-21`: **Raw LRR excerpt ends mid‑sentence.**
-
-Complete 98.7 or cite properly to avoid ambiguity.
-
-```diff
--98.7 The game ends immediately when one player has 10 victory points. If multiple players would simultaneously gain their 10th victory point, the player who is earliest in initiative order among those players is the winner; if this occurs when players
-+98.7 The game ends immediately when one player has 10 victory points. If multiple players would simultaneously gain their 10th victory point, the player who is earliest in initiative order among those players is the winner; if this occurs when players are scoring during the Status Phase, resolve initiative order for that phase.
-```
-
----
-
-`64-70`: **Docs contradiction about law VP persistence.**
-
-You claim 98.6 IMPLEMENTED, but “Areas Needing Attention” says law system not integrated. Clarify that implementation is behavioral (persistence) while a future enhancement is UI/history.
-
-```diff
--7. **Integrate law system** - Support law-based victory points with persistence
-+7. **Law system UI/history hooks** - Persistence is implemented; add UI/history once the law system is introduced
-```
-
-
-Also applies to: 119-122
-
----
-
-`85-93`: **Update test references to match this PR.**
-
-Point to tests/test_rule_98_victory_points.py instead of older, non-existent files.
-
-```diff
--### Current Test Coverage
--- `test_victory_conditions.py`: Comprehensive victory point tracking and objective scoring
--- `test_game_state.py`: Victory point state management and persistence
--...
--- `tests/test_victory_conditions.py`: Comprehensive victory point testing
-+### Current Test Coverage
-+- `tests/test_rule_98_victory_points.py`: VP cap enforcement, initiative tie-breaks, 14‑point variant, tie helpers
-```
-
-
-Also applies to: 98-103
-
-</blockquote></details>
-<details>
-<summary>src/ti4/core/game_state.py (3)</summary><blockquote>
-
-`87-105`: **Guard against negative VP awards.**
-
-Unless explicitly supported, reject negative awards to prevent underflow and ambiguous semantics.
-
-```diff
- def award_victory_points(self, player_id: str, points: int) -> "GameState":
-     """Award victory points to a player, returning a new GameState."""
-+    if points < 0:
-+        raise ValueError("Points cannot be negative; use a dedicated revoke method if needed")
-     # Validate player exists in the game
-     if not any(player.id == player_id for player in self.players):
-         raise ValueError(f"Player {player_id} does not exist in the game")
-```
-
----
-
-`191-233`: **DRY initiative order retrieval (optional).**
-
-_get_winner and _sort_players_by_initiative_order duplicate initiative derivation. Consider extracting a private _get_initiative_order() used by both.
-
----
-
-`425-451`: **Validate player existence on objective scoring.**
-
-score_objective path doesn’t currently assert the player exists; add the same guard as award_victory_points to prevent orphan entries in maps.
-
-```diff
- def score_objective(
-     self, player_id: str, objective: "Objective", current_phase: GamePhase
- ) -> "GameState":
-+    if not any(player.id == player_id for player in self.players):
-+        raise ValueError(f"Player {player_id} does not exist in the game")
-     """
-     Score an objective for a player with comprehensive validation.
-```
+Similarly fix all other emphasized text that should be headings (lines 13, 18, 25, 28, 32, 39).
 
 </blockquote></details>
 
@@ -220,55 +47,18 @@ score_objective path doesn’t currently assert the player exists; add the same 
 <details>
 <summary>📥 Commits</summary>
 
-Reviewing files that changed from the base of the PR and between 074d387ec6d8b10b04e95d018c90b0b5f00f1314 and 47065bd837e43a69845f30dec1835b368d61e82f.
+Reviewing files that changed from the base of the PR and between fa07bb062254e4c13c65d0d30ba35b1c6f7144af and c781d3856a2406f7fee4bcd9346fc8ec8ccf2af7.
 
 </details>
 
 <details>
-<summary>📒 Files selected for processing (16)</summary>
+<summary>📒 Files selected for processing (5)</summary>
 
-* `.trae/lrr_analysis/88_system_tiles.md` (2 hunks)
-* `.trae/lrr_analysis/98_victory_points.md` (3 hunks)
-* `IMPLEMENTATION_ROADMAP.md` (3 hunks)
-* `docs/lrr_analysis_01_abilities.md` (0 hunks)
-* `docs/lrr_analysis_02_action_cards.md` (0 hunks)
-* `docs/lrr_analysis_03_action_phase.md` (0 hunks)
-* `docs/lrr_analysis_04_active_player.md` (0 hunks)
-* `docs/lrr_analysis_05_active_system.md` (0 hunks)
-* `docs/lrr_analysis_06_adjacency.md` (0 hunks)
-* `docs/lrr_tracking/rule_98_test_record.md` (1 hunks)
-* `latest_review.txt` (3 hunks)
-* `latest_review_pr11.txt` (1 hunks)
-* `review_response.md` (1 hunks)
+* `.pre-commit-config.yaml` (1 hunks)
+* `Makefile` (1 hunks)
+* `latest_review.txt` (1 hunks)
 * `review_response_summary.md` (1 hunks)
-* `src/ti4/core/game_state.py` (3 hunks)
-* `tests/test_rule_98_victory_points.py` (1 hunks)
-
-</details>
-
-<details>
-<summary>💤 Files with no reviewable changes (6)</summary>
-
-* docs/lrr_analysis_01_abilities.md
-* docs/lrr_analysis_05_active_system.md
-* docs/lrr_analysis_06_adjacency.md
-* docs/lrr_analysis_03_action_phase.md
-* docs/lrr_analysis_04_active_player.md
-* docs/lrr_analysis_02_action_cards.md
-
-</details>
-
-<details>
-<summary>✅ Files skipped from review due to trivial changes (1)</summary>
-
-* docs/lrr_tracking/rule_98_test_record.md
-
-</details>
-
-<details>
-<summary>🚧 Files skipped from review as they are similar to previous changes (1)</summary>
-
-* .trae/lrr_analysis/88_system_tiles.md
+* `scripts/fetch_pr_review.py` (1 hunks)
 
 </details>
 
@@ -276,88 +66,63 @@ Reviewing files that changed from the base of the PR and between 074d387ec6d8b10
 <summary>🧰 Additional context used</summary>
 
 <details>
-<summary>🧬 Code graph analysis (2)</summary>
+<summary>🪛 checkmake (0.2.2)</summary>
 
 <details>
-<summary>src/ti4/core/game_state.py (1)</summary><blockquote>
+<summary>Makefile</summary>
 
-<details>
-<summary>src/ti4/core/strategy_cards/coordinator.py (1)</summary>
+[warning] 68-68: Target body for "clean" exceeds allowed length of 5 (10).
 
-* `get_action_phase_initiative_order` (468-480)
+(maxbodylength)
 
 </details>
 
-</blockquote></details>
-<details>
-<summary>tests/test_rule_98_victory_points.py (4)</summary><blockquote>
-
-<details>
-<summary>src/ti4/core/game_phase.py (1)</summary>
-
-* `GamePhase` (6-13)
-
 </details>
 <details>
-<summary>src/ti4/core/game_state.py (8)</summary>
-
-* `GameState` (32-907)
-* `award_victory_points` (87-105)
-* `score_objective` (425-450)
-* `get_victory_points` (83-85)
-* `has_winner` (107-112)
-* `get_winner` (114-153)
-* `get_players_with_most_victory_points` (155-171)
-* `get_players_with_fewest_victory_points` (173-189)
-
-</details>
-<details>
-<summary>src/ti4/core/objective.py (1)</summary>
-
-* `Objective` (13-21)
-
-</details>
-<details>
-<summary>src/ti4/core/player.py (1)</summary>
-
-* `Player` (10-44)
-
-</details>
-
-</blockquote></details>
-
-</details><details>
 <summary>🪛 markdownlint-cli2 (0.18.1)</summary>
 
 <details>
-<summary>IMPLEMENTATION_ROADMAP.md</summary>
+<summary>review_response_summary.md</summary>
 
-8-8: Heading levels should only increment by one level at a time
-Expected: h2; Actual: h3
+9-9: Emphasis used instead of a heading
 
-(MD001, heading-increment)
-
-</details>
-<details>
-<summary>review_response.md</summary>
-
-11-11: Spaces inside emphasis markers
-
-(MD037, no-space-in-emphasis)
+(MD036, no-emphasis-as-heading)
 
 ---
 
-84-84: Trailing punctuation in heading
-Punctuation: ':'
+13-13: Emphasis used instead of a heading
 
-(MD026, no-trailing-punctuation)
+(MD036, no-emphasis-as-heading)
 
 ---
 
-90-90: Trailing punctuation in heading
-Punctuation: ':'
+18-18: Emphasis used instead of a heading
 
-(MD026, no-trailing-punctuation)
+(MD036, no-emphasis-as-heading)
+
+---
+
+25-25: Emphasis used instead of a heading
+
+(MD036, no-emphasis-as-heading)
+
+---
+
+28-28: Emphasis used instead of a heading
+
+(MD036, no-emphasis-as-heading)
+
+---
+
+32-32: Emphasis used instead of a heading
+
+(MD036, no-emphasis-as-heading)
+
+---
+
+39-39: Emphasis used instead of a heading
+
+(MD036, no-emphasis-as-heading)
 
 </details>
 
@@ -366,81 +131,150 @@ Punctuation: ':'
 </details>
 
 <details>
-<summary>🔇 Additional comments (9)</summary><blockquote>
+<summary>🔇 Additional comments (21)</summary><blockquote>
 
 <details>
-<summary>review_response.md (2)</summary><blockquote>
+<summary>review_response_summary.md (2)</summary><blockquote>
 
-`13-29`: **DISAGREEMENT rationale is correct.**
+`53-58`: **Summary claims don't align with actual scope of changes**
 
-The pasted _update_victory_points implementation already enforces the cap; no change needed. Good call-out with explicit lines.
+The summary mentions "All 13 review feedback items" but the AI summary indicates this PR implements major new features like burst-icon mechanics, space combat engine, and unit stats overhaul - not just review feedback fixes.
+
+
+
+This appears to be documentation for a different change set than what's being reviewed in this PR.
 
 ---
 
-`52-58`: **Victory timing clarification LGTM.**
+`46-49`: **Update test count in review_response_summary.md**
 
-The wording now reflects immediate victory with initiative tie-breaks.
+This PR added tests (tests/test_rule_18_burst_icons.py, tests/test_rule_78_space_combat.py) but the summary still lists "1037 tests" (review_response_summary.md, lines 46–49). The provided verification script failed to compute the total (wargs: command not found; many grep processes terminated by SIGPIPE). Update the total test count and coverage to match the repo or run a corrected local count.
 
 </blockquote></details>
 <details>
-<summary>tests/test_rule_98_victory_points.py (1)</summary><blockquote>
+<summary>.pre-commit-config.yaml (1)</summary><blockquote>
 
-`121-134`: **Good cap enforcement tests.**
+`14-15`: **LGTM! Proper commit message validation integration**
 
-Covers both direct awards and objective scoring overflow via ValueError.
-
-</blockquote></details>
-<details>
-<summary>latest_review.txt (1)</summary><blockquote>
-
-`8-10`: **Minor doc hygiene only.**
-
-If this is a persisted review artifact for PR #8, leave content unchanged; formatting tweaks are optional.
-
-
-
-
-Also applies to: 13-20
+The addition of `check-commit-message` hook with commit-msg stage correctly enables commit message validation as part of the pre-commit workflow.
 
 </blockquote></details>
 <details>
-<summary>src/ti4/core/game_state.py (4)</summary><blockquote>
+<summary>Makefile (7)</summary><blockquote>
 
-`80-82`: **Configurable victory threshold LGTM.**
+`1-2`: **LGTM! Essential shell hardening implemented**
 
-Proper default and persistence through state transitions.
-
----
-
-`114-153`: **Initiative tie-breaker implementation looks solid.**
-
-Coordinator-first, then assignments, then players list fallback is sensible and deterministic.
-
-
-If cards can be unassigned mid-round, confirm the fallback order matches intended timing for 98.7.
+Adding bash with `-euo pipefail` prevents silent failures and improves error handling across all Make targets - a critical improvement for build reliability.
 
 ---
 
-`155-172`: **Deterministic tie helpers LGTM; test the order.**
+`8-9`: **LGTM! Self-documenting help system implemented**
 
-Helpers return initiative-ordered lists. Ensure tests assert list order (see suggested test tweaks).
-
-
-
-Also applies to: 173-190
+The implementation correctly uses inline comments for automatic help generation, solving the checkmake body length issue while improving maintainability.
 
 ---
 
-`542-554`: **Cap enforcement in _update_victory_points LGTM.**
+`25-27`: **LGTM! Unified lint-fix target with formatting**
 
-Prevents objective scoring from bypassing the maximum.
+Combining linting fixes with code formatting in a single target improves developer workflow by providing one-stop fixing.
+
+---
+
+`32-33`: **LGTM! DRY principle applied for format checking**
+
+Creating a dedicated `format-check` target eliminates duplication between `check-all` and `quality-gate` targets while maintaining clarity.
+
+---
+
+`49-49`: **LGTM! Security gate properly fails on findings**
+
+The Bandit command now correctly fails on security issues with `-ll -ii` flags for high-severity/high-confidence filtering, addressing the previous review concern.
+
+---
+
+`56-57`: **LGTM! Comprehensive pre-commit hook installation**
+
+Installing both standard and commit-msg hooks aligns with the `.pre-commit-config.yaml` changes and provides complete pre-commit integration.
+
+---
+
+`59-60`: **LGTM! Pre-commit maintenance automation**
+
+The `pre-commit-autoupdate` target enables easy hook version maintenance, improving developer experience and security posture.
 
 </blockquote></details>
 <details>
-<summary>review_response_summary.md (1)</summary><blockquote>
+<summary>scripts/fetch_pr_review.py (8)</summary><blockquote>
 
-`9-22`: **Headings fix LGTM — update documented test count.**
-Repo test count is 124; replace "All tests pass (1053 tests)" in review_response_summary.md (lines 9–22; also lines 46–49) or explain the discrepancy.
+`1-24`: **LGTM! Well-structured CLI with comprehensive documentation**
+
+The script provides clear usage instructions, environment variable support, and helpful examples. The import organization and module docstring are excellent.
+
+---
+
+`41-52`: **LGTM! Centralized header management resolves duplication**
+
+The `_headers()` method correctly centralizes header creation and uses consistent Bearer token authentication, addressing previous review concerns about header duplication and auth scheme consistency.
+
+---
+
+`58-70`: **LGTM! Robust request handling with proper timeout**
+
+The timeout parameter (15 seconds) prevents hanging on network stalls, and the error handling correctly maps HTTP and network errors to meaningful messages.
+
+---
+
+`93-96`: **LGTM! Proper payload validation for API responses**
+
+The type guard correctly handles the expectation that paginated endpoints return lists, preventing corruption from unexpected response types.
+
+---
+
+`138-139`: **LGTM! Pagination properly implemented**
+
+Using `_get_all_pages()` ensures complete review collection for large PRs, addressing the previous concern about missing reviews beyond the first 100.
+
+---
+
+`183-184`: **LGTM! Unified pagination for review comments**
+
+Reusing `_get_all_pages()` eliminates manual pagination code and ensures consistent behavior across all paginated endpoints.
+
+---
+
+`227-229`: **LGTM! Robust line number fallback logic**
+
+The fallback logic trying `line`, `original_line`, and `position` fields handles different GitHub API response formats effectively.
+
+---
+
+`258-258`: **LGTM! Proper working directory usage**
+
+Using `os.getcwd()` correctly detects the repository from the current working directory, supporting various invocation methods including symlinks.
+
+</blockquote></details>
+<details>
+<summary>latest_review.txt (3)</summary><blockquote>
+
+`563-609`: **Review comment references non-existent code issues**
+
+The detailed comment mentions authorization header mismatches and "token" vs "Bearer" schemes (lines 571-574), but examining `scripts/fetch_pr_review.py` shows it already uses Bearer tokens consistently throughout. This appears to be stale review feedback.
+
+
+
+The actual code uses `f'Bearer {self.token}'` consistently in the `_headers()` method.
+
+---
+
+`617-657`: **Review comment about missing timeout is outdated**
+
+The comment suggests adding timeout to urlopen calls, but the current code already includes `timeout=15` in both `_make_request` and `_get_all_pages` methods. This review feedback appears to have been already addressed.
+
+---
+
+`666-719`: **Review comment about payload validation is resolved**
+
+The comment suggests adding type guards for non-list payloads, but the current code already implements proper validation in lines 94-95 of `_get_all_pages()` with appropriate error handling for unexpected payload types.
 
 </blockquote></details>
 
