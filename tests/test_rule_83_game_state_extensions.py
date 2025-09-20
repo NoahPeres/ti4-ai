@@ -45,11 +45,17 @@ class TestRule83GameStateExtensions:
 
         Requirements: 1.3, 6.2 - Strategy card tracking and state synchronization
         """
+        from src.ti4.core.constants import Faction
         from src.ti4.core.game_state import GameState
+        from src.ti4.core.player import Player
         from src.ti4.core.strategic_action import StrategyCardType
 
         # RED: This will fail until we implement the functionality
         state = GameState()
+
+        # Add players first
+        player1 = Player("player1", Faction.SOL)
+        state = state.add_player(player1)
 
         # Should be able to assign a strategy card to a player
         new_state = state.assign_strategy_card("player1", StrategyCardType.LEADERSHIP)
@@ -63,11 +69,17 @@ class TestRule83GameStateExtensions:
 
         Requirements: 4.5 - State persistence for card exhaustion
         """
+        from src.ti4.core.constants import Faction
         from src.ti4.core.game_state import GameState
+        from src.ti4.core.player import Player
         from src.ti4.core.strategic_action import StrategyCardType
 
         # RED: This will fail until we implement the functionality
         state = GameState()
+
+        # Add players first
+        player1 = Player("player1", Faction.SOL)
+        state = state.add_player(player1)
 
         # Should be able to exhaust a strategy card
         new_state = state.exhaust_strategy_card(StrategyCardType.LEADERSHIP)
@@ -113,15 +125,22 @@ class TestRule83GameStateExtensions:
         assert len(new_state.exhausted_strategy_cards) == 0
 
     def test_game_state_can_clear_strategy_card_assignments(self) -> None:
-        """Test that GameState can clear strategy card assignments for round reset.
+        """Test that GameState can clear all strategy card assignments.
 
-        Requirements: 10.2 - Round management state tracking
+        Requirements: 10.2 - Round management and state reset
         """
+        from src.ti4.core.constants import Faction
         from src.ti4.core.game_state import GameState
+        from src.ti4.core.player import Player
         from src.ti4.core.strategic_action import StrategyCardType
 
         # RED: This will fail until we implement the functionality
         state = GameState()
+
+        # Add players first
+        player1 = Player("player1", Faction.SOL)
+        player2 = Player("player2", Faction.XXCHA)
+        state = state.add_player(player1).add_player(player2)
 
         # Assign cards to players
         state = state.assign_strategy_card("player1", StrategyCardType.LEADERSHIP)
@@ -225,10 +244,17 @@ class TestRule83GameStateValidation:
 
         Requirements: 1.3 - Strategy card tracking validation
         """
+        from src.ti4.core.constants import Faction
         from src.ti4.core.game_state import GameState
+        from src.ti4.core.player import Player
         from src.ti4.core.strategic_action import StrategyCardType
 
         state = GameState()
+
+        # Add players first
+        player1 = Player("player1", Faction.SOL)
+        player2 = Player("player2", Faction.XXCHA)
+        state = state.add_player(player1).add_player(player2)
 
         # Assign card to player1
         state = state.assign_strategy_card("player1", StrategyCardType.LEADERSHIP)

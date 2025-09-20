@@ -1,35 +1,112 @@
-Latest review for PR #8 in NoahPeres/ti4-ai:
+Latest review for PR #12 in NoahPeres/ti4-ai:
 
 ============================================================
 GITHUB PR REVIEW SUMMARY
 ============================================================
 Reviewer: coderabbitai[bot]
 State: COMMENTED
-Submitted: 2025-09-20T03:49:58Z
-Review ID: 3248170037
+Submitted: 2025-09-20T14:58:30Z
+Review ID: 3249080644
 
 REVIEW BODY:
 ----------------------------------------
-**Actionable comments posted: 0**
+**Actionable comments posted: 4**
+
+> [!CAUTION]
+> Some comments are outside the diff and can’t be posted inline due to platform limitations.
+>
+>
+>
+> <details>
+> <summary>⚠️ Outside diff range comments (2)</summary><blockquote>
+>
+> <details>
+> <summary>src/ti4/core/game_state.py (2)</summary><blockquote>
+>
+> `724-760`: **Validate player ID in assign_strategy_card.**
+>
+> Bring in the same existence checks used elsewhere to prevent assigning to unknown players.
+>
+> ```diff
+>          # Input validation
+>          if player_id is None:
+>              raise ValueError("Player ID cannot be None")
+>          if not isinstance(player_id, str) or not player_id.strip():
+>              raise ValueError("Player ID cannot be empty")
+>          if strategy_card is None:
+>              raise ValueError("Strategy card cannot be None")
+> +        if not any(p.id == player_id for p in self.players):
+> +            raise ValueError(f"Player {player_id} does not exist in the game")
+> ```
+>
+> ---
+>
+> `1-1294`: **Critical: remove in-place mutations of GameState internals (frozen dataclass)**
+>
+> Found direct, in-place mutations of GameState fields that break snapshot/functional semantics. Convert these helpers to operate on copied containers and return a new GameState (or accept/return the copied containers); ensure mutable objects (e.g., PlanetCard) are copied or made functional (exhaust returns a new object) before mutating.
+>
+> - src/ti4/core/game_state.py:1066-1072 — _transfer_planet_card_from_deck: deletes from self.planet_card_deck and appends to self.player_planet_cards (in-place).
+> - src/ti4/core/game_state.py:1085-1095 — _transfer_planet_card_between_players: reassigns/appends into self.player_planet_cards (in-place).
+> - src/ti4/core/game_state.py:1122-1124 — _place_control_token: mutates self.planet_control_tokens set (in-place).
+> - src/ti4/core/game_state.py:1133-1136 — _remove_control_token: mutates self.planet_control_tokens (discard/delete).
+> - src/ti4/core/game_state.py:800-821 — gain_planet_control: only shallow-copies dicts then calls planet_card.exhaust() (mutates shared PlanetCard objects).
+>
+> Required fix: eliminate all self.* mutations — update these helpers to return updated copies or be rewritten to accept and modify prepared shallow/deep copies, then produce a new GameState via _create_new_state.
+>
+> </blockquote></details>
+>
+> </blockquote></details>
 
 <details>
-<summary>🧹 Nitpick comments (1)</summary><blockquote>
+<summary>🧹 Nitpick comments (3)</summary><blockquote>
 
 <details>
-<summary>review_response_summary.md (1)</summary><blockquote>
+<summary>src/ti4/core/game_state.py (3)</summary><blockquote>
 
-`9-10`: **Fix markdown emphasis formatting for section headings**
+`1031-1055`: **_clone-or-factory preferred from _get_or_create_planet_card.**
 
-The linting tool correctly identifies these lines as using emphasis instead of proper headings. This affects readability and document structure.
+Returning an existing object invites accidental cross‑state mutation. Consider returning a fresh instance consistently (or add a clone() on PlanetCard).
 
+---
 
+`671-708`: **Initialize planet-control maps for new players.**
+
+Optional: pre-initialize player_planets and player_planet_cards entries to empty lists to simplify callers.
 
 ```diff
--**Authorization Header Fix**
-+## Authorization Header Fix
+         new_player_secret_objectives[player.id] = []
++        # Optional: initialize planet-control collections for convenience
++        new_player_planets = self.player_planets.copy()
++        new_player_planet_cards = self.player_planet_cards.copy()
++        new_player_planets[player.id] = new_player_planets.get(player.id, [])
++        new_player_planet_cards[player.id] = new_player_planet_cards.get(player.id, [])
+@@
+-        return self._create_new_state(
++        return self._create_new_state(
+             players=new_players,
+             # player_resources parameter removed - incorrect implementation
+             player_technologies=new_player_technologies,
+             victory_points=new_victory_points,
+             completed_objectives=new_completed_objectives,
+             status_phase_scoring=new_status_phase_scoring,
+             combat_scoring=new_combat_scoring,
+             player_secret_objectives=new_player_secret_objectives,
++            player_planets=new_player_planets,
++            player_planet_cards=new_player_planet_cards,
+             # player_influence parameter removed - incorrect implementation
+         )
 ```
 
-Similarly fix all other emphasized text that should be headings (lines 13, 18, 25, 28, 32, 39).
+---
+
+`1243-1269`: **Do not remove/merge blindly — both stores are in active use; plan a deliberate refactor.**
+
+player_technologies (dict[str, list[str]]) is used as the simple ownership view (GameTechnologyManager, movement/validators, scenario builder/tests); player_technology_cards (dict[str, list[TechnologyCard]]) holds per-card state (ready/exhausted) used by status_phase and card logic.
+
+- Preferred refactor: make player_technology_cards the canonical store and add a derived accessor (e.g., GameState.get_player_technologies(player_id) -> set[Technology]) so all callers consume a single source of truth; update GameTechnologyManager._sync_from_game_state, scenario builder, movement/rule callers and tests accordingly.
+- Short-term alternative: keep both but centralize one writer (GameTechnologyManager) to synchronize them and add tests that assert they never drift.
+
+Files to act on: src/ti4/core/game_state.py, src/ti4/core/game_technology_manager.py, src/ti4/testing/scenario_builder.py, src/ti4/core/status_phase.py, src/ti4/core/rule89_validator.py, src/ti4/core/movement.py.
 
 </blockquote></details>
 
@@ -47,18 +124,49 @@ Similarly fix all other emphasized text that should be headings (lines 13, 18, 2
 <details>
 <summary>📥 Commits</summary>
 
-Reviewing files that changed from the base of the PR and between fa07bb062254e4c13c65d0d30ba35b1c6f7144af and c781d3856a2406f7fee4bcd9346fc8ec8ccf2af7.
+Reviewing files that changed from the base of the PR and between 39a0ad181ca811563920b7bc8d65d965e15030db and 271733959406f4b9f0f7f9c0d6386325d91529ab.
 
 </details>
 
 <details>
-<summary>📒 Files selected for processing (5)</summary>
+<summary>📒 Files selected for processing (10)</summary>
 
-* `.pre-commit-config.yaml` (1 hunks)
-* `Makefile` (1 hunks)
-* `latest_review.txt` (1 hunks)
-* `review_response_summary.md` (1 hunks)
-* `scripts/fetch_pr_review.py` (1 hunks)
+* `.gitignore` (1 hunks)
+* `latest_review.txt` (2 hunks)
+* `latest_review_pr11.txt` (0 hunks)
+* `latest_review_pr11_new.txt` (0 hunks)
+* `review_response.md` (1 hunks)
+* `review_response_final.md` (0 hunks)
+* `review_response_summary.md` (0 hunks)
+* `src/ti4/core/game_state.py` (8 hunks)
+* `src/ti4/core/planet_card.py` (1 hunks)
+* `tests/test_rule_25_control.py` (1 hunks)
+
+</details>
+
+<details>
+<summary>💤 Files with no reviewable changes (4)</summary>
+
+* review_response_summary.md
+* review_response_final.md
+* latest_review_pr11.txt
+* latest_review_pr11_new.txt
+
+</details>
+
+<details>
+<summary>✅ Files skipped from review due to trivial changes (1)</summary>
+
+* .gitignore
+
+</details>
+
+<details>
+<summary>🚧 Files skipped from review as they are similar to previous changes (3)</summary>
+
+* src/ti4/core/planet_card.py
+* tests/test_rule_25_control.py
+* latest_review.txt
 
 </details>
 
@@ -66,215 +174,149 @@ Reviewing files that changed from the base of the PR and between fa07bb062254e4c
 <summary>🧰 Additional context used</summary>
 
 <details>
-<summary>🪛 checkmake (0.2.2)</summary>
+<summary>🧬 Code graph analysis (1)</summary>
 
 <details>
-<summary>Makefile</summary>
+<summary>src/ti4/core/game_state.py (3)</summary><blockquote>
 
-[warning] 68-68: Target body for "clean" exceeds allowed length of 5 (10).
+<details>
+<summary>src/ti4/core/planet_card.py (3)</summary>
 
-(maxbodylength)
+* `PlanetCard` (6-92)
+* `is_exhausted` (25-27)
+* `exhaust` (33-37)
+
+</details>
+<details>
+<summary>src/ti4/core/strategy_cards/coordinator.py (4)</summary>
+
+* `ready_strategy_card` (600-610)
+* `ready_all_strategy_cards` (612-619)
+* `get_player_strategy_card_assignments` (987-995)
+* `get_exhausted_cards` (997-1008)
+
+</details>
+<details>
+<summary>src/ti4/core/planet.py (3)</summary>
+
+* `Planet` (9-90)
+* `is_exhausted` (33-35)
+* `exhaust` (41-45)
 
 </details>
 
-</details>
-<details>
-<summary>🪛 markdownlint-cli2 (0.18.1)</summary>
-
-<details>
-<summary>review_response_summary.md</summary>
-
-9-9: Emphasis used instead of a heading
-
-(MD036, no-emphasis-as-heading)
-
----
-
-13-13: Emphasis used instead of a heading
-
-(MD036, no-emphasis-as-heading)
-
----
-
-18-18: Emphasis used instead of a heading
-
-(MD036, no-emphasis-as-heading)
-
----
-
-25-25: Emphasis used instead of a heading
-
-(MD036, no-emphasis-as-heading)
-
----
-
-28-28: Emphasis used instead of a heading
-
-(MD036, no-emphasis-as-heading)
-
----
-
-32-32: Emphasis used instead of a heading
-
-(MD036, no-emphasis-as-heading)
-
----
-
-39-39: Emphasis used instead of a heading
-
-(MD036, no-emphasis-as-heading)
-
-</details>
+</blockquote></details>
 
 </details>
 
 </details>
 
 <details>
-<summary>🔇 Additional comments (21)</summary><blockquote>
+<summary>🔇 Additional comments (9)</summary><blockquote>
 
 <details>
-<summary>review_response_summary.md (2)</summary><blockquote>
+<summary>review_response.md (2)</summary><blockquote>
 
-`53-58`: **Summary claims don't align with actual scope of changes**
+`60-67`: **Immutability claims don’t fully match the code.**
 
-The summary mentions "All 13 review feedback items" but the AI summary indicates this PR implements major new features like burst-icon mechanics, space combat engine, and unit stats overhaul - not just review feedback fixes.
+You state “All dictionary modifications follow the immutable pattern” and rely on frozen dataclass, but:
+- gain_planet_control exhausts the retrieved PlanetCard instance in-place.
+- Helpers _transfer_planet_card_from_deck/_between_players/_place/_remove mutate self.* directly.
 
-
-
-This appears to be documentation for a different change set than what's being reviewed in this PR.
+Either update the doc or adjust code to be mutation-free (see suggestions on game_state.py).
 
 ---
 
-`46-49`: **Update test count in review_response_summary.md**
+`3-4`: **Please confirm the test/coverage numbers.**
 
-This PR added tests (tests/test_rule_18_burst_icons.py, tests/test_rule_78_space_combat.py) but the summary still lists "1037 tests" (review_response_summary.md, lines 46–49). The provided verification script failed to compute the total (wargs: command not found; many grep processes terminated by SIGPIPE). Update the total test count and coverage to match the repo or run a corrected local count.
+“1063 passed, 2 skipped, 87% coverage” sounds good—confirm with the latest CI run ID to avoid drift.
 
 </blockquote></details>
 <details>
-<summary>.pre-commit-config.yaml (1)</summary><blockquote>
+<summary>src/ti4/core/game_state.py (7)</summary><blockquote>
 
-`14-15`: **LGTM! Proper commit message validation integration**
+`14-16`: **Correct coordinator import path.**
 
-The addition of `check-commit-message` hook with commit-msg stage correctly enables commit message validation as part of the pre-commit workflow.
-
-</blockquote></details>
-<details>
-<summary>Makefile (7)</summary><blockquote>
-
-`1-2`: **LGTM! Essential shell hardening implemented**
-
-Adding bash with `-euo pipefail` prevents silent failures and improves error handling across all Make targets - a critical improvement for build reliability.
+Import under TYPE_CHECKING now matches module location. LGTM.
 
 ---
 
-`8-9`: **LGTM! Self-documenting help system implemented**
+`85-95`: **Planet-control state surfaces look consistent.**
 
-The implementation correctly uses inline comments for automatic help generation, solving the checkmake body length issue while improving maintainability.
-
----
-
-`25-27`: **LGTM! Unified lint-fix target with formatting**
-
-Combining linting fixes with code formatting in a single target improves developer workflow by providing one-stop fixing.
+New deck, play-area, token, and mapping fields are coherent with Rule 25 modeling.
 
 ---
 
-`32-33`: **LGTM! DRY principle applied for format checking**
+`315-325`: **Create-new-state wiring includes planet-control fields.**
 
-Creating a dedicated `format-check` target eliminates duplication between `check-all` and `quality-gate` targets while maintaining clarity.
-
----
-
-`49-49`: **LGTM! Security gate properly fails on findings**
-
-The Bandit command now correctly fails on security issues with `-ll -ii` flags for high-severity/high-confidence filtering, addressing the previous review concern.
+Good propagation of all new attributes in _create_new_state.
 
 ---
 
-`56-57`: **LGTM! Comprehensive pre-commit hook installation**
+`947-986`: **Deterministic controller selection looks good.**
 
-Installing both standard and commit-msg hooks aligns with the `.pre-commit-config.yaml` changes and provides complete pre-commit integration.
-
----
-
-`59-60`: **LGTM! Pre-commit maintenance automation**
-
-The `pre-commit-autoupdate` target enables easy hook version maintenance, improving developer experience and security posture.
-
-</blockquote></details>
-<details>
-<summary>scripts/fetch_pr_review.py (8)</summary><blockquote>
-
-`1-24`: **LGTM! Well-structured CLI with comprehensive documentation**
-
-The script provides clear usage instructions, environment variable support, and helpful examples. The import organization and module docstring are excellent.
+resolve_planet_control_change uses initiative ordering; this addresses prior nondeterminism.
 
 ---
 
-`41-52`: **LGTM! Centralized header management resolves duplication**
+`1000-1018`: **Deck size helpers are fine.**
 
-The `_headers()` method correctly centralizes header creation and uses consistent Bearer token authentication, addressing previous review concerns about header duplication and auth scheme consistency.
-
----
-
-`58-70`: **LGTM! Robust request handling with proper timeout**
-
-The timeout parameter (15 seconds) prevents hanging on network stalls, and the error handling correctly maps HTTP and network errors to meaningful messages.
+API surface is clear.
 
 ---
 
-`93-96`: **LGTM! Proper payload validation for API responses**
+`836-844`: **Snapshot immutability breach: exhausting shared PlanetCard instance.**
 
-The type guard correctly handles the expectation that paginated endpoints return lists, preventing corruption from unexpected response types.
+Exhausting planet_card here mutates the object that still exists in the prior GameState (deck/other player's list), breaking snapshots.
 
----
+Apply:
 
-`138-139`: **LGTM! Pagination properly implemented**
-
-Using `_get_all_pages()` ensures complete review collection for large PRs, addressing the previous concern about missing reviews beyond the first 100.
-
----
-
-`183-184`: **LGTM! Unified pagination for review comments**
-
-Reusing `_get_all_pages()` eliminates manual pagination code and ensures consistent behavior across all paginated endpoints.
-
----
-
-`227-229`: **LGTM! Robust line number fallback logic**
-
-The fallback logic trying `line`, `original_line`, and `position` fields handles different GitHub API response formats effectively.
-
----
-
-`258-258`: **LGTM! Proper working directory usage**
-
-Using `os.getcwd()` correctly detects the repository from the current working directory, supporting various invocation methods including symlinks.
-
-</blockquote></details>
-<details>
-<summary>latest_review.txt (3)</summary><blockquote>
-
-`563-609`: **Review comment references non-existent code issues**
-
-The detailed comment mentions authorization header mismatches and "token" vs "Bearer" schemes (lines 571-574), but examining `scripts/fetch_pr_review.py` shows it already uses Bearer tokens consistently throughout. This appears to be stale review feedback.
-
-
-
-The actual code uses `f'Bearer {self.token}'` consistently in the `_headers()` method.
+```diff
+-        if player_id not in new_player_planet_cards:
+-            new_player_planet_cards[player_id] = []
+-        new_player_planet_cards[player_id].append(planet_card)
+-
+-        # Rule 25.1: Card is exhausted when gained
+-        if not planet_card.is_exhausted():
+-            planet_card.exhaust()
++        if player_id not in new_player_planet_cards:
++            new_player_planet_cards[player_id] = []
++        # Create a fresh instance to avoid mutating prior-state references
++        card_copy = type(planet_card)(
++            planet_card.name,
++            planet_card.resources,
++            planet_card.influence,
++            trait=getattr(planet_card, "trait", None),
++        )
++        # Rule 25.1: Card is exhausted when gained
++        if not card_copy.is_exhausted():
++            card_copy.exhaust()
++        new_player_planet_cards[player_id].append(card_copy)
+```
 
 ---
 
-`617-657`: **Review comment about missing timeout is outdated**
+`785-805`: **Add player-existence validation to gain_planet_control.**
 
-The comment suggests adding timeout to urlopen calls, but the current code already includes `timeout=15` in both `_make_request` and `_get_all_pages` methods. This review feedback appears to have been already addressed.
+Currently unknown player IDs can gain control and pollute mappings/tokens.
 
----
+Apply this diff near the start of gain_planet_control:
 
-`666-719`: **Review comment about payload validation is resolved**
-
-The comment suggests adding type guards for non-list payloads, but the current code already implements proper validation in lines 94-95 of `_get_all_pages()` with appropriate error handling for unexpected payload types.
+```diff
+ def gain_planet_control(
+     self, player_id: str, planet: "Planet"
+ ) -> tuple[bool, "GameState"]:
+@@
+-        # Rule 25.2: Cannot gain control of already controlled planet
++        # Validate player exists
++        if not any(p.id == player_id for p in self.players):
++            raise ValueError(f"Player {player_id} does not exist in the game")
++
++        # Rule 25.2: Cannot gain control of already controlled planet
+         current_controller = self.planet_control_mapping.get(planet.name)
+         if current_controller == player_id:
+             raise ValueError("Player already controls this planet")
+```
 
 </blockquote></details>
 
@@ -283,5 +325,236 @@ The comment suggests adding type guards for non-list payloads, but the current c
 </details>
 
 <!-- This is an auto-generated comment by CodeRabbit for review status -->
+
+DETAILED COMMENTS:
+----------------------------------------
+Comment 1:
+  File: src/ti4/core/game_state.py
+  Line: 167
+  Body: _⚠️ Potential issue_
+
+**Stale/duplicate control tokens possible when controller changes.**
+
+When current_controller is not None, tokens for the previous controller aren’t cleared. Also ensure token exclusivity when no units.
+
+Apply:
+
+```diff
+@@
+-        # Rule 25.1b: If another player controls it, take from their play area
++        # Rule 25.1b: If another player controls it, take from their play area
+         if current_controller is not None:
+@@
+-        # Add to new player's play area
++        # Remove any prior controller token for this planet
++        if current_controller is not None and planet.name in new_planet_control_tokens:
++            new_planet_control_tokens[planet.name].discard(current_controller)
++            if not new_planet_control_tokens[planet.name]:
++                del new_planet_control_tokens[planet.name]
++
++        # Add to new player's play area
+@@
+-        # Rule 25.4: If no units on planet, place control token
+-        if len(planet.units) == 0:
+-            if planet.name not in new_planet_control_tokens:
+-                new_planet_control_tokens[planet.name] = set()
+-            new_planet_control_tokens[planet.name].add(player_id)
++        # Rule 25.4: Token placement is exclusive
++        if len(planet.units) == 0:
++            # Only the new controller’s token should remain
++            new_planet_control_tokens[planet.name] = {player_id}
++        else:
++            # With units present, remove any residual tokens
++            if planet.name in new_planet_control_tokens:
++                del new_planet_control_tokens[planet.name]
+```
+
+<!-- suggestion_start -->
+
+<details>
+<summary>📝 Committable suggestion</summary>
+
+> ‼️ **IMPORTANT**
+> Carefully review the code before committing. Ensure that it accurately replaces the highlighted code, contains no missing lines, and has no issues with indentation. Thoroughly test & benchmark the code to ensure it meets the requirements.
+
+```suggestion
+        # Rule 25.1b: If another player controls it, take from their play area
+        if current_controller is not None:
+            # Remove from previous player
+            if current_controller in new_player_planet_cards:
+                new_player_planet_cards[current_controller] = [
+                    card
+                    for card in new_player_planet_cards[current_controller]
+                    if card.name != planet.name
+                ]
+        else:
+            # Rule 25.1a: First control, take from deck
+            if planet.name in new_planet_card_deck:
+                del new_planet_card_deck[planet.name]
+
+        # Remove any prior controller token for this planet
+        if current_controller is not None and planet.name in new_planet_control_tokens:
+            new_planet_control_tokens[planet.name].discard(current_controller)
+            if not new_planet_control_tokens[planet.name]:
+                del new_planet_control_tokens[planet.name]
+
+        # Add to new player's play area
+        if player_id not in new_player_planet_cards:
+            new_player_planet_cards[player_id] = []
+        new_player_planet_cards[player_id].append(planet_card)
+
+        # Rule 25.1: Card is exhausted when gained
+        if not planet_card.is_exhausted():
+            planet_card.exhaust()
+
+        # Update planet control in centralized mapping (don't mutate Planet object)
+        new_planet_control_mapping[planet.name] = player_id
+
+        # Rule 25.4: Token placement is exclusive
+        if len(planet.units) == 0:
+            # Only the new controller's token should remain
+            new_planet_control_tokens[planet.name] = {player_id}
+        else:
+            # With units present, remove any residual tokens
+            if planet.name in new_planet_control_tokens:
+                del new_planet_control_tokens[planet.name]
+```
+
+</details>
+
+<!-- suggestion_end -->
+
+<details>
+<summary>🤖 Prompt for AI Agents</summary>
+
+```
+In src/ti4/core/game_state.py around lines 822-853, when transferring control
+the code currently does not remove control tokens belonging to the previous
+controller and may allow multiple tokens to coexist; update the logic so that if
+current_controller is not None you remove that player’s entry from
+new_planet_control_tokens (or remove planet.name from their token set) before
+assigning to the new controller, and when handling the "no units" case ensure
+token exclusivity by replacing any existing token set for planet.name with a new
+set containing only player_id (create it if absent) instead of adding to the
+existing set; apply analogous clearing when taking from deck (first control) to
+ensure no stale tokens remain.
+```
+
+</details>
+
+<!-- fingerprinting:phantom:poseidon:chinchilla -->
+
+<!-- This is an auto-generated comment by CodeRabbit -->
+
+Comment 2:
+  File: src/ti4/core/game_state.py
+  Line: 261
+  Body: _⚠️ Potential issue_
+
+**Card is “lost” on lose_planet_control; should return to deck readied.**
+
+lose_planet_control removes the card from the player but doesn’t re-add it to the deck, so later gains fabricate a fresh copy, skewing deck size and exploration logic.
+
+Apply:
+
+```diff
+-        # Create new state with updated control tokens and planet cards
++        # Create new state with updated control tokens, planet cards, and deck
+         new_planet_control_tokens = {
+             name: tokens.copy() for name, tokens in self.planet_control_tokens.items()
+         }
+         new_player_planet_cards = {
+             pid: cards.copy() for pid, cards in self.player_planet_cards.items()
+         }
+         new_planet_control_mapping = self.planet_control_mapping.copy()
++        new_planet_card_deck = self.planet_card_deck.copy()
+@@
+-        # Remove planet card from player's play area
++        # Remove planet card from player's play area and return a readied copy to deck
+         if player_id in new_player_planet_cards:
+-            new_player_planet_cards[player_id] = [
++            remaining = [
+                 card
+                 for card in new_player_planet_cards[player_id]
+                 if card.name != planet.name
+             ]
++            # Find the removed card in the old state to clone its stats (not state)
++            original = self._find_player_planet_card(player_id, planet.name)
++            if original is None:
++                original = self._get_or_create_planet_card(planet)
++            card_copy = type(original)(
++                original.name,
++                original.resources,
++                original.influence,
++                trait=getattr(original, "trait", None),
++            )
++            # Cards in deck should be readied
++            if card_copy.is_exhausted():
++                card_copy.ready()
++            new_planet_card_deck[planet.name] = card_copy
++            new_player_planet_cards[player_id] = remaining
+@@
+-        return self._create_new_state(
++        return self._create_new_state(
+             player_planet_cards=new_player_planet_cards,
+             planet_control_tokens=new_planet_control_tokens,
+             planet_control_mapping=new_planet_control_mapping,
+             player_planets=new_player_planets,
++            planet_card_deck=new_planet_card_deck,
+         )
+```
+
+
+> Committable suggestion skipped: line range outside the PR's diff.
+
+<!-- fingerprinting:phantom:poseidon:chinchilla -->
+
+<!-- This is an auto-generated comment by CodeRabbit -->
+
+Comment 3:
+  File: src/ti4/core/game_state.py
+  Line: 440
+  Body: _🛠️ Refactor suggestion_
+
+**Helpers mutate self.*; make them pure or remove.**
+
+_transfer_planet_card_from_deck/_between_players directly mutate self.player_planet_cards/deck, violating snapshot semantics if used.
+
+Apply one of:
+- Remove unused helpers.
+- Or return updated copies to pass into _create_new_state (no side effects).
+
+<!-- fingerprinting:phantom:poseidon:chinchilla -->
+
+<!-- This is an auto-generated comment by CodeRabbit -->
+
+Comment 4:
+  File: src/ti4/core/game_state.py
+  Line: 481
+  Body: _🛠️ Refactor suggestion_
+
+**Token helpers also mutate self.*; align with immutability.**
+
+_place_control_token/_remove_control_token mutate self.planet_control_tokens. Either rewrite to return updated dicts or delete if unused.
+
+<details>
+<summary>🤖 Prompt for AI Agents</summary>
+
+```
+In src/ti4/core/game_state.py around lines 1115 to 1137, the helper methods
+_place_control_token and _remove_control_token currently mutate
+self.planet_control_tokens; refactor them to follow immutability by returning an
+updated planet_control_tokens mapping (or the updated mapping plus any auxiliary
+value) instead of mutating state in-place, and have callers assign the returned
+mapping to self.planet_control_tokens; alternatively, if these helpers are not
+used elsewhere, delete them and inline the immutable update logic where needed
+so no in-place mutations remain.
+```
+
+</details>
+
+<!-- fingerprinting:phantom:poseidon:chinchilla -->
+
+<!-- This is an auto-generated comment by CodeRabbit -->
 
 ============================================================
