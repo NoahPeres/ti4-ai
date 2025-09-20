@@ -1,7 +1,7 @@
 # TI4 AI Implementation Roadmap
 
-**Last Updated**: December 2024
-**Overall Progress**: 24.9%
+**Last Updated**: September 2025
+**Overall Progress**: 25.9%
 
 > **Architecture Note**: Transaction system needs PlayerSupply integration for resource validation. See `docs/architecture_notes/player_supply_system.md` for detailed implementation plan.
 

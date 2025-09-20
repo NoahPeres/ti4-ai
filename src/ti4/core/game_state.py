@@ -86,6 +86,10 @@ class GameState:
 
     def award_victory_points(self, player_id: str, points: int) -> "GameState":
         """Award victory points to a player, returning a new GameState."""
+        # Validate player exists in the game
+        if not any(player.id == player_id for player in self.players):
+            raise ValueError(f"Player {player_id} does not exist in the game")
+
         new_victory_points = self.victory_points.copy()
         current_points = new_victory_points.get(player_id, 0)
         new_points = current_points + points
@@ -118,9 +122,30 @@ class GameState:
         if not winners:
             return None
 
-        # Return the first winner in initiative order (players list order)
-        player_order = [player.id for player in self.players]
-        for player_id in player_order:
+        # Get initiative order from StrategyCardCoordinator if available
+        if self.strategy_card_coordinator:
+            initiative_order = (
+                self.strategy_card_coordinator.get_action_phase_initiative_order()
+            )
+        elif self.strategy_card_assignments:
+            # Sort by strategy card initiative numbers
+            from .strategy_cards.coordinator import STRATEGY_CARD_INITIATIVE_NUMBERS
+
+            player_initiatives = [
+                (
+                    player_id,
+                    STRATEGY_CARD_INITIATIVE_NUMBERS.get(card.value.lower(), 999),
+                )
+                for player_id, card in self.strategy_card_assignments.items()
+            ]
+            player_initiatives.sort(key=lambda x: x[1])
+            initiative_order = [player_id for player_id, _ in player_initiatives]
+        else:
+            # Fallback to players list order
+            initiative_order = [player.id for player in self.players]
+
+        # Return the first winner in initiative order
+        for player_id in initiative_order:
             if player_id in winners:
                 return player_id
 
@@ -128,28 +153,83 @@ class GameState:
         return winners[0]
 
     def get_players_with_most_victory_points(self) -> list[str]:
-        """Get all players tied for the most victory points (Rule 98.5)."""
+        """Get all players tied for the most victory points (Rule 98.5).
+
+        Returns players in initiative order for deterministic tie-breaking.
+        """
         if not self.victory_points:
             return []
 
         max_points = max(self.victory_points.values())
-        return [
+        tied_players = [
             player_id
             for player_id, points in self.victory_points.items()
             if points == max_points
         ]
 
+        # Return in initiative order for deterministic results
+        return self._sort_players_by_initiative_order(tied_players)
+
     def get_players_with_fewest_victory_points(self) -> list[str]:
-        """Get all players tied for the fewest victory points (Rule 98.5)."""
+        """Get all players tied for the fewest victory points (Rule 98.5).
+
+        Returns players in initiative order for deterministic tie-breaking.
+        """
         if not self.victory_points:
             return []
 
         min_points = min(self.victory_points.values())
-        return [
+        tied_players = [
             player_id
             for player_id, points in self.victory_points.items()
             if points == min_points
         ]
+
+        # Return in initiative order for deterministic results
+        return self._sort_players_by_initiative_order(tied_players)
+
+    def _sort_players_by_initiative_order(self, player_ids: list[str]) -> list[str]:
+        """Sort a list of player IDs by initiative order.
+
+        Uses the same logic as get_winner() to determine initiative order.
+        """
+        if not player_ids:
+            return []
+
+        # Get initiative order from StrategyCardCoordinator if available
+        if self.strategy_card_coordinator:
+            initiative_order = (
+                self.strategy_card_coordinator.get_action_phase_initiative_order()
+            )
+        elif self.strategy_card_assignments:
+            # Sort by strategy card initiative numbers
+            from .strategy_cards.coordinator import STRATEGY_CARD_INITIATIVE_NUMBERS
+
+            player_initiatives = [
+                (
+                    player_id,
+                    STRATEGY_CARD_INITIATIVE_NUMBERS.get(card.value.lower(), 999),
+                )
+                for player_id, card in self.strategy_card_assignments.items()
+            ]
+            player_initiatives.sort(key=lambda x: x[1])
+            initiative_order = [player_id for player_id, _ in player_initiatives]
+        else:
+            # Fallback to players list order
+            initiative_order = [player.id for player in self.players]
+
+        # Return players in initiative order
+        result = []
+        for player_id in initiative_order:
+            if player_id in player_ids:
+                result.append(player_id)
+
+        # Add any players not found in initiative order (shouldn't happen normally)
+        for player_id in player_ids:
+            if player_id not in result:
+                result.append(player_id)
+
+        return result
 
     def is_objective_completed(self, player_id: str, objective: Objective) -> bool:
         """Check if a player has completed a specific objective."""
@@ -465,7 +545,12 @@ class GameState:
         """Update the victory points for the player."""
         new_victory_points = self.victory_points.copy()
         current_points = new_victory_points.get(player_id, 0)
-        new_victory_points[player_id] = current_points + objective.points
+        new_total = current_points + objective.points
+        if new_total > self.victory_points_to_win:
+            raise ValueError(
+                f"Player {player_id} cannot exceed maximum victory points ({self.victory_points_to_win}) when scoring objective '{objective.id}'"
+            )
+        new_victory_points[player_id] = new_total
         return new_victory_points
 
     def _update_secret_objectives_after_scoring(

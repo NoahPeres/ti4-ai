@@ -1,7 +1,7 @@
 # Rule 98 Test Record - Victory Points
 
 ## LRR Reference
-**Rule 98**: Victory Points - Players win the game by being the first player to score 10 victory points during the status phase.
+**Rule 98**: Victory Points - Players win the game by being the first player to reach 10 victory points; the game ends immediately, with initiative order breaking simultaneous wins.
 
 ## Implementation Summary
 Rule 98 (Victory Points) has been fully implemented with comprehensive test coverage including victory conditions, tie resolution, and variant support.
@@ -52,7 +52,7 @@ Rule 98 (Victory Points) has been fully implemented with comprehensive test cove
 
 ### Primary Implementation: `src/ti4/core/game_state.py`
 **Key Methods Implemented**:
-- `__init__(victory_points_to_win=10)` - Configurable victory threshold
+- `victory_points_to_win: int = VICTORY_POINTS_TO_WIN` - Configurable victory threshold (dataclass field)
 - `award_victory_points()` - Victory point awarding with maximum enforcement
 - `has_winner()` - Victory condition checking
 - `get_winner()` - Winner determination with tie-breaking

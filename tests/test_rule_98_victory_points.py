@@ -95,6 +95,29 @@ class TestRule98VictoryPoints:
         assert state_14_points.has_winner()
         assert state_14_points.get_winner() == "player1"
 
+    def test_victory_point_maximum_enforcement_objective_scoring(self) -> None:
+        """Test that VP maximum is enforced when scoring objectives, not just direct awards."""
+        player = Player(id="player1", faction="sol")
+        game_state = GameState(players=[player])
+
+        # Create a 2-point objective
+        objective = Objective(
+            id="test_objective",
+            name="Test Objective",
+            description="A test objective worth 2 points",
+            points=2,
+            is_public=True,
+            scoring_phase=GamePhase.ACTION,
+        )
+
+        # Award 9 points first (should be allowed)
+        state_9 = game_state.award_victory_points("player1", 9)
+        assert state_9.get_victory_points("player1") == 9
+
+        # Scoring a 2-point objective should fail (would exceed 10 point maximum)
+        with pytest.raises(ValueError, match="cannot exceed maximum victory points"):
+            state_9.score_objective("player1", objective, GamePhase.ACTION)
+
     def test_victory_point_maximum_enforcement(self) -> None:
         """Test Rule 98.4a: Player cannot have more than 10 victory points (or variant maximum)."""
         player = Player(id="player1", faction="sol")

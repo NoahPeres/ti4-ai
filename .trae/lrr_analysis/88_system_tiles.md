@@ -4,7 +4,7 @@
 **Priority**: HIGH - Core board mechanics
 **Dependencies**: Rule 55 (Modular Board), Rule 64 (Planets)
 **Test Coverage**: 11/11 tests passing (100%)
-**Last Updated**: 2024-12-19
+**Last Updated**: 2025-01-20
 
 **Rule Category Overview**: A system tile represents an area of the galaxy. Players place system tiles during setup to create the game board.
 
@@ -32,40 +32,40 @@
 ### 88.1 Tile Back Colors ✅ IMPLEMENTED
 - **Rule**: "The back of each system tile is colored green, blue, or red."
 - **Implementation**: TileColor enum with GREEN, BLUE, RED values
-- **Test Coverage**: test_rule_88_1_tile_back_colors()
+- **Test Case**: `test_rule_88_1_tile_back_colors()` - Validates all three tile back colors are supported and properly classified
 
 ### 88.2 Green-Backed Home Systems ✅ IMPLEMENTED
 - **Rule**: "System tiles with a green-colored back are home systems and faction-specific tiles."
 - **Implementation**: Validation ensures GREEN tiles must be HOME_SYSTEM type
-- **Test Coverage**: test_rule_88_2_green_back_home_systems()
+- **Test Case**: `test_rule_88_2_green_back_home_systems()` - Verifies green tiles are correctly identified as home systems with faction assignment support
 - **Features**: Faction assignment support for home systems
 
 ### 88.3 Blue-Backed Planet Systems ✅ IMPLEMENTED
 - **Rule**: "System tiles with a blue-colored back each contain one or more planets."
 - **Implementation**: Validation ensures BLUE tiles must be PLANET_SYSTEM type
-- **Test Coverage**: test_rule_88_3_blue_back_planet_systems()
+- **Test Case**: `test_rule_88_3_blue_back_planet_systems()` - Tests blue tiles contain planets and support single/multi-planet systems
 - **Features**: Support for single and multi-planet systems
 
 ### 88.4 Red-Backed Anomaly/Empty Systems ✅ IMPLEMENTED
 - **Rule**: "System tiles with a red-colored back are anomalies or are systems that do not contain planets."
 - **Implementation**: Validation ensures RED tiles must be ANOMALY or EMPTY_SYSTEM type
-- **Test Coverage**: test_rule_88_4_red_back_anomaly_or_empty_systems()
+- **Test Case**: `test_rule_88_4_red_back_anomaly_or_empty_systems()` - Validates red tiles are properly classified as anomalies or empty systems
 
 ### 88.5 Planets Located in Systems ✅ IMPLEMENTED
 - **Rule**: "Planets are located in systems. Ground forces and structures are usually placed on planets."
 - **Implementation**: Planet containment methods and ground force/structure support
-- **Test Coverage**: test_rule_88_5_planets_located_in_systems()
+- **Test Case**: `test_rule_88_5_planets_located_in_systems()` - Tests planet containment and ground force/structure placement capabilities
 - **Features**: Planet.can_hold_ground_forces(), Planet.can_hold_structures()
 
 ### 88.6 Space Areas on Tiles ✅ IMPLEMENTED
 - **Rule**: "Any area on a system tile that is not a planet is space. Ships are usually placed in the space area."
 - **Implementation**: has_space_area() and can_hold_ships() methods
-- **Test Coverage**: test_rule_88_6_space_areas_on_tiles()
+- **Test Case**: `test_rule_88_6_space_areas_on_tiles()` - Verifies space areas exist on tiles and can hold ships
 
 ### 88.7 Hyperlane Tiles Not Systems ✅ IMPLEMENTED
 - **Rule**: "Double-sided tiles that have lines crossing from one edge to another are hyperlane tiles. Hyperlane tiles are not systems."
 - **Implementation**: HYPERLANE tile type with is_hyperlane() and is_system() methods
-- **Test Coverage**: test_rule_88_7_hyperlane_tiles_not_systems()
+- **Test Case**: `test_rule_88_7_hyperlane_tiles_not_systems()` - Tests hyperlane identification and confirms they are not considered systems
 - **Features**: has_crossing_lines() method for hyperlane identification
 
 ## Related Rules Status
