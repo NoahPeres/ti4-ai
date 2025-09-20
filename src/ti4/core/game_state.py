@@ -745,6 +745,8 @@ class GameState:
             raise ValueError("Player ID cannot be empty")
         if strategy_card is None:
             raise ValueError("Strategy card cannot be None")
+        if not any(p.id == player_id for p in self.players):
+            raise ValueError(f"Player {player_id} does not exist in the game")
 
         # Check if card is already assigned to another player
         for existing_player, existing_card in self.strategy_card_assignments.items():
@@ -798,6 +800,10 @@ class GameState:
         Raises:
             ValueError: If player already controls this planet (Rule 25.2)
         """
+        # Validate player exists
+        if not any(p.id == player_id for p in self.players):
+            raise ValueError(f"Player {player_id} does not exist in the game")
+
         # Rule 25.2: Cannot gain control of already controlled planet
         current_controller = self.planet_control_mapping.get(planet.name)
         if current_controller == player_id:
@@ -836,20 +842,36 @@ class GameState:
         # Add to new player's play area
         if player_id not in new_player_planet_cards:
             new_player_planet_cards[player_id] = []
-        new_player_planet_cards[player_id].append(planet_card)
 
-        # Rule 25.1: Card is exhausted when gained
-        if not planet_card.is_exhausted():
-            planet_card.exhaust()
+        # Rule 25.1: Card is exhausted when gained - create fresh copy to avoid mutating shared instance
+        from .planet_card import PlanetCard as PlanetCardClass
+
+        exhausted_card = PlanetCardClass(
+            planet_card.name,
+            planet_card.resources,
+            planet_card.influence,
+            planet_card.trait,
+        )
+        if not exhausted_card.is_exhausted():
+            exhausted_card.exhaust()
+        new_player_planet_cards[player_id].append(exhausted_card)
 
         # Update planet control in centralized mapping (don't mutate Planet object)
         new_planet_control_mapping[planet.name] = player_id
 
-        # Rule 25.4: If no units on planet, place control token
+        # Rule 25.4: Control token management - ensure exclusivity and cleanup
         if len(planet.units) == 0:
-            if planet.name not in new_planet_control_tokens:
+            # Remove any existing control tokens from previous controller
+            if planet.name in new_planet_control_tokens:
+                new_planet_control_tokens[planet.name].clear()
+            else:
                 new_planet_control_tokens[planet.name] = set()
+            # Add control token for new controller
             new_planet_control_tokens[planet.name].add(player_id)
+        else:
+            # If there are units, remove any control tokens (units provide control)
+            if planet.name in new_planet_control_tokens:
+                new_planet_control_tokens[planet.name].clear()
 
         # Update player_planets mapping for consistency
         new_player_planets = {
@@ -915,13 +937,36 @@ class GameState:
             if not new_planet_control_tokens[planet.name]:
                 del new_planet_control_tokens[planet.name]
 
-        # Remove planet card from player's play area
+        # Remove planet card from player's play area and return to deck in readied state
+        new_planet_card_deck = self.planet_card_deck.copy()
         if player_id in new_player_planet_cards:
+            # Find the planet card being removed
+            removed_card = None
+            for card in new_player_planet_cards[player_id]:
+                if card.name == planet.name:
+                    removed_card = card
+                    break
+
+            # Remove from player's cards
             new_player_planet_cards[player_id] = [
                 card
                 for card in new_player_planet_cards[player_id]
                 if card.name != planet.name
             ]
+
+            # Return readied copy to deck
+            if removed_card:
+                from .planet_card import PlanetCard as PlanetCardClass
+
+                readied_card = PlanetCardClass(
+                    removed_card.name,
+                    removed_card.resources,
+                    removed_card.influence,
+                    removed_card.trait,
+                )
+                if readied_card.is_exhausted():
+                    readied_card.ready()
+                new_planet_card_deck[planet.name] = readied_card
 
         # Clear planet control in centralized mapping (don't mutate Planet object)
         new_planet_control_mapping[planet.name] = None
@@ -942,6 +987,7 @@ class GameState:
             planet_control_tokens=new_planet_control_tokens,
             planet_control_mapping=new_planet_control_mapping,
             player_planets=new_player_planets,
+            planet_card_deck=new_planet_card_deck,
         )
 
     def resolve_planet_control_change(self, planet: "Planet") -> "GameState":
@@ -1111,29 +1157,6 @@ class GameState:
             if card.name == planet_name:
                 return card
         return None
-
-    def _place_control_token(self, player_id: str, planet: "Planet") -> None:
-        """Place a control token on a planet.
-
-        Args:
-            player_id: The player placing the token
-            planet: The planet receiving the token
-        """
-        if planet.name not in self.planet_control_tokens:
-            self.planet_control_tokens[planet.name] = set()
-        self.planet_control_tokens[planet.name].add(player_id)
-
-    def _remove_control_token(self, player_id: str, planet: "Planet") -> None:
-        """Remove a control token from a planet.
-
-        Args:
-            player_id: The player removing the token
-            planet: The planet losing the token
-        """
-        if planet.name in self.planet_control_tokens:
-            self.planet_control_tokens[planet.name].discard(player_id)
-            if not self.planet_control_tokens[planet.name]:
-                del self.planet_control_tokens[planet.name]
 
     def add_player_planet(self, player_id: str, planet: "Planet") -> "GameState":
         """Add a planet to a player's controlled planets.

@@ -5,149 +5,108 @@ GITHUB PR REVIEW SUMMARY
 ============================================================
 Reviewer: coderabbitai[bot]
 State: COMMENTED
-Submitted: 2025-09-20T14:10:17Z
-Review ID: 3249053844
+Submitted: 2025-09-20T14:58:30Z
+Review ID: 3249080644
 
 REVIEW BODY:
 ----------------------------------------
 **Actionable comments posted: 4**
 
-<details>
-<summary>🧹 Nitpick comments (7)</summary><blockquote>
+> [!CAUTION]
+> Some comments are outside the diff and can’t be posted inline due to platform limitations.
+>
+>
+>
+> <details>
+> <summary>⚠️ Outside diff range comments (2)</summary><blockquote>
+>
+> <details>
+> <summary>src/ti4/core/game_state.py (2)</summary><blockquote>
+>
+> `724-760`: **Validate player ID in assign_strategy_card.**
+>
+> Bring in the same existence checks used elsewhere to prevent assigning to unknown players.
+>
+> ```diff
+>          # Input validation
+>          if player_id is None:
+>              raise ValueError("Player ID cannot be None")
+>          if not isinstance(player_id, str) or not player_id.strip():
+>              raise ValueError("Player ID cannot be empty")
+>          if strategy_card is None:
+>              raise ValueError("Strategy card cannot be None")
+> +        if not any(p.id == player_id for p in self.players):
+> +            raise ValueError(f"Player {player_id} does not exist in the game")
+> ```
+>
+> ---
+>
+> `1-1294`: **Critical: remove in-place mutations of GameState internals (frozen dataclass)**
+>
+> Found direct, in-place mutations of GameState fields that break snapshot/functional semantics. Convert these helpers to operate on copied containers and return a new GameState (or accept/return the copied containers); ensure mutable objects (e.g., PlanetCard) are copied or made functional (exhaust returns a new object) before mutating.
+>
+> - src/ti4/core/game_state.py:1066-1072 — _transfer_planet_card_from_deck: deletes from self.planet_card_deck and appends to self.player_planet_cards (in-place).
+> - src/ti4/core/game_state.py:1085-1095 — _transfer_planet_card_between_players: reassigns/appends into self.player_planet_cards (in-place).
+> - src/ti4/core/game_state.py:1122-1124 — _place_control_token: mutates self.planet_control_tokens set (in-place).
+> - src/ti4/core/game_state.py:1133-1136 — _remove_control_token: mutates self.planet_control_tokens (discard/delete).
+> - src/ti4/core/game_state.py:800-821 — gain_planet_control: only shallow-copies dicts then calls planet_card.exhaust() (mutates shared PlanetCard objects).
+>
+> Required fix: eliminate all self.* mutations — update these helpers to return updated copies or be rewritten to accept and modify prepared shallow/deep copies, then produce a new GameState via _create_new_state.
+>
+> </blockquote></details>
+>
+> </blockquote></details>
 
 <details>
-<summary>src/ti4/core/game_state.py (5)</summary><blockquote>
+<summary>🧹 Nitpick comments (3)</summary><blockquote>
 
-`817-823`: **Duplicate assignments to new_planet_control_mapping — remove noise.**
+<details>
+<summary>src/ti4/core/game_state.py (3)</summary><blockquote>
 
-Same copy performed three times.
+`1031-1055`: **_clone-or-factory preferred from _get_or_create_planet_card.**
 
-Apply:
-
-```diff
--        new_planet_control_mapping = self.planet_control_mapping.copy()
--        new_planet_control_mapping = self.planet_control_mapping.copy()
-         new_planet_control_tokens = {
-             name: tokens.copy() for name, tokens in self.planet_control_tokens.items()
-         }
--        new_planet_control_mapping = self.planet_control_mapping.copy()
-+        new_planet_control_mapping = self.planet_control_mapping.copy()
-```
+Returning an existing object invites accidental cross‑state mutation. Consider returning a fresh instance consistently (or add a clone() on PlanetCard).
 
 ---
 
-`862-874`: **Avoid duplicate planets by object identity; dedupe by name.**
+`671-708`: **Initialize planet-control maps for new players.**
 
-List membership check uses object identity; use name-based.
-
-Apply:
+Optional: pre-initialize player_planets and player_planet_cards entries to empty lists to simplify callers.
 
 ```diff
--        if player_id not in new_player_planets:
--            new_player_planets[player_id] = []
--        if planet not in new_player_planets[player_id]:
--            new_player_planets[player_id].append(planet)
-+        if player_id not in new_player_planets:
-+            new_player_planets[player_id] = []
-+        if all(p.name != planet.name for p in new_player_planets[player_id]):
-+            new_player_planets[player_id].append(planet)
-```
-
----
-
-`886-899`: **Add player existence validation in loss API.**
-
-Mirror gain validation for symmetry and clearer errors.
-
-Apply:
-
-```diff
- def lose_planet_control(self, player_id: str, planet: "Planet") -> "GameState":
-     """Handle losing control of a planet according to Rule 25.
+         new_player_secret_objectives[player.id] = []
++        # Optional: initialize planet-control collections for convenience
++        new_player_planets = self.player_planets.copy()
++        new_player_planet_cards = self.player_planet_cards.copy()
++        new_player_planets[player.id] = new_player_planets.get(player.id, [])
++        new_player_planet_cards[player.id] = new_player_planet_cards.get(player.id, [])
 @@
--        current_controller = self.planet_control_mapping.get(planet.name)
-+        if not any(p.id == player_id for p in self.players):
-+            raise ValueError(f"Player {player_id} does not exist in the game")
-+        current_controller = self.planet_control_mapping.get(planet.name)
-```
-
----
-
-`1152-1155`: **Use name-based dedupe in add_player_planet.**
-
-Same identity issue as above.
-
-Apply:
-
-```diff
--        # Only add if not already present
--        if planet not in new_player_planets[player_id]:
--            new_player_planets[player_id].append(planet)
-+        # Only add if not already present (by name)
-+        if all(p.name != planet.name for p in new_player_planets[player_id]):
-+            new_player_planets[player_id].append(planet)
-```
-
----
-
-`1267-1293`: **Duplicate APIs for technology; delegate to one.**
-
-Reduce duplication by making add_player_technology_card an alias.
-
-Apply:
-
-```diff
- def add_player_technology_card(
-     self, player_id: str, technology_card: "TechnologyCard"
- ) -> "GameState":
--    """Add a technology card to a player's technology cards.
-+    """Deprecated alias; use add_player_technology().
-
-@@
--        new_player_technology_cards = {
--            pid: cards.copy() for pid, cards in self.player_technology_cards.items()
--        }
--
--        if player_id not in new_player_technology_cards:
--            new_player_technology_cards[player_id] = []
--
--        # Only add if not already present
--        if technology_card not in new_player_technology_cards[player_id]:
--            new_player_technology_cards[player_id].append(technology_card)
--
 -        return self._create_new_state(
--            player_technology_cards=new_player_technology_cards
--        )
-+        return self.add_player_technology(player_id, technology_card)
++        return self._create_new_state(
+             players=new_players,
+             # player_resources parameter removed - incorrect implementation
+             player_technologies=new_player_technologies,
+             victory_points=new_victory_points,
+             completed_objectives=new_completed_objectives,
+             status_phase_scoring=new_status_phase_scoring,
+             combat_scoring=new_combat_scoring,
+             player_secret_objectives=new_player_secret_objectives,
++            player_planets=new_player_planets,
++            player_planet_cards=new_player_planet_cards,
+             # player_influence parameter removed - incorrect implementation
+         )
 ```
 
-</blockquote></details>
-<details>
-<summary>review_response.md (1)</summary><blockquote>
+---
 
-`63-66`: **Specify code fence language for test output block.**
+`1243-1269`: **Do not remove/merge blindly — both stores are in active use; plan a deliberate refactor.**
 
-Adds syntax hint and silences MD040.
+player_technologies (dict[str, list[str]]) is used as the simple ownership view (GameTechnologyManager, movement/validators, scenario builder/tests); player_technology_cards (dict[str, list[TechnologyCard]]) holds per-card state (ready/exhausted) used by status_phase and card logic.
 
-Apply:
+- Preferred refactor: make player_technology_cards the canonical store and add a derived accessor (e.g., GameState.get_player_technologies(player_id) -> set[Technology]) so all callers consume a single source of truth; update GameTechnologyManager._sync_from_game_state, scenario builder, movement/rule callers and tests accordingly.
+- Short-term alternative: keep both but centralize one writer (GameTechnologyManager) to synchronize them and add tests that assert they never drift.
 
-```diff
--```
-+```text
- ======================= 1063 passed, 2 skipped in 9.22s ========================
- ```
-```
-
-</blockquote></details>
-<details>
-<summary>latest_review.txt (1)</summary><blockquote>
-
-`1-9`: **Avoid committing ephemeral review artifacts.**
-
-Consider excluding/auto-generating this report in CI to prevent churn.
-
-
-If you want, I can add a .gitattributes/.gitignore update and a CI artifact upload step.
+Files to act on: src/ti4/core/game_state.py, src/ti4/core/game_technology_manager.py, src/ti4/testing/scenario_builder.py, src/ti4/core/status_phase.py, src/ti4/core/rule89_validator.py, src/ti4/core/movement.py.
 
 </blockquote></details>
 
@@ -165,28 +124,49 @@ If you want, I can add a .gitattributes/.gitignore update and a CI artifact uplo
 <details>
 <summary>📥 Commits</summary>
 
-Reviewing files that changed from the base of the PR and between 2e8fe37486838a0db4cd9a5357b8a2df25bbd076 and 39a0ad181ca811563920b7bc8d65d965e15030db.
+Reviewing files that changed from the base of the PR and between 39a0ad181ca811563920b7bc8d65d965e15030db and 271733959406f4b9f0f7f9c0d6386325d91529ab.
 
 </details>
 
 <details>
-<summary>📒 Files selected for processing (7)</summary>
+<summary>📒 Files selected for processing (10)</summary>
 
-* `.trae/lrr_analysis/executive_summary.md` (1 hunks)
-* `latest_review.txt` (1 hunks)
+* `.gitignore` (1 hunks)
+* `latest_review.txt` (2 hunks)
+* `latest_review_pr11.txt` (0 hunks)
+* `latest_review_pr11_new.txt` (0 hunks)
 * `review_response.md` (1 hunks)
-* `src/ti4/core/game_state.py` (7 hunks)
+* `review_response_final.md` (0 hunks)
+* `review_response_summary.md` (0 hunks)
+* `src/ti4/core/game_state.py` (8 hunks)
 * `src/ti4/core/planet_card.py` (1 hunks)
-* `src/ti4/core/strategy_cards/coordinator.py` (1 hunks)
 * `tests/test_rule_25_control.py` (1 hunks)
 
 </details>
 
 <details>
-<summary>🚧 Files skipped from review as they are similar to previous changes (2)</summary>
+<summary>💤 Files with no reviewable changes (4)</summary>
 
+* review_response_summary.md
+* review_response_final.md
+* latest_review_pr11.txt
+* latest_review_pr11_new.txt
+
+</details>
+
+<details>
+<summary>✅ Files skipped from review due to trivial changes (1)</summary>
+
+* .gitignore
+
+</details>
+
+<details>
+<summary>🚧 Files skipped from review as they are similar to previous changes (3)</summary>
+
+* src/ti4/core/planet_card.py
 * tests/test_rule_25_control.py
-* src/ti4/core/strategy_cards/coordinator.py
+* latest_review.txt
 
 </details>
 
@@ -202,14 +182,16 @@ Reviewing files that changed from the base of the PR and between 2e8fe37486838a0
 <details>
 <summary>src/ti4/core/planet_card.py (3)</summary>
 
-* `PlanetCard` (6-88)
+* `PlanetCard` (6-92)
 * `is_exhausted` (25-27)
 * `exhaust` (33-37)
 
 </details>
 <details>
-<summary>src/ti4/core/strategy_cards/coordinator.py (2)</summary>
+<summary>src/ti4/core/strategy_cards/coordinator.py (4)</summary>
 
+* `ready_strategy_card` (600-610)
+* `ready_all_strategy_cards` (612-619)
 * `get_player_strategy_card_assignments` (987-995)
 * `get_exhausted_cards` (997-1008)
 
@@ -225,215 +207,67 @@ Reviewing files that changed from the base of the PR and between 2e8fe37486838a0
 
 </blockquote></details>
 
-</details><details>
-<summary>🪛 markdownlint-cli2 (0.18.1)</summary>
-
-<details>
-<summary>review_response.md</summary>
-
-9-9: Emphasis used instead of a heading
-
-(MD036, no-emphasis-as-heading)
-
----
-
-15-15: Emphasis used instead of a heading
-
-(MD036, no-emphasis-as-heading)
-
----
-
-21-21: Emphasis used instead of a heading
-
-(MD036, no-emphasis-as-heading)
-
----
-
-27-27: Emphasis used instead of a heading
-
-(MD036, no-emphasis-as-heading)
-
----
-
-33-33: Emphasis used instead of a heading
-
-(MD036, no-emphasis-as-heading)
-
----
-
-39-39: Emphasis used instead of a heading
-
-(MD036, no-emphasis-as-heading)
-
----
-
-45-45: Emphasis used instead of a heading
-
-(MD036, no-emphasis-as-heading)
-
----
-
-53-53: Emphasis used instead of a heading
-
-(MD036, no-emphasis-as-heading)
-
----
-
-64-64: Fenced code blocks should have a language specified
-
-(MD040, fenced-code-language)
-
-</details>
-
 </details>
 
 </details>
 
 <details>
-<summary>🔇 Additional comments (4)</summary><blockquote>
+<summary>🔇 Additional comments (9)</summary><blockquote>
 
 <details>
-<summary>src/ti4/core/planet_card.py (1)</summary><blockquote>
+<summary>review_response.md (2)</summary><blockquote>
 
-`12-17`: **Constructor validation — good coverage.**
+`60-67`: **Immutability claims don’t fully match the code.**
 
-Non-empty name and non-negative ints checks are correct.
+You state “All dictionary modifications follow the immutable pattern” and rely on frozen dataclass, but:
+- gain_planet_control exhausts the retrieved PlanetCard instance in-place.
+- Helpers _transfer_planet_card_from_deck/_between_players/_place/_remove mutate self.* directly.
+
+Either update the doc or adjust code to be mutation-free (see suggestions on game_state.py).
+
+---
+
+`3-4`: **Please confirm the test/coverage numbers.**
+
+“1063 passed, 2 skipped, 87% coverage” sounds good—confirm with the latest CI run ID to avoid drift.
 
 </blockquote></details>
 <details>
-<summary>src/ti4/core/game_state.py (2)</summary><blockquote>
+<summary>src/ti4/core/game_state.py (7)</summary><blockquote>
 
-`14-17`: **Import path for coordinator — correct now.**
+`14-16`: **Correct coordinator import path.**
 
-TYPE_CHECKING path uses strategy_cards.coordinator; aligns with package layout.
+Import under TYPE_CHECKING now matches module location. LGTM.
 
 ---
 
-`974-981`: **Deterministic controller selection — LGTM.**
+`85-95`: **Planet-control state surfaces look consistent.**
 
-Initiative-ordered tie-break removes nondeterminism.
+New deck, play-area, token, and mapping fields are coherent with Rule 25 modeling.
 
-</blockquote></details>
-<details>
-<summary>.trae/lrr_analysis/executive_summary.md (1)</summary><blockquote>
+---
 
-`3-6`: **Headline metrics contradict roadmap; regenerate or drop until automated.**
+`315-325`: **Create-new-state wiring includes planet-control fields.**
 
-“107/101 rules” and “3.5%” don’t match IMPLEMENTATION_ROADMAP.md.
+Good propagation of all new attributes in _create_new_state.
 
+---
 
+`947-986`: **Deterministic controller selection looks good.**
 
-```shell
-#!/bin/bash
-# Cross-check key claims against roadmap
-rg -n "Total Rules Analyzed|Overall Implementation Progress" .trae/lrr_analysis/executive_summary.md
-rg -n "Overall Progress|Completed Rules" IMPLEMENTATION_ROADMAP.md
-```
+resolve_planet_control_change uses initiative ordering; this addresses prior nondeterminism.
 
-</blockquote></details>
+---
 
-</blockquote></details>
+`1000-1018`: **Deck size helpers are fine.**
 
-</details>
+API surface is clear.
 
-<!-- This is an auto-generated comment by CodeRabbit for review status -->
+---
 
-DETAILED COMMENTS:
-----------------------------------------
-Comment 1:
-  File: src/ti4/core/game_state.py
-  Line: 116
-  Body: _⚠️ Potential issue_
+`836-844`: **Snapshot immutability breach: exhausting shared PlanetCard instance.**
 
-**Add player existence validation in control APIs.**
-
-Gain control should reject unknown player IDs (consistency with award_victory_points).
-
-Apply:
-
-```diff
- def gain_planet_control(
-     self, player_id: str, planet: "Planet"
- ) -> tuple[bool, "GameState"]:
-     """Handle gaining control of a planet according to Rule 25.
-@@
--        # Rule 25.2: Cannot gain control of already controlled planet
-+        # Validate player exists
-+        if not any(p.id == player_id for p in self.players):
-+            raise ValueError(f"Player {player_id} does not exist in the game")
-+
-+        # Rule 25.2: Cannot gain control of already controlled planet
-         current_controller = self.planet_control_mapping.get(planet.name)
-         if current_controller == player_id:
-             raise ValueError("Player already controls this planet")
-```
-
-<!-- suggestion_start -->
-
-<details>
-<summary>📝 Committable suggestion</summary>
-
-> ‼️ **IMPORTANT**
-> Carefully review the code before committing. Ensure that it accurately replaces the highlighted code, contains no missing lines, and has no issues with indentation. Thoroughly test & benchmark the code to ensure it meets the requirements.
-
-```suggestion
-    def gain_planet_control(
-        self, player_id: str, planet: "Planet"
-    ) -> tuple[bool, "GameState"]:
-        """Handle gaining control of a planet according to Rule 25.
-
-        Args:
-            player_id: The player gaining control
-            planet: The planet being controlled
-
-        Returns:
-            Tuple of (exploration_triggered, new_game_state)
-            exploration_triggered: True if exploration should be triggered (first control)
-
-        Raises:
-            ValueError: If player already controls this planet (Rule 25.2)
-        """
-        # Validate player exists
-        if not any(p.id == player_id for p in self.players):
-            raise ValueError(f"Player {player_id} does not exist in the game")
-
-        # Rule 25.2: Cannot gain control of already controlled planet
-        current_controller = self.planet_control_mapping.get(planet.name)
-        if current_controller == player_id:
-            raise ValueError("Player already controls this planet")
-```
-
-</details>
-
-<!-- suggestion_end -->
-
-<details>
-<summary>🤖 Prompt for AI Agents</summary>
-
-```
-In src/ti4/core/game_state.py around lines 785 to 805, the gain_planet_control
-method lacks validation that the supplied player_id exists; add the same player
-existence check used by award_victory_points so unknown player IDs are rejected.
-Specifically, before checking current controller, verify player_id is present in
-self.players (or the canonical player collection on GameState) and raise
-ValueError("Unknown player id") (or a matching error message used elsewhere) if
-not found; keep the existing Rule 25.2 check and return semantics unchanged.
-```
-
-</details>
-
-<!-- fingerprinting:phantom:poseidon:chinchilla -->
-
-<!-- This is an auto-generated comment by CodeRabbit -->
-
-Comment 2:
-  File: src/ti4/core/game_state.py
-  Line: 160
-  Body: _⚠️ Potential issue_
-
-**Immutability breach: mutates shared PlanetCard instance across states.**
-
-Exhausting planet_card here mutates the object that also exists in the previous GameState (deck/other player), breaking snapshot semantics of frozen GameState.
+Exhausting planet_card here mutates the object that still exists in the prior GameState (deck/other player's list), breaking snapshots.
 
 Apply:
 
@@ -454,9 +288,85 @@ Apply:
 +            planet_card.influence,
 +            trait=getattr(planet_card, "trait", None),
 +        )
++        # Rule 25.1: Card is exhausted when gained
 +        if not card_copy.is_exhausted():
 +            card_copy.exhaust()
 +        new_player_planet_cards[player_id].append(card_copy)
+```
+
+---
+
+`785-805`: **Add player-existence validation to gain_planet_control.**
+
+Currently unknown player IDs can gain control and pollute mappings/tokens.
+
+Apply this diff near the start of gain_planet_control:
+
+```diff
+ def gain_planet_control(
+     self, player_id: str, planet: "Planet"
+ ) -> tuple[bool, "GameState"]:
+@@
+-        # Rule 25.2: Cannot gain control of already controlled planet
++        # Validate player exists
++        if not any(p.id == player_id for p in self.players):
++            raise ValueError(f"Player {player_id} does not exist in the game")
++
++        # Rule 25.2: Cannot gain control of already controlled planet
+         current_controller = self.planet_control_mapping.get(planet.name)
+         if current_controller == player_id:
+             raise ValueError("Player already controls this planet")
+```
+
+</blockquote></details>
+
+</blockquote></details>
+
+</details>
+
+<!-- This is an auto-generated comment by CodeRabbit for review status -->
+
+DETAILED COMMENTS:
+----------------------------------------
+Comment 1:
+  File: src/ti4/core/game_state.py
+  Line: 167
+  Body: _⚠️ Potential issue_
+
+**Stale/duplicate control tokens possible when controller changes.**
+
+When current_controller is not None, tokens for the previous controller aren’t cleared. Also ensure token exclusivity when no units.
+
+Apply:
+
+```diff
+@@
+-        # Rule 25.1b: If another player controls it, take from their play area
++        # Rule 25.1b: If another player controls it, take from their play area
+         if current_controller is not None:
+@@
+-        # Add to new player's play area
++        # Remove any prior controller token for this planet
++        if current_controller is not None and planet.name in new_planet_control_tokens:
++            new_planet_control_tokens[planet.name].discard(current_controller)
++            if not new_planet_control_tokens[planet.name]:
++                del new_planet_control_tokens[planet.name]
++
++        # Add to new player's play area
+@@
+-        # Rule 25.4: If no units on planet, place control token
+-        if len(planet.units) == 0:
+-            if planet.name not in new_planet_control_tokens:
+-                new_planet_control_tokens[planet.name] = set()
+-            new_planet_control_tokens[planet.name].add(player_id)
++        # Rule 25.4: Token placement is exclusive
++        if len(planet.units) == 0:
++            # Only the new controller’s token should remain
++            new_planet_control_tokens[planet.name] = {player_id}
++        else:
++            # With units present, remove any residual tokens
++            if planet.name in new_planet_control_tokens:
++                del new_planet_control_tokens[planet.name]
 ```
 
 <!-- suggestion_start -->
@@ -468,19 +378,46 @@ Apply:
 > Carefully review the code before committing. Ensure that it accurately replaces the highlighted code, contains no missing lines, and has no issues with indentation. Thoroughly test & benchmark the code to ensure it meets the requirements.
 
 ```suggestion
+        # Rule 25.1b: If another player controls it, take from their play area
+        if current_controller is not None:
+            # Remove from previous player
+            if current_controller in new_player_planet_cards:
+                new_player_planet_cards[current_controller] = [
+                    card
+                    for card in new_player_planet_cards[current_controller]
+                    if card.name != planet.name
+                ]
+        else:
+            # Rule 25.1a: First control, take from deck
+            if planet.name in new_planet_card_deck:
+                del new_planet_card_deck[planet.name]
+
+        # Remove any prior controller token for this planet
+        if current_controller is not None and planet.name in new_planet_control_tokens:
+            new_planet_control_tokens[planet.name].discard(current_controller)
+            if not new_planet_control_tokens[planet.name]:
+                del new_planet_control_tokens[planet.name]
+
         # Add to new player's play area
         if player_id not in new_player_planet_cards:
             new_player_planet_cards[player_id] = []
-        # Create a fresh instance to avoid mutating prior-state references
-        card_copy = type(planet_card)(
-            planet_card.name,
-            planet_card.resources,
-            planet_card.influence,
-            trait=getattr(planet_card, "trait", None),
-        )
-        if not card_copy.is_exhausted():
-            card_copy.exhaust()
-        new_player_planet_cards[player_id].append(card_copy)
+        new_player_planet_cards[player_id].append(planet_card)
+
+        # Rule 25.1: Card is exhausted when gained
+        if not planet_card.is_exhausted():
+            planet_card.exhaust()
+
+        # Update planet control in centralized mapping (don't mutate Planet object)
+        new_planet_control_mapping[planet.name] = player_id
+
+        # Rule 25.4: Token placement is exclusive
+        if len(planet.units) == 0:
+            # Only the new controller's token should remain
+            new_planet_control_tokens[planet.name] = {player_id}
+        else:
+            # With units present, remove any residual tokens
+            if planet.name in new_planet_control_tokens:
+                del new_planet_control_tokens[planet.name]
 ```
 
 </details>
@@ -491,165 +428,127 @@ Apply:
 <summary>🤖 Prompt for AI Agents</summary>
 
 ```
-In src/ti4/core/game_state.py around lines 838 to 846, the code exhausts the
-existing planet_card instance which mutates an object shared with the previous
-GameState; instead, create a new PlanetCard instance (via the class's
-copy/clone/factory method or a shallow/deep copy) representing the gained card,
-set/exhaust that new instance, and append the new exhausted instance to
-new_player_planet_cards[player_id] so the original planet_card in the old state
-remains unchanged and snapshot immutability is preserved.
+In src/ti4/core/game_state.py around lines 822-853, when transferring control
+the code currently does not remove control tokens belonging to the previous
+controller and may allow multiple tokens to coexist; update the logic so that if
+current_controller is not None you remove that player’s entry from
+new_planet_control_tokens (or remove planet.name from their token set) before
+assigning to the new controller, and when handling the "no units" case ensure
+token exclusivity by replacing any existing token set for planet.name with a new
+set containing only player_id (create it if absent) instead of adding to the
+existing set; apply analogous clearing when taking from deck (first control) to
+ensure no stale tokens remain.
 ```
 
 </details>
+
+<!-- fingerprinting:phantom:poseidon:chinchilla -->
+
+<!-- This is an auto-generated comment by CodeRabbit -->
+
+Comment 2:
+  File: src/ti4/core/game_state.py
+  Line: 261
+  Body: _⚠️ Potential issue_
+
+**Card is “lost” on lose_planet_control; should return to deck readied.**
+
+lose_planet_control removes the card from the player but doesn’t re-add it to the deck, so later gains fabricate a fresh copy, skewing deck size and exploration logic.
+
+Apply:
+
+```diff
+-        # Create new state with updated control tokens and planet cards
++        # Create new state with updated control tokens, planet cards, and deck
+         new_planet_control_tokens = {
+             name: tokens.copy() for name, tokens in self.planet_control_tokens.items()
+         }
+         new_player_planet_cards = {
+             pid: cards.copy() for pid, cards in self.player_planet_cards.items()
+         }
+         new_planet_control_mapping = self.planet_control_mapping.copy()
++        new_planet_card_deck = self.planet_card_deck.copy()
+@@
+-        # Remove planet card from player's play area
++        # Remove planet card from player's play area and return a readied copy to deck
+         if player_id in new_player_planet_cards:
+-            new_player_planet_cards[player_id] = [
++            remaining = [
+                 card
+                 for card in new_player_planet_cards[player_id]
+                 if card.name != planet.name
+             ]
++            # Find the removed card in the old state to clone its stats (not state)
++            original = self._find_player_planet_card(player_id, planet.name)
++            if original is None:
++                original = self._get_or_create_planet_card(planet)
++            card_copy = type(original)(
++                original.name,
++                original.resources,
++                original.influence,
++                trait=getattr(original, "trait", None),
++            )
++            # Cards in deck should be readied
++            if card_copy.is_exhausted():
++                card_copy.ready()
++            new_planet_card_deck[planet.name] = card_copy
++            new_player_planet_cards[player_id] = remaining
+@@
+-        return self._create_new_state(
++        return self._create_new_state(
+             player_planet_cards=new_player_planet_cards,
+             planet_control_tokens=new_planet_control_tokens,
+             planet_control_mapping=new_planet_control_mapping,
+             player_planets=new_player_planets,
++            planet_card_deck=new_planet_card_deck,
+         )
+```
+
+
+> Committable suggestion skipped: line range outside the PR's diff.
 
 <!-- fingerprinting:phantom:poseidon:chinchilla -->
 
 <!-- This is an auto-generated comment by CodeRabbit -->
 
 Comment 3:
-  File: src/ti4/core/planet_card.py
-  Line: 62
-  Body: _⚠️ Potential issue_
+  File: src/ti4/core/game_state.py
+  Line: 440
+  Body: _🛠️ Refactor suggestion_
 
-**Validate spend amount type and positivity; clarify errors.**
+**Helpers mutate self.*; make them pure or remove.**
 
-Currently allows 0/negative or non-int amounts and raises late. Tighten upfront.
+_transfer_planet_card_from_deck/_between_players directly mutate self.player_planet_cards/deck, violating snapshot semantics if used.
 
-Apply:
-
-```diff
- def spend_resources(self, amount: int) -> int:
--    """Spend resources from this planet card, exhausting it."""
--    if self._exhausted:
-+    """Spend resources from this planet card, exhausting it."""
-+    if not isinstance(amount, int) or amount <= 0:
-+        raise ValueError("Spend amount must be a positive integer")
-+    if self._exhausted:
-         raise ValueError("Cannot spend from exhausted planet card")
-     if amount > self.resources:
-         raise ValueError(
-             f"Cannot spend {amount} resources, planet card only has {self.resources}"
-         )
-
-     self.exhaust()
-     return amount
-```
-
-<!-- suggestion_start -->
-
-<details>
-<summary>📝 Committable suggestion</summary>
-
-> ‼️ **IMPORTANT**
-> Carefully review the code before committing. Ensure that it accurately replaces the highlighted code, contains no missing lines, and has no issues with indentation. Thoroughly test & benchmark the code to ensure it meets the requirements.
-
-```suggestion
-    def spend_resources(self, amount: int) -> int:
-        """Spend resources from this planet card, exhausting it."""
-        if not isinstance(amount, int) or amount <= 0:
-            raise ValueError("Spend amount must be a positive integer")
-        if self._exhausted:
-            raise ValueError("Cannot spend from exhausted planet card")
-        if amount > self.resources:
-            raise ValueError(
-                f"Cannot spend {amount} resources, planet card only has {self.resources}"
-            )
-
-        self.exhaust()
-        return amount
-```
-
-</details>
-
-<!-- suggestion_end -->
-
-<details>
-<summary>🤖 Prompt for AI Agents</summary>
-
-```
-In src/ti4/core/planet_card.py around lines 51 to 62, validate that amount is an
-integer and strictly positive before any other checks: first check
-isinstance(amount, int) and reject bools, raising a TypeError with a clear
-message if not an int; then check amount > 0 and raise a ValueError with a clear
-message if not positive; only after those validations, check for self._exhausted
-and raise the existing ValueError if exhausted; keep the rest of the logic
-(exhaust and return amount) unchanged.
-```
-
-</details>
+Apply one of:
+- Remove unused helpers.
+- Or return updated copies to pass into _create_new_state (no side effects).
 
 <!-- fingerprinting:phantom:poseidon:chinchilla -->
 
 <!-- This is an auto-generated comment by CodeRabbit -->
 
 Comment 4:
-  File: src/ti4/core/planet_card.py
-  Line: 74
-  Body: _⚠️ Potential issue_
+  File: src/ti4/core/game_state.py
+  Line: 481
+  Body: _🛠️ Refactor suggestion_
 
-**Mirror spend validation for influence.**
+**Token helpers also mutate self.*; align with immutability.**
 
-Same input validation gap as resources.
-
-Apply:
-
-```diff
- def spend_influence(self, amount: int) -> int:
--    """Spend influence from this planet card, exhausting it."""
--    if self._exhausted:
-+    """Spend influence from this planet card, exhausting it."""
-+    if not isinstance(amount, int) or amount <= 0:
-+        raise ValueError("Spend amount must be a positive integer")
-+    if self._exhausted:
-         raise ValueError("Cannot spend from exhausted planet card")
-     if amount > self.influence:
-         raise ValueError(
-             f"Cannot spend {amount} influence, planet card only has {self.influence}"
-         )
-
-     self.exhaust()
-     return amount
-```
-
-<!-- suggestion_start -->
-
-<details>
-<summary>📝 Committable suggestion</summary>
-
-> ‼️ **IMPORTANT**
-> Carefully review the code before committing. Ensure that it accurately replaces the highlighted code, contains no missing lines, and has no issues with indentation. Thoroughly test & benchmark the code to ensure it meets the requirements.
-
-```suggestion
-    def spend_influence(self, amount: int) -> int:
-        """Spend influence from this planet card, exhausting it."""
-        if not isinstance(amount, int) or amount <= 0:
-            raise ValueError("Spend amount must be a positive integer")
-        if self._exhausted:
-            raise ValueError("Cannot spend from exhausted planet card")
-        if amount > self.influence:
-            raise ValueError(
-                f"Cannot spend {amount} influence, planet card only has {self.influence}"
-            )
-
-        self.exhaust()
-        return amount
-```
-
-</details>
-
-<!-- suggestion_end -->
+_place_control_token/_remove_control_token mutate self.planet_control_tokens. Either rewrite to return updated dicts or delete if unused.
 
 <details>
 <summary>🤖 Prompt for AI Agents</summary>
 
 ```
-In src/ti4/core/planet_card.py around lines 63 to 74, the spend_influence method
-lacks the same input validation used by the resources counterpart; update it to
-mirror that validation by checking that amount is a positive integer (e.g.,
-amount > 0) and raising a ValueError for non-positive amounts, ensure you still
-check amount <= self.influence and raise the existing ValueError when exceeding
-available influence, then deduct the influence (or otherwise consume it as
-resources does), call self.exhaust(), and return the spent amount.
+In src/ti4/core/game_state.py around lines 1115 to 1137, the helper methods
+_place_control_token and _remove_control_token currently mutate
+self.planet_control_tokens; refactor them to follow immutability by returning an
+updated planet_control_tokens mapping (or the updated mapping plus any auxiliary
+value) instead of mutating state in-place, and have callers assign the returned
+mapping to self.planet_control_tokens; alternatively, if these helpers are not
+used elsewhere, delete them and inline the immutable update logic where needed
+so no in-place mutations remain.
 ```
 
 </details>
