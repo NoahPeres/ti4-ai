@@ -163,7 +163,6 @@ class StrategyCardCoordinator:
         """
         self._strategic_action_manager = strategic_action_manager
         self._card_assignments: dict[str, StrategyCardType] = {}
-        self._exhausted_cards: set[StrategyCardType] = set()
 
         # Strategy phase selection state
         self._strategy_phase_active: bool = False
@@ -871,7 +870,6 @@ class StrategyCardCoordinator:
         self._speaker_order = []
         self._current_selecting_player_index = 0
         self._card_assignments = {}
-        self._exhausted_cards = set()
         self._player_card_states = {}
         self._secondary_ability_participants = {}
 
@@ -995,6 +993,19 @@ class StrategyCardCoordinator:
         Requirements: 8.3 - AI knows which cards other players have selected
         """
         return self._card_assignments.copy()
+
+    def get_exhausted_cards(self) -> set["StrategyCardType"]:
+        """Get all exhausted strategy cards.
+
+        Returns:
+            Set of exhausted strategy cards
+        """
+        exhausted_cards = set()
+        for _player_id, card_states in self._player_card_states.items():
+            for card, is_readied in card_states.items():
+                if not is_readied:  # False = exhausted
+                    exhausted_cards.add(card)
+        return exhausted_cards
 
     def get_available_cards_for_ai(self) -> list[StrategyCardInformation]:
         """Get information about available cards for AI selection evaluation.
