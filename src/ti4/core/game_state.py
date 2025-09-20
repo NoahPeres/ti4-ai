@@ -77,6 +77,8 @@ class GameState:
     strategy_card_coordinator: Optional["StrategyCardCoordinator"] = field(
         default=None, hash=False
     )  # Optional strategy card coordinator
+    # Rule 98.2a: Victory points to win (10 for standard, 14 for variant)
+    victory_points_to_win: int = VICTORY_POINTS_TO_WIN
 
     def get_victory_points(self, player_id: str) -> int:
         """Get the victory points for a player."""
@@ -86,22 +88,68 @@ class GameState:
         """Award victory points to a player, returning a new GameState."""
         new_victory_points = self.victory_points.copy()
         current_points = new_victory_points.get(player_id, 0)
-        new_victory_points[player_id] = current_points + points
+        new_points = current_points + points
+
+        # Rule 98.4a: Player cannot have more than maximum victory points
+        if new_points > self.victory_points_to_win:
+            raise ValueError(
+                f"Player {player_id} cannot exceed maximum victory points ({self.victory_points_to_win})"
+            )
+
+        new_victory_points[player_id] = new_points
 
         return self._create_new_state(victory_points=new_victory_points)
 
     def has_winner(self) -> bool:
         """Check if any player has reached the victory condition."""
         return any(
-            points >= VICTORY_POINTS_TO_WIN for points in self.victory_points.values()
+            points >= self.victory_points_to_win
+            for points in self.victory_points.values()
         )
 
     def get_winner(self) -> Optional[str]:
         """Get the player ID of the winner, if any."""
+        # Rule 98.7: Initiative order determines winner in case of ties
+        winners = []
         for player_id, points in self.victory_points.items():
-            if points >= VICTORY_POINTS_TO_WIN:
+            if points >= self.victory_points_to_win:
+                winners.append(player_id)
+
+        if not winners:
+            return None
+
+        # Return the first winner in initiative order (players list order)
+        player_order = [player.id for player in self.players]
+        for player_id in player_order:
+            if player_id in winners:
                 return player_id
-        return None
+
+        # Fallback to first winner found (shouldn't happen with proper player order)
+        return winners[0]
+
+    def get_players_with_most_victory_points(self) -> list[str]:
+        """Get all players tied for the most victory points (Rule 98.5)."""
+        if not self.victory_points:
+            return []
+
+        max_points = max(self.victory_points.values())
+        return [
+            player_id
+            for player_id, points in self.victory_points.items()
+            if points == max_points
+        ]
+
+    def get_players_with_fewest_victory_points(self) -> list[str]:
+        """Get all players tied for the fewest victory points (Rule 98.5)."""
+        if not self.victory_points:
+            return []
+
+        min_points = min(self.victory_points.values())
+        return [
+            player_id
+            for player_id, points in self.victory_points.items()
+            if points == min_points
+        ]
 
     def is_objective_completed(self, player_id: str, objective: Objective) -> bool:
         """Check if a player has completed a specific objective."""
@@ -162,6 +210,9 @@ class GameState:
             ),
             strategy_card_coordinator=kwargs.get(
                 "strategy_card_coordinator", self.strategy_card_coordinator
+            ),
+            victory_points_to_win=kwargs.get(
+                "victory_points_to_win", self.victory_points_to_win
             ),
         )
 
