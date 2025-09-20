@@ -133,11 +133,12 @@ class TestUnitAbilities:
 
     def test_production_ability(self) -> None:
         """Test that units with production ability return correct values."""
-        # Units with production
+        # Units without production (space dock production is dynamic based on planet resources)
         space_dock = Unit(unit_type=UnitType.SPACE_DOCK, owner="player1")
-        assert space_dock.get_production() == 2
+        assert (
+            space_dock.get_production() == 0
+        )  # Base production is 0, actual production is planet resources + 2
 
-        # Units without production
         fighter = Unit(unit_type=UnitType.FIGHTER, owner="player1")
         assert fighter.get_production() == 0
 
@@ -205,7 +206,7 @@ class TestUnitAbilitiesIntegration:
             (UnitType.INFANTRY, []),
             (UnitType.MECH, ["sustain_damage", "deploy"]),
             (UnitType.PDS, ["space_cannon", "planetary_shield"]),
-            (UnitType.SPACE_DOCK, ["production"]),
+            (UnitType.SPACE_DOCK, []),  # Production is dynamic, not a static ability
             (UnitType.WAR_SUN, ["sustain_damage", "bombardment", "capacity"]),
         ]
 

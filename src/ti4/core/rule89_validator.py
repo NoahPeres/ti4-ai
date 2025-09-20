@@ -355,12 +355,12 @@ class Rule89Validator:
 
         # Check planets for production units
         planet_units = self._get_player_units_on_planets(system, player)
-        if any(unit.get_production() > 0 for unit in planet_units):
+        if any(unit.has_production() for unit in planet_units):
             return True
 
         # Check space for production units (like war suns with upgrades)
         space_units = self._get_player_units_in_space(system, player)
-        return any(unit.get_production() > 0 for unit in space_units)
+        return any(unit.has_production() for unit in space_units)
 
     def validate_galaxy_integration(self, galaxy: "Galaxy") -> bool:
         """Validate integration with galaxy system.

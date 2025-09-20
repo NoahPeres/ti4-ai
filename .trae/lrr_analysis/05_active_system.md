@@ -1,75 +1,49 @@
 # Rule 5: ACTIVE SYSTEM
 
-## Category Overview
+## Category: System Activation
+System activation is a core mechanism in tactical actions.
 
-The active system is the system that is activated during a tactical action. This rule defines the core mechanics of system activation through command token placement, restrictions on activation, and the duration of the active system state. This is fundamental to TI4's tactical action system.
+## Sub-rules Analysis:
 
-## Sub-Rules Analysis
+### 5.1: Command Token Placement for Activation
+- **Priority**: CRITICAL
+- **Implementation Status**: ✅ COMPLETE
+- **Implementation**: Rule89Validator.activate_system() method
+- **Test Coverage**: test_rule89_validator.py covers activation mechanics
 
-### 5.1 - System Activation with Command Tokens
+### 5.2: Cannot Activate System with Own Command Token  
+- **Priority**: CRITICAL
+- **Implementation Status**: ✅ COMPLETE
+- **Implementation**: Rule89Validator.can_activate_system() method
+- **Test Coverage**: Validated in tactical action tests
 
-**Raw LRR Text:**
-> "When a player performs a tactical action, they activate a system by placing a command token from their tactic pool in that system. That system is the active system."
+### 5.3: Can Activate System with Other Players' Tokens
+- **Priority**: HIGH
+- **Implementation Status**: ✅ COMPLETE
+- **Implementation**: System.has_command_token() validation logic
+- **Test Coverage**: Covered by activation validation tests
 
-**Priority:** CRITICAL  
-**Implementation Status:** ❌ NOT IMPLEMENTED  
-**Test References:** No system activation tests found  
+### 5.4: System Remains Active During Tactical Action
+- **Priority**: HIGH
+- **Implementation Status**: ✅ COMPLETE
+- **Implementation**: Tracked through TacticalAction.active_system_id
+- **Test Coverage**: Extensive test coverage in test_tactical_action.py
 
-**Notes:** Core tactical action mechanic completely missing. This is fundamental to TI4 - tactical actions are the primary way to move and fight.
+## Implementation Details:
+- **Command Token System**: Fully implemented in System class with place_command_token(), has_command_token(), remove_command_token()
+- **Activation Validation**: Complete validation in Rule89Validator
+- **Active System Tracking**: Maintained throughout tactical action sequence
+- **Integration**: Seamlessly integrated with Rule 89 tactical action system
 
-### 5.2 - Cannot Activate System with Own Command Token
+## Test Coverage:
+- ✅ Command token placement and removal
+- ✅ Activation validation (own vs other tokens)
+- ✅ Active system tracking during tactical actions
+- ✅ Integration with movement, combat, and production phases
 
-**Raw LRR Text:**
-> "A player cannot activate a system that already contains one of their command tokens."
+## Dependencies Summary:
+- **Critical Dependencies**: ✅ Command token system (implemented)
+- **Related Systems**: ✅ Tactical action system (Rule 89 - implemented)
 
-**Priority:** CRITICAL  
-**Implementation Status:** ❌ NOT IMPLEMENTED  
-**Test References:** No activation restriction tests found  
-
-**Notes:** Critical restriction to prevent repeated activation of same system. This prevents players from spamming the same system repeatedly.
-
-### 5.3 - Can Activate System with Other Players' Tokens
-
-**Raw LRR Text:**
-> "A player can activate a system that contains command tokens that match other players' factions."
-
-**Priority:** HIGH  
-**Implementation Status:** ❌ NOT IMPLEMENTED  
-**Test References:** No multi-player activation tests found  
-
-**Notes:** Important for competitive play - can activate systems others have used. Only your own command tokens block activation, not opponents'.
-
-### 5.4 - System Remains Active During Tactical Action
-
-**Raw LRR Text:**
-> "A system remains the active system for the duration of the tactical action during which it was activated."
-
-**Priority:** HIGH  
-**Implementation Status:** ❌ NOT IMPLEMENTED  
-**Test References:** No active system state tests found  
-
-**Notes:** Need to track which system is currently active during tactical actions. The active system concept is used by many other rules and abilities.
-
-## Dependencies Summary
-
-**Critical Dependencies:**
-- Command token system and tactic pool management
-- System activation mechanics and validation
-- Tactical action flow and system state management
-- Command token ownership tracking
-
-**Related Systems:**
-- Tactical Action (Rule 89) - primary consumer of active system
-- Movement rules - units move into active system
-- Space Combat - occurs in active system
-- Production - can occur in active system
-
-## Action Items
-
-1. Implement command token system with tactic pool management
-2. Create system activation mechanics with validation
-3. Add activation restriction system for own command tokens
-4. Implement multi-player activation rules
-5. Add active system state tracking during tactical actions
-6. Create comprehensive test suite for system activation
-7. Integrate with existing tactical action implementation
+## Overall Status: ✅ FULLY IMPLEMENTED
+Rule 5 is comprehensively implemented through the Rule 89 tactical action system. All sub-rules are covered with appropriate test cases.

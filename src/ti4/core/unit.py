@@ -110,6 +110,10 @@ class Unit:
         """Check if this unit has planetary shield ability."""
         return self.get_stats().planetary_shield
 
+    def has_production(self) -> bool:
+        """Check if this unit has production ability."""
+        return self.get_stats().has_production
+
     def get_production(self) -> int:
         """Get the production value of this unit."""
         return self.get_stats().production

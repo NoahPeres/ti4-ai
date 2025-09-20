@@ -8,44 +8,58 @@ from .constants import Faction, Technology, UnitType
 
 @dataclass(frozen=True)
 class UnitStats:
-    """Represents the statistics of a unit."""
+    """Represents the statistics of a unit.
 
-    capacity: int = 0
+    Organized into two semantic groups:
+    1. Fundamental Unit Properties: Basic stats that define the unit
+    2. Unit Abilities: Special capabilities the unit may have
+    """
+
+    # === FUNDAMENTAL UNIT PROPERTIES ===
+    cost: float = 0
     combat_value: Optional[int] = None
-    combat_dice: int = 1
-    movement: int = 1
-    cost: float = 1
+    combat_dice: int = 0
+    movement: int = 0
+    capacity: int = 0
+    production: int = 0
+
+    # === UNIT ABILITIES ===
     sustain_damage: bool = False
     anti_fighter_barrage: bool = False
-    space_cannon: bool = False
-    space_cannon_value: Optional[int] = None
-    space_cannon_dice: int = 1
     bombardment: bool = False
     deploy: bool = False
     planetary_shield: bool = False
-    production: int = 0
+    space_cannon: bool = False
+    space_cannon_value: Optional[int] = None
+    space_cannon_dice: int = 0
+    has_production: bool = (
+        False  # Whether unit has production ability (separate from production value)
+    )
 
     def with_modifications(self, **kwargs: Any) -> "UnitStats":
         """Create a new UnitStats with modifications."""
         return UnitStats(
-            capacity=kwargs.get("capacity", self.capacity),
+            # Fundamental properties
+            cost=kwargs.get("cost", self.cost),
             combat_value=kwargs.get("combat_value", self.combat_value),
             combat_dice=kwargs.get("combat_dice", self.combat_dice),
             movement=kwargs.get("movement", self.movement),
-            cost=kwargs.get("cost", self.cost),
+            capacity=kwargs.get("capacity", self.capacity),
+            production=kwargs.get("production", self.production),
+            # Unit abilities
             sustain_damage=kwargs.get("sustain_damage", self.sustain_damage),
             anti_fighter_barrage=kwargs.get(
                 "anti_fighter_barrage", self.anti_fighter_barrage
             ),
+            bombardment=kwargs.get("bombardment", self.bombardment),
+            deploy=kwargs.get("deploy", self.deploy),
+            planetary_shield=kwargs.get("planetary_shield", self.planetary_shield),
             space_cannon=kwargs.get("space_cannon", self.space_cannon),
             space_cannon_value=kwargs.get(
                 "space_cannon_value", self.space_cannon_value
             ),
             space_cannon_dice=kwargs.get("space_cannon_dice", self.space_cannon_dice),
-            bombardment=kwargs.get("bombardment", self.bombardment),
-            deploy=kwargs.get("deploy", self.deploy),
-            planetary_shield=kwargs.get("planetary_shield", self.planetary_shield),
-            production=kwargs.get("production", self.production),
+            has_production=kwargs.get("has_production", self.has_production),
         )
 
 
@@ -54,70 +68,77 @@ class UnitStatsProvider:
 
     # Base unit statistics
     BASE_STATS = {
-        "carrier": UnitStats(
-            capacity=4, combat_value=9, combat_dice=1, movement=1, cost=3
+        UnitType.CARRIER: UnitStats(
+            cost=3, combat_value=9, combat_dice=1, movement=1, capacity=4
         ),
-        "cruiser": UnitStats(
-            capacity=0, combat_value=7, combat_dice=1, movement=2, cost=2
+        UnitType.CRUISER: UnitStats(
+            cost=2, combat_value=7, combat_dice=1, movement=2, capacity=0
         ),  # Base cruiser has no capacity
-        "cruiser_ii": UnitStats(
-            capacity=1, combat_value=6, combat_dice=1, movement=2, cost=2
+        UnitType.CRUISER_II: UnitStats(
+            cost=2, combat_value=6, combat_dice=1, movement=3, capacity=1
         ),  # Upgraded cruiser
-        "dreadnought": UnitStats(
-            capacity=1,
+        UnitType.DREADNOUGHT: UnitStats(
+            cost=4,
             combat_value=5,
             combat_dice=1,
             movement=1,
-            cost=4,
+            capacity=1,
             sustain_damage=True,
             bombardment=True,
         ),
-        "destroyer": UnitStats(
-            capacity=0,
+        UnitType.DESTROYER: UnitStats(
+            cost=1,
             combat_value=9,
             combat_dice=1,
             movement=2,
-            cost=1,
+            capacity=0,
             anti_fighter_barrage=True,
         ),
-        "fighter": UnitStats(
-            capacity=0, combat_value=9, combat_dice=1, movement=0, cost=0.5
+        UnitType.FIGHTER: UnitStats(
+            cost=0.5, combat_value=9, combat_dice=1, movement=0, capacity=0
         ),  # Base fighter needs capacity
-        "fighter_ii": UnitStats(
-            capacity=0, combat_value=8, combat_dice=1, movement=1, cost=0.5
-        ),  # Fighter II independent
-        "infantry": UnitStats(
-            capacity=0, combat_value=8, combat_dice=1, movement=0, cost=0.5
+        UnitType.INFANTRY: UnitStats(
+            cost=0.5, combat_value=8, combat_dice=1, movement=0, capacity=0
         ),
-        "mech": UnitStats(
-            capacity=0,
+        UnitType.MECH: UnitStats(
+            cost=2,
             combat_value=6,
             combat_dice=1,
             movement=0,
-            cost=2,
+            capacity=0,
             sustain_damage=True,
             deploy=True,
         ),
-        "pds": UnitStats(
-            capacity=0,
-            combat_value=6,
-            combat_dice=1,
+        UnitType.PDS: UnitStats(
+            combat_dice=0,  # PDS don't have combat dice, only space cannon
             movement=0,
-            cost=2,
+            capacity=0,
             space_cannon=True,
             space_cannon_value=6,
             space_cannon_dice=1,
             planetary_shield=True,
         ),
-        "space_dock": UnitStats(
-            capacity=0, combat_dice=0, movement=0, cost=4, production=2
-        ),  # No combat, has production
-        "war_sun": UnitStats(
-            capacity=6,
+        UnitType.SPACE_DOCK: UnitStats(
+            cost=0,  # Space docks cannot be produced directly
+            combat_value=None,
+            combat_dice=0,
+            movement=0,
+            capacity=0,
+            production=0,  # Production is dynamic: planet resources + 2
+            sustain_damage=False,
+            anti_fighter_barrage=False,
+            space_cannon=False,
+            bombardment=False,
+            deploy=False,
+            planetary_shield=False,
+            has_production=True,  # Space dock has production ability
+        ),
+        UnitType.WAR_SUN: UnitStats(
+            cost=12,
             combat_value=3,
             combat_dice=3,
             movement=2,
-            cost=12,
+            capacity=6,
             sustain_damage=True,
             bombardment=True,
         ),
@@ -152,7 +173,13 @@ class UnitStatsProvider:
         technologies: frozenset[str],
     ) -> UnitStats:
         """Cached version of unit stats calculation."""
-        base_stats = self.BASE_STATS.get(unit_type)
+        # Convert string unit_type to enum for lookup
+        try:
+            unit_type_enum = UnitType(unit_type)
+        except ValueError as err:
+            raise ValueError(f"Unknown unit type: {unit_type}") from err
+
+        base_stats = self.BASE_STATS.get(unit_type_enum)
         if base_stats is None:
             raise ValueError(f"Unknown unit type: {unit_type}")
 
@@ -177,21 +204,30 @@ class UnitStatsProvider:
     ) -> UnitStats:
         """Apply modifications to base stats."""
         return UnitStats(
-            capacity=base.capacity + modifications.capacity,
+            # Fundamental properties
+            cost=base.cost + modifications.cost,
             combat_value=modifications.combat_value
             if modifications.combat_value is not None
             else base.combat_value,
-            combat_dice=base.combat_dice + modifications.combat_dice,
-            movement=base.movement + modifications.movement,
-            cost=base.cost + modifications.cost,
+            combat_dice=max(0, base.combat_dice + modifications.combat_dice),
+            movement=max(0, base.movement + modifications.movement),
+            capacity=base.capacity + modifications.capacity,
+            production=base.production + modifications.production,
+            # Unit abilities
             sustain_damage=base.sustain_damage or modifications.sustain_damage,
             anti_fighter_barrage=base.anti_fighter_barrage
             or modifications.anti_fighter_barrage,
-            space_cannon=base.space_cannon or modifications.space_cannon,
             bombardment=base.bombardment or modifications.bombardment,
             deploy=base.deploy or modifications.deploy,
             planetary_shield=base.planetary_shield or modifications.planetary_shield,
-            production=base.production + modifications.production,
+            space_cannon=base.space_cannon or modifications.space_cannon,
+            space_cannon_value=modifications.space_cannon_value
+            if modifications.space_cannon_value is not None
+            else base.space_cannon_value,
+            space_cannon_dice=max(
+                0, base.space_cannon_dice + modifications.space_cannon_dice
+            ),
+            has_production=base.has_production or modifications.has_production,
         )
 
     def register_faction_modifier(

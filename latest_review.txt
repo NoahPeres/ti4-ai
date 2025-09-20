@@ -1,0 +1,723 @@
+Latest review for PR #8 in NoahPeres/ti4-ai:
+
+============================================================
+GITHUB PR REVIEW SUMMARY
+============================================================
+Reviewer: coderabbitai[bot]
+State: COMMENTED
+Submitted: 2025-09-20T03:19:14Z
+Review ID: 3248067807
+
+REVIEW BODY:
+----------------------------------------
+**Actionable comments posted: 3**
+
+<details>
+<summary>♻️ Duplicate comments (1)</summary><blockquote>
+
+<details>
+<summary>Makefile (1)</summary><blockquote>
+
+`56-56`: **Bandit gate now fails properly — nice.**
+
+Good use of -ll -ii; exit code is no longer masked.
+
+
+
+Optional: add -q for cleaner logs or drop -f json for human output locally, or emit JSON to a file for CI parsing.
+
+</blockquote></details>
+
+</blockquote></details>
+
+<details>
+<summary>🧹 Nitpick comments (10)</summary><blockquote>
+
+<details>
+<summary>Makefile (5)</summary><blockquote>
+
+`1-1`: **Harden Make shell with bash + -euo pipefail.**
+
+Prevents silent failures across all targets.
+
+
+```diff
++SHELL := bash
++.SHELLFLAGS := -euo pipefail -c
+ .PHONY: all help install test lint lint-fix format type-check check-all clean dev-setup strict-check security-check runtime-check quality-gate pre-commit-install
+```
+
+---
+
+`5-20`: **Help body too long for checkmake; switch to self-documenting help or compress.**
+
+checkmake flags this; adopt auto‑help (preferred) or compress echoes.
+
+
+
+Preferred (auto‑help; annotate targets with “## desc” comments):
+
+```diff
+-help:
+-	@echo "Available commands:"
+-	@echo "  install          Install dependencies with uv"
+-	@echo "  dev-setup        Set up development environment with uv"
+-	@echo "  test             Run tests with coverage"
+-	@echo "  lint             Run linting checks"
+-	@echo "  lint-fix         Run linting checks and automatically fix issues"
+-	@echo "  format           Format code with ruff"
+-	@echo "  type-check       Run type checking with mypy"
+-	@echo "  strict-check     Run mypy with strictest settings (no type ignores allowed)"
+-	@echo "  security-check   Run security analysis with bandit"
+-	@echo "  runtime-check    Run tests with runtime type checking enabled"
+-	@echo "  check-all        Run all quality checks (lint, format-check, type-check)"
+-	@echo "  quality-gate     Run the complete quality gate (all checks + tests)"
+-	@echo "  pre-commit-install Install pre-commit hooks"
+-	@echo "  clean            Clean up build artifacts"
++help: ## Show this help
++	@echo "Available commands:"
++	@awk -F':.*##' '/^[a-zA-Z0-9_.-]+:.*##/{printf "  %-18s %s\n", $$1, $$2}' $(MAKEFILE_LIST) | sort
+```
+
+Quick fix (compress to 2 lines):
+
+```diff
+-help:
+-	@echo "Available commands:"
+-	@echo "  install          Install dependencies with uv"
+-	@echo "  dev-setup        Set up development environment with uv"
+-	@echo "  test             Run tests with coverage"
+-	@echo "  lint             Run linting checks"
+-	@echo "  lint-fix         Run linting checks and automatically fix issues"
+-	@echo "  format           Format code with ruff"
+-	@echo "  type-check       Run type checking with mypy"
+-	@echo "  strict-check     Run mypy with strictest settings (no type ignores allowed)"
+-	@echo "  security-check   Run security analysis with bandit"
+-	@echo "  runtime-check    Run tests with runtime type checking enabled"
+-	@echo "  check-all        Run all quality checks (lint, format-check, type-check)"
+-	@echo "  quality-gate     Run the complete quality gate (all checks + tests)"
+-	@echo "  pre-commit-install Install pre-commit hooks"
+-	@echo "  clean            Clean up build artifacts"
++help:
++	@printf "%s\n" "Available commands:" \
++	"  install          Install dependencies with uv" \
++	"  dev-setup        Set up development environment with uv" \
++	"  test             Run tests with coverage" \
++	"  lint             Run linting checks" \
++	"  lint-fix         Run linting checks and automatically fix issues" \
++	"  format           Format code with ruff" \
++	"  type-check       Run type checking with mypy" \
++	"  strict-check     Run mypy with strictest settings (no type ignores allowed)" \
++	"  security-check   Run security analysis with bandit" \
++	"  runtime-check    Run tests with runtime type checking enabled" \
++	"  check-all        Run all quality checks (lint, format-check, type-check)" \
++	"  quality-gate     Run the complete quality gate (all checks + tests)" \
++	"  pre-commit-install Install pre-commit hooks" \
++	"  clean            Clean up build artifacts"
+```
+
+---
+
+`36-38`: **Consider formatting as part of lint-fix.**
+
+Keeps “fix” one-stop.
+
+
+```diff
+ lint-fix:
+ 	uv run ruff check src tests --fix --show-fixes
++	uv run ruff format src tests
+```
+
+---
+
+`63-63`: **Pre-commit: offer commit-msg hook and autoupdate target.**
+
+Improves DX and policy enforcement.
+
+
+```diff
+ pre-commit-install:
+-	uvx pre-commit install
++	uvx pre-commit install -t pre-commit -t commit-msg
++
++pre-commit-update: ## Update pre-commit hook revisions
++	uvx pre-commit autoupdate
+```
+
+---
+
+`66-73`: **DRY the duplicate “format check” into a dedicated target.**
+
+Avoids repetition in check-all and quality-gate.
+
+
+```diff
+-.PHONY: all help install test lint lint-fix format type-check check-all clean dev-setup strict-check security-check runtime-check quality-gate pre-commit-install
++.PHONY: all help install test lint lint-fix format format-check type-check check-all clean dev-setup strict-check security-check runtime-check quality-gate pre-commit-install
+@@
+-check-all: lint type-check
+-	@echo "Running format check..."
+-	uv run ruff format --check src tests
+-	@echo "All basic quality checks passed!"
++format-check: ## Verify code is formatted
++	@echo "Running format check..."
++	uv run ruff format --check src tests
++	@echo "Format check passed!"
++
++check-all: lint type-check format-check
++	@echo "All basic quality checks passed!"
+@@
+-quality-gate: lint strict-check security-check test runtime-check
+-	@echo "Running format check..."
+-	uv run ruff format --check src tests
+-	@echo "🎉 All quality gate checks passed! Code is ready for production."
++quality-gate: lint strict-check security-check test runtime-check format-check
++	@echo "🎉 All quality gate checks passed! Code is ready for production."
+```
+
+</blockquote></details>
+<details>
+<summary>scripts/fetch_pr_review.py (5)</summary><blockquote>
+
+`79-83`: **Add GitHub API version header.**
+
+Including `X-GitHub-Api-Version` improves forward compatibility and parity with docs.
+
+
+```diff
+             headers = {
+                 'Accept': 'application/vnd.github+json',
+-                'User-Agent': 'TI4-AI-PR-Review-Fetcher/1.0'
++                'User-Agent': 'TI4-AI-PR-Review-Fetcher/1.0',
++                'X-GitHub-Api-Version': '2022-11-28',
+             }
+```
+
+---
+
+`43-46`: **Mirror API version header in `_make_request` too.**
+
+
+```diff
+         headers = {
+             'Accept': 'application/vnd.github+json',
+-            'User-Agent': 'TI4-AI-PR-Review-Fetcher/1.0'
++            'User-Agent': 'TI4-AI-PR-Review-Fetcher/1.0',
++            'X-GitHub-Api-Version': '2022-11-28',
+         }
+```
+
+---
+
+`166-193`: **Reuse the paginator for review comments to simplify and unify behavior.**
+
+Leverage `_get_all_pages` here as well.
+
+
+```diff
+-        all_comments = []
+-        page = 1
+-        per_page = 100
+-
+-        while True:
+-            url = f"{self.base_url}/repos/{self.repo}/pulls/{pr_number}/reviews/{review_id}/comments?per_page={per_page}&page={page}"
+-            comments = self._make_request(url)
+-
+-            if not comments or len(comments) < per_page:
+-                all_comments.extend(comments)
+-                break
+-
+-            all_comments.extend(comments)
+-            page += 1
+-
+-        return all_comments
++        url = f"{self.base_url}/repos/{self.repo}/pulls/{pr_number}/reviews/{review_id}/comments?per_page=100"
++        return self._get_all_pages(url)
+```
+
+---
+
+`233-237`: **Line number fallback for comments.**
+
+Some review comments expose `position`/`original_line` instead of `line`. Add fallback for better display.
+
+
+```diff
+-                            summary.append(f"  Line: {comment.get('line', 'Unknown')}")
++                            line_info = comment.get('line') or comment.get('original_line') or comment.get('position')
++                            summary.append(f"  Line: {line_info if line_info is not None else 'Unknown'}")
+```
+
+---
+
+`264-265`: **Detect repo from current working directory, not script location.**
+
+Using `cwd=os.getcwd()` better matches the help text (“run from a git repository”) and supports invoking via symlinks.
+
+
+```diff
+-            cwd=os.path.dirname(os.path.abspath(__file__))
++            cwd=os.getcwd()
+```
+
+</blockquote></details>
+
+</blockquote></details>
+
+<details>
+<summary>📜 Review details</summary>
+
+**Configuration used**: CodeRabbit UI
+
+**Review profile**: CHILL
+
+**Plan**: Pro
+
+<details>
+<summary>📥 Commits</summary>
+
+Reviewing files that changed from the base of the PR and between f299184b84c374a2caa1deab05f439b4317945fe and fa07bb062254e4c13c65d0d30ba35b1c6f7144af.
+
+</details>
+
+<details>
+<summary>📒 Files selected for processing (5)</summary>
+
+* `.trae/lrr_analysis/78_space_combat.md` (1 hunks)
+* `Makefile` (3 hunks)
+* `scripts/fetch_pr_review.py` (1 hunks)
+* `src/ti4/core/space_combat.py` (1 hunks)
+* `tests/test_rule_78_space_combat.py` (1 hunks)
+
+</details>
+
+<details>
+<summary>🧰 Additional context used</summary>
+
+<details>
+<summary>🧬 Code graph analysis (2)</summary>
+
+<details>
+<summary>tests/test_rule_78_space_combat.py (5)</summary><blockquote>
+
+<details>
+<summary>src/ti4/core/combat.py (2)</summary>
+
+* `CombatDetector` (12-27)
+* `should_initiate_combat` (19-27)
+
+</details>
+<details>
+<summary>src/ti4/core/space_combat.py (15)</summary>
+
+* `CombatStep` (17-25)
+* `SpaceCombat` (149-281)
+* `start_combat` (160-178)
+* `can_use_anti_fighter_barrage` (44-51)
+* `can_defender_announce_retreat` (53-55)
+* `can_attacker_announce_retreat` (57-67)
+* `defender_announces_retreat` (69-71)
+* `get_attacker_dice_count` (109-115)
+* `get_defender_dice_count` (117-123)
+* `assign_hits_to_attacker` (125-127)
+* `assign_hits_to_defender` (129-131)
+* `should_continue` (180-193)
+* `next_round` (195-213)
+* `end_combat` (215-254)
+* `execute_retreat_step` (77-107)
+
+</details>
+<details>
+<summary>src/ti4/core/system.py (1)</summary>
+
+* `System` (12-168)
+
+</details>
+<details>
+<summary>src/ti4/core/unit.py (1)</summary>
+
+* `Unit` (10-191)
+
+</details>
+<details>
+<summary>src/ti4/actions/movement_engine.py (1)</summary>
+
+* `TacticalAction` (588-694)
+
+</details>
+
+</blockquote></details>
+<details>
+<summary>src/ti4/core/space_combat.py (3)</summary><blockquote>
+
+<details>
+<summary>src/ti4/core/constants.py (1)</summary>
+
+* `UnitType` (6-20)
+
+</details>
+<details>
+<summary>src/ti4/core/system.py (3)</summary>
+
+* `System` (12-168)
+* `remove_unit_from_space` (66-68)
+* `place_unit_in_space` (62-64)
+
+</details>
+<details>
+<summary>src/ti4/core/unit.py (4)</summary>
+
+* `Unit` (10-191)
+* `has_anti_fighter_barrage` (93-95)
+* `get_combat_dice` (121-123)
+* `get_combat_value` (73-75)
+
+</details>
+
+</blockquote></details>
+
+</details><details>
+<summary>🪛 checkmake (0.2.2)</summary>
+
+<details>
+<summary>Makefile</summary>
+
+[warning] 5-5: Target body for "help" exceeds allowed length of 5 (15).
+
+(maxbodylength)
+
+</details>
+
+</details>
+
+</details>
+
+<details>
+<summary>🔇 Additional comments (12)</summary><blockquote>
+
+<details>
+<summary>scripts/fetch_pr_review.py (2)</summary><blockquote>
+
+`1-14`: **Nice, self‑contained CLI with clear usage/docs.**
+
+Good structure, helpful env var support, and sane defaults.
+
+---
+
+`41-50`: **DRY headers: centralize GitHub request headers into a single _headers() helper.**
+
+Add this helper inside the class and replace the two local header dicts (lines ~41–50 and ~79–86) with calls to it:
+
+```python
+def _headers(self) -> dict[str, str]:
+    headers = {
+        'Accept': 'application/vnd.github+json',
+        'User-Agent': 'TI4-AI-PR-Review-Fetcher/1.0',
+        'X-GitHub-Api-Version': '2022-11-28',
+    }
+    if self.token:
+        headers['Authorization'] = f'Bearer {self.token}'
+    return headers
+```
+
+Replace sites with:
+
+```diff
+-        headers = {
+-            'Accept': 'application/vnd.github+json',
+-            'User-Agent': 'TI4-AI-PR-Review-Fetcher/1.0'
+-        }
++        headers = self._headers()
+```
+
+```diff
+-            headers = {
+-                'Accept': 'application/vnd.github+json',
+-                'User-Agent': 'TI4-AI-PR-Review-Fetcher/1.0'
+-            }
+-            if self.token:
+-                headers['Authorization'] = f'Bearer {self.token}'
++            headers = self._headers()
+```
+
+Previous ripgrep check failed with a PCRE2 error; to verify Authorization usage, run this simpler check to list all Authorization lines for inspection:
+
+```shell
+rg -n "Authorization" scripts/fetch_pr_review.py -C3 || echo "OK: no Authorization lines"
+```
+
+</blockquote></details>
+<details>
+<summary>src/ti4/core/space_combat.py (4)</summary><blockquote>
+
+`77-107`: **LGTM! Retreat execution correctly handles both attacker and defender retreats.**
+
+The retreat logic properly moves units between systems using the System API methods (`remove_unit_from_space` and `place_unit_in_space`) and handles both attacker and defender retreat scenarios correctly.
+
+---
+
+`269-281`: **Ship type filtering is comprehensive and accurate.**
+
+The `_is_ship` helper correctly identifies all ship types and excludes ground forces (INFANTRY, MECH), structures (PDS, SPACE_DOCK), which properly implements the combat participation rules.
+
+---
+
+`109-123`: **Dice counting logic correctly filters combat-capable units.**
+
+The methods properly sum combat dice only from units that have combat values (filtering out non-combat units), which aligns with TI4 combat mechanics.
+
+---
+
+`57-67`: **Fix attacker retreat logic to match official rules.**
+
+The current implementation incorrectly prevents attackers from ever announcing retreats. According to official TI4 rules (LRR 78.4.b), "If the defender announces a retreat, the attacker cannot announce a retreat during that combat round" - this means attackers CAN retreat when defenders have not announced a retreat.
+
+
+
+Apply this fix to match the official rules:
+
+```diff
+    def can_attacker_announce_retreat(self) -> bool:
+-        """Attacker can announce retreat if defender hasn't announced and eligible system exists.
+-
+-        Per LRR 78.4.b: If defender announces retreat, attacker cannot announce retreat.
+-        Per LRR 78.4.c: Player cannot announce retreat without eligible system.
+-
+-        Note: This method only checks the defender announcement flag.
+-        Retreat eligibility validation (adjacency, ownership, command tokens)
+-        should be implemented in the calling code per rules 78.4c and 78.7.
+-        """
++        """Attacker can announce retreat if defender hasn't announced retreat.
++        
++        Per LRR 78.4.b: If defender announces retreat, attacker cannot announce retreat.
++        Per LRR 78.4.c: Player cannot announce retreat without eligible system.
++        
++        Note: This method only checks the defender announcement flag.
++        Retreat eligibility validation (adjacency, ownership, command tokens)
++        should be implemented in the calling code per rules 78.4c and 78.7.
++        """
+-        return not self.defender_announced_retreat
++        return not self.defender_announced_retreat
+```
+
+Wait, the code is actually correct! The issue is that the attacker retreat was previously broken but appears to have been fixed. The current logic `return not self.defender_announced_retreat` correctly allows attacker retreat when defender has not announced.
+
+
+
+> Likely an incorrect or invalid review comment.
+
+</blockquote></details>
+<details>
+<summary>tests/test_rule_78_space_combat.py (4)</summary><blockquote>
+
+`99-104`: **Test incorrectly validates attacker retreat rules.**
+
+The test assertion `assert round_obj.can_attacker_announce_retreat() is True` followed by `round_obj.defender_announces_retreat()` then `assert round_obj.can_attacker_announce_retreat() is False` is actually correct! This properly tests that attackers CAN retreat when defenders have not announced, but CANNOT retreat after defenders announce - which matches the official rules.
+
+---
+
+`323-330`: **LGTM! Retreat execution test properly validates automatic unit movement.**
+
+The test correctly verifies that `execute_retreat_step()` automatically moves units between systems without requiring manual manipulation. This confirms the retreat mechanism works as intended.
+
+---
+
+`256-264`: **Integration test correctly expects ImportError for unimplemented tactical action.**
+
+This test properly validates that tactical action integration is not yet implemented, which is appropriate given the current development stage.
+
+---
+
+`401-424`: **Comprehensive winner determination test validates Rule 78.10.**
+
+The test correctly validates all aspects of combat result determination including winner, loser, draw status, and final unit counts.
+
+</blockquote></details>
+<details>
+<summary>.trae/lrr_analysis/78_space_combat.md (2)</summary><blockquote>
+
+`76-82`: **Documentation correctly states attacker retreat rules.**
+
+The documentation accurately reflects the official rules: "The attacker may announce retreat only if the defender has not announced and an eligible system exists" and correctly references LRR 78.4.b and 78.4.c.
+
+---
+
+`154-158`: **Test coverage summary demonstrates comprehensive implementation.**
+
+The documentation correctly identifies 4 test classes with 20+ test methods covering all core space combat rules, indicating thorough test coverage.
+
+</blockquote></details>
+
+</blockquote></details>
+
+</details>
+
+<!-- This is an auto-generated comment by CodeRabbit for review status -->
+
+DETAILED COMMENTS:
+----------------------------------------
+Comment 1:
+  File: scripts/fetch_pr_review.py
+  Line: Unknown
+  Body: _⚠️ Potential issue_
+
+**Authorization header mismatch; use Bearer consistently.**
+
+`_make_request` uses Bearer while `_get_all_pages` uses token. Unify to Bearer to avoid auth failures with fine‑grained tokens.
+
+
+```diff
+-            if self.token:
+-                headers['Authorization'] = f'token {self.token}'
++            if self.token:
++                headers['Authorization'] = f'Bearer {self.token}'
+```
+
+<!-- suggestion_start -->
+
+<details>
+<summary>📝 Committable suggestion</summary>
+
+> ‼️ **IMPORTANT**
+> Carefully review the code before committing. Ensure that it accurately replaces the highlighted code, contains no missing lines, and has no issues with indentation. Thoroughly test & benchmark the code to ensure it meets the requirements.
+
+```suggestion
+            if self.token:
+                headers['Authorization'] = f'Bearer {self.token}'
+```
+
+</details>
+
+<!-- suggestion_end -->
+
+<details>
+<summary>🤖 Prompt for AI Agents</summary>
+
+```
+In scripts/fetch_pr_review.py around lines 84 to 86, the Authorization header is
+set using the 'token' scheme while other code uses 'Bearer', causing auth
+mismatches; update the header to use 'Bearer' (i.e., set
+headers['Authorization'] to 'Bearer {self.token}') and scan for other places in
+the file to ensure all Authorization header usages are consistently using
+'Bearer' so fine‑grained tokens authenticate correctly.
+```
+
+</details>
+
+<!-- fingerprinting:phantom:poseidon:chinchilla -->
+
+<!-- This is an auto-generated comment by CodeRabbit -->
+
+Comment 2:
+  File: scripts/fetch_pr_review.py
+  Line: Unknown
+  Body: _⚠️ Potential issue_
+
+**Add timeout to paginated requests.**
+
+`urlopen` here lacks a timeout; the CLI can hang on network stalls.
+
+
+```diff
+-                with urlopen(request) as response:
++                with urlopen(request, timeout=15) as response:
+```
+
+<!-- suggestion_start -->
+
+<details>
+<summary>📝 Committable suggestion</summary>
+
+> ‼️ **IMPORTANT**
+> Carefully review the code before committing. Ensure that it accurately replaces the highlighted code, contains no missing lines, and has no issues with indentation. Thoroughly test & benchmark the code to ensure it meets the requirements.
+
+```suggestion
+                with urlopen(request, timeout=15) as response:
+```
+
+</details>
+
+<!-- suggestion_end -->
+
+<details>
+<summary>🤖 Prompt for AI Agents</summary>
+
+```
+In scripts/fetch_pr_review.py around line 89, the urlopen call lacks a timeout
+which can cause the CLI to hang on network stalls; update the call to include a
+numeric timeout (e.g. urlopen(request, timeout=TIMEOUT_SECONDS)), introduce or
+use an existing TIMEOUT_SECONDS constant or config value (set a sensible default
+like 10–30s), and ensure any surrounding logic continues to handle exceptions
+(URLError/timeout) if present so the process fails fast on network timeouts.
+```
+
+</details>
+
+<!-- fingerprinting:phantom:poseidon:chinchilla -->
+
+<!-- This is an auto-generated comment by CodeRabbit -->
+
+Comment 3:
+  File: scripts/fetch_pr_review.py
+  Line: Unknown
+  Body: _⚠️ Potential issue_
+
+**Guard against non‑list payloads from GitHub.**
+
+Blindly extending a list with a dict will corrupt results (extends by keys). Handle list/dict explicitly.
+
+
+```diff
+-                    data = json.loads(response.read().decode('utf-8'))
+-                    all_results.extend(data)
++                    data = json.loads(response.read().decode('utf-8'))
++                    if isinstance(data, list):
++                        all_results.extend(data)
++                    elif isinstance(data, dict):
++                        all_results.append(data)
++                    else:
++                        raise ValueError(f"Unexpected payload type from {current_url}: {type(data).__name__}")
+```
+
+<!-- suggestion_start -->
+
+<details>
+<summary>📝 Committable suggestion</summary>
+
+> ‼️ **IMPORTANT**
+> Carefully review the code before committing. Ensure that it accurately replaces the highlighted code, contains no missing lines, and has no issues with indentation. Thoroughly test & benchmark the code to ensure it meets the requirements.
+
+```suggestion
+                    data = json.loads(response.read().decode('utf-8'))
+                    if isinstance(data, list):
+                        all_results.extend(data)
+                    elif isinstance(data, dict):
+                        all_results.append(data)
+                    else:
+                        raise ValueError(f"Unexpected payload type from {current_url}: {type(data).__name__}")
+```
+
+</details>
+
+<!-- suggestion_end -->
+
+<details>
+<summary>🤖 Prompt for AI Agents</summary>
+
+```
+In scripts/fetch_pr_review.py around lines 90 to 92, the code unconditionally
+does all_results.extend(data) which breaks when GitHub returns a dict (or other
+non-list); change this to first check the payload type: if isinstance(data,
+list) call all_results.extend(data); elif isinstance(data, dict) call
+all_results.append(data); otherwise log a warning/error (including payload
+type/content) and skip or raise as appropriate to avoid corrupting all_results.
+```
+
+</details>
+
+<!-- fingerprinting:phantom:poseidon:chinchilla -->
+
+<!-- This is an auto-generated comment by CodeRabbit -->
+
+============================================================

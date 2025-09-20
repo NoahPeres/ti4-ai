@@ -22,7 +22,7 @@
 - ✅ Original test passes: `test_alpha_wormhole_systems_are_adjacent_regardless_of_distance`
 - ✅ Edge case test passes: `test_different_wormhole_types_are_not_adjacent`
 - ✅ Edge case test passes: `test_system_without_wormhole_not_adjacent_to_wormhole_system`
-- All 3 tests pass, implementation is robust and handles edge cases
+- All tests pass, implementation is robust and handles edge cases
 
 **Implementation Details**:
 - Wormhole adjacency logic in `Galaxy._check_wormhole_adjacency`

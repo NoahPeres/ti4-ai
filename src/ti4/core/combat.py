@@ -61,7 +61,7 @@ class CombatResolver:
             unit: The unit rolling dice
             dice_count: Optional override for number of dice (uses unit's combat_dice if None)
         """
-        stats = self.unit_stats_provider.get_unit_stats(UnitType(unit.unit_type))
+        stats = unit.get_stats()
         if stats.combat_value is None:
             return 0
 
@@ -77,6 +77,28 @@ class CombatResolver:
         # Roll dice and calculate hits
         dice_results = [random.randint(1, 10) for _ in range(actual_dice_count)]
         return self.calculate_hits(dice_results, stats.combat_value)
+
+    def roll_dice_for_unit_with_burst_icons(self, unit: Unit) -> int:
+        """Roll dice for a unit using burst icon mechanics.
+
+        Each burst icon on the unit's combat value represents one die to roll.
+        The combat_dice stat contains the total number of dice including burst icons.
+
+        Args:
+            unit: The unit rolling dice
+
+        Returns:
+            Number of hits scored
+        """
+        # Delegate to main roll_dice_for_unit method
+        return self.roll_dice_for_unit(unit)
+
+    def calculate_hits_with_burst_icons(self, unit: Unit) -> int:
+        """Calculate hits for a unit using burst icon mechanics.
+
+        This is an alias for roll_dice_for_unit_with_burst_icons for clarity.
+        """
+        return self.roll_dice_for_unit_with_burst_icons(unit)
 
     def calculate_hits(self, dice_results: list[int], combat_value: int) -> int:
         """Calculate hits from dice results given a combat value."""
@@ -215,7 +237,7 @@ class CombatResolver:
             return 0
 
         # Get unit stats and validate combat capability
-        stats = self.unit_stats_provider.get_unit_stats(UnitType(unit.unit_type))
+        stats = unit.get_stats()
         if stats.combat_value is None:
             return 0
 

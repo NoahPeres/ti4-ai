@@ -263,3 +263,6 @@ logs/
 *.bak
 *.backup
 *~
+
+# Review files
+latest_review.txt
