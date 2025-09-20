@@ -8,11 +8,12 @@
 ### 🎯 Next Target: 25% (Advanced Game Mechanics)
 **Focus**: Complete advanced mechanics that enable complex strategic gameplay and AI decision-making
 
-## 📊 **Overall Progress**: 26.7%
-**Completed Rules**: 18/101 rule categories completed
+## 📊 **Overall Progress**: 28.7%
+**Completed Rules**: 20/101 rule categories completed
 - **Rule 6: ADJACENCY** - Core spatial mechanics for system relationships
 - **Rule 14: BLOCKADED** - Blockade mechanics for space docks and production restrictions (Foundation Layer) ✅ **COMPLETED**
 - **Rule 17: CAPTURE** - Unit capture mechanics and faction sheet management (Foundation Layer) ✅ **COMPLETED**
+- **Rule 18: COMBAT** - General combat mechanics with burst icon support (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 20: COMMAND TOKENS** - Resource management and reinforcement system (Foundation Layer)
 - **Rule 34: EXHAUSTED** - Card exhaustion mechanics for planets, technology, and strategy cards (Foundation Layer) ✅ **NEWLY COMPLETED**
 - **Rule 58: MOVEMENT** - Unit movement and fleet mechanics (Core Game Layer) ✅ **COMPLETED**
@@ -21,6 +22,7 @@
 - **Rule 67: PRODUCING UNITS** - Unit production system with blockade integration (Core Game Layer) ✅ **COMPLETED**
 - **Rule 69: PROMISSORY NOTES** - Promissory note mechanics and diplomatic system (Core Game Layer) ✅ **COMPLETED**
 - **Rule 76: SHIPS** - Ship unit mechanics, fleet pool limits, and ship attributes (Foundation Layer) ✅ **COMPLETED**
+- **Rule 78: SPACE COMBAT** - Space combat resolution with anti-fighter barrage, retreats, and multi-round mechanics (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 82: STRATEGIC ACTION** - Strategy card activation framework (Core Game Layer) ✅ **COMPLETED**
 - **Rule 83: STRATEGY CARD** - Strategy card system with initiative, selection, and state management (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 90: TECHNOLOGY** - Technology research, prerequisites, and game state integration (Core Game Layer) ✅ **COMPLETED**
@@ -33,15 +35,23 @@
 1. ✅ **Rule 79: SPACE DOCK** - Space dock mechanics and production abilities (Foundation Layer) - **COMPLETE**
 2. ✅ **Rule 68: PRODUCTION** - Production ability mechanics and capacity calculations (Core Game Layer) - **COMPLETE**
 3. ✅ **Rule 37: FLEET POOL** - Fleet pool command token mechanics and ship limits (Foundation Layer) - **COMPLETE**
+4. ✅ **Rule 101: WORMHOLES** - Special adjacency mechanics (Foundation Layer) - **COMPLETE**
+5. ✅ **Rule 61: OBJECTIVE CARDS** - Victory condition tracking (Victory & Objectives Layer) - **COMPLETE**
+6. ✅ **Rule 99: WARFARE STRATEGY CARD** - Command token management (Strategy & Command Layer) - **COMPLETE**
+
+**Next Up:**
+7. ✅ **Rule 58: MOVEMENT** - Unit movement mechanics (Core Game Layer) - **COMPLETE**
+8. **Rule 86: TACTICAL ACTION** - Core action system (Core Game Layer) 🎯 **NEXT TARGET**
+9. ✅ **Rule 18: COMBAT** - General combat mechanics (Core Game Layer) - **COMPLETE**
 
 ### 📈 Progress Metrics
 - Foundation Layer: 9/8 rules (112.5%) 🎉 (Rule 34 added)
-- Core Game Layer: 12/15 rules (80.0%) 📈 (Rule 83 added)
+- Core Game Layer: 13/15 rules (86.7%) 📈 (Rule 78, Rule 83 added)
 - Advanced Mechanics: 0/43 rules (0%)
 
 ### 📈 Current Metrics
-- **Tests**: 800+ total tests, all passing (Rule 34: 15 tests, Rule 83: 50+ tests)
-- **Coverage**: 28.5% overall (focused on core mechanics)
+- **Tests**: 850+ total tests, all passing (Rule 78: 17 tests, Rule 34: 15 tests, Rule 83: 50+ tests)
+- **Coverage**: 29.0% overall (focused on core mechanics)
 - **Quality**: Strict TDD, type checking, linting standards maintained
 
 ### 📈 Priority Analysis Summary

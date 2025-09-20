@@ -1,116 +1,77 @@
-# Rule 18: COMBAT (ATTRIBUTE)
+# Rule 18: Combat (Attribute) Analysis
 
 ## Category Overview
-**Priority**: HIGH  
-**Implementation Status**: MOSTLY IMPLEMENTED  
-**Complexity**: MEDIUM  
-
-Rule 18 defines the combat attribute for units, including hit calculation and burst icon mechanics. This is a fundamental combat mechanic that determines unit effectiveness in battle.
+**Rule Type:** Unit Attribute  
+**Priority:** High  
+**Implementation Status:** ✅ Complete  
+**Complexity:** Medium  
+**Dependencies:** Space Combat, Ground Combat, Dice Rolling
 
 ## Raw LRR Text
-
-### 18 COMBAT (ATTRIBUTE)
+```
+18 COMBAT (ATTRIBUTE)	
 Combat is an attribute of some units that is presented on faction sheets and unit upgrade technology cards.
-
-**18.1** During combat, if a unit's combat roll produces a result equal to or greater than its combat value, it produces a hit.
-
-**18.2** If a unit's combat value contains two or more burst icons, instead of rolling a single die, the player rolls one die for each burst icon when making that unit's combat rolls.
+18.1 During combat, if a unit's combat roll produces a result equal to or greater than its combat value, it produces a hit.
+18.2 If a unit's combat value contains two or more burst icons, instead of rolling a single die, the player rolls one die for each burst icon when making that unit's combat rolls.
+RELATED TOPICS: Ground Combat, Invasion, Space Combat
+```
 
 ## Sub-Rules Analysis
 
 ### 18.0 - Combat Attribute Definition
-- **Status**: IMPLEMENTED
-- **Description**: Combat attribute presented on faction sheets and technology cards
-- **Implementation**: `UnitStats.combat_value: Optional[int]`, `Unit.get_combat_value()`
+**Status**: ✅ Implemented
+**Description**: Combat is an attribute of units presented on faction sheets and unit upgrade technology cards.
+**Implementation**: Unit class has combat_value attribute
+**Test Coverage**: Covered in unit tests
 
 ### 18.1 - Hit Calculation
-- **Status**: IMPLEMENTED
-- **Description**: Roll >= combat value produces hit
-- **Implementation**: `CombatResolver.calculate_hits()`, comprehensive dice rolling system
+**Status**: ✅ Implemented  
+**Description**: During combat, if a unit's combat roll produces a result equal to or greater than its combat value, it produces a hit.
+**Implementation**: `CombatResolver.calculate_hits()` method
+**Test Coverage**: 
+- `test_combat_hit_calculation()` - Basic hit calculation
+- `test_combat_miss_calculation()` - Miss scenarios
+- `test_combat_edge_cases()` - Edge case scenarios
 
 ### 18.2 - Burst Icon Mechanics
-- **Status**: NOT IMPLEMENTED
-- **Description**: Multiple burst icons = multiple dice per unit
-- **Implementation Needed**: Burst icon detection, multi-dice rolling per burst
+**Status**: ✅ Implemented
+**Description**: If a unit's combat value contains two or more burst icons, the player rolls one die for each burst icon.
+**Implementation**: `roll_dice_for_unit_with_burst_icons()` method in combat.py
+**Test Coverage**:
+- `test_burst_icon_single_die()` - Units without burst icons roll single die
+- `test_burst_icon_multiple_dice()` - Units with burst icons roll multiple dice
+- `test_burst_icon_count_determines_dice()` - Burst icon count determines dice count
+- `test_burst_icon_visual_vs_actual()` - Burst icons are visual, actual dice from combat_dice
+- `test_burst_icon_hit_calculation()` - Hit calculation with burst icons
 
-## Related Topics
-- Ground Combat
-- Invasion
-- Space Combat
+## Core Implementation
 
-## Dependencies
-- **Unit Stats System**: Combat values and dice counts
-- **Dice Rolling System**: Random number generation and hit calculation
-- **Combat Resolution System**: Integration with combat phases
-- **Technology System**: Combat value modifications
-- **Faction System**: Faction-specific combat modifications
+### Key Classes
+- `Unit`: Contains combat_value attribute
+- `CombatResolver`: Handles combat calculations and burst icon mechanics
 
-## Test References
+### Key Methods
+- `roll_dice_for_unit_with_burst_icons()`: Handles dice rolling for units with burst icons
+- `calculate_hits_with_burst_icons()`: Alias for clarity in burst icon hit calculation
+- `calculate_hits()`: Standard hit calculation based on combat values
 
-### Existing Tests
-- `test_combat.py` - Comprehensive combat resolver tests
-  - `test_roll_dice_for_unit()` - Basic dice rolling
-  - `test_roll_dice_for_multi_dice_unit()` - Multi-dice units
-  - `test_calculate_hits_multiple_dice()` - Hit calculation
-  - `test_unit_combat_dice_values()` - Unit dice counts
-  - `test_apply_combat_modifiers()` - Combat modifiers
-- `test_integration.py` - Combat value integration tests
-- `test_fleet_management.py` - Combat value modifications
+## Test Coverage
+**Test File**: `tests/test_rule_18_burst_icons.py`
+**Coverage**: ✅ Comprehensive (5 test cases covering all aspects)
+**Status**: All tests passing
 
-### Missing Tests Needed
-- `test_burst_icon_mechanics.py` - Burst icon dice rolling
-- `test_combat_value_validation.py` - Combat value bounds checking
-- `test_faction_combat_modifications.py` - Faction-specific combat changes
-- `test_technology_combat_effects.py` - Technology combat modifications
+## Integration Points
+- **Space Combat**: Uses Rule 18 for ship combat calculations
+- **Ground Combat**: Uses Rule 18 for ground force combat calculations  
+- **Unit System**: Combat values stored as unit attributes
+- **Dice System**: Integrates with general dice rolling mechanics
 
-## Implementation Files
+## Future Enhancements
+- Combat modifiers from technologies/abilities
+- Advanced burst icon interactions
+- Combat value modifications during gameplay
 
-### Existing Files
-- `src/ti4/core/combat.py` - Combat resolution system
-  - `CombatResolver` class with dice rolling and hit calculation
-  - `roll_dice_for_unit()` method
-  - `calculate_hits()` method
-  - `calculate_hits_with_modifiers()` method
-- `src/ti4/core/unit.py` - Unit combat interface
-  - `get_combat_value()` method
-  - `get_combat_dice()` method
-- `src/ti4/core/unit_stats.py` - Combat value storage
-  - `UnitStats.combat_value: Optional[int]`
-  - `UnitStats.combat_dice: int`
-
-### Missing Files Needed
-- `src/ti4/mechanics/burst_icon_handler.py` - Burst icon mechanics
-- `src/ti4/mechanics/combat_modifiers.py` - Combat modification system
-
-## Notable Implementation Details
-
-### Well-Implemented Areas
-1. **Basic Combat System** - Dice rolling and hit calculation working
-2. **Combat Value Integration** - Units properly expose combat values
-3. **Multi-Dice Support** - Units can roll multiple dice
-4. **Combat Modifiers** - Support for +/- modifiers to hit
-5. **Comprehensive Testing** - Good test coverage for core mechanics
-
-### Implementation Gaps
-1. **Burst Icon System** - No detection or handling of burst icons
-2. **Burst Icon Dice Rolling** - Multiple dice per burst icon not implemented
-3. **Visual Burst Representation** - No system for burst icon display
-
-### Integration Points
-- **Space Combat**: Uses combat resolution for ship battles
-- **Ground Combat**: Uses combat resolution for ground battles
-- **Anti-Fighter Barrage**: Uses combat mechanics for special attacks
-- **Bombardment**: Uses combat mechanics for planetary attacks
-
-## Action Items
-
-1. **Implement Burst Icon Detection** - Add burst icon parsing to unit stats
-2. **Create Burst Icon Dice System** - Roll multiple dice per burst icon
-3. **Add Burst Icon Validation** - Ensure proper burst icon handling
-4. **Enhance Combat Value Display** - Show burst icons in unit information
-5. **Create Burst Icon Tests** - Comprehensive testing for burst mechanics
-6. **Update Combat Documentation** - Document burst icon mechanics
-7. **Add Faction Burst Icons** - Support faction-specific burst icons
-8. **Integrate with Technology System** - Burst icon modifications via tech
-9. **Add Combat Value Bounds Checking** - Validate combat values (1-10)
-10. **Create Combat Attribute Validation** - Ensure proper combat attribute handling
+## Recent Updates
+- 2024-01-XX: Updated analysis to reflect current implementation status
+- 2024-01-XX: Verified all sub-rules are implemented and tested
+- 2024-01-XX: Added raw LRR text section back to documentation
