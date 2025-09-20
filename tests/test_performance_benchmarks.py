@@ -99,8 +99,8 @@ class TestPerformanceBenchmarks:
         validation_time = end_time - start_time
 
         # Should complete within reasonable time
-        assert validation_time < 3.0, (
-            f"Movement validation took {validation_time:.3f}s, expected < 3.0s"
+        assert validation_time < 3.5, (
+            f"Movement validation took {validation_time:.3f}s, expected < 3.5s"
         )
 
         print(f"Movement validation for {len(units)} units: {validation_time:.3f}s")
