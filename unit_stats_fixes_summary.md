@@ -75,7 +75,7 @@ UnitType.PDS: UnitStats(
 ```
 
 ## Test Results
-- All 1037 tests now pass
+- All 1053 tests now pass
 - Coverage remains at 87%
 - No breaking changes to existing functionality
 - Backward compatibility maintained through string-to-enum conversion

@@ -1,6 +1,6 @@
 """Tests for comprehensive scenario library."""
 
-from src.ti4.core.constants import UnitType
+from src.ti4.core.constants import Faction, UnitType
 from src.ti4.core.game_phase import GamePhase
 from src.ti4.testing.scenario_builder import GameScenarioBuilder
 
@@ -140,7 +140,11 @@ class TestScenarioLibrary:
         assert len(game_state.systems) == 3  # 3 home systems
 
         # Verify player factions are assigned correctly
-        expected_factions = ["sol", "xxcha", "hacan"]
+        expected_factions = [
+            Faction.SOL.value,
+            Faction.XXCHA.value,
+            Faction.HACAN.value,
+        ]
         actual_factions = [player.faction.value for player in game_state.players]
         assert actual_factions == expected_factions
 

@@ -1,0 +1,1081 @@
+Latest review for PR #11 in NoahPeres/ti4-ai:
+
+============================================================
+GITHUB PR REVIEW SUMMARY
+============================================================
+Reviewer: coderabbitai[bot]
+State: COMMENTED
+Submitted: 2025-09-20T07:23:47Z
+Review ID: 3248817088
+
+REVIEW BODY:
+----------------------------------------
+**Actionable comments posted: 4**
+
+<details>
+<summary>♻️ Duplicate comments (1)</summary><blockquote>
+
+<details>
+<summary>src/ti4/core/game_state.py (1)</summary><blockquote>
+
+`558-564`: **Cap enforcement in objective scoring — confirmed.**
+
+This addresses the earlier bypass in _update_victory_points flagged in prior review.
+
+</blockquote></details>
+
+</blockquote></details>
+
+<details>
+<summary>🧹 Nitpick comments (15)</summary><blockquote>
+
+<details>
+<summary>review_response.md (1)</summary><blockquote>
+
+`21-27`: **Fix markdownlint nits (MD026, MD037).**
+
+- Remove trailing “:” from headings.
+- Avoid spaces inside emphasis markers.
+
+Example:
+
+```diff
+-## Changes Made Summary:
++## Changes Made Summary
+```
+
+
+
+Also applies to: 84-90, 90-99
+
+</blockquote></details>
+<details>
+<summary>tests/test_game_controller.py (1)</summary><blockquote>
+
+`197-217`: **Reduce duplication using create_test_players().**
+
+Several tests re-create 3‑player arrays; prefer `create_test_players(3)` for consistency and brevity.
+
+
+
+Also applies to: 325-371
+
+</blockquote></details>
+<details>
+<summary>tests/test_rule_61_secret_objectives.py (1)</summary><blockquote>
+
+`224-245`: **Strengthen shuffle test to detect non-trivial shuffles.**
+
+Optional: assert that at least one position changed across multiple shuffles (allowing rare false negatives).
+
+</blockquote></details>
+<details>
+<summary>tests/test_property_based_invariants.py (2)</summary><blockquote>
+
+`24-31`: **Incorrect return type hints on @composite strategies.**
+
+These functions return values (wrapped by Hypothesis as strategies), not `None`. Remove the annotation or use `SearchStrategy[...]`.
+
+```diff
+-@composite
+-def valid_player_strategy(draw) -> None:
++@composite
++def valid_player_strategy(draw):
+@@
+-@composite
+-def valid_hex_coordinate_strategy(draw) -> None:
++@composite
++def valid_hex_coordinate_strategy(draw):
+@@
+-@composite
+-def valid_game_state_strategy(draw) -> None:
++@composite
++def valid_game_state_strategy(draw):
+```
+
+
+
+Also applies to: 46-51, 63-67
+
+---
+
+`26-30`: **Hoist repeated Faction imports to module scope.**
+
+Minor perf/readability tweak: import `Faction` once at top instead of inside functions.
+
+
+
+Also applies to: 37-41, 65-67, 82-85
+
+</blockquote></details>
+<details>
+<summary>latest_review_pr11_updated.txt (1)</summary><blockquote>
+
+`31-41`: **Treat review logs as immutable artifacts; avoid content edits.**
+
+If you must lint, keep to formatting headers only to preserve traceability.
+
+
+
+Also applies to: 211-217
+
+</blockquote></details>
+<details>
+<summary>tests/test_rule_61_objectives.py (2)</summary><blockquote>
+
+`67-68`: **Remove no-op GameState constructions.**
+
+These lines create a state but never use it.
+
+```diff
+-        GameState().add_player(Player("player1", Faction.SOL))
++        # (removed – unused)
+```
+
+
+
+Also applies to: 118-119
+
+---
+
+`223-227`: **Drop duplicate local imports in tests.**
+
+`Faction` and `Player` are already imported at module level.
+
+
+
+Also applies to: 243-247
+
+</blockquote></details>
+<details>
+<summary>IMPLEMENTATION_ROADMAP.md (2)</summary><blockquote>
+
+`7-12`: **Clarify “Next Target: 25%” vs current 25.9%.**
+
+The target appears lower than current progress; reword target as a section label without a percentage to avoid confusion.
+
+```diff
+-## 🎯 Next Target: 25% (Advanced Game Mechanics)
++## 🎯 Next Target (Advanced Game Mechanics)
+```
+
+---
+
+`50-59`: **Normalize metrics source; avoid drift.**
+
+“1053+ tests” and other counts should come from CI artifacts to stay current. Consider templating these from a single JSON.
+
+
+Provide CI-driven numbers once available; until then, consider removing the “+” qualifiers to avoid implying live binding.
+
+</blockquote></details>
+<details>
+<summary>.trae/lrr_analysis/98_victory_points.md (2)</summary><blockquote>
+
+`49-56`: **Clarify that the VP cap follows the selected threshold (10/14).**
+
+Make the implementation note explicit that the cap equals the configured threshold, not hard‑coded to 10.
+
+Apply:
+
+```diff
+-**Implementation**: `award_victory_points()` method with proper tracking and maximum enforcement
++**Implementation**: `award_victory_points()` method with proper tracking and maximum enforcement; cap equals `victory_points_to_win` (10 by default, 14 in the variant)
+```
+
+---
+
+`140-142`: **Temper “100% complete” claim regarding status‑phase ordering nuance.**
+
+Small doc tweak to reflect the current fallback.
+
+```diff
+-**Implementation Status**: 100%
+-**Rationale**: All core victory point mechanics are fully implemented with comprehensive test coverage. Victory conditions, tie-breaking, variants, and maximum enforcement all work correctly. Rule 98 is complete and ready for production use.
++**Implementation Status**: 100% of core logic
++**Rationale**: All core victory point mechanics are implemented and covered. Note: status‑phase simultaneous‑win ordering currently falls back to action‑phase order; update when a status‑phase ordering API is added.
+```
+
+</blockquote></details>
+<details>
+<summary>tests/test_rule_61_test_helpers.py (2)</summary><blockquote>
+
+`87-89`: **Fix return type annotation for standard_objectives fixture.**
+
+It returns a dict, not None. Helps mypy/pyright and IDEs.
+
+```diff
+-def standard_objectives() -> None:
++def standard_objectives() -> dict[str, Objective]:
+```
+
+---
+
+`92-103`: **Fix return type annotation for player_with_secrets fixture.**
+
+It returns a GameState.
+
+```diff
+-def player_with_secrets(game_state, standard_objectives) -> None:
++def player_with_secrets(game_state, standard_objectives) -> GameState:
+```
+
+</blockquote></details>
+<details>
+<summary>src/ti4/core/game_state.py (1)</summary><blockquote>
+
+`197-239`: **Prefer status-phase initiative order when available; otherwise fall back.**
+
+Coordinator exposes get_status_phase_initiative_order — call it when self.phase == GamePhase.STATUS; otherwise use get_action_phase_initiative_order().
+
+```diff
+-        if self.strategy_card_coordinator:
+-            initiative_order = (
+-                self.strategy_card_coordinator.get_action_phase_initiative_order()
+-            )
++        if self.strategy_card_coordinator:
++            # Prefer a status‑phase order if available and relevant
++            if (
++                self.phase == GamePhase.STATUS
++                and hasattr(self.strategy_card_coordinator, "get_status_phase_initiative_order")
++            ):
++                initiative_order = self.strategy_card_coordinator.get_status_phase_initiative_order()
++            else:
++                initiative_order = self.strategy_card_coordinator.get_action_phase_initiative_order()
+```
+
+</blockquote></details>
+
+</blockquote></details>
+
+<details>
+<summary>📜 Review details</summary>
+
+**Configuration used**: CodeRabbit UI
+
+**Review profile**: CHILL
+
+**Plan**: Pro
+
+<details>
+<summary>📥 Commits</summary>
+
+Reviewing files that changed from the base of the PR and between 47065bd837e43a69845f30dec1835b368d61e82f and ee841dca2924428509a166a60788716e0380708b.
+
+</details>
+
+<details>
+<summary>📒 Files selected for processing (14)</summary>
+
+* `.trae/lrr_analysis/98_victory_points.md` (3 hunks)
+* `IMPLEMENTATION_ROADMAP.md` (3 hunks)
+* `latest_review_pr11_updated.txt` (1 hunks)
+* `review_response.md` (1 hunks)
+* `review_response_summary.md` (1 hunks)
+* `src/ti4/core/game_state.py` (5 hunks)
+* `tests/test_game_controller.py` (2 hunks)
+* `tests/test_integration_scenarios.py` (1 hunks)
+* `tests/test_property_based_invariants.py` (3 hunks)
+* `tests/test_rule_61_objectives.py` (14 hunks)
+* `tests/test_rule_61_scoring_limits.py` (13 hunks)
+* `tests/test_rule_61_secret_objectives.py` (14 hunks)
+* `tests/test_rule_61_test_helpers.py` (3 hunks)
+* `tests/test_rule_98_victory_points.py` (1 hunks)
+
+</details>
+
+<details>
+<summary>✅ Files skipped from review due to trivial changes (2)</summary>
+
+* tests/test_rule_61_scoring_limits.py
+* review_response_summary.md
+
+</details>
+
+<details>
+<summary>🚧 Files skipped from review as they are similar to previous changes (1)</summary>
+
+* tests/test_rule_98_victory_points.py
+
+</details>
+
+<details>
+<summary>🧰 Additional context used</summary>
+
+<details>
+<summary>🧬 Code graph analysis (7)</summary>
+
+<details>
+<summary>tests/test_property_based_invariants.py (2)</summary><blockquote>
+
+<details>
+<summary>src/ti4/core/constants.py (1)</summary>
+
+* `Faction` (124-138)
+
+</details>
+<details>
+<summary>src/ti4/core/player.py (1)</summary>
+
+* `Player` (10-44)
+
+</details>
+
+</blockquote></details>
+<details>
+<summary>tests/test_game_controller.py (3)</summary><blockquote>
+
+<details>
+<summary>src/ti4/core/constants.py (1)</summary>
+
+* `Faction` (124-138)
+
+</details>
+<details>
+<summary>tests/test_fleet_management.py (1)</summary>
+
+* `test_faction_specific_unit_stats` (135-162)
+
+</details>
+<details>
+<summary>tests/test_player.py (2)</summary>
+
+* `test_player_equality` (13-18)
+* `test_player_has_unique_identification` (7-10)
+
+</details>
+
+</blockquote></details>
+<details>
+<summary>tests/test_integration_scenarios.py (2)</summary><blockquote>
+
+<details>
+<summary>src/ti4/core/constants.py (1)</summary>
+
+* `Faction` (124-138)
+
+</details>
+<details>
+<summary>src/ti4/core/player.py (1)</summary>
+
+* `Player` (10-44)
+
+</details>
+
+</blockquote></details>
+<details>
+<summary>tests/test_rule_61_secret_objectives.py (4)</summary><blockquote>
+
+<details>
+<summary>src/ti4/core/constants.py (1)</summary>
+
+* `Faction` (124-138)
+
+</details>
+<details>
+<summary>tests/test_rule_61_test_helpers.py (1)</summary>
+
+* `game_state` (81-83)
+
+</details>
+<details>
+<summary>src/ti4/core/game_state.py (2)</summary>
+
+* `GameState` (32-917)
+* `add_player` (646-683)
+
+</details>
+<details>
+<summary>src/ti4/core/player.py (1)</summary>
+
+* `Player` (10-44)
+
+</details>
+
+</blockquote></details>
+<details>
+<summary>src/ti4/core/game_state.py (1)</summary><blockquote>
+
+<details>
+<summary>src/ti4/core/strategy_cards/coordinator.py (1)</summary>
+
+* `get_action_phase_initiative_order` (468-480)
+
+</details>
+
+</blockquote></details>
+<details>
+<summary>tests/test_rule_61_test_helpers.py (3)</summary><blockquote>
+
+<details>
+<summary>src/ti4/core/constants.py (1)</summary>
+
+* `Faction` (124-138)
+
+</details>
+<details>
+<summary>src/ti4/core/game_state.py (2)</summary>
+
+* `GameState` (32-917)
+* `add_player` (646-683)
+
+</details>
+<details>
+<summary>src/ti4/core/player.py (1)</summary>
+
+* `Player` (10-44)
+
+</details>
+
+</blockquote></details>
+<details>
+<summary>tests/test_rule_61_objectives.py (4)</summary><blockquote>
+
+<details>
+<summary>src/ti4/core/constants.py (1)</summary>
+
+* `Faction` (124-138)
+
+</details>
+<details>
+<summary>tests/test_rule_61_test_helpers.py (1)</summary>
+
+* `game_state` (81-83)
+
+</details>
+<details>
+<summary>src/ti4/core/game_state.py (2)</summary>
+
+* `GameState` (32-917)
+* `add_player` (646-683)
+
+</details>
+<details>
+<summary>src/ti4/core/player.py (1)</summary>
+
+* `Player` (10-44)
+
+</details>
+
+</blockquote></details>
+
+</details><details>
+<summary>🪛 markdownlint-cli2 (0.18.1)</summary>
+
+<details>
+<summary>review_response.md</summary>
+
+11-11: Spaces inside emphasis markers
+
+(MD037, no-space-in-emphasis)
+
+</details>
+
+</details>
+
+</details>
+
+<details>
+<summary>🔇 Additional comments (10)</summary><blockquote>
+
+<details>
+<summary>review_response.md (1)</summary><blockquote>
+
+`13-29`: **DISAGREEMENT rationale is correct — no change needed.**
+
+Your pasted `_update_victory_points` already guards against exceeding the cap; calling paths are consistent.
+
+</blockquote></details>
+<details>
+<summary>tests/test_integration_scenarios.py (1)</summary><blockquote>
+
+`31-37`: **LGTM: switched to Faction enum in setup.**
+
+Consistent with Player.faction typing and other tests.
+
+</blockquote></details>
+<details>
+<summary>tests/test_rule_61_secret_objectives.py (1)</summary><blockquote>
+
+`25-29`: **LGTM: fluent add_player + Faction enum throughout.**
+
+Setup reads clearly and aligns with GameState API.
+
+
+
+Also applies to: 53-57, 83-85, 117-118, 141-142, 197-203, 251-253, 271-272, 289-289, 313-314, 347-350
+
+</blockquote></details>
+<details>
+<summary>tests/test_rule_61_objectives.py (1)</summary><blockquote>
+
+`31-54`: **Good phase validation coverage.**
+
+Status vs action/agenda checks and error messages look solid.
+
+</blockquote></details>
+<details>
+<summary>tests/test_rule_61_test_helpers.py (2)</summary><blockquote>
+
+`50-53`: **Good: helpers now create valid GameState with a real player.**
+
+This unblocks objective assignment/ownership checks and aligns with Rule 61 flows.
+
+---
+
+`81-84`: **LGTM: fixture returns a ready‑to‑use GameState.**
+
+Type annotation updated and usage consistent with add_player().
+
+</blockquote></details>
+<details>
+<summary>src/ti4/core/game_state.py (4)</summary><blockquote>
+
+`80-82`: **Configurable victory threshold added — good.**
+
+Field persists across clones and enables 14‑point variant.
+
+---
+
+`89-110`: **Award VP validation looks solid.**
+
+Player existence, non‑negative total, and max‑cap checks are handled.
+
+---
+
+`113-118`: **Winner detection respects configured threshold.**
+
+Simple and correct.
+
+---
+
+`300-303`: **Good: threshold persists across state clones.**
+
+Prevents silent reversion to default in immutable updates.
+
+</blockquote></details>
+
+</blockquote></details>
+
+</details>
+
+<!-- This is an auto-generated comment by CodeRabbit for review status -->
+
+DETAILED COMMENTS:
+----------------------------------------
+Comment 1:
+  File: .trae/lrr_analysis/98_victory_points.md
+  Line: 5
+  Body: _⚠️ Potential issue_
+
+<details>
+<summary>🧩 Analysis chain</summary>
+
+**Raw LRR text should remain verbatim; move tie‑breaking/status‑phase note to analysis.**
+
+This line adds interpretation to the “Raw LRR Text” block. Keep the raw quote exact and document clarifications in the analysis section.
+
+Apply this diff to keep the raw block pure:
+
+```diff
+-98.7 The game ends immediately when one player has 10 victory points. If multiple players would simultaneously gain their 10th victory point, the player who is earliest in initiative order among those players is the winner; if this occurs when players are scoring during the Status Phase, resolve initiative order for that phase.
++98.7 The game ends immediately when one player has 10 victory points.
+```
+
+Please confirm the official wording for TI4 Rule 98.7:
+
+---
+
+🌐 Web query:
+
+```web
+What is the exact text of Twilight Imperium 4th Edition Rule 98.7 regarding victory and simultaneous wins?
+```
+
+💡 Result:
+
+98.7 The game ends immediately when one player has 10 victory points. If multiple players would simultaneously gain their 10th victory point, the player who is earliest in initiative order among those players is the winner; if this occurs when players do not have strategy cards, the player who is nearest the speaker (including the speaker) in clockwise order is the winner. [1][2]
+
+---
+
+
+
+</details>
+
+**Restore exact Raw LRR wording; move interpretation to analysis.**
+
+File: .trae/lrr_analysis/98_victory_points.md Lines: 20-20
+
+Apply this replacement so the Raw LRR block matches the official text and remove the Status Phase interpretation from the raw quote:
+
+```diff
+-98.7 The game ends immediately when one player has 10 victory points. If multiple players would simultaneously gain their 10th victory point, the player who is earliest in initiative order among those players is the winner; if this occurs when players are scoring during the Status Phase, resolve initiative order for that phase.
++98.7 The game ends immediately when one player has 10 victory points. If multiple players would simultaneously gain their 10th victory point, the player who is earliest in initiative order among those players is the winner; if this occurs when players do not have strategy cards, the player who is nearest the speaker (including the speaker) in clockwise order is the winner.
+```
+
+Move any explanatory notes about resolving ties during the Status Phase into the analysis section.
+
+<!-- suggestion_start -->
+
+<details>
+<summary>📝 Committable suggestion</summary>
+
+> ‼️ **IMPORTANT**
+> Carefully review the code before committing. Ensure that it accurately replaces the highlighted code, contains no missing lines, and has no issues with indentation. Thoroughly test & benchmark the code to ensure it meets the requirements.
+
+```suggestion
+98.7 The game ends immediately when one player has 10 victory points. If multiple players would simultaneously gain their 10th victory point, the player who is earliest in initiative order among those players is the winner; if this occurs when players do not have strategy cards, the player who is nearest the speaker (including the speaker) in clockwise order is the winner.
+```
+
+</details>
+
+<!-- suggestion_end -->
+
+<details>
+<summary>🤖 Prompt for AI Agents</summary>
+
+```
+.trae/lrr_analysis/98_victory_points.md around line 20: restore the Raw LRR
+quote to the official wording exactly (replace the current line with the
+official raw text verbatim) and remove the sentence that interprets resolving
+ties during the Status Phase from the Raw LRR block; move that explanatory note
+into the analysis section below the raw quote (create or append to an "Analysis"
+paragraph) so the raw block contains only the official rule text and all
+interpretation lives in the analysis section.
+```
+
+</details>
+
+<!-- fingerprinting:phantom:poseidon:chinchilla -->
+
+<!-- This is an auto-generated comment by CodeRabbit -->
+
+Comment 2:
+  File: .trae/lrr_analysis/98_victory_points.md
+  Line: 90
+  Body: _⚠️ Potential issue_
+
+<details>
+<summary>🧩 Analysis chain</summary>
+
+**Document the current tie‑break ordering source.**
+
+Code uses action‑phase initiative ordering; the note about “resolve initiative order for that phase (Status)” isn’t implemented yet in GameState.
+
+Apply:
+
+```diff
+-**Implementation**: Complete win condition checking with initiative order tie-breaking
++**Implementation**: Complete win condition checking with initiative order tie‑breaking. Uses action‑phase initiative order from StrategyCardCoordinator; simultaneous wins during Status Phase currently fall back to action‑phase order pending a dedicated status‑phase ordering API.
+```
+
+---
+
+🏁 Script executed:
+
+```shell
+#!/bin/bash
+# Verify if a status-phase specific initiative API exists
+rg -n "get_status_phase_initiative_order" -g '!**/site-packages/**'
+```
+
+Length of output: 148
+
+---
+
+🏁 Script executed:
+
+```shell
+#!/bin/bash
+set -euo pipefail
+echo "PWD: $(pwd)"
+echo "--- top-level files ---"
+ls -la | sed -n '1,200p' || true
+echo "--- rg version ---"
+rg --version 2>/dev/null || true
+echo "--- search: StrategyCardCoordinator ---"
+rg -n --hidden --no-ignore-vcs -S "StrategyCardCoordinator" || true
+rg -n --hidden --no-ignore-vcs -S "strategycardcoordinator" -i || true
+echo "--- search: initiative / initiative_order ---"
+rg -n --hidden --no-ignore-vcs -S '\binitiative\b' || true
+rg -n --hidden --no-ignore-vcs -S 'initiative_order' || true
+echo "--- search: status phase variants ---"
+rg -n --hidden --no-ignore-vcs -S 'status[-_ ]phase|Status Phase|status_phase|StatusPhase' || true
+echo "--- search: get_status_phase_initiative_order ---"
+rg -n --hidden --no-ignore-vcs -S 'get_status_phase_initiative_order' || true
+```
+
+Length of output: 142600
+
+---
+
+
+
+</details>
+
+**Use status‑phase initiative order for Status Phase tie‑breaks (GameState currently uses action‑phase order).**
+
+StrategyCardCoordinator exposes get_action_phase_initiative_order() and get_status_phase_initiative_order(); GameState currently calls get_action_phase_initiative_order() when sorting tied winners — switch to get_status_phase_initiative_order() when resolving simultaneous 10‑VP wins that occur during the Status Phase.
+
+Locations:
+- src/ti4/core/game_state.py — get_winner / _sort_players_by_initiative_order call get_action_phase_initiative_order() (around lines 131–154 and 197–229); winner check invoked from execute_status_phase_step_1_score_objectives (around line 337).
+- src/ti4/core/strategy_cards/coordinator.py — implements get_action_phase_initiative_order() and get_status_phase_initiative_order() (around lines 468–496).
+
+<!-- fingerprinting:phantom:poseidon:chinchilla -->
+
+<!-- This is an auto-generated comment by CodeRabbit -->
+
+Comment 3:
+  File: src/ti4/core/game_state.py
+  Line: 87
+  Body: _🛠️ Refactor suggestion_
+
+<details>
+<summary>🧩 Analysis chain</summary>
+
+**Unify tie‑break logic and avoid partial‑assignment nondeterminism.**
+
+Current logic duplicates initiative derivation and can skip winners lacking a strategy card assignment, falling back to an arbitrary list order. Use the existing sorter for deterministic ties and to centralize initiative logic.
+
+
+Apply:
+
+```diff
+ def get_winner(self) -> Optional[str]:
+     """Get the player ID of the winner, if any."""
+-        # Rule 98.7: Initiative order determines winner in case of ties
+-        winners = []
+-        for player_id, points in self.victory_points.items():
+-            if points >= self.victory_points_to_win:
+-                winners.append(player_id)
+-
+-        if not winners:
+-            return None
+-
+-        # Get initiative order from StrategyCardCoordinator if available
+-        if self.strategy_card_coordinator:
+-            initiative_order = (
+-                self.strategy_card_coordinator.get_action_phase_initiative_order()
+-            )
+-        elif self.strategy_card_assignments:
+-            # Sort by strategy card initiative numbers
+-            from .strategy_cards.coordinator import STRATEGY_CARD_INITIATIVE_NUMBERS
+-
+-            player_initiatives = [
+-                (
+-                    player_id,
+-                    STRATEGY_CARD_INITIATIVE_NUMBERS.get(card.value.lower(), 999),
+-                )
+-                for player_id, card in self.strategy_card_assignments.items()
+-            ]
+-            player_initiatives.sort(key=lambda x: x[1])
+-            initiative_order = [player_id for player_id, _ in player_initiatives]
+-        else:
+-            # Fallback to players list order
+-            initiative_order = [player.id for player in self.players]
+-
+-        # Return the first winner in initiative order
+-        for player_id in initiative_order:
+-            if player_id in winners:
+-                return player_id
+-
+-        # Fallback to first winner found (shouldn't happen with proper player order)
+-        return winners[0]
++        winners = [
++            player_id
++            for player_id, points in self.victory_points.items()
++            if points >= self.victory_points_to_win
++        ]
++        if not winners:
++            return None
++        ordered_winners = self._sort_players_by_initiative_order(winners)
++        return ordered_winners[0] if ordered_winners else None
+```
+
+---
+
+🏁 Script executed:
+
+```shell
+#!/bin/bash
+# Sanity checks around initiative ordering coverage
+rg -n -C2 '\bget_winner\s*\(' src | cat
+rg -n -C2 '_sort_players_by_initiative_order' src | cat
+# Look for tests that cover winners with missing assignments/coordinator
+rg -n -C3 'simultaneous|tie.*winner|initiative' tests | cat
+```
+
+Length of output: 48867
+
+---
+
+
+
+</details>
+
+**Unify tie‑break logic — call _sort_players_by_initiative_order(winners)**
+
+get_winner duplicates initiative derivation and can omit winners that lack strategy‑card assignments; use the existing _sort_players_by_initiative_order to centralize logic and guarantee deterministic results.
+
+Apply:
+
+```diff
+ def get_winner(self) -> Optional[str]:
+     """Get the player ID of the winner, if any."""
+-        # Rule 98.7: Initiative order determines winner in case of ties
+-        winners = []
+-        for player_id, points in self.victory_points.items():
+-            if points >= self.victory_points_to_win:
+-                winners.append(player_id)
+-
+-        if not winners:
+-            return None
+-
+-        # Get initiative order from StrategyCardCoordinator if available
+-        if self.strategy_card_coordinator:
+-            initiative_order = (
+-                self.strategy_card_coordinator.get_action_phase_initiative_order()
+-            )
+-        elif self.strategy_card_assignments:
+-            # Sort by strategy card initiative numbers
+-            from .strategy_cards.coordinator import STRATEGY_CARD_INITIATIVE_NUMBERS
+-
+-            player_initiatives = [
+-                (
+-                    player_id,
+-                    STRATEGY_CARD_INITIATIVE_NUMBERS.get(card.value.lower(), 999),
+-                )
+-                for player_id, card in self.strategy_card_assignments.items()
+-            ]
+-            player_initiatives.sort(key=lambda x: x[1])
+-            initiative_order = [player_id for player_id, _ in player_initiatives]
+-        else:
+-            # Fallback to players list order
+-            initiative_order = [player.id for player in self.players]
+-
+-        # Return the first winner in initiative order
+-        for player_id in initiative_order:
+-            if player_id in winners:
+-                return player_id
+-
+-        # Fallback to first winner found (shouldn't happen with proper player order)
+-        return winners[0]
++        winners = [
++            player_id
++            for player_id, points in self.victory_points.items()
++            if points >= self.victory_points_to_win
++        ]
++        if not winners:
++            return None
++        ordered_winners = self._sort_players_by_initiative_order(winners)
++        return ordered_winners[0] if ordered_winners else None
+```
+
+File: src/ti4/core/game_state.py (get_winner) — replace with above.
+
+<!-- suggestion_start -->
+
+<details>
+<summary>📝 Committable suggestion</summary>
+
+> ‼️ **IMPORTANT**
+> Carefully review the code before committing. Ensure that it accurately replaces the highlighted code, contains no missing lines, and has no issues with indentation. Thoroughly test & benchmark the code to ensure it meets the requirements.
+
+```suggestion
+        def get_winner(self) -> Optional[str]:
+            """Get the player ID of the winner, if any."""
+            winners = [
+                player_id
+                for player_id, points in self.victory_points.items()
+                if points >= self.victory_points_to_win
+            ]
+            if not winners:
+                return None
+            ordered_winners = self._sort_players_by_initiative_order(winners)
+            return ordered_winners[0] if ordered_winners else None
+```
+
+</details>
+
+<!-- suggestion_end -->
+
+<details>
+<summary>🤖 Prompt for AI Agents</summary>
+
+```
+In src/ti4/core/game_state.py around lines 122 to 159, get_winner duplicates
+initiative-order derivation and can skip winners without strategy-card
+assignments; replace the duplicated initiative-derivation and selection logic
+with a single call to the existing _sort_players_by_initiative_order(winners)
+helper and then iterate that sorted list to return the first matching winner
+(fall back to winners[0] only if no match). Ensure the helper is passed the
+winners list and that the method still respects strategy_card_coordinator,
+strategy_card_assignments, and players order as the tie-breaker.
+```
+
+</details>
+
+<!-- fingerprinting:phantom:poseidon:chinchilla -->
+
+<!-- This is an auto-generated comment by CodeRabbit -->
+
+Comment 4:
+  File: tests/test_game_controller.py
+  Line: 4
+  Body: _🛠️ Refactor suggestion_
+
+<details>
+<summary>🧩 Analysis chain</summary>
+
+**Unify on Faction enum; replace string factions.**
+
+Mixed string/enum usage will drift and can break type checks. Replace string literals with `Faction.*` everywhere.
+
+```diff
+ from src.ti4.core.constants import Faction
+@@
+-        Player(id="player1", faction="sol"),
+-        Player(id="player2", faction="hacan"),
+-        Player(id="player3", faction="xxcha"),
++        Player(id="player1", faction=Faction.SOL),
++        Player(id="player2", faction=Faction.HACAN),
++        Player(id="player3", faction=Faction.XXCHA),
+@@
+-        Player(id="player1", faction="sol"),
+-        Player(id="player2", faction="hacan"),
+-        Player(id="player3", faction="xxcha"),
++        Player(id="player1", faction=Faction.SOL),
++        Player(id="player2", faction=Faction.HACAN),
++        Player(id="player3", faction=Faction.XXCHA),
+@@
+-        Player(id="player1", faction="sol"),
+-        Player(id="player2", faction="hacan"),
+-        Player(id="player3", faction="xxcha"),
++        Player(id="player1", faction=Faction.SOL),
++        Player(id="player2", faction=Faction.HACAN),
++        Player(id="player3", faction=Faction.XXCHA),
+@@
+-        Player(id="player1", faction="sol"),
+-        Player(id="player2", faction="hacan"),
+-        Player(id="player3", faction="xxcha"),
+-        Player(id="player4", faction="yssaril"),
+-        Player(id="player5", faction="naalu"),
+-        Player(id="player6", faction="barony"),
+-        Player(id="player7", faction="saar"),
+-        Player(id="player8", faction="muaat"),
++        Player(id="player1", faction=Faction.SOL),
++        Player(id="player2", faction=Faction.HACAN),
++        Player(id="player3", faction=Faction.XXCHA),
++        Player(id="player4", faction=Faction.YSSARIL),
++        Player(id="player5", faction=Faction.NAALU),
++        Player(id="player6", faction=Faction.BARONY),
++        Player(id="player7", faction=Faction.SAAR),
++        Player(id="player8", faction=Faction.MUAAT),
+@@
+-        Player(id="player1", faction="sol"),
+-        Player(id="player2", faction="hacan"),
+-        Player(id="player3", faction="xxcha"),
+-        Player(id="player4", faction="yssaril"),
++        Player(id="player1", faction=Faction.SOL),
++        Player(id="player2", faction=Faction.HACAN),
++        Player(id="player3", faction=Faction.XXCHA),
++        Player(id="player4", faction=Faction.YSSARIL),
+```
+
+
+Run to find any remaining string-based factions:
+
+
+
+
+Also applies to: 40-43, 65-68, 200-203, 223-231, 329-333, 437-440
+
+---
+
+🏁 Script executed:
+
+```shell
+#!/bin/bash
+rg -nP --glob '!venv/**' 'faction\s*=\s*"(sol|hacan|xxcha|yssaril|naalu|barony|saar|muaat|arborec|l1z1x|winnu)"'
+```
+
+Length of output: 148
+
+---
+
+🏁 Script executed:
+
+```shell
+#!/bin/bash
+set -euo pipefail
+echo "PWD: $(pwd)"
+echo "Top-level (first 100 entries):"
+ls -la | sed -n '1,100p' || true
+echo
+echo "rg version:"
+rg --version || true
+echo
+python - <<'PY'
+import re, os
+root='.'
+skip_dirs = {'venv','.venv','node_modules','.git','dist','build'}
+patterns = [
+    re.compile(r'faction\s*=\s*["\'](sol|hacan|xxcha|yssaril|naalu|barony|saar|muaat|arborec|l1z1x|winnu)["\']', re.I),
+    re.compile(r'faction\s*=\s*["\']([a-z0-9_+-]+)["\']', re.I),
+    re.compile(r'Player\([^)]*faction\s*=\s*["\']', re.I),
+]
+found = False
+for dirpath, dirnames, filenames in os.walk(root):
+    # prune skipped dirs
+    parts = set(dirpath.split(os.sep))
+    if parts & skip_dirs:
+        continue
+    for fn in filenames:
+        if not fn.endswith(('.py', '.pyi', '.pyw', '.md', '.txt', '.rst')):
+            continue
+        path = os.path.join(dirpath, fn)
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                data = f.read()
+        except Exception:
+            continue
+        for p in patterns:
+            for m in p.finditer(data):
+                found = True
+                line_no = data.count('\n', 0, m.start()) + 1
+                line = data.splitlines()[line_no-1].strip()
+                print(f'{path}:{line_no}: {line}')
+if not found:
+    print('NO_MATCHES')
+PY
+```
+
+Length of output: 19179
+
+---
+
+
+
+</details>
+
+**Unify on Faction enum; replace string factions.**
+
+Replace all literal faction strings with Faction.<NAME> (import from src.ti4.core.constants) to avoid mixed string/enum usage and type-check breakage.
+
+Affected locations (examples; multiple occurrences in each):
+- tests/test_game_controller.py: lines 40-42, 65-67, 104-105, 200-202, 223-231, 329-333, 377-380, 437-439
+- tests/test_player_interface.py: 119, 130, 143, 155, 168, 182-183
+- tests/test_integration.py: 183, 187
+- tests/test_victory_conditions.py: 12, 19, 27, 66, 91, 124, 134, 144
+- tests/test_rule_98_victory_points.py: 21-23, 83, 104, 127, 141-143
+- tests/test_game_controller_commands.py: 14-16, 35-37, 71-73, 88-90
+- docs/REFACTORING_ANALYSIS.md: line 73
+- latest_review_pr11.txt: line 607
+
+Example change: faction="sol" -> faction=Faction.SOL. Import Faction where missing and run type checks.
+
+<!-- fingerprinting:phantom:poseidon:chinchilla -->
+
+<!-- This is an auto-generated comment by CodeRabbit -->
+
+============================================================

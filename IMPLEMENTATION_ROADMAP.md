@@ -1,15 +1,15 @@
 # TI4 AI Implementation Roadmap
 
-**Last Updated**: December 2024
-**Overall Progress**: 24.9%
+**Last Updated**: September 2025
 
 > **Architecture Note**: Transaction system needs PlayerSupply integration for resource validation. See `docs/architecture_notes/player_supply_system.md` for detailed implementation plan.
 
-### 🎯 Next Target: 25% (Advanced Game Mechanics)
+## 🎯 Next Target: 25% (Advanced Game Mechanics)
 **Focus**: Complete advanced mechanics that enable complex strategic gameplay and AI decision-making
 
-## 📊 **Overall Progress**: 24.9%
-**Completed Rules**: 25/101 rule categories completed
+## 📊 Progress
+**Overall Progress**: 25.9%
+**Completed Rules**: 26/101
 - **Rule 6: ADJACENCY** - Core spatial mechanics for system relationships
 - **Rule 14: BLOCKADED** - Blockade mechanics for space docks and production restrictions (Foundation Layer) ✅ **COMPLETED**
 - **Rule 17: CAPTURE** - Unit capture mechanics and faction sheet management (Foundation Layer) ✅ **COMPLETED**
@@ -28,6 +28,7 @@
 - **Rule 90: TECHNOLOGY** - Technology research, prerequisites, and game state integration (Core Game Layer) ✅ **COMPLETED**
 - **Rule 91: TECHNOLOGY (Strategy Card)** - Technology strategy card with primary/secondary abilities (Core Game Layer) ✅ **COMPLETED**
 - **Rule 94: TRANSACTIONS** - Player trading and exchange system (Core Game Layer) ✅ **COMPLETED**
+- **Rule 98: VICTORY POINTS** - Victory point tracking and win conditions (Victory & Objectives Layer) ✅ **NEWLY COMPLETED**
 - **Rule 99: WARFARE STRATEGY CARD** - Command token management and redistribution (Core Game Layer) ✅ **COMPLETED**
 - **Rule 101: WORMHOLES** - Wormhole adjacency mechanics (Foundation Layer)
 
@@ -39,16 +40,20 @@
 5. ✅ **Rule 61: OBJECTIVE CARDS** - Victory condition tracking (Victory & Objectives Layer) - **COMPLETE**
 6. ✅ **Rule 99: WARFARE STRATEGY CARD** - Command token management (Strategy & Command Layer) - **COMPLETE**
 
+**Recently Completed:**
+8. ✅ **Rule 88: SYSTEM TILES** - Tile classification and board mechanics (Core Game Layer) - **COMPLETE** (95% → 100%, 11/11 tests passing)
+9. ✅ **Rule 98: VICTORY POINTS** - Victory point tracking and win conditions (Victory & Objectives Layer) - **COMPLETE** (75% → 100%, comprehensive tie resolution and variant support)
+
 **Next Up:**
-8. **Rule 88: SYSTEM TILES** - Tile classification and board mechanics (Core Game Layer) 🎯 **NEXT TARGET** (15% complete, needs SystemTile class and color classification)
+10. **Rule [TBD]** - Next highest priority rule to be determined 🎯 **NEXT TARGET**
 
 ### 📈 Progress Metrics
-- Foundation Layer: 9/8 rules (112.5%) 🎉 (Rule 34 added)
-- Core Game Layer: 13/15 rules (86.7%) 📈 (Rule 78, Rule 83 added)
+- Foundation Layer: 9 rules completed
+- Core Game Layer: 13/15 rules (86.7%)
 - Advanced Mechanics: 0/43 rules (0%)
 
 ### 📈 Current Metrics
-- **Tests**: 850+ total tests, all passing (Rule 78: 17 tests, Rule 34: 15 tests, Rule 83: 50+ tests)
+- **Tests**: 1053+ total tests, all passing (Rule 78: 17 tests, Rule 34: 15 tests, Rule 83: 50+ tests)
 - **Coverage**: 29.0% overall (focused on core mechanics)
 - **Quality**: Strict TDD, type checking, linting standards maintained
 

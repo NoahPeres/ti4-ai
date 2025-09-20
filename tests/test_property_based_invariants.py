@@ -23,18 +23,22 @@ def test_property_based_testing_setup(text_value) -> None:
 @composite
 def valid_player_strategy(draw) -> None:
     """Generate a valid Player instance using hypothesis."""
+    from src.ti4.core.constants import Faction
+
     player_id = draw(st.text(min_size=1, max_size=50).filter(lambda x: x.strip()))
-    faction = draw(st.text(min_size=1, max_size=50).filter(lambda x: x.strip()))
+    faction = draw(st.sampled_from(list(Faction)))
     return Player(id=player_id, faction=faction)
 
 
 @given(valid_player_strategy())
 def test_player_generator_creates_valid_players(player) -> None:
     """Test that we can generate valid Player instances."""
+    from src.ti4.core.constants import Faction
+
     assert isinstance(player, Player)
     assert player.is_valid()
     assert len(player.id.strip()) > 0
-    assert len(player.faction.strip()) > 0
+    assert isinstance(player.faction, Faction)
 
 
 # GREEN Phase: Minimal hex coordinate generator
@@ -58,6 +62,8 @@ def test_hex_coordinate_generator_creates_valid_coordinates(coord) -> None:
 @composite
 def valid_game_state_strategy(draw) -> None:
     """Generate a valid GameState instance using hypothesis."""
+    from src.ti4.core.constants import Faction
+
     num_players = draw(st.integers(min_value=2, max_value=6))
 
     # Generate unique player IDs
@@ -73,7 +79,7 @@ def valid_game_state_strategy(draw) -> None:
     # Generate players with unique IDs
     players = []
     for player_id in player_ids:
-        faction = draw(st.text(min_size=1, max_size=50).filter(lambda x: x.strip()))
+        faction = draw(st.sampled_from(list(Faction)))
         players.append(Player(id=player_id, faction=faction))
 
     phase = draw(st.sampled_from(list(GamePhase)))

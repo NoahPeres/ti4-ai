@@ -26,7 +26,7 @@ A comprehensive, enterprise-grade framework for Twilight Imperium 4th Edition th
 - **Diagnostic Tools**: Comprehensive debugging and analysis utilities
 
 ### Quality & Performance
-- **Test Coverage**: 89% test coverage with 359+ comprehensive tests
+- **Test Coverage**: 87% test coverage with 1053+ comprehensive tests
 - **Performance Optimized**: Caching layer with 40-60% improvement in critical operations
 - **Thread Safe**: Full concurrent game support with proper isolation
 - **Memory Managed**: Automatic resource cleanup for long-running sessions
@@ -166,7 +166,7 @@ src/
 │   │   └── test_utilities.py   # Common test helpers
 │   ├── players/           # Player interfaces and implementations
 │   └── rules/             # Game rules and validation engine
-tests/                     # Comprehensive test suite (359+ tests)
+tests/                     # Comprehensive test suite (1053+ tests)
 docs/                      # Documentation and examples
 ├── API_DOCUMENTATION.md       # Complete API reference
 ├── USAGE_EXAMPLES.md          # Practical usage examples

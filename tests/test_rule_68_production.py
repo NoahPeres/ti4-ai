@@ -15,7 +15,7 @@ Rule 68 Sub-rules tested:
 - 68.4: Space area production - special placement rules for space-based production
 """
 
-from src.ti4.core.constants import UnitType
+from src.ti4.core.constants import Faction, UnitType
 from src.ti4.core.galaxy import Galaxy
 from src.ti4.core.hex_coordinate import HexCoordinate
 from src.ti4.core.planet import Planet
@@ -371,7 +371,11 @@ class TestRule68ArborecRestriction:
         planet = Planet(
             MockPlanet.PLANET_A.value, resources=1, influence=1
         )  # Production = 1 + 2 = 3
-        arborec_space_dock = Unit(unit_type=UnitType.SPACE_DOCK, owner="Arborec")
+        arborec_space_dock = Unit(
+            unit_type=UnitType.SPACE_DOCK,
+            owner=MockPlayer.PLAYER_1.value,
+            faction=Faction.ARBOREC,
+        )
 
         # Should not be able to produce infantry with Arborec space dock
         can_produce_infantry = manager.can_produce_units(

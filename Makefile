@@ -66,13 +66,6 @@ quality-gate: lint strict-check security-check test runtime-check format-check #
 	@echo "🎉 All quality gate checks passed! Code is ready for production."
 
 clean: ## Clean up build artifacts
-	rm -rf build/
-	rm -rf dist/
-	rm -rf *.egg-info/
-	rm -rf .coverage
-	rm -rf htmlcov/
-	rm -rf .pytest_cache/
-	rm -rf .mypy_cache/
-	rm -rf .ruff_cache/
-	find . -type d -name __pycache__ -delete
-	find . -type f -name "*.pyc" -delete
+	@rm -rf build/ dist/ *.egg-info/ .coverage htmlcov/ .pytest_cache/ .mypy_cache/ .ruff_cache/
+	@find . -type d -name __pycache__ -delete
+	@find . -type f -name "*.pyc" -delete

@@ -9,9 +9,11 @@ Tests the enforcement of:
 
 import pytest
 
+from src.ti4.core.constants import Faction
 from src.ti4.core.game_phase import GamePhase
 from src.ti4.core.game_state import GameState
 from src.ti4.core.objective import Objective
+from src.ti4.core.player import Player
 
 
 class TestStatusPhaseScoringLimits:
@@ -19,7 +21,7 @@ class TestStatusPhaseScoringLimits:
 
     def test_can_score_one_public_objective_per_status_phase(self) -> None:
         """Test that players can score exactly one public objective per status phase."""
-        game_state = GameState()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         public_obj1 = Objective(
             "pub1", "Public 1", "First public", 1, True, GamePhase.STATUS
@@ -42,7 +44,7 @@ class TestStatusPhaseScoringLimits:
 
     def test_can_score_one_secret_objective_per_status_phase(self) -> None:
         """Test that players can score exactly one secret objective per status phase."""
-        game_state = GameState()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         secret_obj1 = Objective(
             "sec1", "Secret 1", "First secret", 1, False, GamePhase.STATUS
@@ -73,7 +75,7 @@ class TestStatusPhaseScoringLimits:
 
     def test_can_score_one_public_and_one_secret_per_status_phase(self) -> None:
         """Test that players can score one public AND one secret objective per status phase."""
-        game_state = GameState()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         public_obj = Objective(
             "pub", "Public", "Public objective", 1, True, GamePhase.STATUS
@@ -99,7 +101,11 @@ class TestStatusPhaseScoringLimits:
 
     def test_different_players_have_separate_scoring_limits(self) -> None:
         """Test that scoring limits are per-player."""
-        game_state = GameState()
+        game_state = (
+            GameState()
+            .add_player(Player("player1", Faction.SOL))
+            .add_player(Player("player2", Faction.XXCHA))
+        )
 
         public_obj1 = Objective(
             "pub1", "Public 1", "First public", 1, True, GamePhase.STATUS
@@ -121,7 +127,7 @@ class TestStatusPhaseScoringLimits:
 
     def test_status_phase_limits_reset_between_phases(self) -> None:
         """Test that status phase scoring limits reset when advancing to next status phase."""
-        game_state = GameState()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         public_obj1 = Objective(
             "pub1", "Public 1", "First public", 1, True, GamePhase.STATUS
@@ -149,7 +155,7 @@ class TestCombatScoringLimits:
 
     def test_can_score_one_objective_per_combat(self) -> None:
         """Test that players can score only one objective per combat."""
-        game_state = GameState()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         action_obj1 = Objective(
             "act1", "Action 1", "First action", 1, True, GamePhase.ACTION
@@ -175,7 +181,7 @@ class TestCombatScoringLimits:
 
     def test_different_combats_have_separate_limits(self) -> None:
         """Test that different combats have separate scoring limits."""
-        game_state = GameState()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         action_obj1 = Objective(
             "act1", "Action 1", "First action", 1, True, GamePhase.ACTION
@@ -203,7 +209,7 @@ class TestCombatScoringLimits:
 
     def test_combat_scoring_requires_action_phase_objective(self) -> None:
         """Test that combat scoring only works with action phase objectives."""
-        game_state = GameState()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         status_obj = Objective(
             "stat", "Status", "Status objective", 1, True, GamePhase.STATUS
@@ -222,7 +228,7 @@ class TestStatusPhaseStepExecution:
 
     def test_execute_status_phase_step_1_multiple_objectives(self) -> None:
         """Test executing status phase step 1 with multiple objectives."""
-        game_state = GameState()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         public_obj = Objective(
             "pub", "Public", "Public objective", 1, True, GamePhase.STATUS
@@ -246,7 +252,7 @@ class TestStatusPhaseStepExecution:
 
     def test_execute_status_phase_step_1_respects_limits(self) -> None:
         """Test that status phase step 1 execution respects scoring limits."""
-        game_state = GameState()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         public_obj1 = Objective(
             "pub1", "Public 1", "First public", 1, True, GamePhase.STATUS
@@ -272,7 +278,7 @@ class TestObjectiveScoringEdgeCases:
 
     def test_cannot_score_same_objective_twice(self) -> None:
         """Test Rule 61.8: A player can score each objective only once during the game."""
-        game_state = GameState()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         public_obj = Objective(
             "pub", "Public", "Public objective", 1, True, GamePhase.STATUS
@@ -291,7 +297,11 @@ class TestObjectiveScoringEdgeCases:
 
     def test_multiple_players_can_score_same_public_objective(self) -> None:
         """Test that multiple players can score the same public objective."""
-        game_state = GameState()
+        game_state = (
+            GameState()
+            .add_player(Player("player1", Faction.SOL))
+            .add_player(Player("player2", Faction.XXCHA))
+        )
 
         public_obj = Objective(
             "pub", "Public", "Public objective", 1, True, GamePhase.STATUS
@@ -310,7 +320,7 @@ class TestObjectiveScoringEdgeCases:
 
     def test_non_status_phase_objectives_ignore_status_limits(self) -> None:
         """Test that non-status phase objectives don't count against status phase limits."""
-        game_state = GameState()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         action_obj = Objective(
             "act", "Action", "Action objective", 1, True, GamePhase.ACTION

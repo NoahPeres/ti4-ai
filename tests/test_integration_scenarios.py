@@ -28,10 +28,12 @@ def test_full_turn_sequence_integration() -> None:
 # GREEN Phase: Minimal implementation to make test pass
 def create_test_game_controller() -> GameController:
     """Create a test game controller for testing."""
+    from src.ti4.core.constants import Faction
+
     players = [
-        Player(id="player1", faction="faction1"),
-        Player(id="player2", faction="faction2"),
-        Player(id="player3", faction="faction3"),
+        Player(id="player1", faction=Faction.SOL),
+        Player(id="player2", faction=Faction.HACAN),
+        Player(id="player3", faction=Faction.XXCHA),
     ]
     return GameController(players)
 

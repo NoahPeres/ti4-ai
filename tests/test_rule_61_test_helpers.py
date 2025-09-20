@@ -1,12 +1,14 @@
-"""Helper functions and fixtures for Rule 61 objective tests."""
+"""Test helpers for Rule 61: OBJECTIVE CARDS tests."""
 
 from typing import Optional
 
 import pytest
 
+from src.ti4.core.constants import Faction
 from src.ti4.core.game_phase import GamePhase
 from src.ti4.core.game_state import GameState
 from src.ti4.core.objective import Objective
+from src.ti4.core.player import Player
 
 
 class ObjectiveTestHelpers:
@@ -45,7 +47,7 @@ class ObjectiveTestHelpers:
         player_id: str, secret_objectives: list[Objective]
     ) -> GameState:
         """Create a game state with secret objectives assigned to a player."""
-        game_state = GameState()
+        game_state = GameState().add_player(Player(player_id, Faction.SOL))
         for secret_obj in secret_objectives:
             game_state = game_state.assign_secret_objective(player_id, secret_obj)
         return game_state
@@ -76,9 +78,9 @@ class ObjectiveTestHelpers:
 
 
 @pytest.fixture
-def game_state() -> None:
+def game_state() -> GameState:
     """Fixture providing a fresh GameState for each test."""
-    return GameState()
+    return GameState().add_player(Player("player1", Faction.SOL))
 
 
 @pytest.fixture

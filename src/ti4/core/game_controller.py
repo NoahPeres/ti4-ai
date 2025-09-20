@@ -5,10 +5,12 @@ from typing import Any, Optional
 from src.ti4.commands.base import GameCommand
 from src.ti4.commands.manager import CommandManager
 from src.ti4.core.events import create_phase_changed_event
+from src.ti4.core.exceptions import InvalidPlayerError
 from src.ti4.core.game_phase import GamePhase
 from src.ti4.core.game_state_machine import GameStateMachine
 from src.ti4.core.player import Player
 from src.ti4.core.strategy_card import STANDARD_STRATEGY_CARDS, StrategyCard
+from src.ti4.core.validation import ValidationError
 
 
 class GameController:
@@ -17,9 +19,9 @@ class GameController:
     def __init__(self, players: list[Player]) -> None:
         """Initialize the game controller with players."""
         if not players:
-            raise ValueError("At least one player is required")
+            raise InvalidPlayerError("At least one player is required")
         if len(players) < 3:
-            raise ValueError("At least 3 players are required for TI4")
+            raise InvalidPlayerError("At least 3 players are required for TI4")
         self._players = players
         self._current_player_index = 0
         self._state_machine = GameStateMachine()
@@ -49,8 +51,6 @@ class GameController:
     def _validate_player_exists(self, player_id: str) -> None:
         """Validate that a player exists in the game."""
         if not any(player.id == player_id for player in self._players):
-            from .exceptions import InvalidPlayerError
-
             raise InvalidPlayerError(f"Player '{player_id}' not found in game")
 
     def is_player_activated(self, player_id: str) -> bool:
@@ -90,7 +90,7 @@ class GameController:
             (c for c in self._available_strategy_cards if c.id == card_id), None
         )
         if card is None:
-            raise ValueError(f"Strategy card with id {card_id} is not available")
+            raise ValidationError(f"Strategy card with id {card_id} is not available")
 
         # Initialize player's card list if needed
         if player_id not in self._selected_strategy_cards:
@@ -153,10 +153,10 @@ class GameController:
         self._validate_player_exists(player_id)
 
         if not self.is_player_activated(player_id):
-            raise ValueError(f"Player '{player_id}' is not currently active")
+            raise ValidationError(f"Player '{player_id}' is not currently active")
 
         if self._state_machine.current_phase != GamePhase.ACTION:
-            raise ValueError("Not currently in action phase")
+            raise ValidationError("Not currently in action phase")
 
     def _reset_consecutive_passes(self) -> None:
         """Reset the consecutive passes counter."""
@@ -204,7 +204,7 @@ class GameController:
             )
             self._current_game_state = previous_state
             return True
-        except ValueError:
+        except ValidationError:
             # No commands to undo
             return False
 
