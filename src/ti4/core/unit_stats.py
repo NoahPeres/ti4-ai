@@ -16,10 +16,10 @@ class UnitStats:
     """
 
     # === FUNDAMENTAL UNIT PROPERTIES ===
-    cost: float = 1
+    cost: float = 0
     combat_value: Optional[int] = None
-    combat_dice: int = 1
-    movement: int = 1
+    combat_dice: int = 0
+    movement: int = 0
     capacity: int = 0
     production: int = 0
 
@@ -32,6 +32,7 @@ class UnitStats:
     space_cannon: bool = False
     space_cannon_value: Optional[int] = None
     space_cannon_dice: int = 1
+    has_production: bool = False  # Whether unit has production ability (separate from production value)
 
     def with_modifications(self, **kwargs: Any) -> "UnitStats":
         """Create a new UnitStats with modifications."""
@@ -56,6 +57,7 @@ class UnitStats:
                 "space_cannon_value", self.space_cannon_value
             ),
             space_cannon_dice=kwargs.get("space_cannon_dice", self.space_cannon_dice),
+            has_production=kwargs.get("has_production", self.has_production),
         )
 
 
@@ -64,16 +66,16 @@ class UnitStatsProvider:
 
     # Base unit statistics
     BASE_STATS = {
-        "carrier": UnitStats(
+        UnitType.CARRIER: UnitStats(
             cost=3, combat_value=9, combat_dice=1, movement=1, capacity=4
         ),
-        "cruiser": UnitStats(
+        UnitType.CRUISER: UnitStats(
             cost=2, combat_value=7, combat_dice=1, movement=2, capacity=0
         ),  # Base cruiser has no capacity
-        "cruiser_ii": UnitStats(
-            cost=2, combat_value=6, combat_dice=1, movement=2, capacity=1
+        UnitType.CRUISER_II: UnitStats(
+            cost=2, combat_value=6, combat_dice=1, movement=3, capacity=1
         ),  # Upgraded cruiser
-        "dreadnought": UnitStats(
+        UnitType.DREADNOUGHT: UnitStats(
             cost=4,
             combat_value=5,
             combat_dice=1,
@@ -82,7 +84,7 @@ class UnitStatsProvider:
             sustain_damage=True,
             bombardment=True,
         ),
-        "destroyer": UnitStats(
+        UnitType.DESTROYER: UnitStats(
             cost=1,
             combat_value=9,
             combat_dice=1,
@@ -90,16 +92,13 @@ class UnitStatsProvider:
             capacity=0,
             anti_fighter_barrage=True,
         ),
-        "fighter": UnitStats(
+        UnitType.FIGHTER: UnitStats(
             cost=0.5, combat_value=9, combat_dice=1, movement=0, capacity=0
         ),  # Base fighter needs capacity
-        "fighter_ii": UnitStats(
-            cost=0.5, combat_value=8, combat_dice=1, movement=1, capacity=0
-        ),  # Fighter II independent
-        "infantry": UnitStats(
+        UnitType.INFANTRY: UnitStats(
             cost=0.5, combat_value=8, combat_dice=1, movement=0, capacity=0
         ),
-        "mech": UnitStats(
+        UnitType.MECH: UnitStats(
             cost=2,
             combat_value=6,
             combat_dice=1,
@@ -108,10 +107,8 @@ class UnitStatsProvider:
             sustain_damage=True,
             deploy=True,
         ),
-        "pds": UnitStats(
-            cost=2,
-            combat_value=6,
-            combat_dice=1,
+        UnitType.PDS: UnitStats(
+            combat_dice=0,  # PDS don't have combat dice, only space cannon
             movement=0,
             capacity=0,
             space_cannon=True,
@@ -119,10 +116,22 @@ class UnitStatsProvider:
             space_cannon_dice=1,
             planetary_shield=True,
         ),
-        "space_dock": UnitStats(
-            cost=4, combat_dice=0, movement=0, capacity=0, production=2
-        ),  # No combat, has production
-        "war_sun": UnitStats(
+        UnitType.SPACE_DOCK: UnitStats(
+            cost=0,  # Space docks cannot be produced directly
+            combat_value=None,
+            combat_dice=0,
+            movement=0,
+            capacity=0,
+            production=0,  # Production is dynamic: planet resources + 2
+            sustain_damage=False,
+            anti_fighter_barrage=False,
+            space_cannon=False,
+            bombardment=False,
+            deploy=False,
+            planetary_shield=False,
+            has_production=True,  # Space dock has production ability
+        ),
+        UnitType.WAR_SUN: UnitStats(
             cost=12,
             combat_value=3,
             combat_dice=3,
@@ -162,7 +171,13 @@ class UnitStatsProvider:
         technologies: frozenset[str],
     ) -> UnitStats:
         """Cached version of unit stats calculation."""
-        base_stats = self.BASE_STATS.get(unit_type)
+        # Convert string unit_type to enum for lookup
+        try:
+            unit_type_enum = UnitType(unit_type)
+        except ValueError:
+            raise ValueError(f"Unknown unit type: {unit_type}")
+            
+        base_stats = self.BASE_STATS.get(unit_type_enum)
         if base_stats is None:
             raise ValueError(f"Unknown unit type: {unit_type}")
 

@@ -255,8 +255,8 @@ class TestSpaceCombatIntegration:
         """Test that tactical action properly triggers space combat when needed."""
         # This should fail initially - tactical action integration not implemented
         with pytest.raises(ImportError):
-            pass
-            # This import should fail since tactical action integration isn't implemented yet
+            from src.ti4.actions.tactical_action import TacticalAction  # This import should fail
+            TacticalAction()  # This should not be reached
 
     def test_space_combat_affects_game_state(self) -> None:
         """Test that space combat results properly update game state."""

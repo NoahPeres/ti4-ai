@@ -1,15 +1,15 @@
 # TI4 AI Implementation Roadmap
 
 **Last Updated**: December 2024  
-**Overall Progress**: 22.9% → **24.9%** ✅ (+2.0% from Rule 91 Technology Strategy Card)
+**Overall Progress**: 24.9%
 
 > **Architecture Note**: Transaction system needs PlayerSupply integration for resource validation. See `docs/architecture_notes/player_supply_system.md` for detailed implementation plan.
 
 ### 🎯 Next Target: 25% (Advanced Game Mechanics)
 **Focus**: Complete advanced mechanics that enable complex strategic gameplay and AI decision-making
 
-## 📊 **Overall Progress**: 28.7%
-**Completed Rules**: 20/101 rule categories completed
+## 📊 **Overall Progress**: 24.9%
+**Completed Rules**: 25/101 rule categories completed
 - **Rule 6: ADJACENCY** - Core spatial mechanics for system relationships
 - **Rule 14: BLOCKADED** - Blockade mechanics for space docks and production restrictions (Foundation Layer) ✅ **COMPLETED**
 - **Rule 17: CAPTURE** - Unit capture mechanics and faction sheet management (Foundation Layer) ✅ **COMPLETED**
@@ -40,9 +40,7 @@
 6. ✅ **Rule 99: WARFARE STRATEGY CARD** - Command token management (Strategy & Command Layer) - **COMPLETE**
 
 **Next Up:**
-7. ✅ **Rule 58: MOVEMENT** - Unit movement mechanics (Core Game Layer) - **COMPLETE**
 8. **Rule 86: TACTICAL ACTION** - Core action system (Core Game Layer) 🎯 **NEXT TARGET**
-9. ✅ **Rule 18: COMBAT** - General combat mechanics (Core Game Layer) - **COMPLETE**
 
 ### 📈 Progress Metrics
 - Foundation Layer: 9/8 rules (112.5%) 🎉 (Rule 34 added)

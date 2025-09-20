@@ -24,6 +24,8 @@ a	A retreat will not occur immediately; the units retreat during the "Retreat" s
 b  If the defender announces a retreat, the attacker cannot announce a retreat during that combat round.
 c	A player cannot announce a retreat if there is not at least one eligible system to retreat to.
 
+**Implementation Note**: The current code implementation includes `can_attacker_announce_retreat()` and `attacker_announces_retreat()` methods, but per LRR 78.4.b, attacker retreat is only allowed if the defender has not announced retreat. The current implementation correctly returns `False` for `can_attacker_announce_retreat()` under base rules, maintaining consistency with the LRR.
+
 78.5 STEP 3-ROLL DICE: Each player rolls one die for each ship they have in the active system; this is called a combat roll. If a unit's combat roll produces a result that is equal to or greater than that unit's combat value, that result produces a hit.
 a	If a unit's combat value contains two or more burst icons, the player rolls one die for each burst icon instead.
 b  If a player has ships that have different combat values in the active system, that player rolls these dice separately.

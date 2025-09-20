@@ -5,7 +5,7 @@ After resolving the "Space Cannon Offense" step of a tactical action,
 if two players have ships in the active system, those players must resolve a space combat.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
 
@@ -34,24 +34,27 @@ class CombatRound:
     defender_id: str
     attacker_units: list[Unit]
     defender_units: list[Unit]
+    system: "System"
     attacker_announced_retreat: bool = False
     defender_announced_retreat: bool = False
     attacker_hits: int = 0
     defender_hits: int = 0
 
     def can_use_anti_fighter_barrage(self) -> bool:
-        """Anti-fighter barrage only available in first round (Rule 78.3b)."""
-        return self.round_number == 1
+        """AFB only in first round and only if any unit has AFB (Rule 78.3b)."""
+        if self.round_number != 1:
+            return False
+        return any(
+            u.has_anti_fighter_barrage() for u in (self.attacker_units + self.defender_units)
+        )
 
     def can_defender_announce_retreat(self) -> bool:
         """Defender can announce retreat if not already announced."""
         return not self.defender_announced_retreat
 
     def can_attacker_announce_retreat(self) -> bool:
-        """Attacker can announce retreat if defender hasn't announced retreat (Rule 78.4b)."""
-        return (
-            not self.attacker_announced_retreat and not self.defender_announced_retreat
-        )
+        """Attacker retreat disabled under base rules; enable via variant if needed."""
+        return False
 
     def defender_announces_retreat(self) -> None:
         """Defender announces retreat."""
@@ -62,16 +65,21 @@ class CombatRound:
         self.attacker_announced_retreat = True
 
     def execute_retreat_step(self, retreat_system: System) -> bool:
-        """Execute retreat step - move retreating units to retreat system."""
+        """Execute retreat step - move retreating units to retreat system.
+
+        Note: This implementation assumes the retreat_system is valid/eligible.
+        Full retreat eligibility validation (adjacency, ownership, command tokens)
+        should be implemented in the calling code per rules 78.4c and 78.7.
+        """
         if self.defender_announced_retreat:
             # Move defender units to retreat system
             retreating_units = [u for u in self.defender_units if u.owner == self.defender_id]
             for unit in retreating_units:
                 if unit in self.defender_units:
                     self.defender_units.remove(unit)
-                # Remove from current system (need to access the system from combat context)
-                # This is a simplified implementation - in full game would need proper system reference
-                retreat_system.space_units.append(unit)
+                # Move between systems
+                self.system.remove_unit_from_space(unit)
+                retreat_system.place_unit_in_space(unit)
             return True
         elif self.attacker_announced_retreat:
             # Move attacker units to retreat system
@@ -79,20 +87,22 @@ class CombatRound:
             for unit in retreating_units:
                 if unit in self.attacker_units:
                     self.attacker_units.remove(unit)
-                # Remove from current system and add to retreat system
-                retreat_system.space_units.append(unit)
+                self.system.remove_unit_from_space(unit)
+                retreat_system.place_unit_in_space(unit)
             return True
         return False
 
     def get_attacker_dice_count(self) -> int:
-        """Get number of dice attacker should roll."""
-        # For now, return number of units (simplified)
-        return len(self.attacker_units)
+        """Total dice from attacker units."""
+        return sum(
+            u.get_combat_dice() for u in self.attacker_units if u.get_combat_value() is not None
+        )
 
     def get_defender_dice_count(self) -> int:
-        """Get number of dice defender should roll."""
-        # For now, return number of units (simplified)
-        return len(self.defender_units)
+        """Total dice from defender units."""
+        return sum(
+            u.get_combat_dice() for u in self.defender_units if u.get_combat_value() is not None
+        )
 
     def assign_hits_to_attacker(self, hits: int) -> None:
         """Assign hits to attacker."""
@@ -114,11 +124,7 @@ class SpaceCombatResult:
     loser: Optional[str] = None
     is_draw: bool = False
     rounds_fought: int = 0
-    units_destroyed: list[Unit] = None
-
-    def __post_init__(self) -> None:
-        if self.units_destroyed is None:
-            self.units_destroyed = []
+    units_destroyed: list[Unit] = field(default_factory=list)
 
 
 class SpaceCombat:
@@ -149,6 +155,7 @@ class SpaceCombat:
             defender_id=self.defender_id,
             attacker_units=attacker_units,
             defender_units=defender_units,
+            system=self.system,
         )
 
     def should_continue(self) -> bool:
@@ -183,6 +190,7 @@ class SpaceCombat:
             defender_id=self.defender_id,
             attacker_units=attacker_units,
             defender_units=defender_units,
+            system=self.system,
         )
 
     def end_combat(self, winner: Optional[str] = None) -> SpaceCombatResult:

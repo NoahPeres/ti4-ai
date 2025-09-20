@@ -41,7 +41,7 @@ RELATED TOPICS: Ground Combat, Invasion, Space Combat
 - `test_burst_icon_single_die()` - Units without burst icons roll single die
 - `test_burst_icon_multiple_dice()` - Units with burst icons roll multiple dice
 - `test_burst_icon_count_determines_dice()` - Burst icon count determines dice count
-- `test_burst_icon_visual_vs_actual()` - Burst icons are visual, actual dice from combat_dice
+- `test_burst_icon_visual_vs_actual()` - Burst icons are visual representation; combat_dice contains the total dice count including burst icons
 - `test_burst_icon_hit_calculation()` - Hit calculation with burst icons
 
 ## Core Implementation
