@@ -7,7 +7,7 @@
 ### 6.1 Wormhole Adjacency
 **Rule**: "A system that has a wormhole is treated as being adjacent to a system that has a matching wormhole."
 
-**Implementation Status**: ✅ IMPLEMENTED (90% complete)
+**Implementation Status**: ✅ IMPLEMENTED
 - **Code**: Wormhole adjacency logic in `Galaxy._check_wormhole_adjacency`
 - **Tests**: `tests/test_wormhole_adjacency.py` with comprehensive coverage
 - **Assessment**: Full TDD cycle completed with core functionality and edge cases

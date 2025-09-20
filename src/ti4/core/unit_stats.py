@@ -31,7 +31,7 @@ class UnitStats:
     planetary_shield: bool = False
     space_cannon: bool = False
     space_cannon_value: Optional[int] = None
-    space_cannon_dice: int = 1
+    space_cannon_dice: int = 0
     has_production: bool = (
         False  # Whether unit has production ability (separate from production value)
     )

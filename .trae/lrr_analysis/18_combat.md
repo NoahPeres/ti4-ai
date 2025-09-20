@@ -9,7 +9,7 @@
 
 ## Raw LRR Text
 ```text
-18 COMBAT (ATTRIBUTE)	
+18 COMBAT (ATTRIBUTE)
 Combat is an attribute of some units that is presented on faction sheets and unit upgrade technology cards.
 18.1 During combat, if a unit's combat roll produces a result equal to or greater than its combat value, it produces a hit.
 18.2 If a unit's combat value contains two or more burst icons, instead of rolling a single die, the player rolls one die for each burst icon when making that unit's combat rolls.
@@ -27,7 +27,7 @@ RELATED TOPICS: Ground Combat, Invasion, Space Combat
 ### 18.1 - Hit Calculation
 **Status**: ✅ Implemented  
 **Description**: During combat, if a unit's combat roll produces a result equal to or greater than its combat value, it produces a hit.
-**Implementation**: `CombatResolver.calculate_hits()` method
+**Implementation**: `CombatResolver.roll_dice_for_unit()` method handles combat dice rolling
 **Test Coverage**: 
 - `test_combat_hit_calculation()` - Basic hit calculation
 - `test_combat_miss_calculation()` - Miss scenarios
@@ -51,9 +51,10 @@ RELATED TOPICS: Ground Combat, Invasion, Space Combat
 - `CombatResolver`: Handles combat calculations and burst icon mechanics
 
 ### Key Methods
+- `roll_dice_for_unit()`: Main method for rolling dice and calculating hits for units
 - `roll_dice_for_unit_with_burst_icons()`: Handles dice rolling for units with burst icons
 - `calculate_hits_with_burst_icons()`: Alias for clarity in burst icon hit calculation
-- `calculate_hits()`: Standard hit calculation based on combat values
+- `calculate_hits()`: Core hit calculation based on dice results and combat values
 
 ## Test Coverage
 **Test File**: `tests/test_rule_18_burst_icons.py`

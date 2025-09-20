@@ -1,4 +1,6 @@
-.PHONY: help install test lint lint-fix format ruff-format type-check check-all clean dev-setup strict-check security-check runtime-check quality-gate pre-commit-install
+.PHONY: all help install test lint lint-fix format type-check check-all clean dev-setup strict-check security-check runtime-check quality-gate pre-commit-install
+
+all: quality-gate
 
 help:
 	@echo "Available commands:"
@@ -32,7 +34,7 @@ lint:
 	uv run ruff check src tests --show-fixes
 
 lint-fix:
-	uv run ruff check src tests --fix
+	uv run ruff check src tests --fix --show-fixes
 
 format:
 	uv run ruff format src tests
@@ -51,16 +53,14 @@ strict-check:
 
 security-check:
 	@echo "Running security analysis..."
-	uv add --dev bandit
-	uv run bandit -r src/ -f json || echo "Security issues found - review above"
+	uvx bandit -r src/ -f json || echo "Security issues found - review above"
 
 runtime-check:
 	@echo "Running tests with runtime type checking..."
 	PYTHONPATH=src uv run pytest tests/ -v --tb=short
 
 pre-commit-install:
-	uv add --dev pre-commit
-	uv run pre-commit install
+	uvx pre-commit install
 
 check-all: lint type-check
 	@echo "Running format check..."

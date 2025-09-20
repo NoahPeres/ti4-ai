@@ -24,8 +24,6 @@ a    A retreat will not occur immediately; the units retreat during the "Retreat
 b    If the defender announces a retreat, the attacker cannot announce a retreat during that combat round.
 c    A player cannot announce a retreat if there is not at least one eligible system to retreat to.
 
-**Implementation Note**: The current code implementation includes `can_attacker_announce_retreat()` and `attacker_announces_retreat()` methods, but per LRR 78.4.b, attacker retreat is only allowed if the defender has not announced retreat. The current implementation correctly returns `False` for `can_attacker_announce_retreat()` under base rules, maintaining consistency with the LRR.
-
 78.5 STEP 3-ROLL DICE: Each player rolls one die for each ship they have in the active system; this is called a combat roll. If a unit's combat roll produces a result that is equal to or greater than that unit's combat value, that result produces a hit.
 a    If a unit's combat value contains two or more burst icons, the player rolls one die for each burst icon instead.
 b    If a player has ships that have different combat values in the active system, that player rolls these dice separately.
@@ -78,39 +76,31 @@ Space combat is a complex system involving multiple phases and steps. This analy
 ### Rule 78.3: Announce Retreats Step
 **Status**: ✅ Implemented
 **Description**: At the start of each combat round, the defender may announce retreat.
+**Implementation Note**: The current code implementation includes `can_attacker_announce_retreat()` and `attacker_announces_retreat()` methods, but per LRR 78.4.b, attacker retreat is only allowed if the defender has not announced retreat. The current implementation correctly returns `False` for `can_attacker_announce_retreat()` under base rules, maintaining consistency with the LRR.
 **Test Cases**:
 - `test_announce_retreats_step()` - Verifies defender can announce retreat at round start
 - `test_attacker_cannot_announce_retreat()` - Verifies only defender can announce retreat
 
-### Rule 78.4: Roll Dice Step  
+### Rule 78.5: Roll Dice Step  
 **Status**: ✅ Implemented
 **Description**: Players roll dice for their participating units.
 **Test Cases**:
 - `test_roll_dice_step()` - Verifies dice rolling mechanics for combat units
 - `test_dice_results_calculation()` - Verifies hit calculation from dice results
 
-### Rule 78.5: Assign Hits Step
+### Rule 78.6: Assign Hits Step
 **Status**: ✅ Implemented
 **Description**: Players assign hits to their units, potentially destroying them.
 **Test Cases**:
 - `test_assign_hits_step()` - Verifies hit assignment and unit destruction
 - `test_hit_assignment_priority()` - Verifies proper hit assignment rules
 
-### Rule 78.6: Retreat Step
+### Rule 78.7: Retreat Step
 **Status**: ✅ Implemented
 **Description**: If retreat was announced, the retreating player moves their ships.
 **Test Cases**:
 - `test_retreat_step()` - Verifies retreat execution when announced
 - `test_no_retreat_when_not_announced()` - Verifies no retreat when not announced
-
-### Rule 78.7: Retreat Execution
-**Status**: ✅ Implemented
-**Description**: When a player announces retreat and has an eligible system, they must move their ships to that system during the retreat step.
-**Test Cases**:
-- `test_rule_78_7_retreat_execution()` - Verifies that announced retreats are properly executed
-  - Tests that defender can announce retreat
-  - Tests that retreat execution moves units to retreat system
-  - Tests that retreated units are removed from active combat
 
 ### Rule 78.8: Combat Continuation After Retreat
 **Status**: ✅ Implemented

@@ -8,421 +8,243 @@ GITHUB PR REVIEW SUMMARY
 ============================================================
 Reviewer: coderabbitai[bot]
 State: COMMENTED
-Submitted: 2025-09-20T01:45:19Z
-Review ID: 3247911025
+Submitted: 2025-09-20T02:23:11Z
+Review ID: 3247953494
 
 REVIEW BODY:
 ----------------------------------------
-**Actionable comments posted: 0**
+**Actionable comments posted: 1**
 
 <details>
-<summary>♻️ Duplicate comments (1)</summary><blockquote>
+<summary>🧹 Nitpick comments (19)</summary><blockquote>
 
 <details>
-<summary>src/ti4/core/unit_stats.py (1)</summary><blockquote>
+<summary>Makefile (4)</summary><blockquote>
 
-`205-226`: **Missing has_production propagation; also clamp additive fields >= 0.**
-
-Mods flipping production won’t apply; negative dice/movement possible.
-
-
+`34-36`: **Show what got auto-fixed.**
+Add --show-fixes so devs see applied changes.
 
 ```diff
-         return UnitStats(
-             # Fundamental properties
--            cost=base.cost + modifications.cost,
-+            cost=base.cost + modifications.cost,
-             combat_value=modifications.combat_value
-             if modifications.combat_value is not None
-             else base.combat_value,
--            combat_dice=base.combat_dice + modifications.combat_dice,
--            movement=base.movement + modifications.movement,
-+            combat_dice=max(0, base.combat_dice + modifications.combat_dice),
-+            movement=max(0, base.movement + modifications.movement),
-             capacity=base.capacity + modifications.capacity,
-             production=base.production + modifications.production,
-             # Unit abilities
-             sustain_damage=base.sustain_damage or modifications.sustain_damage,
-             anti_fighter_barrage=base.anti_fighter_barrage
-             or modifications.anti_fighter_barrage,
-             bombardment=base.bombardment or modifications.bombardment,
-             deploy=base.deploy or modifications.deploy,
-             planetary_shield=base.planetary_shield or modifications.planetary_shield,
-             space_cannon=base.space_cannon or modifications.space_cannon,
-             space_cannon_value=modifications.space_cannon_value
-             if modifications.space_cannon_value is not None
-             else base.space_cannon_value,
--            space_cannon_dice=base.space_cannon_dice + modifications.space_cannon_dice,
-+            space_cannon_dice=max(0, base.space_cannon_dice + modifications.space_cannon_dice),
-+            has_production=base.has_production or modifications.has_production,
-         )
-```
-
-</blockquote></details>
-
-</blockquote></details>
-
-<details>
-<summary>🧹 Nitpick comments (28)</summary><blockquote>
-
-<details>
-<summary>.trae/lrr_analysis/78_space_combat.md (4)</summary><blockquote>
-
-`5-5`: **Add a language to fenced LRR block to satisfy markdownlint (MD040).**
-Use a neutral language tag.
-
-```diff
--```
-+```text
-...
--```
-+``` 
-```
-
-
-Also applies to: 56-56
-
----
-
-`12-12`: **Replace hard tabs with spaces (MD010).**
-Tabs render inconsistently across viewers.
-
-
-
-Also applies to: 18-18, 20-20, 23-23, 25-25, 30-30, 32-32, 42-42, 44-44, 50-50
-
----
-
-`22-29`: **Attacker retreat policy: align doc with code/tests.**
-Doc implies only defender retreats; LRR excerpt suggests both may (attacker blocked if defender already announced). Make the stance explicit and consistent with implementation/tests.
-
----
-
-`41-46`: **Document eligibility checks for retreat.**
-Spell out adjacency/ownership/no‑enemy constraints here if implementation enforces them, or mark as a current limitation.
-
-</blockquote></details>
-<details>
-<summary>scripts/fetch_pr_review.py (4)</summary><blockquote>
-
-`40-41`: **_make_request type is too narrow; it returns lists for collection endpoints.**
-Loosen the return type to handle both dict and list.
-
-```diff
--    def _make_request(self, url: str) -> Dict[str, Any]:
-+    def _make_request(self, url: str) -> Any:
-         """Make a request to the GitHub API."""
+lint-fix:
+-	uv run ruff check src tests --fix
++	uv run ruff check src tests --fix --show-fixes
 ```
 
 ---
 
-`51-54`: **Add a network timeout to avoid hanging.**
-Small safety net for CI/CLI.
+`1-1`: **Fix .PHONY drift and add a standard all target.**
+Remove undefined ruff-format and add all to satisfy checkmake.
 
 ```diff
--            with urlopen(request) as response:
-+            with urlopen(request, timeout=15) as response:
-                 return json.loads(response.read().decode('utf-8'))
+-.PHONY: help install test lint lint-fix format ruff-format type-check check-all clean dev-setup strict-check security-check runtime-check quality-gate pre-commit-install
++.PHONY: all help install test lint lint-fix format type-check check-all clean dev-setup strict-check security-check runtime-check quality-gate pre-commit-install
+```
+Add this target (outside the shown hunk):
+```
+all: quality-gate
 ```
 
 ---
 
-`74-75`: **Paginate or request more items for reviews.**
-Default per_page=30 can miss older reviews; add per_page and (optionally) pagination later.
+`52-56`: **Avoid mutating pyproject during security-check.**
+uv add modifies lockfiles; prefer ephemeral runs.
 
 ```diff
--        url = f"{self.base_url}/repos/{self.repo}/pulls/{pr_number}/reviews"
-+        url = f"{self.base_url}/repos/{self.repo}/pulls/{pr_number}/reviews?per_page=100"
-         return self._make_request(url)
+ security-check:
+ 	@echo "Running security analysis..."
+-	uv add --dev bandit
+-	uv run bandit -r src/ -f json || echo "Security issues found - review above"
++	uvx bandit -r src/ -f json || echo "Security issues found - review above"
 ```
 
 ---
 
-`91-93`: **Sort fallback for missing submitted_at.**
-Some reviews may lack submitted_at; use created_at as a fallback.
+`61-63`: **Don’t edit dependencies in pre-commit-install.**
+Use ephemeral execution instead.
 
 ```diff
--        reviews.sort(key=lambda x: x.get('submitted_at', ''), reverse=True)
-+        reviews.sort(
-+            key=lambda x: x.get('submitted_at') or x.get('created_at') or '',
-+            reverse=True
-+        )
+ pre-commit-install:
+-	uv add --dev pre-commit
+-	uv run pre-commit install
++	uvx pre-commit install
 ```
 
 </blockquote></details>
 <details>
-<summary>scripts/example_usage.md (1)</summary><blockquote>
+<summary>scripts/fetch_pr_review.py (7)</summary><blockquote>
 
-`55-55`: **Add language to “Sample Output” code fence (MD040).**
+`42-49`: **Modernize GitHub headers.**
+Prefer application/vnd.github+json and Bearer tokens (works for classic and fine‑grained).
 
 ```diff
--```
-+```text
+-        headers = {
+-            'Accept': 'application/vnd.github.v3+json',
+-            'User-Agent': 'TI4-AI-PR-Review-Fetcher/1.0'
+-        }
++        headers = {
++            'Accept': 'application/vnd.github+json',
++            'User-Agent': 'TI4-AI-PR-Review-Fetcher/1.0'
++        }
+ ...
+-        if self.token:
+-            headers['Authorization'] = f'token {self.token}'
++        if self.token:
++            headers['Authorization'] = f'Bearer {self.token}'
+```
+
+---
+
+`109-110`: **Fetch up to 100 review comments.**
+Default (30) can truncate busy reviews.
+
+```diff
+-        url = f"{self.base_url}/repos/{self.repo}/pulls/{pr_number}/reviews/{review_id}/comments"
++        url = f"{self.base_url}/repos/{self.repo}/pulls/{pr_number}/reviews/{review_id}/comments?per_page=100"
+```
+
+---
+
+`91-96`: **Consider robust timestamp sorting.**
+String sort works for RFC3339, but parsing is safer against format drift or timezones.
+
+Example (outside hunk):
+```python
+from datetime import datetime
+
+def _parse_ts(ts: Optional[str]) -> datetime:
+    return datetime.strptime(ts, "%Y-%m-%dT%H:%M:%SZ") if ts else datetime.min
+
+reviews.sort(key=lambda x: _parse_ts(x.get("submitted_at") or x.get("created_at")), reverse=True)
+```
+
+---
+
+`64-75`: **Optional: follow pagination via Link headers.**
+If a PR accumulates >100 reviews, follow next links to gather all.
+
+I can sketch a small pager using response.getheaders().get('Link') if you want.
+
+---
+
+`174-198`: **Origin-only detection can fail.**
+Fallback to first remote if origin is missing, and allow HTTPS/SSH forms.
+
+I can provide a snippet to try git remote get-url origin, then git remote and pick the first if origin is absent.
+
+---
+
+`235-239`: **Send warnings to stderr.**
+Keeps stdout clean for tooling.
+
+```diff
+-        print("Warning: No GitHub token provided. API rate limits may apply.")
+-        print("Consider setting GITHUB_TOKEN environment variable or using --token")
+-        print()
++        print("Warning: No GitHub token provided. API rate limits may apply.", file=sys.stderr)
++        print("Consider setting GITHUB_TOKEN environment variable or using --token", file=sys.stderr)
++        print(file=sys.stderr)
+```
+
+---
+
+`269-274`: **Send errors to stderr.**
+Conventional and script-friendly.
+
+```diff
+-        print(f"Error: {e}")
++        print(f"Error: {e}", file=sys.stderr)
+ ...
+-        print(f"Unexpected error: {e}")
++        print(f"Unexpected error: {e}", file=sys.stderr)
 ```
 
 </blockquote></details>
 <details>
 <summary>.trae/lrr_analysis/18_combat.md (4)</summary><blockquote>
 
-`11-11`: **Add language to fenced LRR block (MD040).**
+`12-16`: **Replace the hard tab in LRR text with spaces.**
+
+Lint (MD010) flags the tab after the title line.
 
 ```diff
--```
-+```text
+-18 COMBAT (ATTRIBUTE)	
++18 COMBAT (ATTRIBUTE)
+```
+
+---
+
+`24-31`: **Align implementation wording with current API (`Unit.get_stats()`/accessors).**
+
+Docs say “Unit class has combat_value attribute,” but code reads via `unit.get_stats()` / accessors. Update to avoid confusion.
+
+---
+
+`41-46`: **Clarify burst‑icon vs. combat_dice source of dice.**
+
+You state “burst icons are visual; combat_dice contains the total.” Make it explicit that combat_dice already reflects burst icons so readers don’t double-count.
+
+---
+
+`75-77`: **Placeholder dates: optional to keep, but consider stability.**
+
+If you retain “2024-01-XX,” add a brief note explaining placeholders to preempt future “replace dates” comments.
+
+</blockquote></details>
+<details>
+<summary>.trae/lrr_analysis/78_space_combat.md (2)</summary><blockquote>
+
+`27-27`: **Move “Implementation Note” out of the Raw LRR block.**
+
+Raw excerpts should be verbatim. Put the note below the fenced block.
+
+```diff
+-**Implementation Note**: The current code implementation includes `can_attacker_announce_retreat()` and `attacker_announces_retreat()` methods, but per LRR 78.4.b, attacker retreat is only allowed if the defender has not announced retreat. The current implementation correctly returns `False` for `can_attacker_announce_retreat()` under base rules, maintaining consistency with the LRR.
+```
+
+Add below the code block:
+```text
+Implementation Note: The current code includes `can_attacker_announce_retreat()` / `attacker_announces_retreat()`. Under LRR 78.4.b, attacker retreat is allowed only if the defender has not announced retreat; base rules keep attacker retreat disabled.
+```
+
+---
+
+`78-106`: **Section numbering offset from LRR; please realign.**
+
+Headings labeled “Rule 78.3: Announce Retreats” etc. should match LRR (78.3 Anti‑Fighter Barrage, 78.4 Announce Retreats, 78.5 Roll Dice, …).
+
+```diff
+-### Rule 78.3: Announce Retreats Step
++### Rule 78.4: Announce Retreats Step
 ...
--```
-+``` 
-```
-
-
-Also applies to: 17-17
-
----
-
-`12-12`: **Replace hard tab with spaces (MD010).**
-
----
-
-`41-45`: **Clarify burst‑icon vs combat_dice source of dice.**
-Currently reads as “visual only” yet 18.2 says each icon adds a die. Define whether combat_dice already includes burst icons or how icons modify dice.
-
----
-
-`75-77`: **Replace placeholder dates with actuals.**
-For auditability.
-
-</blockquote></details>
-<details>
-<summary>latest_review.md (1)</summary><blockquote>
-
-`836-836`: **Add a language to fenced prompt/code blocks (MD040).**
-Use text for prompts to silence lint.
-
-```diff
--```
-+```text
-```
-
-
-Also applies to: 953-953, 1032-1032, 1106-1106, 1183-1183
-
-</blockquote></details>
-<details>
-<summary>tests/test_unit.py (2)</summary><blockquote>
-
-`136-139`: **Also assert SPACE_DOCK has_production flag is True.**
-Reflects new boolean capability while keeping base production at 0.
-
-```diff
-         space_dock = Unit(unit_type=UnitType.SPACE_DOCK, owner="player1")
-+        assert space_dock.has_production() is True
-         assert space_dock.get_production() == 0  # Base production is 0, actual production is planet resources + 2
-```
-
----
-
-`207-208`: **Optional: Add a dedicated test for has_production semantics.**
-Keeps “static abilities” list clean while validating capability.
-
-```python
-def test_space_dock_has_production_flag() -> None:
-    sd = Unit(unit_type=UnitType.SPACE_DOCK, owner="player1")
-    assert sd.has_production() is True
-    assert sd.get_production() == 0
+-### Rule 78.4: Roll Dice Step
++### Rule 78.5: Roll Dice Step
+...
+-### Rule 78.5: Assign Hits Step
++### Rule 78.6: Assign Hits Step
+...
+-### Rule 78.6: Retreat Step
++### Rule 78.7: Retreat Step
 ```
 
 </blockquote></details>
 <details>
-<summary>.trae/lrr_analysis/05_active_system.md (1)</summary><blockquote>
+<summary>latest_review.txt (1)</summary><blockquote>
 
-`32-37`: **Clarify cross-token rule in one sentence.**
+`1-5`: **Consider treating this as a generated artifact.**
 
-Add a concise note: “Presence of another player’s command token does not prevent activation; only your own token does.”
-
-</blockquote></details>
-<details>
-<summary>src/ti4/core/unit_stats.py (2)</summary><blockquote>
-
-`35-35`: **Default for space_cannon_dice should be 0 (modifier safety).**
-
-Using 1 causes +1 dice when a modifier intends “no change.”
-
-Apply:
+To reduce churn in diffs, exclude this from version control or generate it on demand.
 
 ```diff
--    space_cannon_dice: int = 1
-+    space_cannon_dice: int = 0
-```
-
----
-
-`175-179`: **Use exception chaining (B904) and remove trailing whitespace.**
-
-Complies with flake8-bugbear and keeps traceback clear.
-
-
-```diff
--        try:
--            unit_type_enum = UnitType(unit_type)
--        except ValueError:
--            raise ValueError(f"Unknown unit type: {unit_type}")
--            
-+        try:
-+            unit_type_enum = UnitType(unit_type)
-+        except ValueError as err:
-+            raise ValueError(f"Unknown unit type: {unit_type}") from err
++# .gitignore
++latest_review.txt
 ```
 
 </blockquote></details>
 <details>
-<summary>IMPLEMENTATION_ROADMAP.md (2)</summary><blockquote>
+<summary>review_response.md (1)</summary><blockquote>
 
-`8-8`: **Fix heading level increment (MD001).**
-
-Change to H2 to avoid skipping levels.
-
-
-```diff
--### 🎯 Next Target: 25% (Advanced Game Mechanics)
-+## 🎯 Next Target: 25% (Advanced Game Mechanics)
-```
-
----
-
-`4-12`: **Avoid duplicate “Overall Progress” blocks.**
-
-You show 24.9% twice (Lines 4 and 11). Keep one.
-
-</blockquote></details>
-<details>
-<summary>unit_stats_fixes_summary.md (1)</summary><blockquote>
-
-`56-64`: **Also note default for space_cannon_dice.**
-
-Document that UnitStats.default(space_cannon_dice)=0 so modifiers don’t add dice unintentionally.
-
-</blockquote></details>
-<details>
-<summary>src/ti4/core/space_combat.py (6)</summary><blockquote>
-
-`63-66`: **Guard attacker_announces_retreat() with policy.**
-
-Prevent accidental enabling when base rules disallow it.
-
-
-```diff
- def attacker_announces_retreat(self) -> None:
-     """Attacker announces retreat."""
--    self.attacker_announced_retreat = True
-+    if not self.can_attacker_announce_retreat():
-+        raise RuntimeError("Attacker retreat is disabled under base rules")
-+    self.attacker_announced_retreat = True
-```
-
----
-
-`74-93`: **Retreat: tolerate desync between round lists and system.**
-
-Avoid ValueError if unit already moved/removed by callers.
-
-
-```diff
--                # Move between systems
--                self.system.remove_unit_from_space(unit)
-+                # Move between systems (guard against desync)
-+                if unit in self.system.space_units:
-+                    self.system.remove_unit_from_space(unit)
-                 retreat_system.place_unit_in_space(unit)
-@@
--                self.system.remove_unit_from_space(unit)
-+                if unit in self.system.space_units:
-+                    self.system.remove_unit_from_space(unit)
-                 retreat_system.place_unit_in_space(unit)
-```
-
----
-
-`141-159`: **Filter to ships at combat start.**
-
-Space combat should consider ships only; prevents accidental inclusion of non-ship units.
-
-
-```diff
--        attacker_units = [
--            u for u in self.system.space_units if u.owner == self.attacker_id
--        ]
--        defender_units = [
--            u for u in self.system.space_units if u.owner == self.defender_id
--        ]
-+        attacker_units = [
-+            u for u in self.system.space_units
-+            if u.owner == self.attacker_id and self._is_ship(u)
-+        ]
-+        defender_units = [
-+            u for u in self.system.space_units
-+            if u.owner == self.defender_id and self._is_ship(u)
-+        ]
-```
-
----
-
-`161-175`: **Continuation check should align with ship presence.**
-
-Match is_combat_required semantics.
-
-
-```diff
--        attacker_units = [
--            u for u in self.system.space_units if u.owner == self.attacker_id
--        ]
--        defender_units = [
--            u for u in self.system.space_units if u.owner == self.defender_id
--        ]
-+        attacker_units = [
-+            u for u in self.system.space_units
-+            if u.owner == self.attacker_id and self._is_ship(u)
-+        ]
-+        defender_units = [
-+            u for u in self.system.space_units
-+            if u.owner == self.defender_id and self._is_ship(u)
-+        ]
-```
-
----
-
-`176-194`: **Next round: also restrict to ships.**
-
-Keep unit lists consistent across rounds.
-
-
-```diff
--        attacker_units = [
--            u for u in self.system.space_units if u.owner == self.attacker_id
--        ]
--        defender_units = [
--            u for u in self.system.space_units if u.owner == self.defender_id
--        ]
-+        attacker_units = [
-+            u for u in self.system.space_units
-+            if u.owner == self.attacker_id and self._is_ship(u)
-+        ]
-+        defender_units = [
-+            u for u in self.system.space_units
-+            if u.owner == self.defender_id and self._is_ship(u)
-+        ]
-```
-
----
-
-`196-234`: **Unused winner parameter.**
-
-Either remove it or honor an explicit override.
-
-
-```diff
--def end_combat(self, winner: Optional[str] = None) -> SpaceCombatResult:
-+def end_combat(self) -> SpaceCombatResult:
-```
+`16-17`: **Avoid hardcoded test/coverage numbers — fetch from CI artifacts or omit.**
+"1037 tests, 87% coverage" is hardcoded in multiple files: review_response.md:16, review_response.md:83, unit_stats_fixes_summary.md:78, latest_review.txt:832. Replace these with values pulled from CI artifacts (or remove the numbers) to prevent stale/inaccurate documentation.
 
 </blockquote></details>
 
@@ -440,45 +262,27 @@ Either remove it or honor an explicit override.
 <details>
 <summary>📥 Commits</summary>
 
-Reviewing files that changed from the base of the PR and between 2f73104c82f8a049b00c73681a5b0cf2fd585164 and ff663cc5188b7bab9240ede5e854f086e3bf2a54.
+Reviewing files that changed from the base of the PR and between ff663cc5188b7bab9240ede5e854f086e3bf2a54 and 2c5e19a394b81b9cd56dee284a1d4f5085aaa973.
 
 </details>
 
 <details>
-<summary>📒 Files selected for processing (17)</summary>
+<summary>📒 Files selected for processing (8)</summary>
 
-* `.trae/lrr_analysis/05_active_system.md` (1 hunks)
 * `.trae/lrr_analysis/18_combat.md` (1 hunks)
 * `.trae/lrr_analysis/78_space_combat.md` (1 hunks)
-* `IMPLEMENTATION_ROADMAP.md` (3 hunks)
-* `latest_review.md` (1 hunks)
+* `Makefile` (2 hunks)
+* `latest_review.txt` (1 hunks)
 * `review_response.md` (1 hunks)
-* `scripts/example_usage.md` (1 hunks)
 * `scripts/fetch_pr_review.py` (1 hunks)
-* `src/ti4/core/combat.py` (3 hunks)
-* `src/ti4/core/rule89_validator.py` (1 hunks)
-* `src/ti4/core/space_combat.py` (1 hunks)
-* `src/ti4/core/unit.py` (1 hunks)
 * `src/ti4/core/unit_stats.py` (4 hunks)
-* `tests/test_rule_18_burst_icons.py` (1 hunks)
 * `tests/test_rule_78_space_combat.py` (1 hunks)
-* `tests/test_unit.py` (2 hunks)
-* `unit_stats_fixes_summary.md` (1 hunks)
 
 </details>
 
 <details>
-<summary>✅ Files skipped from review due to trivial changes (1)</summary>
+<summary>🚧 Files skipped from review as they are similar to previous changes (1)</summary>
 
-* review_response.md
-
-</details>
-
-<details>
-<summary>🚧 Files skipped from review as they are similar to previous changes (3)</summary>
-
-* src/ti4/core/combat.py
-* tests/test_rule_18_burst_icons.py
 * tests/test_rule_78_space_combat.py
 
 </details>
@@ -487,19 +291,8 @@ Reviewing files that changed from the base of the PR and between 2f73104c82f8a04
 <summary>🧰 Additional context used</summary>
 
 <details>
-<summary>🧬 Code graph analysis (4)</summary>
+<summary>🧬 Code graph analysis (1)</summary>
 
-<details>
-<summary>src/ti4/core/rule89_validator.py (1)</summary><blockquote>
-
-<details>
-<summary>src/ti4/core/unit.py (1)</summary>
-
-* `has_production` (113-115)
-
-</details>
-
-</blockquote></details>
 <details>
 <summary>src/ti4/core/unit_stats.py (2)</summary><blockquote>
 
@@ -518,251 +311,36 @@ Reviewing files that changed from the base of the PR and between 2f73104c82f8a04
 </details>
 
 </blockquote></details>
-<details>
-<summary>tests/test_unit.py (2)</summary><blockquote>
-
-<details>
-<summary>src/ti4/core/unit.py (2)</summary>
-
-* `Unit` (10-191)
-* `get_production` (117-119)
-
-</details>
-<details>
-<summary>src/ti4/core/constants.py (1)</summary>
-
-* `UnitType` (6-20)
-
-</details>
-
-</blockquote></details>
-<details>
-<summary>src/ti4/core/space_combat.py (3)</summary><blockquote>
-
-<details>
-<summary>src/ti4/core/constants.py (1)</summary>
-
-* `UnitType` (6-20)
-
-</details>
-<details>
-<summary>src/ti4/core/system.py (3)</summary>
-
-* `System` (12-168)
-* `remove_unit_from_space` (66-68)
-* `place_unit_in_space` (62-64)
-
-</details>
-<details>
-<summary>src/ti4/core/unit.py (4)</summary>
-
-* `Unit` (10-191)
-* `has_anti_fighter_barrage` (93-95)
-* `get_combat_dice` (121-123)
-* `get_combat_value` (73-75)
-
-</details>
-
-</blockquote></details>
 
 </details><details>
 <summary>🪛 markdownlint-cli2 (0.18.1)</summary>
 
 <details>
-<summary>.trae/lrr_analysis/05_active_system.md</summary>
-
-11-11: Fenced code blocks should have a language specified
-
-(MD040, fenced-code-language)
-
----
-
-12-12: Hard tabs
-Column: 22
-
-(MD010, no-hard-tabs)
-
-</details>
-<details>
-<summary>IMPLEMENTATION_ROADMAP.md</summary>
-
-8-8: Heading levels should only increment by one level at a time
-Expected: h2; Actual: h3
-
-(MD001, heading-increment)
-
-</details>
-<details>
-<summary>latest_review.md</summary>
-
-14-14: Trailing punctuation in heading
-Punctuation: ':'
-
-(MD026, no-trailing-punctuation)
-
----
-
-16-16: Emphasis used instead of a heading
-
-(MD036, no-emphasis-as-heading)
-
----
-
-163-163: Strong style
-Expected: asterisk; Actual: underscore
-
-(MD050, strong-style)
-
----
-
-163-163: Strong style
-Expected: asterisk; Actual: underscore
-
-(MD050, strong-style)
-
----
-
-686-686: Trailing punctuation in heading
-Punctuation: ':'
-
-(MD026, no-trailing-punctuation)
-
----
-
-836-836: Fenced code blocks should have a language specified
-
-(MD040, fenced-code-language)
-
----
-
-953-953: Fenced code blocks should have a language specified
-
-(MD040, fenced-code-language)
-
----
-
-1032-1032: Fenced code blocks should have a language specified
-
-(MD040, fenced-code-language)
-
----
-
-1106-1106: Fenced code blocks should have a language specified
-
-(MD040, fenced-code-language)
-
----
-
-1127-1127: Spaces inside emphasis markers
-
-(MD037, no-space-in-emphasis)
-
----
-
-1183-1183: Fenced code blocks should have a language specified
-
-(MD040, fenced-code-language)
-
-</details>
-<details>
-<summary>.trae/lrr_analysis/78_space_combat.md</summary>
-
-5-5: Fenced code blocks should have a language specified
-
-(MD040, fenced-code-language)
-
----
-
-12-12: Hard tabs
-Column: 2
-
-(MD010, no-hard-tabs)
-
----
-
-18-18: Hard tabs
-Column: 2
-
-(MD010, no-hard-tabs)
-
----
-
-20-20: Hard tabs
-Column: 2
-
-(MD010, no-hard-tabs)
-
----
-
-23-23: Hard tabs
-Column: 2
-
-(MD010, no-hard-tabs)
-
----
-
-25-25: Hard tabs
-Column: 2
-
-(MD010, no-hard-tabs)
-
----
-
-30-30: Hard tabs
-Column: 2
-
-(MD010, no-hard-tabs)
-
----
-
-32-32: Hard tabs
-Column: 2
-
-(MD010, no-hard-tabs)
-
----
-
-42-42: Hard tabs
-Column: 2
-
-(MD010, no-hard-tabs)
-
----
-
-44-44: Hard tabs
-Column: 2
-
-(MD010, no-hard-tabs)
-
----
-
-50-50: Hard tabs
-Column: 2
-
-(MD010, no-hard-tabs)
-
-</details>
-<details>
 <summary>.trae/lrr_analysis/18_combat.md</summary>
 
-11-11: Fenced code blocks should have a language specified
-
-(MD040, fenced-code-language)
-
----
-
 12-12: Hard tabs
 Column: 22
 
 (MD010, no-hard-tabs)
 
 </details>
+
+</details>
 <details>
-<summary>scripts/example_usage.md</summary>
+<summary>🪛 checkmake (0.2.2)</summary>
 
-55-55: Fenced code blocks should have a language specified
+<details>
+<summary>Makefile</summary>
 
-(MD040, fenced-code-language)
+[warning] 3-3: Target body for "help" exceeds allowed length of 5 (15).
+
+(maxbodylength)
+
+---
+
+[warning] 1-1: Missing required phony target "all"
+
+(minphony)
 
 </details>
 
@@ -773,11 +351,7 @@ Column: 22
 <details>
 <summary>src/ti4/core/unit_stats.py</summary>
 
-[error] 178-178: B904: Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling.
-
----
-
-[warning] 179-179: W293: Blank line contains whitespace. Remove whitespace from blank line.
+[error] 1-1: Command 'uv run ruff format --check src tests' failed. Ruff format check would reformatted: src/ti4/core/unit_stats.py. Run 'ruff format' to fix code style issues.
 
 </details>
 
@@ -786,58 +360,45 @@ Column: 22
 </details>
 
 <details>
-<summary>🔇 Additional comments (6)</summary><blockquote>
+<summary>🔇 Additional comments (5)</summary><blockquote>
 
 <details>
-<summary>src/ti4/core/unit.py (1)</summary><blockquote>
+<summary>Makefile (1)</summary><blockquote>
 
-`113-116`: **Expose production capability via has_production(): LGTM.**
-Matches UnitStats.has_production and decouples capability from numeric production.
-
-
-Please confirm UnitStatsProvider always sets has_production for SPACE_DOCK (True) even if production=0.
+`9-9`: **Help entry for lint-fix looks good.**
+Clear and consistent with the new target.
 
 </blockquote></details>
 <details>
-<summary>src/ti4/core/rule89_validator.py (1)</summary><blockquote>
+<summary>scripts/fetch_pr_review.py (1)</summary><blockquote>
 
-`358-364`: **Switching to unit.has_production(): LGTM.**
-Aligns with dynamic production semantics.
-
-
-Ensure tests cover “has_production True, production 0” (SPACE_DOCK) and “both False/0” cases.
-
-</blockquote></details>
-<details>
-<summary>.trae/lrr_analysis/05_active_system.md (1)</summary><blockquote>
-
-`14-19`: **Own-token activation restriction: LGTM.**
-
-Reads consistent with Rule 89. Please confirm tests explicitly cover: (a) own-token present → cannot activate, (b) no own-token but other-player token present → can activate.
+`74-75`: **per_page=100 for reviews: LGTM.**
+Good call minimizing pagination needs.
 
 </blockquote></details>
 <details>
 <summary>src/ti4/core/unit_stats.py (1)</summary><blockquote>
 
-`119-133`: **Space Dock base stats: LGTM.**
+`175-179`: **Run ruff format to fix B904 / trailing-whitespace (W293)**
 
-cost=0, production=0, has_production=True aligns with rules and downstream checks.
-
-</blockquote></details>
-<details>
-<summary>unit_stats_fixes_summary.md (1)</summary><blockquote>
-
-`77-82`: **Metrics claims: verify against CI.**
-
-“1037 tests pass / 87% coverage” — ensure these reflect current pipeline to avoid drift.
+Exception chaining is correct; CI still flags trailing whitespace in src/ti4/core/unit_stats.py (lines 175–179). Formatter couldn't be executed in the verification sandbox (uv: command not found). Run: ruff format src/ti4/core/unit_stats.py && ruff check src/ti4/core/unit_stats.py and re-run CI.
 
 </blockquote></details>
 <details>
-<summary>src/ti4/core/space_combat.py (1)</summary><blockquote>
+<summary>review_response.md (1)</summary><blockquote>
 
-`252-262`: **Ship whitelist: LGTM.**
+`82-85`: **Run ruff formatter & soften "No breaking changes introduced"**
 
-Includes fighters; aligns with Rule 76 and space combat requirements.
+- The provided script failed here: "uv: command not found" — ruff did not execute. CI indicated ruff would reformat src/ti4/core/unit_stats.py. Run `ruff format` (or `python -m ruff format`), commit/push, then verify with `ruff format --check src tests`.
+- Tabs detected in docs under .trae/lrr_analysis — fix tabs in: 63_pds.md, 18_combat.md, 64_planets.md, 62_opponent.md, 65_planetary_shield.md, 60_neighbors.md, 61_objective_cards.md, 47_legendary_planets.md, 27_custodians_token.md, 25_control.md, 28_deals.md, 26_cost.md, 100_wormhole_nexus.md.
+- Replace the strong claim "No breaking changes introduced" with a softer phrasing such as "No intended breaking changes; see migration notes if applicable."
+
+</blockquote></details>
+<details>
+<summary>.trae/lrr_analysis/78_space_combat.md (1)</summary><blockquote>
+
+`5-56`: **Resolved — tabs replaced with 4 spaces in .trae/lrr_analysis/78_space_combat.md**  
+Tabs were converted to spaces; markdownlint MD010 should now be cleared.
 
 </blockquote></details>
 
@@ -846,5 +407,56 @@ Includes fighters; aligns with Rule 76 and space combat requirements.
 </details>
 
 <!-- This is an auto-generated comment by CodeRabbit for review status -->
+
+DETAILED COMMENTS:
+----------------------------------------
+Comment 1:
+  File: src/ti4/core/unit_stats.py
+  Line: Unknown
+  Body: _⚠️ Potential issue_
+
+**Default `space_cannon_dice` should be 0 (modifier safety).**
+
+With modifiers defaulting to zero-change, leaving this at 1 injects +1 die unintentionally.
+
+```diff
+-    space_cannon_dice: int = 1
++    space_cannon_dice: int = 0
+```
+
+<!-- suggestion_start -->
+
+<details>
+<summary>📝 Committable suggestion</summary>
+
+> ‼️ **IMPORTANT**
+> Carefully review the code before committing. Ensure that it accurately replaces the highlighted code, contains no missing lines, and has no issues with indentation. Thoroughly test & benchmark the code to ensure it meets the requirements.
+
+```suggestion
+    space_cannon_value: Optional[int] = None
+    space_cannon_dice: int = 0
+    has_production: bool = False  # Whether unit has production ability (separate from production value)
+```
+
+</details>
+
+<!-- suggestion_end -->
+
+<details>
+<summary>🤖 Prompt for AI Agents</summary>
+
+```
+In src/ti4/core/unit_stats.py around lines 33 to 36, the dataclass field
+space_cannon_dice is set to 1 which unintentionally adds a die when modifiers
+default to zero; change the default to 0 (space_cannon_dice: int = 0) so
+modifiers must explicitly add dice, and update the inline comment if present to
+reflect that 0 is the safe default for no modifier.
+```
+
+</details>
+
+<!-- fingerprinting:phantom:medusa:chinchilla -->
+
+<!-- This is an auto-generated comment by CodeRabbit -->
 
 ============================================================

@@ -17,6 +17,7 @@ import argparse
 import json
 import os
 import sys
+from datetime import datetime
 from typing import Dict, List, Optional, Any
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
@@ -40,12 +41,12 @@ class GitHubPRReviewFetcher:
     def _make_request(self, url: str) -> Any:
         """Make a request to the GitHub API."""
         headers = {
-            'Accept': 'application/vnd.github.v3+json',
+            'Accept': 'application/vnd.github+json',
             'User-Agent': 'TI4-AI-PR-Review-Fetcher/1.0'
         }
         
         if self.token:
-            headers['Authorization'] = f'token {self.token}'
+            headers['Authorization'] = f'Bearer {self.token}'
             
         try:
             request = Request(url, headers=headers)
@@ -74,6 +75,16 @@ class GitHubPRReviewFetcher:
         url = f"{self.base_url}/repos/{self.repo}/pulls/{pr_number}/reviews?per_page=100"
         return self._make_request(url)
     
+    def _parse_timestamp(self, ts: Optional[str]) -> datetime:
+        """Parse GitHub timestamp string to datetime object."""
+        if not ts:
+            return datetime.min
+        try:
+            return datetime.strptime(ts, "%Y-%m-%dT%H:%M:%SZ")
+        except ValueError:
+            # Fallback for different timestamp formats
+            return datetime.min
+
     def get_latest_review(self, pr_number: int) -> Optional[Dict[str, Any]]:
         """
         Get the most recent review for a PR.
@@ -88,9 +99,9 @@ class GitHubPRReviewFetcher:
         if not reviews:
             return None
             
-        # Sort by submitted_at timestamp to get the latest
+        # Sort by submitted_at timestamp using robust parsing
         reviews.sort(
-            key=lambda x: x.get('submitted_at') or x.get('created_at') or '',
+            key=lambda x: self._parse_timestamp(x.get('submitted_at') or x.get('created_at')),
             reverse=True
         )
         return reviews[0]
@@ -106,7 +117,7 @@ class GitHubPRReviewFetcher:
         Returns:
             List of review comment objects
         """
-        url = f"{self.base_url}/repos/{self.repo}/pulls/{pr_number}/reviews/{review_id}/comments"
+        url = f"{self.base_url}/repos/{self.repo}/pulls/{pr_number}/reviews/{review_id}/comments?per_page=100"
         return self._make_request(url)
     
     def format_review_summary(self, review: Dict[str, Any], include_comments: bool = True) -> str:
@@ -227,15 +238,15 @@ Environment Variables:
     # Determine repository
     repo = args.repo or os.getenv('GITHUB_REPO') or detect_repo_from_git()
     if not repo:
-        print("Error: Repository not specified. Use --repo, set GITHUB_REPO env var, or run from a git repository.")
+        print("Error: Repository not specified. Use --repo, set GITHUB_REPO env var, or run from a git repository.", file=sys.stderr)
         sys.exit(1)
     
     # Initialize fetcher
     token = args.token or os.getenv('GITHUB_TOKEN')
     if not token:
-        print("Warning: No GitHub token provided. API rate limits may apply.")
-        print("Consider setting GITHUB_TOKEN environment variable or using --token")
-        print()
+        print("Warning: No GitHub token provided. API rate limits may apply.", file=sys.stderr)
+        print("Consider setting GITHUB_TOKEN environment variable or using --token", file=sys.stderr)
+        print(file=sys.stderr)
     
     try:
         fetcher = GitHubPRReviewFetcher(repo, token)
@@ -267,10 +278,10 @@ Environment Variables:
             print(fetcher.format_review_summary(review, not args.no_comments))
             
     except ValueError as e:
-        print(f"Error: {e}")
+        print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
     except Exception as e:
-        print(f"Unexpected error: {e}")
+        print(f"Unexpected error: {e}", file=sys.stderr)
         sys.exit(1)
 
 
