@@ -28,7 +28,7 @@ To resolve the primary ability on the "Warfare" strategy card, the active player
 ### 99.2 Command Token Redistribution (Step 2)
 **Rule**: "The active player can redistribute their command tokens."
 
-**Implementation Status**: ✅ IMPLEMENTED  
+**Implementation Status**: ✅ IMPLEMENTED
 - **Code**: `WarfareStrategyCard.redistribute_tokens()` and `CommandSheet.redistribute_tokens()` methods
 - **Tests**: `test_can_redistribute_command_tokens_between_pools()`, `test_redistribution_preserves_total_token_count()`
 - **Assessment**: Full redistribution mechanics with token count preservation

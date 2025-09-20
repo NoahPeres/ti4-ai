@@ -7,26 +7,28 @@ Rule 88: A system tile represents an area of the galaxy. Players place system ti
 from __future__ import annotations
 
 from enum import Enum
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ti4.core.planet import Planet
+    from ti4.core.planet import Planet  # type: ignore[import-untyped]
 
 
 class TileColor(Enum):
     """Tile back colors as defined in Rule 88.1"""
+
     GREEN = "green"  # Home systems and faction-specific tiles (88.2)
-    BLUE = "blue"    # Systems containing one or more planets (88.3)
-    RED = "red"      # Anomalies or systems without planets (88.4)
+    BLUE = "blue"  # Systems containing one or more planets (88.3)
+    RED = "red"  # Anomalies or systems without planets (88.4)
 
 
 class TileType(Enum):
     """Types of system tiles"""
-    HOME_SYSTEM = "home_system"      # Green-backed home systems (88.2)
+
+    HOME_SYSTEM = "home_system"  # Green-backed home systems (88.2)
     PLANET_SYSTEM = "planet_system"  # Blue-backed systems with planets (88.3)
-    ANOMALY = "anomaly"              # Red-backed anomaly systems (88.4)
-    EMPTY_SYSTEM = "empty_system"    # Red-backed systems without planets (88.4)
-    HYPERLANE = "hyperlane"          # Double-sided hyperlane tiles (88.7)
+    ANOMALY = "anomaly"  # Red-backed anomaly systems (88.4)
+    EMPTY_SYSTEM = "empty_system"  # Red-backed systems without planets (88.4)
+    HYPERLANE = "hyperlane"  # Double-sided hyperlane tiles (88.7)
 
 
 class SystemTile:
@@ -37,7 +39,13 @@ class SystemTile:
     during setup to create the game board.
     """
 
-    def __init__(self, tile_id: str, color: Optional[TileColor], tile_type: TileType, faction: Optional[str] = None):
+    def __init__(
+        self,
+        tile_id: str,
+        color: TileColor | None,
+        tile_type: TileType,
+        faction: str | None = None,
+    ):
         """
         Initialize a SystemTile.
 
@@ -65,7 +73,10 @@ class SystemTile:
         if self.color == TileColor.BLUE and self.tile_type != TileType.PLANET_SYSTEM:
             raise ValueError("Blue tiles must be planet systems (Rule 88.3)")
 
-        if self.color == TileColor.RED and self.tile_type not in [TileType.ANOMALY, TileType.EMPTY_SYSTEM]:
+        if self.color == TileColor.RED and self.tile_type not in [
+            TileType.ANOMALY,
+            TileType.EMPTY_SYSTEM,
+        ]:
             raise ValueError("Red tiles must be anomalies or empty systems (Rule 88.4)")
 
     def add_planet(self, planet: Planet) -> None:
@@ -109,13 +120,13 @@ class SystemTile:
         """Check if this tile has crossing lines (hyperlane property) (Rule 88.7)."""
         return self.is_hyperlane()
 
-    def add_adjacent_tile(self, tile: 'SystemTile') -> None:
+    def add_adjacent_tile(self, tile: SystemTile) -> None:
         """Add an adjacent tile (for Rule 6 adjacency support)."""
         self.adjacent_tiles.add(tile)
 
     def __str__(self) -> str:
         """String representation of the tile."""
-        color_str = self.color.value.upper() if self.color else 'None'
+        color_str = self.color.value.upper() if self.color else "None"
         type_str = self.tile_type.value.upper()
         return f"SystemTile({self.tile_id}, {color_str}, {type_str})"
 

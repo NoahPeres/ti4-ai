@@ -61,7 +61,7 @@ def test_player_has_id():
 
 # 2. GREEN: Fix test to pass with minimal code
 def test_player_has_id():
-    player = Player(id="test") 
+    player = Player(id="test")
     assert player.id == "test"  # Now passes
 
 # 3. REFACTOR: Explicitly consider improvements

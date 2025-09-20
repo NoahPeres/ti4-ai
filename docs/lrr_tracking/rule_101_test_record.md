@@ -11,7 +11,7 @@
 
 ### Core Wormhole Type Tests
 - ✅ `test_alpha_wormhole_systems_are_adjacent` - Alpha wormhole adjacency
-- ✅ `test_beta_wormhole_systems_are_adjacent` - Beta wormhole adjacency  
+- ✅ `test_beta_wormhole_systems_are_adjacent` - Beta wormhole adjacency
 - ✅ `test_gamma_wormhole_systems_are_adjacent` - Gamma wormhole adjacency
 - ✅ `test_delta_wormhole_systems_are_adjacent` - Delta wormhole adjacency
 

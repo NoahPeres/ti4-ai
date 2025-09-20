@@ -1,9 +1,9 @@
 # Rule 30: DEPLOY - Analysis
 
 ## Category Overview
-**Rule Type:** Unit Abilities  
-**Priority:** MEDIUM-HIGH  
-**Implementation Status:** PARTIALLY IMPLEMENTED  
+**Rule Type:** Unit Abilities
+**Priority:** MEDIUM-HIGH
+**Implementation Status:** PARTIALLY IMPLEMENTED
 
 ## Raw LRR Text
 ```
@@ -24,28 +24,28 @@ RELATED TOPICS: Abilities, Mechs, Reinforcements
 ## Sub-Rules Analysis
 
 ### 30.1 Deploy Ability Usage
-**Status:** 🔶 PARTIALLY IMPLEMENTED  
-**Implementation:** Unit has deploy flag but no deployment mechanics  
+**Status:** 🔶 PARTIALLY IMPLEMENTED
+**Implementation:** Unit has deploy flag but no deployment mechanics
 **Details:** Conditions and placement logic not implemented
 
 ### 30.1.a Resource-Free Deployment
-**Status:** ❌ NOT IMPLEMENTED  
-**Implementation:** No cost system for deploy abilities  
+**Status:** ❌ NOT IMPLEMENTED
+**Implementation:** No cost system for deploy abilities
 **Details:** Deploy should bypass normal resource costs
 
 ### 30.2 Reinforcement Requirement
-**Status:** ❌ NOT IMPLEMENTED  
-**Implementation:** No reinforcement validation for deploy  
+**Status:** ❌ NOT IMPLEMENTED
+**Implementation:** No reinforcement validation for deploy
 **Details:** Must check unit availability in reinforcements
 
 ### 30.2.a Availability Check
-**Status:** ❌ NOT IMPLEMENTED  
-**Implementation:** No validation of deploy unit availability  
+**Status:** ❌ NOT IMPLEMENTED
+**Implementation:** No validation of deploy unit availability
 **Details:** Cannot deploy if no units with deploy ability in reinforcements
 
 ### 30.3 Timing Window Restriction
-**Status:** ❌ NOT IMPLEMENTED  
-**Implementation:** No timing window tracking for deploy abilities  
+**Status:** ❌ NOT IMPLEMENTED
+**Implementation:** No timing window tracking for deploy abilities
 **Details:** Each deploy ability can only be used once per timing window
 
 ## Related Topics

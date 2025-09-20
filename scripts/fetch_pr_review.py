@@ -35,20 +35,20 @@ class GitHubPRReviewFetcher:
             token: GitHub personal access token (optional but recommended)
         """
         self.repo = repo
-        self.token = token or os.getenv('GITHUB_TOKEN')
+        self.token = token or os.getenv("GITHUB_TOKEN")
         self.base_url = "https://api.github.com"
 
     def _headers(self) -> dict[str, str]:
         """Create standard headers for GitHub API requests."""
         headers = {
-            'Accept': 'application/vnd.github+json',
-            'User-Agent': 'TI4-AI-PR-Review-Fetcher/1.0',
-            'X-GitHub-Api-Version': '2022-11-28'
+            "Accept": "application/vnd.github+json",
+            "User-Agent": "TI4-AI-PR-Review-Fetcher/1.0",
+            "X-GitHub-Api-Version": "2022-11-28",
         }
-        
+
         if self.token:
-            headers['Authorization'] = f'Bearer {self.token}'
-            
+            headers["Authorization"] = f"Bearer {self.token}"
+
         return headers
 
     def _make_request(self, url: str) -> Any:
@@ -58,16 +58,20 @@ class GitHubPRReviewFetcher:
         try:
             request = Request(url, headers=headers)
             with urlopen(request, timeout=15) as response:
-                return json.loads(response.read().decode('utf-8'))
+                return json.loads(response.read().decode("utf-8"))
         except HTTPError as e:
             if e.code == 404:
-                raise ValueError(f"PR not found or repository not accessible: {url}")
+                raise ValueError(
+                    f"PR not found or repository not accessible: {url}"
+                ) from e
             elif e.code == 403:
-                raise ValueError("API rate limit exceeded or insufficient permissions. Consider using a GitHub token.")
+                raise ValueError(
+                    "API rate limit exceeded or insufficient permissions. Consider using a GitHub token."
+                ) from e
             else:
-                raise ValueError(f"HTTP error {e.code}: {e.reason}")
+                raise ValueError(f"HTTP error {e.code}: {e.reason}") from e
         except URLError as e:
-            raise ValueError(f"Network error: {e.reason}")
+            raise ValueError(f"Network error: {e.reason}") from e
 
     def _get_all_pages(self, url: str) -> list[dict[str, Any]]:
         """
@@ -88,40 +92,44 @@ class GitHubPRReviewFetcher:
             try:
                 request = Request(current_url, headers=headers)
                 with urlopen(request, timeout=15) as response:
-                    data = json.loads(response.read().decode('utf-8'))
-                    
+                    data = json.loads(response.read().decode("utf-8"))
+
                     # Guard against non-list payloads
                     if not isinstance(data, list):
-                        raise ValueError(f"Expected list response from GitHub API, got {type(data).__name__}")
-                    
+                        raise ValueError(
+                            f"Expected list response from GitHub API, got {type(data).__name__}"
+                        )
+
                     all_results.extend(data)
 
                     # Parse Link header for next page
-                    link_header = response.headers.get('Link', '')
+                    link_header = response.headers.get("Link", "")
                     current_url = None
 
                     if link_header:
                         # Parse Link header: <url>; rel="next", <url>; rel="last"
                         links = {}
-                        for link in link_header.split(','):
+                        for link in link_header.split(","):
                             link = link.strip()
-                            if '; rel=' in link:
-                                url_part, rel_part = link.split('; rel=', 1)
-                                url_clean = url_part.strip('<>')
+                            if "; rel=" in link:
+                                url_part, rel_part = link.split("; rel=", 1)
+                                url_clean = url_part.strip("<>")
                                 rel_clean = rel_part.strip('"')
                                 links[rel_clean] = url_clean
 
-                        current_url = links.get('next')
+                        current_url = links.get("next")
 
             except HTTPError as e:
                 if e.code == 404:
-                    raise ValueError(f"Resource not found: {current_url}")
+                    raise ValueError(f"Resource not found: {current_url}") from e
                 elif e.code == 403:
-                    raise ValueError("API rate limit exceeded or insufficient permissions")
+                    raise ValueError(
+                        "API rate limit exceeded or insufficient permissions"
+                    ) from e
                 else:
-                    raise ValueError(f"HTTP error {e.code}: {e.reason}")
+                    raise ValueError(f"HTTP error {e.code}: {e.reason}") from e
             except URLError as e:
-                raise ValueError(f"Network error: {e.reason}")
+                raise ValueError(f"Network error: {e.reason}") from e
 
         return all_results
 
@@ -135,7 +143,9 @@ class GitHubPRReviewFetcher:
         Returns:
             List of review objects from GitHub API
         """
-        url = f"{self.base_url}/repos/{self.repo}/pulls/{pr_number}/reviews?per_page=100"
+        url = (
+            f"{self.base_url}/repos/{self.repo}/pulls/{pr_number}/reviews?per_page=100"
+        )
         return self._get_all_pages(url)
 
     def _parse_timestamp(self, ts: Optional[str]) -> datetime:
@@ -164,12 +174,16 @@ class GitHubPRReviewFetcher:
 
         # Sort by submitted_at timestamp using robust parsing
         reviews.sort(
-            key=lambda x: self._parse_timestamp(x.get('submitted_at') or x.get('created_at')),
-            reverse=True
+            key=lambda x: self._parse_timestamp(
+                x.get("submitted_at") or x.get("created_at")
+            ),
+            reverse=True,
         )
         return reviews[0]
 
-    def get_review_comments(self, pr_number: int, review_id: int) -> list[dict[str, Any]]:
+    def get_review_comments(
+        self, pr_number: int, review_id: int
+    ) -> list[dict[str, Any]]:
         """
         Get detailed comments for a specific review.
 
@@ -183,7 +197,9 @@ class GitHubPRReviewFetcher:
         url = f"{self.base_url}/repos/{self.repo}/pulls/{pr_number}/reviews/{review_id}/comments?per_page=100"
         return self._get_all_pages(url)
 
-    def format_review_summary(self, review: dict[str, Any], include_comments: bool = True) -> str:
+    def format_review_summary(
+        self, review: dict[str, Any], include_comments: bool = True
+    ) -> str:
         """
         Format a review into a readable summary.
 
@@ -205,7 +221,7 @@ class GitHubPRReviewFetcher:
         summary.append("")
 
         # Main review body
-        body = review.get('body', '').strip()
+        body = review.get("body", "").strip()
         if body:
             summary.append("REVIEW BODY:")
             summary.append("-" * 40)
@@ -213,11 +229,11 @@ class GitHubPRReviewFetcher:
             summary.append("")
 
         # Include detailed comments if requested
-        if include_comments and review.get('id'):
+        if include_comments and review.get("id"):
             try:
                 pr_number = self._extract_pr_number_from_review(review)
                 if pr_number:
-                    comments = self.get_review_comments(pr_number, review['id'])
+                    comments = self.get_review_comments(pr_number, review["id"])
                     if comments:
                         summary.append("DETAILED COMMENTS:")
                         summary.append("-" * 40)
@@ -225,9 +241,15 @@ class GitHubPRReviewFetcher:
                             summary.append(f"Comment {i}:")
                             summary.append(f"  File: {comment.get('path', 'Unknown')}")
                             # Try to get line number with fallback
-                            line_num = comment.get('line') or comment.get('original_line') or comment.get('position', 'Unknown')
+                            line_num = (
+                                comment.get("line")
+                                or comment.get("original_line")
+                                or comment.get("position", "Unknown")
+                            )
                             summary.append(f"  Line: {line_num}")
-                            summary.append(f"  Body: {comment.get('body', 'No content')}")
+                            summary.append(
+                                f"  Body: {comment.get('body', 'No content')}"
+                            )
                             summary.append("")
             except Exception as e:
                 summary.append(f"Note: Could not fetch detailed comments: {e}")
@@ -238,10 +260,10 @@ class GitHubPRReviewFetcher:
 
     def _extract_pr_number_from_review(self, review: dict[str, Any]) -> Optional[int]:
         """Extract PR number from review object."""
-        pull_request_url = review.get('pull_request_url', '')
+        pull_request_url = review.get("pull_request_url", "")
         if pull_request_url:
             try:
-                return int(pull_request_url.split('/')[-1])
+                return int(pull_request_url.split("/")[-1])
             except (ValueError, IndexError):
                 pass
         return None
@@ -251,20 +273,21 @@ def detect_repo_from_git() -> Optional[str]:
     """Try to detect the GitHub repository from git remote."""
     try:
         import subprocess
+
         result = subprocess.run(
-            ['git', 'remote', 'get-url', 'origin'],
+            ["git", "remote", "get-url", "origin"],
             capture_output=True,
             text=True,
-            cwd=os.getcwd()
+            cwd=os.getcwd(),
         )
         if result.returncode == 0:
             url = result.stdout.strip()
             # Parse GitHub URL formats
-            if 'github.com' in url:
-                if url.startswith('git@github.com:'):
-                    repo = url.replace('git@github.com:', '').replace('.git', '')
-                elif 'github.com/' in url:
-                    repo = url.split('github.com/')[-1].replace('.git', '')
+            if "github.com" in url:
+                if url.startswith("git@github.com:"):
+                    repo = url.replace("git@github.com:", "").replace(".git", "")
+                elif "github.com/" in url:
+                    repo = url.split("github.com/")[-1].replace(".git", "")
                 else:
                     return None
                 return repo
@@ -287,30 +310,45 @@ Examples:
 Environment Variables:
     GITHUB_TOKEN: GitHub personal access token
     GITHUB_REPO: Repository in format "owner/repo"
-        """
+        """,
     )
 
-    parser.add_argument('pr_number', type=int, help='Pull request number')
-    parser.add_argument('--repo', help='Repository in format "owner/repo"')
-    parser.add_argument('--token', help='GitHub personal access token')
-    parser.add_argument('--all-reviews', action='store_true',
-                       help='Show all reviews instead of just the latest')
-    parser.add_argument('--no-comments', action='store_true',
-                       help='Skip fetching detailed review comments')
+    parser.add_argument("pr_number", type=int, help="Pull request number")
+    parser.add_argument("--repo", help='Repository in format "owner/repo"')
+    parser.add_argument("--token", help="GitHub personal access token")
+    parser.add_argument(
+        "--all-reviews",
+        action="store_true",
+        help="Show all reviews instead of just the latest",
+    )
+    parser.add_argument(
+        "--no-comments",
+        action="store_true",
+        help="Skip fetching detailed review comments",
+    )
 
     args = parser.parse_args()
 
     # Determine repository
-    repo = args.repo or os.getenv('GITHUB_REPO') or detect_repo_from_git()
+    repo = args.repo or os.getenv("GITHUB_REPO") or detect_repo_from_git()
     if not repo:
-        print("Error: Repository not specified. Use --repo, set GITHUB_REPO env var, or run from a git repository.", file=sys.stderr)
+        print(
+            "Error: Repository not specified. Use --repo, set GITHUB_REPO env var, or run from a git repository.",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     # Initialize fetcher
-    token = args.token or os.getenv('GITHUB_TOKEN')
+    token = args.token or os.getenv("GITHUB_TOKEN")
     if not token:
-        print("Warning: No GitHub token provided. API rate limits may apply.", file=sys.stderr)
-        print("Consider setting GITHUB_TOKEN environment variable or using --token", file=sys.stderr)
+        print(
+            "Warning: No GitHub token provided. API rate limits may apply.",
+            file=sys.stderr,
+        )
+        print(
+            "Consider setting GITHUB_TOKEN environment variable or using --token",
+            file=sys.stderr,
+        )
         print(file=sys.stderr)
 
     try:
@@ -330,7 +368,7 @@ Environment Variables:
                 print(f"REVIEW {i}/{len(reviews)}")
                 print(fetcher.format_review_summary(review, not args.no_comments))
                 if i < len(reviews):
-                    print("\n" + "="*60 + "\n")
+                    print("\n" + "=" * 60 + "\n")
         else:
             # Fetch latest review only
             review = fetcher.get_latest_review(args.pr_number)
@@ -350,5 +388,5 @@ Environment Variables:
         sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

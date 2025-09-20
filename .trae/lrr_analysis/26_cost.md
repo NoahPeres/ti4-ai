@@ -1,14 +1,14 @@
 # Rule 26: COST (ATTRIBUTE) - Analysis
 
 ## Category Overview
-**Rule Type**: Unit Attribute  
-**Priority**: HIGH  
-**Complexity**: MEDIUM  
-**Dependencies**: Resources, Producing Units, Faction Sheets, Technology Cards  
+**Rule Type**: Unit Attribute
+**Priority**: HIGH
+**Complexity**: MEDIUM
+**Dependencies**: Resources, Producing Units, Faction Sheets, Technology Cards
 
 ## Raw LRR Text
 ```
-26 COST (ATTRIBUTE)	
+26 COST (ATTRIBUTE)
 Cost is an attribute of some units that is presented on faction sheets and unit upgrade technology cards. A unit's cost determines the number of resources a player must spend to produce that unit.
 
 26.1 To produce a unit, a player must spend a number of resources equal to or greater than the cost of the unit they are producing.
@@ -24,28 +24,28 @@ RELATED TOPICS: Producing Units, Resources
 ## Sub-Rules Analysis
 
 ### 26.1 Resource Spending for Production
-**Status**: ✅ IMPLEMENTED  
-**Implementation**: `UnitStats.cost` attribute, resource validation in production  
-**Tests**: Unit cost tests exist  
-**Notes**: Basic cost system exists with proper resource spending validation  
+**Status**: ✅ IMPLEMENTED
+**Implementation**: `UnitStats.cost` attribute, resource validation in production
+**Tests**: Unit cost tests exist
+**Notes**: Basic cost system exists with proper resource spending validation
 
 ### 26.2 Dual Unit Production (Fighter/Infantry Icons)
-**Status**: ⚠️ PARTIAL  
-**Implementation**: Cost values include 0.5 for fighters/infantry but dual production logic unclear  
-**Tests**: Limited tests for dual unit production  
-**Notes**: Cost system recognizes 0.5 cost but production mechanics need verification  
+**Status**: ⚠️ PARTIAL
+**Implementation**: Cost values include 0.5 for fighters/infantry but dual production logic unclear
+**Tests**: Limited tests for dual unit production
+**Notes**: Cost system recognizes 0.5 cost but production mechanics need verification
 
 ### 26.3 Unproducible Units (No Cost)
-**Status**: ✅ IMPLEMENTED  
-**Implementation**: Units without cost cannot be produced, structures handled separately  
-**Tests**: Production validation tests exist  
-**Notes**: Properly prevents production of units without cost values  
+**Status**: ✅ IMPLEMENTED
+**Implementation**: Units without cost cannot be produced, structures handled separately
+**Tests**: Production validation tests exist
+**Notes**: Properly prevents production of units without cost values
 
 ### 26.3a Structure Placement via Construction
-**Status**: ❌ NOT IMPLEMENTED  
-**Implementation**: Construction strategy card mechanics missing  
-**Tests**: No tests for structure placement  
-**Notes**: Links to Rule 24 (Construction) - needs strategy card implementation  
+**Status**: ❌ NOT IMPLEMENTED
+**Implementation**: Construction strategy card mechanics missing
+**Tests**: No tests for structure placement
+**Notes**: Links to Rule 24 (Construction) - needs strategy card implementation
 
 ## Related Topics
 - **Producing Units** (Rule 67): Core production mechanics

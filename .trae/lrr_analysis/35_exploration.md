@@ -1,10 +1,10 @@
 # Rule 35: EXPLORATION - Analysis
 
 ## Category Overview
-**Rule Type:** Core Game Mechanic  
-**Priority:** MEDIUM  
-**Status:** NOT IMPLEMENTED  
-**Complexity:** High  
+**Rule Type:** Core Game Mechanic
+**Priority:** MEDIUM
+**Status:** NOT IMPLEMENTED
+**Complexity:** High
 
 ## Raw LRR Text
 ```

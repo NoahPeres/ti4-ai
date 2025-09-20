@@ -1,10 +1,10 @@
 # Rule 38: GAME ROUND - Analysis
 
 ## Category Overview
-**Rule Type:** Core Game Structure  
-**Priority:** HIGH  
-**Status:** WELL IMPLEMENTED  
-**Complexity:** Medium  
+**Rule Type:** Core Game Structure
+**Priority:** HIGH
+**Status:** WELL IMPLEMENTED
+**Complexity:** Medium
 
 ## Raw LRR Text
 ```

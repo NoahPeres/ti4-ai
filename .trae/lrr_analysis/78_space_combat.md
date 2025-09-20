@@ -67,7 +67,7 @@ Space combat is a complex system involving multiple phases and steps. This analy
 - `test_no_combat_same_player()` - Verifies no combat between same player's units
 
 ### Rule 78.2: Combat Initiation
-**Status**: ✅ Implemented  
+**Status**: ✅ Implemented
 **Description**: Combat begins with the first combat round.
 **Test Cases**:
 - `test_combat_initiation()` - Verifies combat starts properly with correct participants
@@ -80,7 +80,7 @@ Space combat is a complex system involving multiple phases and steps. This analy
 **Test Cases**:
 - `test_announce_retreats_step()` - Verifies both attacker and defender retreat announcement scenarios
 
-### Rule 78.5: Roll Dice Step  
+### Rule 78.5: Roll Dice Step
 **Status**: ✅ Implemented
 **Description**: Players roll dice for their participating units.
 **Test Cases**:
@@ -127,7 +127,7 @@ Space combat is a complex system involving multiple phases and steps. This analy
   - Verifies loser is set to defender
   - Verifies is_draw is False
 - `test_rule_78_10_defender_wins()` - Tests defender victory when attacker has no ships
-  - Verifies winner is set to defender  
+  - Verifies winner is set to defender
   - Verifies loser is set to attacker
   - Verifies is_draw is False
 - `test_rule_78_10_draw_result()` - Tests draw when neither side has ships

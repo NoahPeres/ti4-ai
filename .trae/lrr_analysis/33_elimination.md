@@ -1,10 +1,10 @@
 # Rule 33: ELIMINATION - Analysis
 
 ## Category Overview
-**Rule Type:** Core Game Mechanic  
-**Priority:** MEDIUM-HIGH  
-**Status:** NOT IMPLEMENTED  
-**Complexity:** High  
+**Rule Type:** Core Game Mechanic
+**Priority:** MEDIUM-HIGH
+**Status:** NOT IMPLEMENTED
+**Complexity:** High
 
 ## Raw LRR Text
 ```

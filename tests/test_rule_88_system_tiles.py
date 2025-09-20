@@ -25,33 +25,48 @@ class TestRule88SystemTiles:
     def test_rule_88_1_tile_back_colors(self):
         """Test Rule 88.1: The back of each system tile is colored green, blue, or red."""
         # Test green-backed tile (home system)
-        green_tile = SystemTile(tile_id="1", color=TileColor.GREEN, tile_type=TileType.HOME_SYSTEM)
+        green_tile = SystemTile(
+            tile_id="1", color=TileColor.GREEN, tile_type=TileType.HOME_SYSTEM
+        )
         assert green_tile.color == TileColor.GREEN
 
         # Test blue-backed tile (planet system)
-        blue_tile = SystemTile(tile_id="2", color=TileColor.BLUE, tile_type=TileType.PLANET_SYSTEM)
+        blue_tile = SystemTile(
+            tile_id="2", color=TileColor.BLUE, tile_type=TileType.PLANET_SYSTEM
+        )
         assert blue_tile.color == TileColor.BLUE
 
         # Test red-backed tile (anomaly/empty system)
-        red_tile = SystemTile(tile_id="3", color=TileColor.RED, tile_type=TileType.ANOMALY)
+        red_tile = SystemTile(
+            tile_id="3", color=TileColor.RED, tile_type=TileType.ANOMALY
+        )
         assert red_tile.color == TileColor.RED
 
     def test_rule_88_2_green_back_home_systems(self):
         """Test Rule 88.2: System tiles with a green-colored back are home systems and faction-specific tiles."""
-        home_tile = SystemTile(tile_id="1", color=TileColor.GREEN, tile_type=TileType.HOME_SYSTEM)
+        home_tile = SystemTile(
+            tile_id="1", color=TileColor.GREEN, tile_type=TileType.HOME_SYSTEM
+        )
 
         assert home_tile.color == TileColor.GREEN
         assert home_tile.tile_type == TileType.HOME_SYSTEM
         assert home_tile.is_home_system()
 
         # Each home system should be unique to one faction
-        faction_tile = SystemTile(tile_id="51", color=TileColor.GREEN, tile_type=TileType.HOME_SYSTEM, faction="The Arborec")
+        faction_tile = SystemTile(
+            tile_id="51",
+            color=TileColor.GREEN,
+            tile_type=TileType.HOME_SYSTEM,
+            faction="The Arborec",
+        )
         assert faction_tile.faction == "The Arborec"
 
     def test_rule_88_3_blue_back_planet_systems(self):
         """Test Rule 88.3: System tiles with a blue-colored back each contain one or more planets."""
         # Single planet system
-        single_planet_tile = SystemTile(tile_id="19", color=TileColor.BLUE, tile_type=TileType.PLANET_SYSTEM)
+        single_planet_tile = SystemTile(
+            tile_id="19", color=TileColor.BLUE, tile_type=TileType.PLANET_SYSTEM
+        )
         planet1 = Planet("Wellon", resources=1, influence=2)
         single_planet_tile.add_planet(planet1)
 
@@ -61,7 +76,9 @@ class TestRule88SystemTiles:
         assert single_planet_tile.has_planets()
 
         # Multi-planet system
-        multi_planet_tile = SystemTile(tile_id="26", color=TileColor.BLUE, tile_type=TileType.PLANET_SYSTEM)
+        multi_planet_tile = SystemTile(
+            tile_id="26", color=TileColor.BLUE, tile_type=TileType.PLANET_SYSTEM
+        )
         planet2 = Planet("Centauri", resources=1, influence=3)
         planet3 = Planet("Gral", resources=1, influence=1)
         multi_planet_tile.add_planet(planet2)
@@ -73,21 +90,27 @@ class TestRule88SystemTiles:
     def test_rule_88_4_red_back_anomaly_or_empty_systems(self):
         """Test Rule 88.4: System tiles with a red-colored back are anomalies or are systems that do not contain planets."""
         # Anomaly system
-        anomaly_tile = SystemTile(tile_id="39", color=TileColor.RED, tile_type=TileType.ANOMALY)
+        anomaly_tile = SystemTile(
+            tile_id="39", color=TileColor.RED, tile_type=TileType.ANOMALY
+        )
         assert anomaly_tile.color == TileColor.RED
         assert anomaly_tile.tile_type == TileType.ANOMALY
         assert not anomaly_tile.has_planets()
         assert anomaly_tile.is_anomaly()
 
         # Empty system (no planets)
-        empty_tile = SystemTile(tile_id="79", color=TileColor.RED, tile_type=TileType.EMPTY_SYSTEM)
+        empty_tile = SystemTile(
+            tile_id="79", color=TileColor.RED, tile_type=TileType.EMPTY_SYSTEM
+        )
         assert empty_tile.color == TileColor.RED
         assert empty_tile.tile_type == TileType.EMPTY_SYSTEM
         assert not empty_tile.has_planets()
 
     def test_rule_88_5_planets_located_in_systems(self):
         """Test Rule 88.5: Planets are located in systems. Ground forces and structures are usually placed on planets."""
-        system_tile = SystemTile(tile_id="1", color=TileColor.BLUE, tile_type=TileType.PLANET_SYSTEM)
+        system_tile = SystemTile(
+            tile_id="1", color=TileColor.BLUE, tile_type=TileType.PLANET_SYSTEM
+        )
         planet = Planet("Mecatol Rex", resources=1, influence=6)
         system_tile.add_planet(planet)
 
@@ -101,7 +124,9 @@ class TestRule88SystemTiles:
 
     def test_rule_88_6_space_areas_on_tiles(self):
         """Test Rule 88.6: Any area on a system tile that is not a planet is space. Ships are usually placed in the space area."""
-        system_tile = SystemTile(tile_id="1", color=TileColor.BLUE, tile_type=TileType.PLANET_SYSTEM)
+        system_tile = SystemTile(
+            tile_id="1", color=TileColor.BLUE, tile_type=TileType.PLANET_SYSTEM
+        )
         planet = Planet("Test Planet", resources=2, influence=1)
         system_tile.add_planet(planet)
 
@@ -112,13 +137,17 @@ class TestRule88SystemTiles:
         assert system_tile.can_hold_ships()
 
         # Even systems without planets have space areas
-        empty_system = SystemTile(tile_id="79", color=TileColor.RED, tile_type=TileType.EMPTY_SYSTEM)
+        empty_system = SystemTile(
+            tile_id="79", color=TileColor.RED, tile_type=TileType.EMPTY_SYSTEM
+        )
         assert empty_system.has_space_area()
         assert empty_system.can_hold_ships()
 
     def test_rule_88_7_hyperlane_tiles_not_systems(self):
         """Test Rule 88.7: Double-sided tiles that have lines crossing from one edge to another are hyperlane tiles. Hyperlane tiles are not systems."""
-        hyperlane_tile = SystemTile(tile_id="83A", color=None, tile_type=TileType.HYPERLANE)
+        hyperlane_tile = SystemTile(
+            tile_id="83A", color=None, tile_type=TileType.HYPERLANE
+        )
 
         assert hyperlane_tile.tile_type == TileType.HYPERLANE
         assert hyperlane_tile.is_hyperlane()
@@ -133,7 +162,9 @@ class TestRule88SystemTiles:
 
     def test_system_tile_basic_properties(self):
         """Test basic SystemTile properties and methods"""
-        tile = SystemTile(tile_id="42", color=TileColor.BLUE, tile_type=TileType.PLANET_SYSTEM)
+        tile = SystemTile(
+            tile_id="42", color=TileColor.BLUE, tile_type=TileType.PLANET_SYSTEM
+        )
 
         assert tile.tile_id == "42"
         assert tile.color == TileColor.BLUE
@@ -142,7 +173,9 @@ class TestRule88SystemTiles:
 
     def test_system_tile_adjacency_support(self):
         """Test that SystemTile supports adjacency operations (for Rule 6)"""
-        tile1 = SystemTile(tile_id="1", color=TileColor.BLUE, tile_type=TileType.PLANET_SYSTEM)
+        tile1 = SystemTile(
+            tile_id="1", color=TileColor.BLUE, tile_type=TileType.PLANET_SYSTEM
+        )
         tile2 = SystemTile(tile_id="2", color=TileColor.RED, tile_type=TileType.ANOMALY)
 
         # Should be able to set adjacent tiles (implementation detail for Rule 6)
@@ -156,7 +189,9 @@ class TestRule88SystemTiles:
     def test_tile_color_validation(self):
         """Test that only valid tile colors are accepted"""
         # Valid colors should work
-        valid_tile = SystemTile(tile_id="1", color=TileColor.GREEN, tile_type=TileType.HOME_SYSTEM)
+        valid_tile = SystemTile(
+            tile_id="1", color=TileColor.GREEN, tile_type=TileType.HOME_SYSTEM
+        )
         assert valid_tile.color == TileColor.GREEN
 
         # Hyperlane tiles can have no color
@@ -167,12 +202,16 @@ class TestRule88SystemTiles:
         """Test that tile color and type are consistent with rules"""
         # Green tiles should be home systems
         with pytest.raises(ValueError, match="Green tiles must be home systems"):
-            SystemTile(tile_id="1", color=TileColor.GREEN, tile_type=TileType.PLANET_SYSTEM)
+            SystemTile(
+                tile_id="1", color=TileColor.GREEN, tile_type=TileType.PLANET_SYSTEM
+            )
 
         # Blue tiles should contain planets
         with pytest.raises(ValueError, match="Blue tiles must be planet systems"):
             SystemTile(tile_id="1", color=TileColor.BLUE, tile_type=TileType.ANOMALY)
 
         # Red tiles should be anomalies or empty systems
-        with pytest.raises(ValueError, match="Red tiles must be anomalies or empty systems"):
+        with pytest.raises(
+            ValueError, match="Red tiles must be anomalies or empty systems"
+        ):
             SystemTile(tile_id="1", color=TileColor.RED, tile_type=TileType.HOME_SYSTEM)

@@ -5,7 +5,7 @@ The transaction system currently lacks validation against player resources. Play
 
 ## Current Gap
 - `TransactionOffer` allows any values without validation
-- No concept of player "supply" or "play area" 
+- No concept of player "supply" or "play area"
 - Similar to how `CommandSheet` tracks command tokens, we need resource tracking
 
 ## Required Components
@@ -15,18 +15,18 @@ The transaction system currently lacks validation against player resources. Play
 @dataclass
 class PlayerSupply:
     """Tracks a player's available resources for transactions."""
-    
+
     trade_goods: int = 0
     commodities: int = 0
     promissory_notes: list[PromissoryNote] = field(default_factory=list)
     relic_fragments: int = 0
-    
+
     def can_afford(self, offer: TransactionOffer) -> bool:
         """Check if player has sufficient resources for the offer."""
-        
+
     def deduct_resources(self, offer: TransactionOffer) -> "PlayerSupply":
         """Return new supply with resources deducted."""
-        
+
     def add_resources(self, offer: TransactionOffer) -> "PlayerSupply":
         """Return new supply with resources added."""
 ```
@@ -49,11 +49,11 @@ def execute_transaction(
     player2_offer: TransactionOffer,
 ) -> tuple[TransactionResult, GameState]:
     """Execute transaction with supply validation."""
-    
+
     # Validate both players can afford their offers
     if not game_state.get_player_supply(player1).can_afford(player1_offer):
         return TransactionResult(success=False, error="Player1 insufficient resources"), game_state
-        
+
     # Execute transaction and update supplies
     new_state = game_state.update_player_supplies(...)
     return TransactionResult(success=True, ...), new_state
@@ -96,7 +96,7 @@ def execute_transaction(
 - Add to GameState
 - Basic validation in TransactionManager
 
-### Phase 2: Resource Integration  
+### Phase 2: Resource Integration
 - Connect to planet production
 - Strategy card effects
 - Technology effects
@@ -121,7 +121,7 @@ def execute_transaction(
 
 ## LRR References
 - Rule 94.3: Lists exchangeable items
-- Rule 75: Trade Goods mechanics  
+- Rule 75: Trade Goods mechanics
 - Rule 19: Commodities mechanics
 - Rule 80: Promissory Notes mechanics
 

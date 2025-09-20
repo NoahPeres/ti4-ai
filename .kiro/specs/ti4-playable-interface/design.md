@@ -62,27 +62,27 @@ from typing import List, Dict, Any, Optional
 
 class GameInterface(ABC):
     """Standard contract for all game interfaces."""
-    
+
     @abstractmethod
     def display_game_state(self, game_state: GameState, player_id: str) -> None:
         """Display current game state for the specified player."""
         pass
-    
+
     @abstractmethod
     def get_player_action(self, legal_actions: List[Action], context: Dict[str, Any]) -> Action:
         """Get player's chosen action from available legal actions."""
         pass
-    
+
     @abstractmethod
     def display_message(self, message: str, message_type: str = "info") -> None:
         """Display a message to the player."""
         pass
-    
+
     @abstractmethod
     def get_player_choice(self, prompt: str, choices: List[Any]) -> Any:
         """Get player's choice from a list of options."""
         pass
-    
+
     @abstractmethod
     def display_help(self, context: Optional[str] = None) -> None:
         """Display context-sensitive help information."""
@@ -95,18 +95,18 @@ class GameInterface(ABC):
 ```python
 class CLIGameInterface(GameInterface):
     """Command-line interface for TI4 gameplay."""
-    
+
     def __init__(self):
         self.display_manager = CLIDisplayManager()
         self.input_parser = CLIInputParser()
         self.help_system = CLIHelpSystem()
-    
+
     def display_game_state(self, game_state: GameState, player_id: str) -> None:
         """Display game state using ASCII art and formatted text."""
         self.display_manager.show_galaxy_map(game_state.galaxy)
         self.display_manager.show_player_dashboard(game_state, player_id)
         self.display_manager.show_current_phase(game_state.current_phase)
-    
+
     def get_player_action(self, legal_actions: List[Action], context: Dict[str, Any]) -> Action:
         """Parse player input and return corresponding action."""
         while True:
@@ -121,12 +121,12 @@ class CLIGameInterface(GameInterface):
 ```python
 class CLIDisplayManager:
     """Handles all CLI display formatting and output."""
-    
+
     def show_galaxy_map(self, galaxy: Galaxy) -> None:
         """Display ASCII representation of the galaxy."""
         # ASCII art galaxy with hex coordinates
         pass
-    
+
     def show_player_dashboard(self, game_state: GameState, player_id: str) -> None:
         """Display player's resources, technologies, and status."""
         player = game_state.players[player_id]
@@ -134,7 +134,7 @@ class CLIDisplayManager:
         print(f"Trade Goods: {player.trade_goods}")
         print(f"Command Tokens: {player.command_tokens}")
         # ... more player info
-    
+
     def show_system_details(self, system: System) -> None:
         """Display detailed information about a specific system."""
         pass
@@ -151,23 +151,23 @@ app = FastAPI(title="TI4 Game API", version="1.0.0")
 
 class TI4APIServer:
     """REST API server for TI4 game interactions."""
-    
+
     def __init__(self):
         self.session_manager = GameSessionManager()
         self.game_controller_factory = GameControllerFactory()
-    
+
     @app.post("/games")
     async def create_game(self, game_config: GameConfig) -> Dict[str, Any]:
         """Create a new game session."""
         game_id = self.session_manager.create_game(game_config)
         return {"game_id": game_id, "status": "created"}
-    
+
     @app.get("/games/{game_id}/state")
     async def get_game_state(self, game_id: str, player_id: str) -> Dict[str, Any]:
         """Get current game state for a player."""
         game_controller = self.session_manager.get_game(game_id)
         return game_controller.get_player_view(player_id)
-    
+
     @app.post("/games/{game_id}/actions")
     async def execute_action(self, game_id: str, action_data: Dict[str, Any]) -> Dict[str, Any]:
         """Execute a player action."""
@@ -186,17 +186,17 @@ import json
 
 class GameWebSocketManager:
     """Manages WebSocket connections for real-time game updates."""
-    
+
     def __init__(self):
         self.active_connections: Dict[str, List[WebSocket]] = {}
-    
+
     async def connect(self, websocket: WebSocket, game_id: str):
         """Connect a client to game updates."""
         await websocket.accept()
         if game_id not in self.active_connections:
             self.active_connections[game_id] = []
         self.active_connections[game_id].append(websocket)
-    
+
     async def broadcast_game_update(self, game_id: str, update_data: Dict[str, Any]):
         """Broadcast game state updates to all connected clients."""
         if game_id in self.active_connections:
@@ -210,12 +210,12 @@ class GameWebSocketManager:
 ```python
 class GameSessionManager:
     """Manages multiple game sessions and their lifecycle."""
-    
+
     def __init__(self):
         self.active_games: Dict[str, GameController] = {}
         self.persistence_manager = GamePersistenceManager()
         self.session_metadata: Dict[str, SessionMetadata] = {}
-    
+
     def create_game(self, config: GameConfig) -> str:
         """Create a new game session."""
         game_id = self._generate_game_id()
@@ -227,13 +227,13 @@ class GameSessionManager:
             config=config
         )
         return game_id
-    
+
     def save_game(self, game_id: str) -> None:
         """Save game state to persistent storage."""
         if game_id in self.active_games:
             game_state = self.active_games[game_id].get_current_state()
             self.persistence_manager.save_game(game_id, game_state)
-    
+
     def load_game(self, game_id: str) -> GameController:
         """Load game from persistent storage."""
         game_state = self.persistence_manager.load_game(game_id)
@@ -248,16 +248,16 @@ class GameSessionManager:
 ```python
 class TutorialEngine:
     """Provides interactive tutorials for learning TI4."""
-    
+
     def __init__(self):
         self.tutorial_scenarios = TutorialScenarioLibrary()
         self.progress_tracker = TutorialProgressTracker()
-    
+
     def start_tutorial(self, tutorial_id: str, player_id: str) -> TutorialSession:
         """Start a specific tutorial for a player."""
         scenario = self.tutorial_scenarios.get_scenario(tutorial_id)
         return TutorialSession(scenario, player_id, self.progress_tracker)
-    
+
     def get_available_tutorials(self, player_id: str) -> List[TutorialInfo]:
         """Get tutorials available to a player based on their progress."""
         progress = self.progress_tracker.get_progress(player_id)
@@ -265,17 +265,17 @@ class TutorialEngine:
 
 class TutorialSession:
     """Manages an individual tutorial session."""
-    
+
     def __init__(self, scenario: TutorialScenario, player_id: str, progress_tracker: TutorialProgressTracker):
         self.scenario = scenario
         self.player_id = player_id
         self.progress_tracker = progress_tracker
         self.current_step = 0
-    
+
     def get_current_instruction(self) -> str:
         """Get the current tutorial instruction."""
         return self.scenario.steps[self.current_step].instruction
-    
+
     def validate_player_action(self, action: Action) -> TutorialValidationResult:
         """Validate if player action matches tutorial expectations."""
         expected_action = self.scenario.steps[self.current_step].expected_action
@@ -288,25 +288,25 @@ class TutorialSession:
 ```python
 class GameAnalyzer:
     """Provides post-game analysis and strategic insights."""
-    
+
     def __init__(self):
         self.statistics_calculator = GameStatisticsCalculator()
         self.strategy_analyzer = StrategyAnalyzer()
         self.decision_analyzer = DecisionAnalyzer()
-    
+
     def analyze_completed_game(self, game_history: GameHistory) -> GameAnalysis:
         """Analyze a completed game and provide insights."""
         stats = self.statistics_calculator.calculate_stats(game_history)
         strategic_analysis = self.strategy_analyzer.analyze_strategies(game_history)
         decision_analysis = self.decision_analyzer.analyze_decisions(game_history)
-        
+
         return GameAnalysis(
             statistics=stats,
             strategic_insights=strategic_analysis,
             decision_insights=decision_analysis,
             improvement_suggestions=self._generate_suggestions(game_history)
         )
-    
+
     def analyze_board_position(self, game_state: GameState) -> PositionAnalysis:
         """Analyze current board position for strategic opportunities."""
         return self.strategy_analyzer.analyze_position(game_state)
@@ -318,28 +318,28 @@ class GameAnalyzer:
 ```python
 class LRRRuleCoverageManager:
     """Manages mapping between LRR rules and test coverage."""
-    
+
     def __init__(self):
         self.rule_mapping = self._load_rule_mapping()
         self.test_registry = TestRegistry()
-    
+
     def register_rule_test(self, lrr_rule_id: str, test_function: str, description: str) -> None:
         """Register a test as covering a specific LRR rule."""
         if lrr_rule_id not in self.rule_mapping:
             self.rule_mapping[lrr_rule_id] = []
-        
+
         self.rule_mapping[lrr_rule_id].append(RuleTestMapping(
             test_function=test_function,
             description=description,
             registered_at=datetime.now()
         ))
-    
+
     def get_rule_coverage_report(self) -> RuleCoverageReport:
         """Generate a report of LRR rule test coverage."""
         lrr_rules = self._load_lrr_rules()
         covered_rules = set(self.rule_mapping.keys())
         uncovered_rules = set(lrr_rules.keys()) - covered_rules
-        
+
         return RuleCoverageReport(
             total_rules=len(lrr_rules),
             covered_rules=len(covered_rules),
@@ -347,7 +347,7 @@ class LRRRuleCoverageManager:
             coverage_percentage=(len(covered_rules) / len(lrr_rules)) * 100,
             rule_mappings=self.rule_mapping
         )
-    
+
     def validate_rule_implementation(self, lrr_rule_id: str) -> RuleValidationResult:
         """Validate that a specific LRR rule is properly implemented."""
         if lrr_rule_id not in self.rule_mapping:
@@ -356,13 +356,13 @@ class LRRRuleCoverageManager:
                 is_covered=False,
                 message="No tests found for this rule"
             )
-        
+
         # Run all tests associated with this rule
         test_results = []
         for mapping in self.rule_mapping[lrr_rule_id]:
             result = self.test_registry.run_test(mapping.test_function)
             test_results.append(result)
-        
+
         return RuleValidationResult(
             rule_id=lrr_rule_id,
             is_covered=True,
@@ -468,7 +468,7 @@ class StrategyInsight:
 ```python
 class CLIErrorHandler:
     """Handles errors in CLI interface gracefully."""
-    
+
     def handle_invalid_input(self, error: InvalidInputError) -> None:
         """Handle invalid user input with helpful messages."""
         print(f"❌ Invalid input: {error.message}")
@@ -476,7 +476,7 @@ class CLIErrorHandler:
             print("💡 Suggestions:")
             for suggestion in error.suggestions:
                 print(f"   • {suggestion}")
-    
+
     def handle_game_error(self, error: TI4Error) -> None:
         """Handle game-related errors with context."""
         print(f"🚫 Game Error: {error}")
@@ -490,7 +490,7 @@ class CLIErrorHandler:
 ```python
 class APIErrorHandler:
     """Standardized error handling for REST API."""
-    
+
     @staticmethod
     def handle_game_error(error: TI4Error) -> Dict[str, Any]:
         """Convert game errors to API error responses."""
@@ -502,7 +502,7 @@ class APIErrorHandler:
                 "timestamp": datetime.now().isoformat()
             }
         }
-    
+
     @staticmethod
     def handle_validation_error(error: ValidationError) -> Dict[str, Any]:
         """Handle validation errors with detailed field information."""
@@ -524,22 +524,22 @@ class APIErrorHandler:
 ```python
 class InterfaceContractTest(unittest.TestCase):
     """Base class for testing interface contract compliance."""
-    
+
     def setUp(self):
         self.test_game_state = create_test_game_state()
         self.test_actions = create_test_actions()
-    
+
     def test_interface_contract_compliance(self):
         """Test that interface implements all required methods."""
         interface = self.create_interface()
-        
+
         # Test all required methods exist and work
         self.assertTrue(hasattr(interface, 'display_game_state'))
         self.assertTrue(hasattr(interface, 'get_player_action'))
         self.assertTrue(hasattr(interface, 'display_message'))
         self.assertTrue(hasattr(interface, 'get_player_choice'))
         self.assertTrue(hasattr(interface, 'display_help'))
-    
+
     @abstractmethod
     def create_interface(self) -> GameInterface:
         """Create the interface instance for testing."""
@@ -547,10 +547,10 @@ class InterfaceContractTest(unittest.TestCase):
 
 class CLIInterfaceTest(InterfaceContractTest):
     """Test CLI interface implementation."""
-    
+
     def create_interface(self) -> GameInterface:
         return CLIGameInterface()
-    
+
     def test_cli_specific_functionality(self):
         """Test CLI-specific features."""
         pass
@@ -560,23 +560,23 @@ class CLIInterfaceTest(InterfaceContractTest):
 ```python
 class LRRRuleCoverageTest(unittest.TestCase):
     """Test LRR rule coverage system."""
-    
+
     def setUp(self):
         self.coverage_manager = LRRRuleCoverageManager()
-    
+
     def test_rule_registration(self):
         """Test that rules can be registered with tests."""
         self.coverage_manager.register_rule_test("1.1", "test_game_setup", "Test game setup")
         report = self.coverage_manager.get_rule_coverage_report()
         self.assertIn("1.1", report.rule_mappings)
-    
+
     def test_coverage_report_generation(self):
         """Test coverage report generation."""
         report = self.coverage_manager.get_rule_coverage_report()
         self.assertIsInstance(report.coverage_percentage, float)
         self.assertGreaterEqual(report.coverage_percentage, 0.0)
         self.assertLessEqual(report.coverage_percentage, 100.0)
-    
+
     @covers_lrr_rule("test.rule", "Test rule for testing")
     def test_decorator_functionality(self):
         """Test that the decorator properly registers rules."""

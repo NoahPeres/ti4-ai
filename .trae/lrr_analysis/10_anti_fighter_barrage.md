@@ -1,10 +1,10 @@
 # Rule 10: ANTI-FIGHTER BARRAGE (UNIT ABILITY)
 
 ## Category Overview
-**Rule Type**: Unit Ability  
-**Complexity**: Medium  
-**Dependencies**: Space Combat, Unit Stats, Dice Rolling  
-**Implementation Status**: 🟡 Partially Implemented  
+**Rule Type**: Unit Ability
+**Complexity**: Medium
+**Dependencies**: Space Combat, Unit Stats, Dice Rolling
+**Implementation Status**: 🟡 Partially Implemented
 
 Anti-Fighter Barrage is a unit ability that allows certain units (primarily Destroyers) to attack enemy fighters before normal space combat begins. This ability occurs during the first round of space combat only and follows specific targeting and timing rules.
 
@@ -13,9 +13,9 @@ Anti-Fighter Barrage is a unit ability that allows certain units (primarily Dest
 ### 10.1 STEP 1 - Anti-Fighter Barrage Rolls 🔴 HIGH PRIORITY
 **Raw LRR Text**: "Each player rolls dice for each of their units in the combat that has the 'Anti-Fighter Barrage' ability; this is called an anti-fighter barrage roll. A hit is produced for each die roll that is equal to or greater than the unit's anti-fighter barrage value."
 
-**Implementation Status**: 🟡 Partially Implemented  
-**Current State**: Basic ability detection and dice rolling implemented in `CombatResolver.perform_anti_fighter_barrage()`  
-**Missing Elements**: 
+**Implementation Status**: 🟡 Partially Implemented
+**Current State**: Basic ability detection and dice rolling implemented in `CombatResolver.perform_anti_fighter_barrage()`
+**Missing Elements**:
 - Anti-fighter barrage value system (currently uses combat value)
 - Proper ability display format parsing ("Anti-Fighter Barrage X (xY)")
 - Integration with space combat timing
@@ -29,8 +29,8 @@ Anti-Fighter Barrage is a unit ability that allows certain units (primarily Dest
 ### 10.2 STEP 2 - Assign Hits to Fighters 🔴 HIGH PRIORITY
 **Raw LRR Text**: "Each player must choose and destroy one of their fighters in the active system for each hit their opponent's anti-fighter barrage roll produced."
 
-**Implementation Status**: 🔴 Not Implemented  
-**Current State**: No hit assignment or fighter destruction logic  
+**Implementation Status**: 🔴 Not Implemented
+**Current State**: No hit assignment or fighter destruction logic
 **Missing Elements**:
 - Hit assignment system for anti-fighter barrage
 - Fighter destruction mechanics

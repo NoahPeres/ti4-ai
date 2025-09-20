@@ -14,8 +14,8 @@ Frontier tokens can be explored for a variety of game effects.
 ## Overall Implementation Status
 - **Current State**: Not Started/In Progress/Complete
 - **Estimated Effort**: Small/Medium/Large
-- **Dependencies**: 
-- **Blockers**: 
+- **Dependencies**:
+- **Blockers**:
 
 ## Notes
 - Note: Rule 38 only has one sub-rule (38.1)

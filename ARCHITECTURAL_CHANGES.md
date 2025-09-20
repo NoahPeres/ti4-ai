@@ -299,11 +299,11 @@ class MovementCommand(GameCommand):
     def execute(self, game_state):
         # Execute movement
         new_state = self._perform_movement(game_state)
-        
+
         # Publish event
         event = UnitMovedEvent(...)
         self.event_bus.publish(event)
-        
+
         return new_state
 ```
 
@@ -316,7 +316,7 @@ class PhaseAwareCommandManager(CommandManager):
     def execute_command(self, command, game_state):
         if not self.state_machine.allows_command(command):
             raise PhaseTransitionError("Command not allowed in current phase")
-        
+
         return super().execute_command(command, game_state)
 ```
 

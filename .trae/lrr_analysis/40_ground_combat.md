@@ -1,9 +1,9 @@
 # Rule 40: GROUND COMBAT
 
 ## Category Overview
-**Rule Type:** Combat Mechanics  
-**Complexity:** High  
-**Frequency:** High (occurs during invasions)  
+**Rule Type:** Combat Mechanics
+**Complexity:** High
+**Frequency:** High (occurs during invasions)
 **Dependencies:** Ground Forces, Invasion, Sustain Damage, Combat Modifiers
 
 ## Raw LRR Text
@@ -32,7 +32,7 @@ b During the last round of a combat, "end of combat" and "end of combat round" e
 - **Test Coverage:** ✅ Comprehensive (`test_combat.py`)
 - **Details:** Dice rolling mechanics fully implemented with proper hit calculation based on combat values
 
-### 42.2 - Assign Hits (WELL IMPLEMENTED) 
+### 42.2 - Assign Hits (WELL IMPLEMENTED)
 - **Implementation Status:** ✅ COMPLETE
 - **Code Location:** `CombatResolver.resolve_sustain_damage_abilities()`
 - **Test Coverage:** ✅ Comprehensive (`test_combat.py`)
@@ -52,7 +52,7 @@ b During the last round of a combat, "end of combat" and "end of combat round" e
 
 ## Related Topics
 - **Rule 49: INVASION** - Ground combat occurs during invasion step
-- **Rule 43: GROUND FORCES** - Units that participate in ground combat  
+- **Rule 43: GROUND FORCES** - Units that participate in ground combat
 - **Rule 87: SUSTAIN DAMAGE** - Damage absorption mechanics
 - **Rule 15: BOMBARDMENT** - Pre-combat bombardment affects ground forces
 - **Rule 56: MODIFIERS** - Combat modifiers affect dice rolls

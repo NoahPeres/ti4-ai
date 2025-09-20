@@ -69,15 +69,16 @@ class Planet:
         return amount
 
     def spend_influence(self, amount: int) -> int:
-        """
-        Spend influence from this planet.
-        Returns the amount actually spent.
-        """
-        if not self.can_spend_influence():
-            return 0
+        """Spend influence from this planet, exhausting it."""
+        if self._exhausted:
+            raise ValueError("Cannot spend from exhausted planet")
+        if amount > self.influence:
+            raise ValueError(
+                f"Cannot spend {amount} influence, planet only has {self.influence}"
+            )
 
-        actual_amount = min(amount, self.influence)
-        return actual_amount
+        self.exhaust()
+        return amount
 
     # Rule 88.5: Support for ground forces and structures
     def can_hold_ground_forces(self) -> bool:

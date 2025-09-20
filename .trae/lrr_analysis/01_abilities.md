@@ -13,7 +13,7 @@ Cards and faction sheets each have abilities that players can resolve to trigger
 **Test References**: N/A - Documentation rule
 **Notes**: This is a meta-rule about rule precedence, not a game mechanic
 
-### 1.2 - Card Ability Precedence  
+### 1.2 - Card Ability Precedence
 **Raw LRR Text**: "If a card ability contradicts information in the Rules Reference, the card takes precedence. If both the card and the rules can be followed at the same time, they should be."
 
 **Priority**: CRITICAL - Core game mechanic

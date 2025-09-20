@@ -29,7 +29,7 @@
 - Systems registry in `Galaxy.system_objects` for efficient system lookup
 - Wormhole support in `System` class with `add_wormhole` and `has_wormhole` methods
 
-**Next Steps**: 
+**Next Steps**:
 1. ✅ Implement wormhole adjacency logic in `Galaxy._check_wormhole_adjacency`
 2. ✅ Move to GREEN phase by making test pass
 3. ✅ Refactor for clean implementation and add edge case tests

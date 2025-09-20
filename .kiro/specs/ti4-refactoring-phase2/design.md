@@ -54,22 +54,22 @@ from typing import Any, Dict
 
 class GameCommand(ABC):
     """Base interface for all game commands."""
-    
+
     @abstractmethod
     def execute(self, game_state: GameState) -> GameState:
         """Execute the command and return new game state."""
         pass
-    
+
     @abstractmethod
     def undo(self, game_state: GameState) -> GameState:
         """Undo the command and return previous game state."""
         pass
-    
+
     @abstractmethod
     def get_undo_data(self) -> Dict[str, Any]:
         """Get data needed for undo operation."""
         pass
-    
+
     @abstractmethod
     def can_execute(self, game_state: GameState) -> bool:
         """Check if command can be executed in current state."""
@@ -80,19 +80,19 @@ class GameCommand(ABC):
 ```python
 class CommandManager:
     """Manages command execution, undo, and replay functionality."""
-    
+
     def __init__(self):
         self._command_history: List[GameCommand] = []
         self._undo_stack: List[Dict[str, Any]] = []
-    
+
     def execute_command(self, command: GameCommand, game_state: GameState) -> GameState:
         """Execute command and store for potential undo."""
         pass
-    
+
     def undo_last_command(self, game_state: GameState) -> GameState:
         """Undo the most recent command."""
         pass
-    
+
     def replay_commands(self, initial_state: GameState) -> GameState:
         """Replay all commands from initial state."""
         pass
@@ -106,18 +106,18 @@ from typing import Callable, List, Any
 
 class GameEventBus:
     """Central event bus for game event notifications."""
-    
+
     def __init__(self):
         self._observers: Dict[str, List[Callable]] = {}
-    
+
     def subscribe(self, event_type: str, observer: Callable) -> None:
         """Subscribe to specific event types."""
         pass
-    
+
     def unsubscribe(self, event_type: str, observer: Callable) -> None:
         """Unsubscribe from event types."""
         pass
-    
+
     def publish(self, event: GameEvent) -> None:
         """Publish event to all subscribers."""
         pass
@@ -164,19 +164,19 @@ class GamePhaseState(Enum):
 
 class GameStateMachine:
     """Manages game phase transitions with validation."""
-    
+
     def __init__(self):
         self._current_phase = GamePhaseState.SETUP
         self._valid_transitions = self._build_transition_map()
-    
+
     def can_transition_to(self, new_phase: GamePhaseState) -> bool:
         """Check if transition to new phase is valid."""
         pass
-    
+
     def transition_to(self, new_phase: GamePhaseState) -> None:
         """Transition to new phase if valid."""
         pass
-    
+
     def get_valid_transitions(self) -> Set[GamePhaseState]:
         """Get all valid transitions from current phase."""
         pass
@@ -188,29 +188,29 @@ class GameStateMachine:
 ```python
 class GameScenarioBuilder:
     """Fluent builder for creating complex test scenarios."""
-    
+
     def __init__(self):
         self._players: List[Player] = []
         self._galaxy: Optional[Galaxy] = None
         self._phase: GamePhaseState = GamePhaseState.SETUP
         self._custom_setup: Dict[str, Any] = {}
-    
+
     def with_players(self, *player_configs) -> 'GameScenarioBuilder':
         """Add players to the scenario."""
         return self
-    
+
     def with_galaxy(self, galaxy_config) -> 'GameScenarioBuilder':
         """Set galaxy configuration."""
         return self
-    
+
     def in_phase(self, phase: GamePhaseState) -> 'GameScenarioBuilder':
         """Set the game phase."""
         return self
-    
+
     def with_units(self, unit_placements) -> 'GameScenarioBuilder':
         """Place units on the board."""
         return self
-    
+
     def build(self) -> GameState:
         """Build the final game state."""
         pass
@@ -252,15 +252,15 @@ from typing import Hashable
 
 class GameStateCache:
     """Caches expensive computations for game states."""
-    
+
     def __init__(self, max_size: int = 1000):
         self._cache_size = max_size
-    
+
     @lru_cache(maxsize=1000)
     def get_legal_moves(self, state_hash: Hashable, player_id: str) -> List[GameCommand]:
         """Cache legal moves for game state."""
         pass
-    
+
     def invalidate_cache(self, state_hash: Hashable) -> None:
         """Invalidate cache entries for specific state."""
         pass
@@ -283,19 +283,19 @@ from typing import Any, Dict
 
 class GameLogger:
     """Enhanced logging with structured data."""
-    
+
     def __init__(self, game_id: str):
         self.game_id = game_id
         self.logger = logging.getLogger(f"ti4.game.{game_id}")
-    
+
     def log_command(self, command: GameCommand, result: str, context: Dict[str, Any] = None):
         """Log command execution with context."""
         pass
-    
+
     def log_event(self, event: GameEvent):
         """Log game events."""
         pass
-    
+
     def log_error(self, error: Exception, context: Dict[str, Any] = None):
         """Log errors with full context."""
         pass
@@ -315,7 +315,7 @@ class GameLogger:
 ```python
 class TestScenarioManager:
     """Manages complex test scenarios with builder pattern."""
-    
+
     @staticmethod
     def create_basic_game() -> GameScenarioBuilder:
         """Create basic 2-player game scenario."""
@@ -323,7 +323,7 @@ class TestScenarioManager:
                 .with_players(("player1", "sol"), ("player2", "xxcha"))
                 .with_galaxy("standard_6p")
                 .in_phase(GamePhaseState.ACTION))
-    
+
     @staticmethod
     def create_combat_scenario() -> GameScenarioBuilder:
         """Create scenario with units ready for combat."""
@@ -336,12 +336,12 @@ from hypothesis import given, strategies as st
 
 class GameStateInvariants:
     """Property-based tests for game state invariants."""
-    
+
     @given(st.lists(st.text(), min_size=2, max_size=6))
     def test_player_uniqueness(self, player_ids):
         """Test that all players have unique IDs."""
         pass
-    
+
     @given(st.integers(min_value=0, max_value=10))
     def test_resource_non_negative(self, resource_amount):
         """Test that resources never go negative."""

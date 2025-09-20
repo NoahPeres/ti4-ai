@@ -1,9 +1,9 @@
 # Rule 17: CAPTURE
 
 ## Category Overview
-**Priority**: HIGH  
-**Implementation Status**: ✅ **COMPLETED**  
-**Complexity**: HIGH  
+**Priority**: HIGH
+**Implementation Status**: ✅ **COMPLETED**
+**Complexity**: HIGH
 
 Rule 17 defines the capture mechanics for units, including placement on faction sheets, return conditions, and blockade interactions. This is a critical combat and strategic mechanic that affects unit availability and player resources.
 
@@ -37,7 +37,7 @@ Some abilities instruct a player to capture a unit, preventing the unit's origin
 - **Test Reference**: `test_capture_system_exists`
 
 ### 17.1 - Non-Fighter Ship/Mech Capture
-- **Status**: ✅ **IMPLEMENTED**  
+- **Status**: ✅ **IMPLEMENTED**
 - **Description**: Captured ships/mechs go to faction sheet, return to reinforcements
 - **Test References**: `test_capture_cruiser_to_faction_sheet`, `test_capture_mech_to_faction_sheet`
 
@@ -70,7 +70,7 @@ Some abilities instruct a player to capture a unit, preventing the unit's origin
 - Blockaded (Rule 14)
 - Fighter Tokens
 - Ground Combat
-- Infantry Tokens  
+- Infantry Tokens
 - Space Combat
 
 ## Dependencies

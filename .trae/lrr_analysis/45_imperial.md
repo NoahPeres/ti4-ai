@@ -32,11 +32,11 @@ The "Imperial" strategy card allows players to score victory points and draw sec
 ## Overall Implementation Status
 - **Current State**: Not Started/In Progress/Complete
 - **Estimated Effort**: Small/Medium/Large
-- **Dependencies**: 
-- **Blockers**: 
+- **Dependencies**:
+- **Blockers**:
 
 ## Notes
-- 
+-
 
 ## Related Rules
 - Rule 82: STRATEGY CARDS

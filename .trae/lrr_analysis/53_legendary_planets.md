@@ -1,15 +1,15 @@
 # Rule 53: LEGENDARY PLANETS
 
 ## Category Overview
-**Rule Type**: Planet Mechanics  
-**Complexity**: Medium  
-**Implementation Priority**: Medium  
-**Dependencies**: Planet Control, Planet Cards, Abilities System  
+**Rule Type**: Planet Mechanics
+**Complexity**: Medium
+**Implementation Priority**: Medium
+**Dependencies**: Planet Control, Planet Cards, Abilities System
 
 ## Raw LRR Text
 From `lrr.txt` section 53:
 
-**53** LEGENDARY PLANETS  
+**53** LEGENDARY PLANETS
 Legendary planets grant the player that controls them unique, planet-specific abilities.
 
 **53.1** A legendary planet is indicated by the legendary planet icon.
@@ -154,7 +154,7 @@ Legendary planets grant the player that controls them unique, planet-specific ab
 - Ability usage: ❌ Missing
 - Visual indicators: ❌ Missing
 
-**Recommended Focus**: 
+**Recommended Focus**:
 1. Design legendary planet identification system
 2. Create legendary planet ability card framework
 3. Implement ability usage mechanics

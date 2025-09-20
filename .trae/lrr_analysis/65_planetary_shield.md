@@ -1,13 +1,13 @@
 # Rule 65: PLANETARY SHIELD (UNIT ABILITY)
 
 ## Category Overview
-**Rule Type**: Unit Ability  
-**Complexity**: Medium  
-**Dependencies**: Bombardment, Unit Abilities, L1Z1X Harrow, X-89 Bacterial Weapon, War Sun, Magen Defense Grid  
+**Rule Type**: Unit Ability
+**Complexity**: Medium
+**Dependencies**: Bombardment, Unit Abilities, L1Z1X Harrow, X-89 Bacterial Weapon, War Sun, Magen Defense Grid
 
 ## Raw LRR Text
 ```
-65 PLANETARY SHIELD (UNIT ABILITY)	
+65 PLANETARY SHIELD (UNIT ABILITY)
 Units cannot use the "Bombardment" ability against a planet that contains a unit that has the "Planetary Shield" ability.
 65.1 The "Planetary Shield" ability does not prevent a planet from being affected by the "X-89 Bacterial Weapon" technology.
 65.2 The "Planetary Shield" ability prevents an L1Z1X player from using their "Harrow" faction ability.
@@ -20,34 +20,34 @@ RELATED TOPICS: Bombardment
 ## Sub-Rules Analysis
 
 ### 65.0 - Basic Bombardment Prevention ✅ IMPLEMENTED
-**Status**: Implemented in unit ability system  
-**Implementation**: PDS units have planetary_shield ability flag  
-**Test Coverage**: Unit tests verify planetary shield ability detection  
+**Status**: Implemented in unit ability system
+**Implementation**: PDS units have planetary_shield ability flag
+**Test Coverage**: Unit tests verify planetary shield ability detection
 
 ### 65.1 - X-89 Bacterial Weapon Exception ❌ NOT IMPLEMENTED
-**Status**: Not implemented  
-**Implementation**: No X-89 Bacterial Weapon technology or exception handling  
-**Test Coverage**: No tests for X-89 Bacterial Weapon interactions  
+**Status**: Not implemented
+**Implementation**: No X-89 Bacterial Weapon technology or exception handling
+**Test Coverage**: No tests for X-89 Bacterial Weapon interactions
 
 ### 65.2 - L1Z1X Harrow Prevention ❌ NOT IMPLEMENTED
-**Status**: Not implemented  
-**Implementation**: No L1Z1X faction abilities or Harrow ability system  
-**Test Coverage**: No tests for L1Z1X Harrow interactions  
+**Status**: Not implemented
+**Implementation**: No L1Z1X faction abilities or Harrow ability system
+**Test Coverage**: No tests for L1Z1X Harrow interactions
 
 ### 65.3 - War Sun Override ❌ NOT IMPLEMENTED
-**Status**: Not implemented  
-**Implementation**: No war sun override mechanics for planetary shield  
-**Test Coverage**: No tests for war sun bombardment override  
+**Status**: Not implemented
+**Implementation**: No war sun override mechanics for planetary shield
+**Test Coverage**: No tests for war sun bombardment override
 
 ### 65.3a - Magen Defense Grid Restriction ❌ NOT IMPLEMENTED
-**Status**: Not implemented  
-**Implementation**: No Magen Defense Grid technology or restriction system  
-**Test Coverage**: No tests for Magen Defense Grid interactions  
+**Status**: Not implemented
+**Implementation**: No Magen Defense Grid technology or restriction system
+**Test Coverage**: No tests for Magen Defense Grid interactions
 
 ### 65.3b - War Sun Bombardment Override ❌ NOT IMPLEMENTED
-**Status**: Not implemented  
-**Implementation**: No bombardment system with war sun exceptions  
-**Test Coverage**: No tests for war sun bombardment mechanics  
+**Status**: Not implemented
+**Implementation**: No bombardment system with war sun exceptions
+**Test Coverage**: No tests for war sun bombardment mechanics
 
 ## Related Topics
 - **Bombardment**: Core combat mechanic that planetary shield blocks
@@ -115,6 +115,6 @@ RELATED TOPICS: Bombardment
 7. **LOW**: Add comprehensive bombardment integration tests
 
 ## Priority Assessment
-**Priority**: Medium  
-**Implementation Status**: 20%  
+**Priority**: Medium
+**Implementation Status**: 20%
 **Rationale**: While the basic unit ability is implemented, the actual protective mechanics and all exceptions are missing. Planetary shield is important for defensive strategy but not as critical as core economic or movement systems.

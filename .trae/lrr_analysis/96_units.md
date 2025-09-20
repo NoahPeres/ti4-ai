@@ -1,8 +1,8 @@
 # Rule 96: UNITS Analysis
 
 ## Category Overview
-**Rule Type**: Core Game Mechanics  
-**Scope**: Unit representation, types, and supply management  
+**Rule Type**: Core Game Mechanics
+**Scope**: Unit representation, types, and supply management
 **Related Systems**: Production, reinforcements, fleet management, tokens
 
 ## Raw LRR Text
@@ -12,7 +12,7 @@ A unit is represented by a plastic figure.
 96.1 There are three types of units: ships, ground forces, and structures.
 96.2 Each color of plastic comes with the following units:
 • 10 Fighters
-• 4 Carriers  
+• 4 Carriers
 • 5 Dreadnoughts
 • 1 Flagship
 • 4 Mechs
@@ -28,25 +28,25 @@ A unit is represented by a plastic figure.
 ## Sub-Rules Analysis
 
 ### 96.1 - Unit Types (✅ Implemented)
-**Status**: Fully implemented  
-**Implementation**: `UnitType` enum in `constants.py` defines all unit types  
+**Status**: Fully implemented
+**Implementation**: `UnitType` enum in `constants.py` defines all unit types
 **Coverage**: Ships, ground forces, and structures properly categorized
 
 ### 96.2 - Unit Supply Limits (❌ Not Implemented)
-**Status**: Not implemented  
-**Missing**: No enforcement of plastic piece limits per faction  
-**Impact**: Players could theoretically exceed physical game limits  
+**Status**: Not implemented
+**Missing**: No enforcement of plastic piece limits per faction
+**Impact**: Players could theoretically exceed physical game limits
 **Required**: Supply tracking and validation system
 
 ### 96.3 - Unit Location States (⚠️ Partially Implemented)
-**Status**: Partially implemented  
-**Current**: Units can be placed on board via various systems  
-**Missing**: Explicit reinforcement pool management and tracking  
+**Status**: Partially implemented
+**Current**: Units can be placed on board via various systems
+**Missing**: Explicit reinforcement pool management and tracking
 **Gap**: No clear distinction between "on board" vs "in reinforcements"
 
 ## Related Topics
 - **Fighter Tokens (Rule 36)**: Token representation for fighters
-- **Infantry Tokens (Rule 46)**: Token representation for infantry  
+- **Infantry Tokens (Rule 46)**: Token representation for infantry
 - **Producing Units (Rule 67)**: Unit creation and supply limitations
 - **Components (Rule 23)**: Physical component limitations and substitutions
 - **Captured Units (Rule 17)**: Unit capture and reinforcement mechanics
@@ -99,7 +99,7 @@ A unit is represented by a plastic figure.
 2. **Add reinforcement pool management** - Explicit on-board vs reinforcement states
 3. **Create unit supply validation** - Prevent exceeding physical limits
 
-### Medium Priority  
+### Medium Priority
 4. **Implement token/plastic distinction** - Fighter and infantry token mechanics
 5. **Add unit removal mechanics** - Automatic removal when supply exceeded
 6. **Enhance test coverage** - Supply limits and reinforcement scenarios
@@ -109,6 +109,6 @@ A unit is represented by a plastic figure.
 8. **Implement supply warnings** - Alert when approaching limits
 
 ## Priority Assessment
-**Priority**: High  
-**Implementation Status**: 40%  
+**Priority**: High
+**Implementation Status**: 40%
 **Rationale**: Core unit representation works, but missing critical supply management that affects game balance and rule compliance. Physical component limitations are fundamental to TI4 gameplay.

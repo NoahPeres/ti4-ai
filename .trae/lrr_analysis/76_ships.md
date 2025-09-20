@@ -1,9 +1,9 @@
 # Rule 76: SHIPS
 
 ## Category Overview
-**Priority**: High  
-**Implementation Status**: ✅ **COMPLETED**  
-**Test Coverage**: ✅ **Comprehensive (18 tests)** 
+**Priority**: High
+**Implementation Status**: ✅ **COMPLETED**
+**Test Coverage**: ✅ **Comprehensive (18 tests)**
 
 Ships are the primary unit type for space-based gameplay in TI4. This rule defines ship mechanics, fleet pool limits, and ship attributes that are fundamental to movement, combat, and strategic positioning.
 
@@ -14,29 +14,29 @@ Ships are the primary unit type for space-based gameplay in TI4. This rule defin
 ### 76.0 - Ship Definition
 **Raw LRR Text**: "A ship is a unit type consisting of carriers, cruisers, dreadnoughts, destroyers, fighters, and war suns. Each race also has a unique flagship."
 
-**Implementation Status**: ✅ **COMPLETED**  
-**Priority**: High  
+**Implementation Status**: ✅ **COMPLETED**
+**Priority**: High
 **Details**: Implemented `ShipManager.is_ship()` method that identifies all seven ship types and distinguishes them from ground forces and structures.
 
 ### 76.1 - Ship Placement
 **Raw LRR Text**: "Ships are always placed in space."
 
-**Implementation Status**: ✅ **COMPLETED**  
-**Priority**: High  
+**Implementation Status**: ✅ **COMPLETED**
+**Priority**: High
 **Details**: Implemented `can_place_ship_in_space()` and `can_place_ship_on_planet()` methods that enforce space-only placement for ships.
 
 ### 76.2 - Fleet Pool Limits
 **Raw LRR Text**: "A player can have a number of ships in a system equal to or less than the number of command tokens in that player's fleet pool."
 
-**Implementation Status**: ✅ **COMPLETED**  
-**Priority**: High  
+**Implementation Status**: ✅ **COMPLETED**
+**Priority**: High
 **Details**: Implemented `can_add_ship_to_system()` and `count_non_fighter_ships_in_system()` methods that enforce fleet pool limits. Fighters properly excluded from fleet pool counting.
 
 ### 76.3 - Ship Attributes
 **Raw LRR Text**: "Ships can have any number of the following attributes: cost, combat, move, and capacity. These attributes are shown on faction sheets and unit upgrade technology cards."
 
-**Implementation Status**: ✅ **COMPLETED**  
-**Priority**: High  
+**Implementation Status**: ✅ **COMPLETED**
+**Priority**: High
 **Details**: Implemented `ship_has_*_attribute()` methods for cost, combat, move, and capacity attributes. Full integration with existing UnitStatsProvider system.
 
 ## Related Rules

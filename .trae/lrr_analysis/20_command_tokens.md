@@ -67,7 +67,7 @@ Command tokens are a currency that players use to perform actions and expand the
 
 ## Next Steps for Full Completion
 1. Implement tactical action system (Rule 58) for Rule 20.4 completion
-2. Implement strategy card system for Rule 20.5 completion  
+2. Implement strategy card system for Rule 20.5 completion
 3. Implement system placement mechanics for Rule 20.6 completion
 4. Add integration tests between command tokens and other systems
 

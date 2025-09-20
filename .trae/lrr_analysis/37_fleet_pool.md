@@ -1,8 +1,8 @@
 # Rule 37: FLEET POOL
 
 ## Category Overview
-**Priority**: High  
-**Implementation Status**: ✅ **COMPLETE**  
+**Priority**: High
+**Implementation Status**: ✅ **COMPLETE**
 **Test Coverage**: ✅ **COMPLETE** (17 tests, 94% coverage)
 
 Fleet pool mechanics are fundamental to ship movement and system control in TI4. This rule defines how command tokens in the fleet pool limit non-fighter ships per system.
@@ -14,50 +14,50 @@ Fleet pool mechanics are fundamental to ship movement and system control in TI4.
 ### 37.0 - Fleet Pool Definition
 **Raw LRR Text**: "The fleet pool is an area of a player's command sheet."
 
-**Implementation Status**: 🔄 **PENDING**  
-**Priority**: Medium  
+**Implementation Status**: 🔄 **PENDING**
+**Priority**: Medium
 **Details**: Need command sheet representation with fleet pool area. Currently no visual command sheet system.
 
 ### 37.1 - Fleet Pool Ship Limits
 **Raw LRR Text**: "The number of command tokens in a player's fleet pool indicates the maximum number of non-fighter ships that a player can have in a system."
 
-**Implementation Status**: ✅ **COMPLETE**  
-**Priority**: High  
+**Implementation Status**: ✅ **COMPLETE**
+**Priority**: High
 **Details**: Well implemented in FleetPoolManager. Properly distinguishes non-fighter ships and validates limits.
 
 ### 37.1a - Planet and Capacity Unit Exclusions
 **Raw LRR Text**: "Units that are on planets or that count against a player's capacity do not count against that player's fleet pool."
 
-**Implementation Status**: ✅ **COMPLETE**  
-**Priority**: High  
+**Implementation Status**: ✅ **COMPLETE**
+**Priority**: High
 **Details**: Properly excludes planet-based units and capacity-consuming units from fleet pool counting.
 
 ### 37.1b - Transport Exclusions
 **Raw LRR Text**: "Units that are being transported through systems do not count against that player's fleet pool in those systems."
 
-**Implementation Status**: ✅ **COMPLETE**  
-**Priority**: Medium  
+**Implementation Status**: ✅ **COMPLETE**
+**Priority**: Medium
 **Details**: Transport system integration implemented to exclude transported units from fleet pool limits.
 
 ### 37.2 - Token Placement Orientation
 **Raw LRR Text**: "Players place command tokens in their fleet pools with the ship silhouette faceup."
 
-**Implementation Status**: ✅ **COMPLETE**  
-**Priority**: Low  
+**Implementation Status**: ✅ **COMPLETE**
+**Priority**: Low
 **Details**: Token orientation tracking implemented with proper validation.
 
 ### 37.3 - Excess Ship Removal
 **Raw LRR Text**: "If at any time the number of a player's non-fighter ships in a system exceeds the number of tokens in that player's fleet pool, they choose and remove excess ships in that system, returning those units to their reinforcements."
 
-**Implementation Status**: ✅ **COMPLETE**  
-**Priority**: High  
+**Implementation Status**: ✅ **COMPLETE**
+**Priority**: High
 **Details**: Automatic excess ship removal system implemented with player choice and reinforcement return.
 
 ### 37.4 - Fleet Pool Token Spending Restriction
 **Raw LRR Text**: "Players do not spend command tokens from this pool unless a game effect specifically allows it."
 
-**Implementation Status**: ✅ **COMPLETE**  
-**Priority**: Medium  
+**Implementation Status**: ✅ **COMPLETE**
+**Priority**: Medium
 **Details**: Spending restriction enforcement and game effect validation system implemented.
 
 ## Related Rules

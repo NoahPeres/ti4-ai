@@ -11,9 +11,9 @@ Two system tiles are adjacent to each other if any of the tiles' sides are touch
 **Raw LRR Text:**
 > "A system that has a wormhole is treated as being adjacent to a system that has a matching wormhole."
 
-**Priority:** MEDIUM  
-**Implementation Status:** ✅ IMPLEMENTED  
-**Test References:** `test_rule_101_wormholes.py`, wormhole adjacency in `galaxy.py`  
+**Priority:** MEDIUM
+**Implementation Status:** ✅ IMPLEMENTED
+**Test References:** `test_rule_101_wormholes.py`, wormhole adjacency in `galaxy.py`
 
 **Notes:** Wormhole adjacency fully implemented with matching logic. Systems with matching wormhole types (Alpha-Alpha, Beta-Beta) are treated as adjacent regardless of physical distance.
 
@@ -23,9 +23,9 @@ Two system tiles are adjacent to each other if any of the tiles' sides are touch
 > "A unit or planet is adjacent to all system tiles that are adjacent to the system tile that contains that unit or planet."
 > Sub-rule: "A system is not adjacent to itself."
 
-**Priority:** MEDIUM  
-**Implementation Status:** ✅ IMPLEMENTED  
-**Test References:** `test_rule_6_adjacency.py::TestRule6UnitAdjacency`, `galaxy.py::is_unit_adjacent_to_system`  
+**Priority:** MEDIUM
+**Implementation Status:** ✅ IMPLEMENTED
+**Test References:** `test_rule_6_adjacency.py::TestRule6UnitAdjacency`, `galaxy.py::is_unit_adjacent_to_system`
 
 **Notes:** Complete implementation with comprehensive test coverage. Units are adjacent to neighboring systems but not their own system. Includes edge case handling for invalid units/systems.
 
@@ -34,9 +34,9 @@ Two system tiles are adjacent to each other if any of the tiles' sides are touch
 **Raw LRR Text:**
 > "A planet is treated as being adjacent to the system that contains that planet."
 
-**Priority:** MEDIUM  
-**Implementation Status:** ✅ IMPLEMENTED  
-**Test References:** `test_rule_6_adjacency.py::TestRule6PlanetAdjacency`, `galaxy.py::is_planet_adjacent_to_system`  
+**Priority:** MEDIUM
+**Implementation Status:** ✅ IMPLEMENTED
+**Test References:** `test_rule_6_adjacency.py::TestRule6PlanetAdjacency`, `galaxy.py::is_planet_adjacent_to_system`
 
 **Notes:** Fully implemented with test validation. Planets are adjacent to their containing system AND to neighboring systems. Corrected initial test expectation to match LRR specification.
 
@@ -45,9 +45,9 @@ Two system tiles are adjacent to each other if any of the tiles' sides are touch
 **Raw LRR Text:**
 > "Systems that are connected by lines drawn across one or more hyperlane tiles are adjacent for all purposes."
 
-**Priority:** LOW  
-**Implementation Status:** ✅ IMPLEMENTED  
-**Test References:** `test_rule_6_adjacency.py::TestRule6HyperlaneAdjacency`, `galaxy.py::add_hyperlane_connection`  
+**Priority:** LOW
+**Implementation Status:** ✅ IMPLEMENTED
+**Test References:** `test_rule_6_adjacency.py::TestRule6HyperlaneAdjacency`, `galaxy.py::add_hyperlane_connection`
 
 **Notes:** Complete hyperlane system implemented with connection storage and adjacency checking. Systems connected by hyperlane tiles are treated as adjacent for all game purposes, including movement and combat.
 

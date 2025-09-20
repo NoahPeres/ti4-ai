@@ -1,8 +1,8 @@
 # Rule 23: COMPONENT LIMITATIONS
 
 ## Category Overview
-**Priority**: High  
-**Implementation Status**: Partial  
+**Priority**: High
+**Implementation Status**: Partial
 **Core Concept**: Defines how to handle depleted game components including dice, tokens, units, and cards
 
 ## Raw LRR Text
@@ -14,7 +14,7 @@ If a component type is depleted during the game, players obey the following rule
 
 23.2 TOKENS: Tokens are limited to those included in the game, except for the following:
 • Control Tokens
-• Fighter Tokens  
+• Fighter Tokens
 • Trade Good Tokens
 • Infantry Tokens
 
@@ -32,31 +32,31 @@ RELATED TOPICS: Producing Units, Units
 ## Sub-Rules Analysis
 
 ### 23.1 - Dice Limitations
-**Status**: ✅ Implemented  
-**Implementation**: Dice rolling is handled through game mechanics without physical limitations  
+**Status**: ✅ Implemented
+**Implementation**: Dice rolling is handled through game mechanics without physical limitations
 **Details**: Digital implementation naturally handles unlimited dice rolls
 
-### 23.2 - Token Limitations  
-**Status**: ⚠️ Partially Implemented  
-**Implementation**: Some token types tracked, but not all limitation rules enforced  
+### 23.2 - Token Limitations
+**Status**: ⚠️ Partially Implemented
+**Implementation**: Some token types tracked, but not all limitation rules enforced
 **Details**: Control tokens, fighter tokens, infantry tokens, and trade good tokens should be unlimited with substitutes allowed
 
 ### 23.3 - Token Substitutes
-**Status**: ❌ Not Implemented  
-**Implementation**: No substitute mechanism for depleted tokens  
+**Status**: ❌ Not Implemented
+**Implementation**: No substitute mechanism for depleted tokens
 **Details**: Need system to handle token depletion with suitable substitutes
 
 ### 23.4 - Unit Limitations
-**Status**: ⚠️ Partially Implemented  
-**Implementation**: Fleet capacity validation exists, but unit redeployment rules missing  
-**Details**: 
+**Status**: ⚠️ Partially Implemented
+**Implementation**: Fleet capacity validation exists, but unit redeployment rules missing
+**Details**:
 - Unit removal from non-command token systems not implemented
 - Fighter/infantry token substitution partially implemented
 - Plastic piece requirements not enforced
 
 ### 23.5 - Card Deck Depletion
-**Status**: ❌ Not Implemented  
-**Implementation**: No deck reshuffling mechanism  
+**Status**: ❌ Not Implemented
+**Implementation**: No deck reshuffling mechanism
 **Details**: Need to handle depleted decks by shuffling discard piles
 
 ## Related Topics

@@ -1,9 +1,9 @@
 # Rule 41: GROUND FORCES
 
 ## Category Overview
-**Rule Type:** Unit Mechanics  
-**Complexity:** Medium  
-**Frequency:** High (used in transport, invasion, control)  
+**Rule Type:** Unit Mechanics
+**Complexity:** Medium
+**Frequency:** High (used in transport, invasion, control)
 **Dependencies:** Transport, Capacity, Invasion, Planets, Units
 
 ## Raw LRR Text
@@ -27,7 +27,7 @@ A ground force is a type of unit. All infantry and mech units in the game are gr
 - **Details:** Ground forces can be placed on planets, in space (with capacity), and transported properly
 
 ### 43.2 - Transport Mechanics (WELL IMPLEMENTED)
-- **Implementation Status:** ✅ COMPLETE  
+- **Implementation Status:** ✅ COMPLETE
 - **Code Location:** `TransportOperation`, `TransportExecutor`, `MovementCommand`
 - **Test Coverage:** ✅ Comprehensive (`test_movement.py`)
 - **Details:** Transport system properly handles ground forces in space area with ships
@@ -118,7 +118,7 @@ A ground force is a type of unit. All infantry and mech units in the game are gr
 ## Priority Assessment
 **PRIORITY: MEDIUM-HIGH**
 
-Ground forces are fundamental units that participate in many core game mechanics including transport, invasion, and planet control. The current implementation is quite solid with good transport mechanics, proper placement systems, and basic unit functionality. 
+Ground forces are fundamental units that participate in many core game mechanics including transport, invasion, and planet control. The current implementation is quite solid with good transport mechanics, proper placement systems, and basic unit functionality.
 
 The main gaps are in faction-specific variants and some edge case validations, but the core functionality is well-implemented and tested. This represents a strong foundation that supports the primary use cases effectively.
 

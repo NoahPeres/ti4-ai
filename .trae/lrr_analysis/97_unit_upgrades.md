@@ -1,8 +1,8 @@
 # Rule 97: UNIT UPGRADES Analysis
 
 ## Category Overview
-**Rule Type**: Technology System  
-**Scope**: Unit upgrade technology cards, roman numeral progression, attribute improvements  
+**Rule Type**: Technology System
+**Scope**: Unit upgrade technology cards, roman numeral progression, attribute improvements
 **Related Systems**: Technology research, unit stats, faction sheets
 
 ## Raw LRR Text
@@ -20,32 +20,32 @@ a The Nekro Virus player may upgrade their units with units of the same type (e.
 ## Sub-Rules Analysis
 
 ### 97.1 - Roman Numeral Progression (✅ Implemented)
-**Status**: Fully implemented  
-**Implementation**: Unit upgrade constants and technology system support roman numeral naming  
-**Coverage**: Carrier II, Cruiser II, Dreadnought II, Fighter II, Destroyer II properly defined  
+**Status**: Fully implemented
+**Implementation**: Unit upgrade constants and technology system support roman numeral naming
+**Coverage**: Carrier II, Cruiser II, Dreadnought II, Fighter II, Destroyer II properly defined
 **Special Case**: Nekro Virus upgrade mechanics partially implemented
 
 ### 97.2 - Faction Sheet Placement (❌ Not Implemented)
-**Status**: Not implemented  
-**Missing**: No visual faction sheet or card placement mechanics  
-**Impact**: Upgrade acquisition works but lacks proper UI representation  
+**Status**: Not implemented
+**Missing**: No visual faction sheet or card placement mechanics
+**Impact**: Upgrade acquisition works but lacks proper UI representation
 **Required**: Faction sheet UI system with card overlay mechanics
 
 ### 97.3 - Attribute Improvement Indicators (❌ Not Implemented)
-**Status**: Not implemented  
-**Missing**: No white arrow indicators or visual upgrade hints  
-**Impact**: Players cannot see which attributes will improve  
+**Status**: Not implemented
+**Missing**: No white arrow indicators or visual upgrade hints
+**Impact**: Players cannot see which attributes will improve
 **Required**: UI system showing upgrade previews and improvements
 
 ### 97.4 - Attribute Replacement (✅ Implemented)
-**Status**: Fully implemented  
-**Implementation**: `UnitStatsProvider` with technology modifiers replaces base stats  
-**Coverage**: Upgraded units use new attributes, ignoring base faction sheet values  
+**Status**: Fully implemented
+**Implementation**: `UnitStatsProvider` with technology modifiers replaces base stats
+**Coverage**: Upgraded units use new attributes, ignoring base faction sheet values
 **Validation**: Comprehensive test coverage for stat replacement
 
 ### 97.5 - Mech Exception (✅ Implemented)
-**Status**: Correctly implemented  
-**Implementation**: Mech units handled separately from technology system  
+**Status**: Correctly implemented
+**Implementation**: Mech units handled separately from technology system
 **Coverage**: Mech unit cards are not treated as technologies
 
 ## Related Topics
@@ -107,7 +107,7 @@ a The Nekro Virus player may upgrade their units with units of the same type (e.
 2. **Add upgrade preview system** - Show attribute improvements before research
 3. **Create upgrade indicators** - Visual arrows and improvement hints
 
-### Medium Priority  
+### Medium Priority
 4. **Complete Nekro Virus mechanics** - Valefar Assimilator and upgrade replacement
 5. **Add upgrade comparison UI** - Before/after stat comparison
 6. **Enhance test coverage** - Visual and UI upgrade mechanics
@@ -117,6 +117,6 @@ a The Nekro Virus player may upgrade their units with units of the same type (e.
 8. **Implement upgrade history** - Track upgrade progression per player
 
 ## Priority Assessment
-**Priority**: Medium  
-**Implementation Status**: 70%  
+**Priority**: Medium
+**Implementation Status**: 70%
 **Rationale**: Core upgrade mechanics work well with proper stat replacement and technology integration. Missing primarily UI/visual elements and special faction mechanics. Functional for gameplay but lacks polish for user experience.

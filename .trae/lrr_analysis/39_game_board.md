@@ -20,11 +20,11 @@ The game board consists of all system tiles in play.
 ## Overall Implementation Status
 - **Current State**: Not Started/In Progress/Complete
 - **Estimated Effort**: Small/Medium/Large
-- **Dependencies**: 
-- **Blockers**: 
+- **Dependencies**:
+- **Blockers**:
 
 ## Notes
-- 
+-
 
 ## Related Rules
 - Rule 83: SYSTEM TILES

@@ -80,7 +80,7 @@ Anomalies are special system tiles with unique rules that affect movement and ga
 - **Dependencies**: Movement validation system
 
 ### Nebula (Rule 59) 🔴 HIGH
-**Effects**: 
+**Effects**:
 - Ships can only move into nebula if it's the active system
 - Ships in nebula have move value of 1
 - Defender gets +1 to combat rolls in nebula

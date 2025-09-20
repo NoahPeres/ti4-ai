@@ -1,8 +1,8 @@
 # Rule 94: TRANSACTIONS
 
 ## Category Overview
-**Priority**: HIGH  
-**Implementation Status**: ✅ **COMPLETED**  
+**Priority**: HIGH
+**Implementation Status**: ✅ **COMPLETED**
 **Complexity**: MEDIUM
 
 A transaction is a way for a player to exchange commodities, trade goods, promissory notes, and relic fragments.

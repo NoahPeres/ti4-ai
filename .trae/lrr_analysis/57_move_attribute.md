@@ -14,8 +14,8 @@ Move is an attribute of some units that is presented on faction sheets and unit 
 ## Overall Implementation Status
 - **Current State**: Not Started/In Progress/Complete
 - **Estimated Effort**: Small/Medium/Large
-- **Dependencies**: 
-- **Blockers**: 
+- **Dependencies**:
+- **Blockers**:
 
 ## Notes
 - Rule 57 has only 1 sub-rule

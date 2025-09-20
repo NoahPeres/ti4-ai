@@ -1,13 +1,13 @@
 # Rule 25: CONTROL
 
 ## Category Overview
-**Priority**: High  
-**Implementation Status**: Partial  
+**Priority**: High
+**Implementation Status**: Partial
 **Core Concept**: System for gaining, maintaining, and losing control of planets through unit presence and control tokens
 
 ## Raw LRR Text
 ```
-25 CONTROL	
+25 CONTROL
 Each player begins the game with control of each planet in their home system. During the game, players can gain control of additional planets.
 
 25.1 When a player gains control of a planet, they take the planet card that corresponds to that planet and place it in their play area; that card is exhausted.
@@ -35,9 +35,9 @@ RELATED TOPICS: Attach, Exhausted, Invasion, Planets
 ## Sub-Rules Analysis
 
 ### 25.1 - Gaining Control and Planet Cards
-**Status**: ⚠️ Partially Implemented  
-**Implementation**: Basic planet control tracking exists, but planet card management missing  
-**Details**: 
+**Status**: ⚠️ Partially Implemented
+**Implementation**: Basic planet control tracking exists, but planet card management missing
+**Details**:
 - Planet control assignment implemented
 - Planet card deck management not implemented
 - Planet card transfer between players not implemented
@@ -45,39 +45,39 @@ RELATED TOPICS: Attach, Exhausted, Invasion, Planets
 - Planet card exhaustion on gain not implemented
 
 ### 25.2 - Cannot Gain Already Controlled Planet
-**Status**: ❌ Not Implemented  
-**Implementation**: No validation preventing duplicate control gain  
+**Status**: ❌ Not Implemented
+**Implementation**: No validation preventing duplicate control gain
 **Details**: No checks to prevent gaining control of already controlled planets
 
 ### 25.3 - Planet Card Persistence
-**Status**: ❌ Not Implemented  
-**Implementation**: No planet card play area management  
+**Status**: ❌ Not Implemented
+**Implementation**: No planet card play area management
 **Details**: Planet cards not tracked in player play areas
 
 ### 25.4 - Control Without Units (Control Tokens)
-**Status**: ❌ Not Implemented  
-**Implementation**: Control token placement system missing  
-**Details**: 
+**Status**: ❌ Not Implemented
+**Implementation**: Control token placement system missing
+**Details**:
 - Control token placement on planets not implemented
 - Control without unit presence not supported
 - Control token tracking not implemented
 
 ### 25.5 - Losing Control Through Unit Presence
-**Status**: ⚠️ Partially Implemented  
-**Implementation**: Basic control change exists but invasion timing missing  
-**Details**: 
+**Status**: ⚠️ Partially Implemented
+**Implementation**: Basic control change exists but invasion timing missing
+**Details**:
 - Basic control transfer implemented
 - Invasion step "Establish Control" timing not implemented
 - Unit presence validation for control loss not complete
 
 ### 25.6 - Control Loss Through Game Effects
-**Status**: ❌ Not Implemented  
-**Implementation**: No game effect-based control loss system  
+**Status**: ❌ Not Implemented
+**Implementation**: No game effect-based control loss system
 **Details**: No framework for losing control through abilities or effects
 
 ### 25.7 - Control Token Removal
-**Status**: ❌ Not Implemented  
-**Implementation**: Control token removal not implemented  
+**Status**: ❌ Not Implemented
+**Implementation**: Control token removal not implemented
 **Details**: No system for removing control tokens when losing control
 
 ## Related Topics

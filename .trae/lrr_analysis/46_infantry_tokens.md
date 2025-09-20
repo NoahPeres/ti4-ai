@@ -32,11 +32,11 @@ An infantry token functions as a plastic infantry unit for all game purposes.
 ## Overall Implementation Status
 - **Current State**: Not Started/In Progress/Complete
 - **Estimated Effort**: Small/Medium/Large
-- **Dependencies**: 
-- **Blockers**: 
+- **Dependencies**:
+- **Blockers**:
 
 ## Notes
-- 
+-
 
 ## Related Rules
 - Rule 36: FIGHTER TOKENS

@@ -6,7 +6,7 @@
 ## Test Scenario
 Testing the core neighbor detection mechanics:
 1. Players with units in the same system are neighbors
-2. Players with units in adjacent systems are neighbors  
+2. Players with units in adjacent systems are neighbors
 3. Players with units in non-adjacent systems are not neighbors
 
 ## Current Status
@@ -20,7 +20,7 @@ Testing the core neighbor detection mechanics:
 
 ## Test Coverage
 - ✅ Same system neighbor detection
-- ✅ Adjacent system neighbor detection  
+- ✅ Adjacent system neighbor detection
 - ✅ Non-adjacent system rejection
 - ✅ Wormhole adjacency neighbor detection
 - ✅ No units edge case

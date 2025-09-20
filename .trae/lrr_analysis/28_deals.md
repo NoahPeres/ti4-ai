@@ -1,14 +1,14 @@
 # Rule 28: DEALS - Analysis
 
 ## Category Overview
-**Rule Type**: Player Interaction/Trading System  
-**Priority**: MEDIUM-HIGH  
-**Complexity**: MEDIUM  
-**Dependencies**: Transactions, Trade Goods, Promissory Notes, Neighbors  
+**Rule Type**: Player Interaction/Trading System
+**Priority**: MEDIUM-HIGH
+**Complexity**: MEDIUM
+**Dependencies**: Transactions, Trade Goods, Promissory Notes, Neighbors
 
 ## Raw LRR Text
 ```
-28 DEALS	
+28 DEALS
 A deal is an agreement between two players that may or may not include a transaction that involves physical components.
 
 28.1 Players can make deals with each other at any time, even if they are not neighbors. However, deals that include a transaction must follow the rules for transactions, including that the players be neighbors.
@@ -26,34 +26,34 @@ RELATED TOPICS: Promissory Notes, Trade Goods
 ## Sub-Rules Analysis
 
 ### 28.1 Deal Timing and Transaction Requirements
-**Status**: ⚠️ PARTIAL  
-**Implementation**: Basic transaction system exists but no deal framework  
-**Tests**: Transaction tests exist but no deal validation  
-**Notes**: Neighbor requirement for transactions exists but no deal system to enforce it  
+**Status**: ⚠️ PARTIAL
+**Implementation**: Basic transaction system exists but no deal framework
+**Tests**: Transaction tests exist but no deal validation
+**Notes**: Neighbor requirement for transactions exists but no deal system to enforce it
 
 ### 28.2 Binding vs Non-Binding Classification
-**Status**: ❌ NOT IMPLEMENTED  
-**Implementation**: No deal classification system or binding enforcement  
-**Tests**: No tests for deal binding mechanics  
-**Notes**: Core mechanic for determining deal enforceability missing  
+**Status**: ❌ NOT IMPLEMENTED
+**Implementation**: No deal classification system or binding enforcement
+**Tests**: No tests for deal binding mechanics
+**Notes**: Core mechanic for determining deal enforceability missing
 
 ### 28.3 Binding Deal Requirements and Enforcement
-**Status**: ❌ NOT IMPLEMENTED  
-**Implementation**: No immediate resolution validation or binding enforcement  
-**Tests**: No tests for binding deal adherence  
-**Notes**: Critical for ensuring players honor immediate agreements  
+**Status**: ❌ NOT IMPLEMENTED
+**Implementation**: No immediate resolution validation or binding enforcement
+**Tests**: No tests for binding deal adherence
+**Notes**: Critical for ensuring players honor immediate agreements
 
 ### 28.3a Action Card Exclusion from Binding Deals
-**Status**: ❌ NOT IMPLEMENTED  
-**Implementation**: No action card result validation in deal system  
-**Tests**: No tests for action card exclusion from binding deals  
-**Notes**: Important limitation preventing guaranteed action card outcomes  
+**Status**: ❌ NOT IMPLEMENTED
+**Implementation**: No action card result validation in deal system
+**Tests**: No tests for action card exclusion from binding deals
+**Notes**: Important limitation preventing guaranteed action card outcomes
 
 ### 28.4 Non-Binding Deal Flexibility
-**Status**: ❌ NOT IMPLEMENTED  
-**Implementation**: No non-binding deal system or adherence flexibility  
-**Tests**: No tests for non-binding deal behavior  
-**Notes**: Allows future promises without enforcement  
+**Status**: ❌ NOT IMPLEMENTED
+**Implementation**: No non-binding deal system or adherence flexibility
+**Tests**: No tests for non-binding deal behavior
+**Notes**: Allows future promises without enforcement
 
 ## Related Topics
 - **Transactions** (Rule 94): Physical component exchange system

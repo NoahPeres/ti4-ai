@@ -1,15 +1,15 @@
 # Rule 52: LEADERSHIP (STRATEGY CARD)
 
 ## Category Overview
-**Rule Type**: Strategy Card Mechanics  
-**Complexity**: Medium  
-**Implementation Priority**: High  
-**Dependencies**: Command Tokens, Influence, Strategy Phase, Strategic Actions  
+**Rule Type**: Strategy Card Mechanics
+**Complexity**: Medium
+**Implementation Priority**: High
+**Dependencies**: Command Tokens, Influence, Strategy Phase, Strategic Actions
 
 ## Raw LRR Text
 From `lrr.txt` section 52:
 
-**52** LEADERSHIP (STRATEGY CARD)  
+**52** LEADERSHIP (STRATEGY CARD)
 The "Leadership" strategy card allows players to gain command tokens. This card's initiative value is "1."
 
 **52.1** During the action phase, if the active player has the "Leadership" strategy card, they can perform a strategic action to resolve that card's primary ability.
@@ -160,7 +160,7 @@ The "Leadership" strategy card allows players to gain command tokens. This card'
 - Leadership secondary ability: ❌ Missing
 - Influence conversion: ❌ Missing
 
-**Recommended Focus**: 
+**Recommended Focus**:
 1. Implement Leadership-specific primary and secondary abilities
 2. Add influence-to-command-token conversion logic
 3. Handle Leadership's unique secondary ability exception

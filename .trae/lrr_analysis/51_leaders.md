@@ -80,8 +80,8 @@ Each player has several faction-specific leader cards that represent characters 
 ## Overall Implementation Status
 - **Current State**: Not Started/In Progress/Complete
 - **Estimated Effort**: Small/Medium/Large
-- **Dependencies**: 
-- **Blockers**: 
+- **Dependencies**:
+- **Blockers**:
 
 ## Notes
 - Rule 51 has 12 sub-rules covering agents, commanders, and heroes

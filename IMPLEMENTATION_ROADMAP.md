@@ -1,6 +1,6 @@
 # TI4 AI Implementation Roadmap
 
-**Last Updated**: December 2024  
+**Last Updated**: December 2024
 **Overall Progress**: 24.9%
 
 > **Architecture Note**: Transaction system needs PlayerSupply integration for resource validation. See `docs/architecture_notes/player_supply_system.md` for detailed implementation plan.
@@ -76,8 +76,8 @@ Core game flow and player actions:
 
 ### 🎯 Rule 6: ADJACENCY Implementation Plan ✅ **COMPLETED**
 
-**Target**: 0% → 95% implementation ✅ **ACHIEVED**  
-**Actual Effort**: 2 days with strict TDD methodology  
+**Target**: 0% → 95% implementation ✅ **ACHIEVED**
+**Actual Effort**: 2 days with strict TDD methodology
 **Dependencies**: None (foundational)
 
 #### ✅ Step 1: Enhanced Adjacency System (COMPLETED)
@@ -86,7 +86,7 @@ Core game flow and player actions:
 
 1.1 Basic Physical Adjacency (ENHANCED)
    ✅ Test: Adjacent hex coordinates return true
-   ✅ Test: Non-adjacent hex coordinates return false  
+   ✅ Test: Non-adjacent hex coordinates return false
    ✅ Test: System not adjacent to itself
    ✅ Implementation: Enhanced Galaxy.are_systems_adjacent()
 
@@ -114,7 +114,7 @@ Core game flow and player actions:
 ```
 ✅ 12 comprehensive tests in test_rule_6_adjacency.py:
    - TestRule6UnitAdjacency (3 tests)
-   - TestRule6PlanetSystemAdjacency (3 tests) 
+   - TestRule6PlanetSystemAdjacency (3 tests)
    - TestRule6EdgeCases (3 tests)
    - TestRule6HyperlaneAdjacency (3 tests)
 
@@ -144,8 +144,8 @@ Core game flow and player actions:
 
 ### ✅ Rule 60: NEIGHBORS Implementation (COMPLETED)
 
-**Status**: 85% → 100% implementation  
-**Completion Date**: Previously implemented  
+**Status**: 85% → 100% implementation
+**Completion Date**: Previously implemented
 **Dependencies**: Rule 6 (Adjacency) ✅ COMPLETED
 
 #### ✅ Step 1: Neighbor Determination System (COMPLETED)
@@ -171,7 +171,7 @@ Core game flow and player actions:
 ```
 ✅ 5 comprehensive tests in test_neighbor_detection.py:
    - Same system neighbor detection
-   - Adjacent system neighbor detection  
+   - Adjacent system neighbor detection
    - Non-neighbor validation
    - Wormhole-based neighbor detection
    - Edge case handling
@@ -189,8 +189,8 @@ Core game flow and player actions:
 
 ### ✅ Rule 101: WORMHOLES Implementation (COMPLETED)
 
-**Target**: 0% → 80% implementation ✅ **ACHIEVED**  
-**Actual Effort**: 2 days with strict TDD methodology  
+**Target**: 0% → 80% implementation ✅ **ACHIEVED**
+**Actual Effort**: 2 days with strict TDD methodology
 **Dependencies**: Rule 6 (Adjacency) foundation ✅ COMPLETED
 
 #### ✅ Step 1: Wormhole Type System (COMPLETED)
@@ -213,7 +213,7 @@ Core game flow and player actions:
 ```
 ✅ 15 comprehensive tests in test_rule_101_wormholes.py:
    - TestRule101WormholeAdjacency (8 tests)
-   - TestRule101WormholeTypes (4 tests) 
+   - TestRule101WormholeTypes (4 tests)
    - TestRule101EdgeCases (3 tests)
 
 ✅ Quality Metrics Achieved:
@@ -244,8 +244,8 @@ Core game flow and player actions:
 
 ### ✅ Rule 61: OBJECTIVE CARDS Implementation (COMPLETED)
 
-**Target**: 0% → 75% implementation ✅ **ACHIEVED**  
-**Actual Effort**: 3 days with strict TDD methodology  
+**Target**: 0% → 75% implementation ✅ **ACHIEVED**
+**Actual Effort**: 3 days with strict TDD methodology
 **Dependencies**: Foundation spatial mechanics (Rules 6, 60, 101) ✅ COMPLETED
 
 #### ✅ Step 1: Objective Card System (COMPLETED)
@@ -301,8 +301,8 @@ Core game flow and player actions:
 
 ### ✅ Rule 99: WARFARE STRATEGY CARD Implementation (COMPLETED)
 
-**Target**: 0% → 85% implementation ✅ **ACHIEVED**  
-**Actual Effort**: 1 day with strict TDD methodology  
+**Target**: 0% → 85% implementation ✅ **ACHIEVED**
+**Actual Effort**: 1 day with strict TDD methodology
 **Dependencies**: Rule 20 (Command Tokens) ✅ COMPLETED
 
 #### ✅ Step 1: Command Token Management (COMPLETED)
@@ -359,8 +359,8 @@ Core game flow and player actions:
 
 ### ✅ Rule 17: CAPTURE Implementation (COMPLETED)
 
-**Target**: 0% → 85% implementation ✅ **ACHIEVED**  
-**Actual Effort**: 1 day with strict TDD methodology  
+**Target**: 0% → 85% implementation ✅ **ACHIEVED**
+**Actual Effort**: 1 day with strict TDD methodology
 **Dependencies**: None (foundational)
 
 #### ✅ Step 1: Core Capture System (COMPLETED)
@@ -439,8 +439,8 @@ Core game flow and player actions:
 
 ### ✅ Rule 94: TRANSACTIONS Implementation (COMPLETED)
 
-**Target**: 0% → 80% implementation ✅ **ACHIEVED**  
-**Actual Effort**: 1 day with strict TDD methodology  
+**Target**: 0% → 80% implementation ✅ **ACHIEVED**
+**Actual Effort**: 1 day with strict TDD methodology
 **Dependencies**: Rule 60 (Neighbors) ✅ COMPLETED
 
 #### ✅ Step 1: Core Transaction System (COMPLETED)
@@ -518,8 +518,8 @@ Core game flow and player actions:
 
 ### ✅ Rule 14: BLOCKADED Implementation (COMPLETED)
 
-**Target**: 0% → 85% implementation ✅ **ACHIEVED**  
-**Actual Effort**: 1 day with strict TDD methodology  
+**Target**: 0% → 85% implementation ✅ **ACHIEVED**
+**Actual Effort**: 1 day with strict TDD methodology
 **Dependencies**: Rule 17 (Capture) ✅ COMPLETED
 
 #### ✅ Step 1: Core Blockade System (COMPLETED)
@@ -595,8 +595,8 @@ Core game flow and player actions:
 
 ### ✅ Rule 82: STRATEGIC ACTION Implementation (COMPLETED)
 
-**Target**: 0% → 85% implementation ✅ **ACHIEVED**  
-**Actual Effort**: 1 day with strict TDD methodology  
+**Target**: 0% → 85% implementation ✅ **ACHIEVED**
+**Actual Effort**: 1 day with strict TDD methodology
 **Dependencies**: Rule 61 (Objective Cards) ✅ COMPLETED, Rule 99 (Warfare Strategy Card) ✅ COMPLETED
 
 #### ✅ Step 1: Core Strategic Action System (COMPLETED)
@@ -667,8 +667,8 @@ Core game flow and player actions:
 
 ### ✅ Rule 69: PROMISSORY NOTES Implementation (COMPLETED)
 
-**Target**: 0% → 85% implementation ✅ **ACHIEVED**  
-**Actual Effort**: 1 day with strict TDD methodology  
+**Target**: 0% → 85% implementation ✅ **ACHIEVED**
+**Actual Effort**: 1 day with strict TDD methodology
 **Dependencies**: Rule 94 (Transactions) ✅ COMPLETED
 
 #### ✅ Step 1: Core Promissory Note System (COMPLETED)
@@ -741,8 +741,8 @@ Core game flow and player actions:
 
 ### ✅ Rule 90: TECHNOLOGY Implementation (COMPLETED)
 
-**Target**: 0% → 85% implementation ✅ **ACHIEVED**  
-**Actual Effort**: 2 days with strict TDD methodology and full system integration  
+**Target**: 0% → 85% implementation ✅ **ACHIEVED**
+**Actual Effort**: 2 days with strict TDD methodology and full system integration
 **Dependencies**: Game State System ✅ COMPLETED
 
 #### ✅ Step 1: Core Technology System (COMPLETED)
@@ -850,8 +850,8 @@ Core game flow and player actions:
 
 ### ✅ Rule 91: TECHNOLOGY (Strategy Card) Implementation (COMPLETED)
 
-**Target**: 0% → 85% implementation ✅ **ACHIEVED**  
-**Actual Effort**: 1 day with strict TDD methodology and full system integration  
+**Target**: 0% → 85% implementation ✅ **ACHIEVED**
+**Actual Effort**: 1 day with strict TDD methodology and full system integration
 **Dependencies**: Rule 82 (Strategic Action) ✅ COMPLETED, Rule 90 (Technology) ✅ COMPLETED
 
 #### ✅ Step 1: Core Strategy Card System (COMPLETED)
@@ -955,8 +955,8 @@ Core game flow and player actions:
 
 ### ✅ Rule 67: PRODUCING UNITS Implementation (COMPLETED)
 
-**Target**: 0% → 85% implementation ✅ **ACHIEVED**  
-**Actual Effort**: 1 day with strict TDD methodology and system integration  
+**Target**: 0% → 85% implementation ✅ **ACHIEVED**
+**Actual Effort**: 1 day with strict TDD methodology and system integration
 **Dependencies**: Rule 14 (Blockaded) ✅ COMPLETED, Unit Stats System ✅ COMPLETED
 
 #### ✅ Step 1: Core Production System (COMPLETED)
@@ -1041,8 +1041,8 @@ Core game flow and player actions:
 
 ### ✅ Rule 76: SHIPS Implementation (COMPLETED)
 
-**Target**: 0% → 85% implementation ✅ **ACHIEVED**  
-**Actual Effort**: 1 day with strict TDD methodology  
+**Target**: 0% → 85% implementation ✅ **ACHIEVED**
+**Actual Effort**: 1 day with strict TDD methodology
 **Dependencies**: Unit Stats System ✅ COMPLETED, System/Galaxy Framework ✅ COMPLETED
 
 #### ✅ Step 1: Ship Type System (COMPLETED)
@@ -1132,7 +1132,7 @@ Core game flow and player actions:
 
 ### Strict TDD Process
 1. **RED**: Write failing test first
-2. **GREEN**: Write minimal code to pass test  
+2. **GREEN**: Write minimal code to pass test
 3. **REFACTOR**: Clean up code while keeping tests green
 4. **REPEAT**: For each small feature increment
 
@@ -1155,7 +1155,7 @@ Core game flow and player actions:
 This roadmap prioritizes **foundational spatial mechanics** that enable all higher-level TI4 gameplay. Once Phase 1 is complete:
 
 - **Movement system** will have proper adjacency foundation
-- **Combat system** can use accurate neighbor determination  
+- **Combat system** can use accurate neighbor determination
 - **Ability ranges** will work correctly with wormhole adjacency
 - **AI planning** will have spatial awareness for strategic decisions
 
@@ -1169,7 +1169,7 @@ The **strict TDD approach** ensures each implementation is robust, testable, and
 - **Approach**: Review roadmap priorities and select next high-impact rule
 - **Focus**: Continue with core game mechanics or strategic systems
 
-**Context for Future Development**: 
+**Context for Future Development**:
 With foundational spatial mechanics, victory conditions, and command token system complete, implementing movement mechanics will enable tactical gameplay, combat positioning, and strategic unit deployment across the galaxy:
 - Unit movement validation and path finding
 - Fleet capacity and movement restrictions
@@ -1193,7 +1193,7 @@ With foundational spatial mechanics, victory conditions, and command token syste
 
 ### Test Coverage:
 - `test_rule_20_command_tokens.py`: Core command sheet functionality (8 tests)
-- `test_rule_20_reinforcement_limits.py`: Reinforcement system validation (4 tests)  
+- `test_rule_20_reinforcement_limits.py`: Reinforcement system validation (4 tests)
 - `test_rule_20_token_gain.py`: Token gain mechanics with pool choice (6 tests)
 
 ### Quality Metrics:

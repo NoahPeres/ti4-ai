@@ -8,7 +8,7 @@ Some units have the "Sustain Damage" ability. Immediately before a player assign
 ### Current Implementation
 - **Core Classes**: `Unit`, `UnitStats`, `CombatResolver`
 - **Test Coverage**: 8 dedicated tests covering sustain damage mechanics
-- **Key Methods**: 
+- **Key Methods**:
   - `Unit.has_sustain_damage() -> bool`
   - `Unit.sustain_damage()` - activates ability
   - `Unit.repair()` - repairs damaged units
@@ -66,7 +66,7 @@ Some units have the "Sustain Damage" ability. Immediately before a player assign
 
 ## Action Items
 - [x] ✅ Analyze Sustain Damage mechanics
-- [x] ✅ Review damage state management  
+- [x] ✅ Review damage state management
 - [x] ✅ Examine repair timing and methods
 - [x] ✅ Study hit assignment interactions
 - [ ] 🔄 Investigate faction-specific enhancements

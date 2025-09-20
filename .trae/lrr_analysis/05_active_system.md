@@ -11,7 +11,7 @@ System activation is a core mechanism in tactical actions.
 - **Implementation**: Rule89Validator.activate_system() method
 - **Test Coverage**: test_rule89_validator.py covers activation mechanics
 
-### 5.2: Cannot Activate System with Own Command Token  
+### 5.2: Cannot Activate System with Own Command Token
 - **Priority**: CRITICAL
 - **Implementation Status**: ✅ COMPLETE
 - **Implementation**: Rule89Validator.can_activate_system() method

@@ -1,9 +1,9 @@
 # Rule 29: DEFENDER - Analysis
 
 ## Category Overview
-**Rule Type:** Combat Mechanics  
-**Priority:** MEDIUM  
-**Implementation Status:** PARTIALLY IMPLEMENTED  
+**Rule Type:** Combat Mechanics
+**Priority:** MEDIUM
+**Implementation Status:** PARTIALLY IMPLEMENTED
 
 ## Raw LRR Text
 ```
@@ -16,8 +16,8 @@ RELATED TOPICS: Attacker, Invasion, Nebula, Space Combat
 ## Sub-Rules Analysis
 
 ### 29.1 Combat Role Definition
-**Status:** ✅ IMPLEMENTED  
-**Implementation:** The concept is implicit in combat system - active player initiates combat  
+**Status:** ✅ IMPLEMENTED
+**Implementation:** The concept is implicit in combat system - active player initiates combat
 **Details:** The rule defines defender by exclusion (non-active player in combat)
 
 ## Related Topics
@@ -39,7 +39,7 @@ RELATED TOPICS: Attacker, Invasion, Nebula, Space Combat
 
 ### Missing Tests
 - Defender role identification in space combat
-- Defender role identification in ground combat  
+- Defender role identification in ground combat
 - Defender-specific abilities and timing
 - Multi-player combat defender determination
 - Retreat mechanics for defenders vs attackers

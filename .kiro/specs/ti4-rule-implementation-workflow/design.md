@@ -10,7 +10,7 @@ This design outlines a manual, systematic workflow for implementing TI4 game rul
 
 #### 1. Manual Rule Status Verification
 - **Purpose**: Human verification of actual implementation status vs documentation
-- **Process**: 
+- **Process**:
   - Manually run tests for specific rules to validate completion status
   - Compare documentation claims with actual test results using human judgment
   - Update tracking documents when discrepancies are found

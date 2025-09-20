@@ -1,14 +1,14 @@
 # Rule 27: CUSTODIANS TOKEN - Analysis
 
 ## Category Overview
-**Rule Type**: Game Token/Mechanic  
-**Priority**: HIGH  
-**Complexity**: MEDIUM  
-**Dependencies**: Mecatol Rex, Influence, Victory Points, Agenda Phase, Ground Forces  
+**Rule Type**: Game Token/Mechanic
+**Priority**: HIGH
+**Complexity**: MEDIUM
+**Dependencies**: Mecatol Rex, Influence, Victory Points, Agenda Phase, Ground Forces
 
 ## Raw LRR Text
 ```
-27 CUSTODIANS TOKEN	
+27 CUSTODIANS TOKEN
 The custodians token begins each game on Mecatol Rex. The token represents the caretakers that safeguard the seat of the empire until such time as the galactic council can be reconvened.
 
 27.1 Units can move into the system that contains Mecatol Rex following normal rules; however, players cannot commit ground forces to land on Mecatol Rex until the custodians token is removed from the planet.
@@ -26,34 +26,34 @@ RELATED TOPICS: Agenda Phase, Influence, Victory Points
 ## Sub-Rules Analysis
 
 ### 27.1 Movement Restriction to Mecatol Rex
-**Status**: ❌ NOT IMPLEMENTED  
-**Implementation**: No custodians token system or Mecatol Rex landing restrictions  
-**Tests**: No tests for ground force landing restrictions  
-**Notes**: Core mechanic preventing ground force landing until token removal missing  
+**Status**: ❌ NOT IMPLEMENTED
+**Implementation**: No custodians token system or Mecatol Rex landing restrictions
+**Tests**: No tests for ground force landing restrictions
+**Notes**: Core mechanic preventing ground force landing until token removal missing
 
 ### 27.2 Token Removal via Influence Spending
-**Status**: ❌ NOT IMPLEMENTED  
-**Implementation**: No influence spending system for custodians token removal  
-**Tests**: No tests for influence spending or token removal  
-**Notes**: Requires 6 influence spending + mandatory ground force commitment  
+**Status**: ❌ NOT IMPLEMENTED
+**Implementation**: No influence spending system for custodians token removal
+**Tests**: No tests for influence spending or token removal
+**Notes**: Requires 6 influence spending + mandatory ground force commitment
 
 ### 27.2a Ground Force Commitment Requirement
-**Status**: ❌ NOT IMPLEMENTED  
-**Implementation**: No validation for ground force availability during token removal  
-**Tests**: No tests for ground force commitment validation  
-**Notes**: Must have available ground forces to remove token  
+**Status**: ❌ NOT IMPLEMENTED
+**Implementation**: No validation for ground force availability during token removal
+**Tests**: No tests for ground force commitment validation
+**Notes**: Must have available ground forces to remove token
 
 ### 27.3 Victory Point Award
-**Status**: ⚠️ PARTIAL  
-**Implementation**: Victory point system exists but not connected to custodians token  
-**Tests**: Victory point tests exist but not for custodians token  
-**Notes**: Basic VP system exists but needs custodians token integration  
+**Status**: ⚠️ PARTIAL
+**Implementation**: Victory point system exists but not connected to custodians token
+**Tests**: Victory point tests exist but not for custodians token
+**Notes**: Basic VP system exists but needs custodians token integration
 
 ### 27.4 Agenda Phase Activation
-**Status**: ❌ NOT IMPLEMENTED  
-**Implementation**: No agenda phase system or game round modification  
-**Tests**: No tests for agenda phase activation  
-**Notes**: Critical game state change - enables political gameplay  
+**Status**: ❌ NOT IMPLEMENTED
+**Implementation**: No agenda phase system or game round modification
+**Tests**: No tests for agenda phase activation
+**Notes**: Critical game state change - enables political gameplay
 
 ## Related Topics
 - **Agenda Phase** (Rule 8): Political voting system activated by token removal

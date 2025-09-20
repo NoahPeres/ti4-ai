@@ -28,7 +28,7 @@
 - **Implementation**: TileColor enum with GREEN, BLUE, RED values
 - **Test Coverage**: test_rule_88_1_tile_back_colors()
 
-### 88.2 Green-Backed Home Systems ✅ IMPLEMENTED  
+### 88.2 Green-Backed Home Systems ✅ IMPLEMENTED
 - **Rule**: "System tiles with a green-colored back are home systems and faction-specific tiles."
 - **Implementation**: Validation ensures GREEN tiles must be HOME_SYSTEM type
 - **Test Coverage**: test_rule_88_2_green_back_home_systems()

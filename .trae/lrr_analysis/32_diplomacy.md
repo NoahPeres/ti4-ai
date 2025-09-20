@@ -1,10 +1,10 @@
 # Rule 32: DIPLOMACY (STRATEGY CARD) - Analysis
 
 ## Category Overview
-**Rule Type:** Strategy Card Mechanic  
-**Priority:** MEDIUM  
-**Status:** PARTIALLY IMPLEMENTED  
-**Complexity:** Medium-High  
+**Rule Type:** Strategy Card Mechanic
+**Priority:** MEDIUM
+**Status:** PARTIALLY IMPLEMENTED
+**Complexity:** Medium-High
 
 ## Raw LRR Text
 ```
@@ -34,7 +34,7 @@ RELATED TOPICS: Active System, Command Tokens, Initiative Order, Planets, Readie
 - **Description:** System selection, command token placement, planet readying
 - **Gap:** No implementation of Diplomacy-specific primary ability logic
 
-### 32.3 Secondary Ability Resolution  
+### 32.3 Secondary Ability Resolution
 - **Status:** NOT IMPLEMENTED
 - **Description:** Other players spending command tokens to ready planets
 - **Gap:** No secondary ability system for strategy cards

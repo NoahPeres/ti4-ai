@@ -26,8 +26,8 @@ Influence represents a planet's political power. Players spend influence to gain
 ## Overall Implementation Status
 - **Current State**: Not Started/In Progress/Complete
 - **Estimated Effort**: Small/Medium/Large
-- **Dependencies**: 
-- **Blockers**: 
+- **Dependencies**:
+- **Blockers**:
 
 ## Notes
 - Rule 47 has only 3 sub-rules

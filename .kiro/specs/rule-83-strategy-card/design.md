@@ -56,19 +56,19 @@ A lightweight coordinator that manages card assignments and integrates with exis
 ```python
 class StrategyCardCoordinator:
     """Lightweight coordinator for strategy card system integration."""
-    
+
     def __init__(self, strategic_action_manager: StrategicActionManager):
         self._strategic_action_manager = strategic_action_manager
         self._card_assignments: Dict[str, StrategyCardType] = {}
         self._exhausted_cards: Set[StrategyCardType] = set()
-        
+
     # Card selection (integrates with game state)
     def assign_strategy_card(self, player_id: str, card: StrategyCardType) -> Result
     def get_available_cards(self) -> List[StrategyCardType]
-    
+
     # Initiative order (pure calculation, no state)
     def calculate_initiative_order(self, player_assignments: Dict[str, StrategyCardType]) -> List[str]
-    
+
     # Integration points
     def integrate_with_strategic_actions(self) -> None
 ```
@@ -81,10 +81,10 @@ Extend our existing Rule 82 implementation to work with the strategy card coordi
 # Existing StrategicActionManager gets minimal extensions
 class StrategicActionManager:
     # Existing methods remain unchanged
-    
+
     # NEW: Integration method
     def set_strategy_card_coordinator(self, coordinator: StrategyCardCoordinator) -> None
-    
+
     # ENHANCED: Use coordinator for card state
     def execute_strategic_action(self, player_id: str) -> StrategicActionResult:
         # Leverage coordinator for card validation and state management
@@ -98,10 +98,10 @@ Follow the pattern established by Rule 91 (Technology Strategy Card) for individ
 # Each strategy card follows the TechnologyStrategyCard pattern
 class LeadershipStrategyCard(BaseStrategyCard):
     """Follows exact pattern from TechnologyStrategyCard implementation."""
-    
+
 class DiplomacyStrategyCard(BaseStrategyCard):
     """Follows exact pattern from TechnologyStrategyCard implementation."""
-    
+
 # etc. for all 8 cards
 ```
 
@@ -165,7 +165,7 @@ class StrategyCardValidationError(GameValidationError):
     """Extends existing validation error hierarchy."""
     pass
 
-def validate_card_selection(player_id: str, card: StrategyCardType, 
+def validate_card_selection(player_id: str, card: StrategyCardType,
                           available_cards: Set[StrategyCardType]) -> ValidationResult:
     """Follows existing validation patterns."""
 ```

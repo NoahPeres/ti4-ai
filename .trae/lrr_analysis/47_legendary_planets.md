@@ -1,14 +1,14 @@
 # Rule 47: LEGENDARY PLANETS
 
 ## Category Overview
-**Rule Type**: Core Mechanics - Planet Special Abilities  
-**Complexity**: Medium  
-**Dependencies**: High (Planets, Control, Abilities, Exploration)  
+**Rule Type**: Core Mechanics - Planet Special Abilities
+**Complexity**: Medium
+**Dependencies**: High (Planets, Control, Abilities, Exploration)
 **Implementation Priority**: Medium
 
 ## Raw LRR Text
 ```
-53 LEGENDARY PLANETS	
+53 LEGENDARY PLANETS
 Legendary planets grant the player that controls them unique, planet-specific abilities.
 
 53.1 A legendary planet is indicated by the legendary planet icon.
@@ -33,9 +33,9 @@ RELATED TOPICS: Planets
 - **Priority**: Medium
 
 ### 53.2 - Legendary Planet Ability Cards
-- **Status**: ❌ Not Implemented  
+- **Status**: ❌ Not Implemented
 - **Description**: Gaining control grants corresponding ability card
-- **Implementation Need**: 
+- **Implementation Need**:
   - Legendary planet ability card system
   - Automatic card placement when gaining control
   - Readied/exhausted state tracking
@@ -44,7 +44,7 @@ RELATED TOPICS: Planets
 ### 53.3 - Using Legendary Planet Abilities
 - **Status**: ❌ Not Implemented
 - **Description**: Players can use abilities from cards in play area
-- **Implementation Need**: 
+- **Implementation Need**:
   - Ability activation system for legendary planets
   - Play area management for ability cards
 - **Priority**: High

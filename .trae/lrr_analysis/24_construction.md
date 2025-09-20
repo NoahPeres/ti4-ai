@@ -1,8 +1,8 @@
 # Rule 24: CONSTRUCTION (STRATEGY CARD)
 
 ## Category Overview
-**Priority**: High  
-**Implementation Status**: Partial  
+**Priority**: High
+**Implementation Status**: Partial
 **Core Concept**: Strategy card allowing players to construct PDS and space dock structures on planets they control
 
 ## Raw LRR Text
@@ -27,32 +27,32 @@ RELATED TOPICS: Initiative Order, Strategic Action, Strategy Card, Structures
 ## Sub-Rules Analysis
 
 ### 24.1 - Strategic Action Trigger
-**Status**: ⚠️ Partially Implemented  
-**Implementation**: Strategic action framework exists, but Construction-specific logic missing  
+**Status**: ⚠️ Partially Implemented
+**Implementation**: Strategic action framework exists, but Construction-specific logic missing
 **Details**: Can perform strategic actions but Construction card primary ability not implemented
 
 ### 24.2 - Primary Ability Resolution
-**Status**: ❌ Not Implemented  
-**Implementation**: No Construction primary ability implementation  
-**Details**: 
+**Status**: ❌ Not Implemented
+**Implementation**: No Construction primary ability implementation
+**Details**:
 - Structure placement (PDS or space dock) not implemented
 - Additional PDS placement not implemented
 - Same/different planet placement rules not enforced
 - System command token independence not implemented
 
 ### 24.3 - Secondary Ability Resolution
-**Status**: ❌ Not Implemented  
-**Implementation**: No Construction secondary ability implementation  
-**Details**: 
+**Status**: ❌ Not Implemented
+**Implementation**: No Construction secondary ability implementation
+**Details**:
 - Command token spending from strategy pool not implemented
 - Command token placement in systems not implemented
 - Token return to reinforcements logic missing
 - Structure placement in chosen system not implemented
 
 ### 24.4 - Structure Placement from Reinforcements
-**Status**: ⚠️ Partially Implemented  
-**Implementation**: Unit reinforcement system exists but Construction-specific rules missing  
-**Details**: 
+**Status**: ⚠️ Partially Implemented
+**Implementation**: Unit reinforcement system exists but Construction-specific rules missing
+**Details**:
 - Basic reinforcement system exists
 - Unit removal from non-command token systems not implemented for Construction
 - Immediate placement requirement not enforced

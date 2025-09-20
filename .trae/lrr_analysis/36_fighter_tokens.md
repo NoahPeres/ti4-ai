@@ -1,10 +1,10 @@
 # Rule 36: FIGHTER TOKENS - Analysis
 
 ## Category Overview
-**Rule Type:** Unit Management Mechanic  
-**Priority:** LOW-MEDIUM  
-**Status:** PARTIALLY IMPLEMENTED  
-**Complexity:** Low  
+**Rule Type:** Unit Management Mechanic
+**Priority:** LOW-MEDIUM
+**Status:** PARTIALLY IMPLEMENTED
+**Complexity:** Low
 
 ## Raw LRR Text
 ```

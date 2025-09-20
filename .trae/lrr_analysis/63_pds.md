@@ -1,13 +1,13 @@
 # Rule 63: PDS
 
 ## Category Overview
-**Rule Type**: Unit/Structure Mechanics  
-**Complexity**: Medium  
-**Dependencies**: Construction Strategy Card, Space Cannon, Structures  
+**Rule Type**: Unit/Structure Mechanics
+**Complexity**: Medium
+**Dependencies**: Construction Strategy Card, Space Cannon, Structures
 
 ## Raw LRR Text
 ```
-63 PDS	
+63 PDS
 A PDS (planetary defense system) is a structure that allows a player to defend their territory against invading forces.
 63.1  Each PDS has the "Space Cannon" ability.
 63.2 The primary way by which players acquire PDS units is by resolving either the primary or secondary ability of the "Construction" strategy card.
@@ -19,24 +19,24 @@ RELATED TOPICS: Structures, Space Cannon
 ## Sub-Rules Analysis
 
 ### 63.1 - Space Cannon Ability ✅ IMPLEMENTED
-**Status**: Fully implemented  
-**Implementation**: Unit stats system correctly assigns space cannon ability to PDS units  
-**Test Coverage**: Comprehensive tests verify PDS has space cannon ability  
+**Status**: Fully implemented
+**Implementation**: Unit stats system correctly assigns space cannon ability to PDS units
+**Test Coverage**: Comprehensive tests verify PDS has space cannon ability
 
 ### 63.2 - Acquisition via Construction ⚠️ PARTIALLY IMPLEMENTED
-**Status**: Basic structure placement exists, strategy card integration unclear  
-**Implementation**: Construction strategy card mentioned in LRR but implementation status unknown  
-**Test Coverage**: No specific tests for PDS acquisition through Construction strategy card  
+**Status**: Basic structure placement exists, strategy card integration unclear
+**Implementation**: Construction strategy card mentioned in LRR but implementation status unknown
+**Test Coverage**: No specific tests for PDS acquisition through Construction strategy card
 
 ### 63.3 - Placement and Limits ❌ NOT IMPLEMENTED
-**Status**: Not implemented  
-**Implementation**: No validation for maximum 2 PDS per planet  
-**Test Coverage**: No tests for PDS placement limits  
+**Status**: Not implemented
+**Implementation**: No validation for maximum 2 PDS per planet
+**Test Coverage**: No tests for PDS placement limits
 
 ### 63.4 - Destruction Conditions ❌ NOT IMPLEMENTED
-**Status**: Not implemented  
-**Implementation**: No logic for automatic PDS destruction when isolated  
-**Test Coverage**: No tests for PDS destruction scenarios  
+**Status**: Not implemented
+**Implementation**: No logic for automatic PDS destruction when isolated
+**Test Coverage**: No tests for PDS destruction scenarios
 
 ## Related Topics
 - **Structures**: PDS is a structure type with placement rules
@@ -93,6 +93,6 @@ RELATED TOPICS: Structures, Space Cannon
 5. **LOW**: Enhance test coverage for all PDS-specific mechanics
 
 ## Priority Assessment
-**Priority**: High  
-**Implementation Status**: 40%  
+**Priority**: High
+**Implementation Status**: 40%
 **Rationale**: PDS units have solid ability foundation but lack critical placement rules and destruction mechanics. These are fundamental to proper PDS gameplay and strategic balance.

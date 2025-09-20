@@ -60,7 +60,7 @@ The builder provides several preset scenarios for common testing needs:
 # Test Sol faction abilities
 game_state = GameScenarioBuilder.create_faction_specific_scenario("sol")
 
-# Test Xxcha faction abilities  
+# Test Xxcha faction abilities
 game_state = GameScenarioBuilder.create_faction_specific_scenario("xxcha")
 ```
 
@@ -172,7 +172,7 @@ GameScenarioBuilder().with_players(("player1", "sol"), ("player1", "xxcha")).bui
 def test_combat_detection():
     game_state = GameScenarioBuilder.create_combat_scenario()
     combat_system = game_state.systems["combat_system"]
-    
+
     detector = CombatDetector()
     assert detector.should_initiate_combat(combat_system) is True
 ```
@@ -181,7 +181,7 @@ def test_combat_detection():
 ```python
 def test_movement_validation():
     game_state = TestUtilities.create_game_with_adjacent_systems()
-    
+
     # Test movement between adjacent systems
     movement = MovementOperation(
         unit=game_state.systems["system_a"].space_units[0],
@@ -189,7 +189,7 @@ def test_movement_validation():
         to_system_id="system_b",
         player_id="player1"
     )
-    
+
     validator = MovementValidator(game_state.galaxy)
     assert validator.is_valid_movement(movement) is True
 ```
@@ -199,11 +199,11 @@ def test_movement_validation():
 def test_fleet_capacity_rules():
     game_state = TestUtilities.create_fleet_capacity_test_scenario()
     test_system = game_state.systems["test_system"]
-    
+
     fleet = Fleet(owner="player1", system_id="test_system")
     for unit in test_system.space_units:
         fleet.add_unit(unit)
-    
+
     validator = FleetCapacityValidator()
     assert validator.is_fleet_capacity_valid(fleet) is True
 ```

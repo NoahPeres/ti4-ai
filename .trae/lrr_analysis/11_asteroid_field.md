@@ -1,10 +1,10 @@
 # Rule 11: ASTEROID FIELD
 
 ## Category Overview
-**Rule Type**: Anomaly  
-**Complexity**: Low  
-**Dependencies**: Movement, Anomalies, System Tiles  
-**Implementation Status**: 🔴 Not Implemented  
+**Rule Type**: Anomaly
+**Complexity**: Low
+**Dependencies**: Movement, Anomalies, System Tiles
+**Implementation Status**: 🔴 Not Implemented
 
 An asteroid field is an anomaly that affects movement by completely blocking ship movement through or into the system. This is one of the four types of anomalies in TI4, identified by its distinctive art and red border.
 
@@ -13,9 +13,9 @@ An asteroid field is an anomaly that affects movement by completely blocking shi
 ### 11.1 Movement Restriction 🔴 HIGH PRIORITY
 **Raw LRR Text**: "A ship cannot move through or into an asteroid field."
 
-**Implementation Status**: 🔴 Not Implemented  
-**Current State**: `AnomalyRule` class exists but returns `True` for all movement checks  
-**Missing Elements**: 
+**Implementation Status**: 🔴 Not Implemented
+**Current State**: `AnomalyRule` class exists but returns `True` for all movement checks
+**Missing Elements**:
 - Asteroid field detection in systems
 - Movement blocking logic for asteroid fields
 - Integration with movement validation system
