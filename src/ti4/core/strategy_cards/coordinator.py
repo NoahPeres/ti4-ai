@@ -996,6 +996,19 @@ class StrategyCardCoordinator:
         """
         return self._card_assignments.copy()
 
+    def get_exhausted_cards(self) -> set["StrategyCardType"]:
+        """Get all exhausted strategy cards.
+
+        Returns:
+            Set of exhausted strategy cards
+        """
+        exhausted_cards = set()
+        for _player_id, card_states in self._player_card_states.items():
+            for card, is_readied in card_states.items():
+                if not is_readied:  # False = exhausted
+                    exhausted_cards.add(card)
+        return exhausted_cards
+
     def get_available_cards_for_ai(self) -> list[StrategyCardInformation]:
         """Get information about available cards for AI selection evaluation.
 

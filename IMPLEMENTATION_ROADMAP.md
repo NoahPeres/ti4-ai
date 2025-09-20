@@ -8,13 +8,14 @@
 **Focus**: Complete advanced mechanics that enable complex strategic gameplay and AI decision-making
 
 ## 📊 Progress
-**Overall Progress**: 25.9%
-**Completed Rules**: 26/101
+**Overall Progress**: 28.7%
+**Completed Rules**: 28/101
 - **Rule 6: ADJACENCY** - Core spatial mechanics for system relationships
 - **Rule 14: BLOCKADED** - Blockade mechanics for space docks and production restrictions (Foundation Layer) ✅ **COMPLETED**
 - **Rule 17: CAPTURE** - Unit capture mechanics and faction sheet management (Foundation Layer) ✅ **COMPLETED**
 - **Rule 18: COMBAT** - General combat mechanics with burst icon support (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 20: COMMAND TOKENS** - Resource management and reinforcement system (Foundation Layer)
+- **Rule 25: CONTROL** - Planet control mechanics with planet card management and control tokens (Core Game Layer) ✅ **COMPLETED**
 - **Rule 34: EXHAUSTED** - Card exhaustion mechanics for planets, technology, and strategy cards (Foundation Layer) ✅ **NEWLY COMPLETED**
 - **Rule 58: MOVEMENT** - Unit movement and fleet mechanics (Core Game Layer) ✅ **COMPLETED**
 - **Rule 60: NEIGHBORS** - Player neighbor determination for transactions
@@ -43,18 +44,19 @@
 **Recently Completed:**
 8. ✅ **Rule 88: SYSTEM TILES** - Tile classification and board mechanics (Core Game Layer) - **COMPLETE** (95% → 100%, 11/11 tests passing)
 9. ✅ **Rule 98: VICTORY POINTS** - Victory point tracking and win conditions (Victory & Objectives Layer) - **COMPLETE** (75% → 100%, comprehensive tie resolution and variant support)
+10. ✅ **Rule 25: CONTROL** - Planet control mechanics with planet card management and control tokens (Core Game Layer) - **COMPLETE** (0% → 100%, 12/12 tests passing)
 
 **Next Up:**
-10. **Rule [TBD]** - Next highest priority rule to be determined 🎯 **NEXT TARGET**
+11. **Rule [TBD]** - Next highest priority rule to be determined 🎯 **NEXT TARGET**
 
 ### 📈 Progress Metrics
 - Foundation Layer: 9 rules completed
-- Core Game Layer: 13/15 rules (86.7%)
+- Core Game Layer: 14/15 rules (93.3%)
 - Advanced Mechanics: 0/43 rules (0%)
 
 ### 📈 Current Metrics
-- **Tests**: 1053+ total tests, all passing (Rule 78: 17 tests, Rule 34: 15 tests, Rule 83: 50+ tests)
-- **Coverage**: 29.0% overall (focused on core mechanics)
+- **Tests**: 1065+ total tests, all passing (Rule 78: 17 tests, Rule 34: 15 tests, Rule 83: 50+ tests, Rule 25: 12 tests)
+- **Coverage**: 30.2% overall (focused on core mechanics)
 - **Quality**: Strict TDD, type checking, linting standards maintained
 
 ### 📈 Priority Analysis Summary
