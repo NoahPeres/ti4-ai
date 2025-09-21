@@ -212,3 +212,56 @@ The following test cases in `tests/test_rule_52_leadership.py` demonstrate compl
 - Influence conversion: ✅ Complete
 
 The Leadership strategy card is fully implemented with comprehensive test coverage. All aspects of Rule 52 are properly handled, including the 3-token base gain, influence conversion at 3:1 ratio, token pool choice, and the unique secondary ability that doesn't require command token spending. The implementation correctly integrates with the broader strategy card system and command token economy.
+
+## Implementation Approach: Strict Validation and Player Agency
+
+### Design Philosophy
+The Leadership strategy card implementation follows a **strict validation and player agency** approach, requiring explicit player choices and failing operations that cannot be completed as requested.
+
+### Key Implementation Principles
+
+1. **Explicit Planet Exhaustion**: Players must specify exactly which planets to exhaust via the `planets_to_exhaust` parameter. The system validates:
+   - All specified planets exist and are controlled by the player
+   - All specified planets are currently unexhausted
+   - The total influence from specified planets matches the intended spending amount
+   - No automatic planet selection or "graceful degradation" occurs
+
+2. **Strict Influence Validation**: The system performs exact influence calculations:
+   - Players must provide sufficient influence for their intended token gain
+   - Operations fail if insufficient influence is provided (no automatic capping)
+   - Trade goods can supplement influence at 1:1 ratio via `trade_goods_to_spend` parameter
+   - All influence spending must follow the exact 3:1 conversion ratio
+
+3. **Atomic Operations**: All abilities are strictly atomic:
+   - Either the entire operation succeeds exactly as requested, or it fails completely
+   - No partial execution or automatic adjustments
+   - Clear error messages indicate why operations failed
+
+4. **Player Agency**: The implementation respects player decision-making:
+   - Players choose exactly which planets to exhaust
+   - Players specify exact token distribution across pools
+   - Players can decline secondary ability participation
+   - No system-driven automatic choices or optimizations
+
+### Validation Requirements
+
+**Primary Ability (`execute_primary_ability`)**:
+- `planets_to_exhaust`: List of planet names to exhaust for influence
+- `trade_goods_to_spend`: Number of trade goods to convert to influence (optional)
+- `token_distribution`: Exact distribution of gained tokens across pools
+
+**Secondary Ability (`execute_secondary_ability`)**:
+- `participate`: Boolean indicating whether to participate (defaults to True)
+- `planets_to_exhaust`: List of planet names to exhaust for influence
+- `trade_goods_to_spend`: Number of trade goods to convert to influence (optional)
+- `token_distribution`: Exact distribution of gained tokens across pools
+
+### Error Handling
+The system provides clear, actionable error messages for:
+- Invalid planet choices (non-existent, not controlled, already exhausted)
+- Insufficient influence for requested token gain
+- Invalid token distribution (wrong totals, invalid pools)
+- Insufficient trade goods
+- Missing required parameters
+
+This approach ensures predictable behavior, respects player agency, and maintains strict adherence to game rules while providing clear feedback for invalid operations.

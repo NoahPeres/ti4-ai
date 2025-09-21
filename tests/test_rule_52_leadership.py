@@ -25,10 +25,12 @@ class TestRule52LeadershipStrategyCard:
 
         # Mock planets for influence spending
         self.mock_planet1 = Mock()
+        self.mock_planet1.name = "planet1"
         self.mock_planet1.influence = 3
         self.mock_planet1.is_exhausted.return_value = False
 
         self.mock_planet2 = Mock()
+        self.mock_planet2.name = "planet2"
         self.mock_planet2.influence = 2
         self.mock_planet2.is_exhausted.return_value = False
 
@@ -47,8 +49,19 @@ class TestRule52LeadershipStrategyCard:
         if planets is None:
             planets = [self.mock_planet1, self.mock_planet2]
 
+        # Ensure planets have names if they don't already
+        for i, planet in enumerate(planets):
+            if not hasattr(planet, "name") or planet.name is None:
+                planet.name = f"planet{i}"
+
         # Mock the game state's get_player_planets method to return these planets
-        self.mock_game_state.get_player_planets.return_value = planets
+        # Use side_effect to ensure it returns the actual list, not a Mock
+        self.mock_game_state.get_player_planets.side_effect = lambda player_id: planets
+
+        # Mock the galaxy structure for planet exhaustion
+        mock_system = Mock()
+        mock_system.planets = planets
+        self.mock_game_state.galaxy.system_objects.values.return_value = [mock_system]
 
     def test_leadership_card_basic_properties(self) -> None:
         """Test basic Leadership card properties.
@@ -81,6 +94,7 @@ class TestRule52LeadershipStrategyCard:
                 "fleet": 1,
                 "strategy": 0,
             },  # Player choice
+            planets_to_exhaust=[],  # No influence spending
         )
 
         # Assert
@@ -101,7 +115,7 @@ class TestRule52LeadershipStrategyCard:
         test_player = self._create_test_player()
         self._setup_player_planets(test_player)
 
-        # Act - spend 6 influence (should get 2 additional tokens)
+        # Act - spend 5 influence by exhausting both planets
         result = self.leadership_card.execute_primary_ability(
             "test_player",
             game_state=self.mock_game_state,
@@ -109,24 +123,27 @@ class TestRule52LeadershipStrategyCard:
             token_distribution={
                 "tactic": 3,
                 "fleet": 1,
-                "strategy": 1,
-            },  # 3 base + 2 from influence
-            influence_to_spend=6,
+                "strategy": 0,
+            },  # 3 base + 1 from influence = 4 total
+            planets_to_exhaust=[
+                "planet1",
+                "planet2",
+            ],  # 3 + 2 = 5 influence, gets 1 token
         )
 
         # Assert
         assert result.success is True
-        # Should gain 3 base + 2 from influence = 5 total tokens
+        # Should gain 3 base + 1 from influence = 4 total tokens (5 influence // 3 = 1 token)
         total_tokens_gained = (
             test_player.command_sheet.tactic_pool
             + test_player.command_sheet.fleet_pool
             + test_player.command_sheet.strategy_pool
         )
-        assert total_tokens_gained == 5
+        assert total_tokens_gained == 4
 
         # Planets should be exhausted for influence spent
         assert self.mock_planet1.exhaust.called is True  # 3 influence
-        assert self.mock_planet2.exhaust.called is True  # 2 influence (partial)
+        assert self.mock_planet2.exhaust.called is True  # 2 influence
 
     def test_primary_ability_partial_influence_spending(self) -> None:
         """Test Rule 52.2: Can spend partial influence amounts.
@@ -137,7 +154,7 @@ class TestRule52LeadershipStrategyCard:
         test_player = self._create_test_player()
         self._setup_player_planets(test_player)
 
-        # Act - spend only 3 influence (should get 1 additional token)
+        # Act - spend only 3 influence by exhausting one planet
         result = self.leadership_card.execute_primary_ability(
             "test_player",
             game_state=self.mock_game_state,
@@ -147,7 +164,7 @@ class TestRule52LeadershipStrategyCard:
                 "fleet": 0,
                 "strategy": 0,
             },  # 3 base + 1 from influence
-            influence_to_spend=3,
+            planets_to_exhaust=["planet1"],  # 3 influence, gets 1 token
         )
 
         # Assert
@@ -165,7 +182,7 @@ class TestRule52LeadershipStrategyCard:
         test_player = self._create_test_player()
         self._setup_player_planets(test_player)
 
-        # Act - spend no influence
+        # Act - spend no influence by not exhausting any planets
         result = self.leadership_card.execute_primary_ability(
             "test_player",
             game_state=self.mock_game_state,
@@ -175,7 +192,7 @@ class TestRule52LeadershipStrategyCard:
                 "fleet": 0,
                 "strategy": 0,
             },  # Only 3 base tokens
-            influence_to_spend=0,
+            planets_to_exhaust=[],  # No planets exhausted
         )
 
         # Assert
@@ -202,6 +219,7 @@ class TestRule52LeadershipStrategyCard:
             game_state=self.mock_game_state,
             player=test_player,
             token_distribution={"tactic": 2, "fleet": 0, "strategy": 0},
+            planets_to_exhaust=[],  # No influence spending
         )
 
         # Assert
@@ -219,19 +237,22 @@ class TestRule52LeadershipStrategyCard:
         other_player = self._create_test_player("other_player")
         self._setup_player_planets(other_player)
 
-        # Act - spend 6 influence for 2 tokens
+        # Act - spend 5 influence by exhausting both planets (gets 1 token)
         result = self.leadership_card.execute_secondary_ability(
             "other_player",
             game_state=self.mock_game_state,
             player=other_player,
-            token_distribution={"tactic": 1, "fleet": 1, "strategy": 0},
-            influence_to_spend=6,
+            token_distribution={"tactic": 1, "fleet": 0, "strategy": 0},
+            planets_to_exhaust=[
+                "planet1",
+                "planet2",
+            ],  # 3 + 2 = 5 influence, gets 1 token
         )
 
         # Assert
         assert result.success is True
         assert other_player.command_sheet.tactic_pool == 1
-        assert other_player.command_sheet.fleet_pool == 1
+        assert other_player.command_sheet.fleet_pool == 0
         assert other_player.command_sheet.strategy_pool == 0
 
     def test_secondary_ability_no_command_token_cost(self) -> None:
@@ -252,7 +273,7 @@ class TestRule52LeadershipStrategyCard:
             game_state=self.mock_game_state,
             player=other_player,
             token_distribution={"tactic": 1, "fleet": 0, "strategy": 0},
-            influence_to_spend=3,
+            planets_to_exhaust=["planet1"],  # 3 influence, gets 1 token
         )
 
         # Assert
@@ -300,6 +321,7 @@ class TestRule52LeadershipStrategyCard:
             game_state=self.mock_game_state,
             player=test_player,
             token_distribution={"tactic": 1, "fleet": 1, "strategy": 1},
+            planets_to_exhaust=[],  # No influence spent, just base tokens
         )
 
         # Assert
@@ -329,11 +351,15 @@ class TestRule52LeadershipStrategyCard:
             # Create enough planets to provide the influence
             planets = []
             remaining_influence = influence_spent
+            planet_names = []
             while remaining_influence > 0:
                 planet = Mock()
+                planet_name = f"planet{len(planets)}"
+                planet.name = planet_name
                 planet.influence = min(remaining_influence, 5)  # Max 5 per planet
                 planet.is_exhausted.return_value = False
                 planets.append(planet)
+                planet_names.append(planet_name)
                 remaining_influence -= planet.influence
 
             # Create test player with these planets
@@ -350,7 +376,7 @@ class TestRule52LeadershipStrategyCard:
                     "fleet": 0,
                     "strategy": 0,
                 },
-                influence_to_spend=influence_spent,
+                planets_to_exhaust=planet_names if influence_spent > 0 else [],
             )
 
             # Assert
@@ -379,7 +405,176 @@ class TestRule52LeadershipStrategyCard:
                 game_state=self.mock_game_state,
                 player=test_player,
                 token_distribution={"tactic": 3, "fleet": 0, "strategy": 0},
+                planets_to_exhaust=[],  # No influence spent, just base tokens
             )
 
             assert result.success is True
             assert result.player_id == "test_player"
+
+    def test_token_distribution_validation_errors(self) -> None:
+        """Test various token distribution validation errors."""
+        test_player = self._create_test_player()
+        self._setup_player_planets(test_player)
+
+        # Test invalid pool name
+        result = self.leadership_card.execute_primary_ability(
+            "test_player",
+            game_state=self.mock_game_state,
+            player=test_player,
+            token_distribution={"invalid_pool": 3},
+            planets_to_exhaust=[],
+        )
+        assert result.success is False
+        assert "Invalid token_distribution" in result.error_message
+
+        # Test negative count
+        result = self.leadership_card.execute_primary_ability(
+            "test_player",
+            game_state=self.mock_game_state,
+            player=test_player,
+            token_distribution={"tactic": -1, "fleet": 4},
+            planets_to_exhaust=[],
+        )
+        assert result.success is False
+        assert "Invalid token_distribution" in result.error_message
+
+        # Test insufficient allocation
+        result = self.leadership_card.execute_primary_ability(
+            "test_player",
+            game_state=self.mock_game_state,
+            player=test_player,
+            token_distribution={"tactic": 2},  # Only allocates 2 but needs 3 base
+            planets_to_exhaust=[],
+        )
+        assert result.success is False
+        assert "must allocate at least" in result.error_message
+
+    def test_primary_ability_invalid_planet_choices(self) -> None:
+        """Test primary ability with invalid planet choices for strict validation."""
+        test_player = self._create_test_player()
+        self._setup_player_planets(test_player)
+
+        # Test exhausting non-existent planet
+        result = self.leadership_card.execute_primary_ability(
+            "test_player",
+            game_state=self.mock_game_state,
+            player=test_player,
+            token_distribution={"tactic": 4, "fleet": 0, "strategy": 0},
+            planets_to_exhaust=["nonexistent_planet"],
+        )
+        assert result.success is False
+        assert (
+            "Player does not control planet 'nonexistent_planet'"
+            in result.error_message
+        )
+
+        # Test exhausting already exhausted planet
+        self.mock_planet1.is_exhausted.return_value = True
+        result = self.leadership_card.execute_primary_ability(
+            "test_player",
+            game_state=self.mock_game_state,
+            player=test_player,
+            token_distribution={"tactic": 4, "fleet": 0, "strategy": 0},
+            planets_to_exhaust=["planet1"],
+        )
+        assert result.success is False
+        assert "Planet 'planet1' is already exhausted" in result.error_message
+
+    def test_primary_ability_insufficient_influence_strict(self) -> None:
+        """Test primary ability fails when requested tokens exceed available influence."""
+        test_player = self._create_test_player()
+        self._setup_player_planets(test_player)
+
+        # Try to get 5 tokens (3 base + 2 from influence) but only exhaust 1 planet (3 influence = 1 token)
+        result = self.leadership_card.execute_primary_ability(
+            "test_player",
+            game_state=self.mock_game_state,
+            player=test_player,
+            token_distribution={
+                "tactic": 5,
+                "fleet": 0,
+                "strategy": 0,
+            },  # Request 5 tokens
+            planets_to_exhaust=["planet1"],  # Only provides 3 influence = 1 token
+        )
+        assert result.success is False
+        assert "Insufficient influence" in result.error_message
+
+    def test_secondary_ability_invalid_planet_choices(self) -> None:
+        """Test secondary ability with invalid planet choices for strict validation."""
+        other_player = self._create_test_player("other_player")
+        self._setup_player_planets(other_player)
+
+        # Test exhausting non-existent planet
+        result = self.leadership_card.execute_secondary_ability(
+            "other_player",
+            game_state=self.mock_game_state,
+            player=other_player,
+            token_distribution={"tactic": 1, "fleet": 0, "strategy": 0},
+            planets_to_exhaust=["nonexistent_planet"],
+        )
+        assert result.success is False
+        assert (
+            "Player does not control planet 'nonexistent_planet'"
+            in result.error_message
+        )
+
+    def test_secondary_ability_insufficient_influence_strict(self) -> None:
+        """Test secondary ability fails when requested tokens exceed available influence."""
+        other_player = self._create_test_player("other_player")
+        self._setup_player_planets(other_player)
+
+        # Try to get 2 tokens but only exhaust 1 planet (3 influence = 1 token)
+        result = self.leadership_card.execute_secondary_ability(
+            "other_player",
+            game_state=self.mock_game_state,
+            player=other_player,
+            token_distribution={
+                "tactic": 2,
+                "fleet": 0,
+                "strategy": 0,
+            },  # Request 2 tokens
+            planets_to_exhaust=["planet1"],  # Only provides 3 influence = 1 token
+        )
+        assert result.success is False
+        assert "Insufficient influence" in result.error_message
+
+    def test_primary_ability_with_trade_goods(self) -> None:
+        """Test primary ability using trade goods for additional influence."""
+        test_player = self._create_test_player()
+        self._setup_player_planets(test_player)
+        test_player.command_sheet.gain_trade_goods(5)  # Give player 5 trade goods
+
+        # Use 1 planet (3 influence) + 3 trade goods = 6 influence total = 2 tokens
+        result = self.leadership_card.execute_primary_ability(
+            "test_player",
+            game_state=self.mock_game_state,
+            player=test_player,
+            token_distribution={
+                "tactic": 5,
+                "fleet": 0,
+                "strategy": 0,
+            },  # 3 base + 2 from influence
+            planets_to_exhaust=["planet1"],
+            trade_goods_to_spend=3,
+        )
+        assert result.success is True
+        assert test_player.command_sheet.tactic_pool == 5
+        assert test_player.get_trade_goods() == 2  # 5 - 3 = 2 remaining
+
+    def test_primary_ability_insufficient_trade_goods(self) -> None:
+        """Test primary ability fails when player doesn't have enough trade goods."""
+        test_player = self._create_test_player()
+        self._setup_player_planets(test_player)
+        test_player.command_sheet.gain_trade_goods(2)  # Only 2 trade goods
+
+        result = self.leadership_card.execute_primary_ability(
+            "test_player",
+            game_state=self.mock_game_state,
+            player=test_player,
+            token_distribution={"tactic": 5, "fleet": 0, "strategy": 0},
+            planets_to_exhaust=["planet1"],
+            trade_goods_to_spend=3,  # Try to spend 3 but only have 2
+        )
+        assert result.success is False
+        assert "Insufficient trade goods" in result.error_message

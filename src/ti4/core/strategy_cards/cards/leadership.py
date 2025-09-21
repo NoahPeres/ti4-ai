@@ -3,7 +3,7 @@
 This module implements the Leadership strategy card following the
 BaseStrategyCard pattern established for all strategy cards.
 
-LRR Reference: Rule 83 - STRATEGY CARD (Leadership)
+LRR Reference: Rule 52 - STRATEGY CARD (Leadership)
 """
 
 from typing import TYPE_CHECKING, Any, Optional
@@ -16,10 +16,12 @@ if TYPE_CHECKING:
 
 
 class LeadershipStrategyCard(BaseStrategyCard):
-    """Implementation of the Leadership strategy card.
+    """Leadership Strategy Card implementation.
 
-    LRR Reference: Rule 83 - The "Leadership" strategy card.
-    This card's initiative value is "1."
+    LRR Reference: Rule 52 - The "Leadership" strategy card.
+
+    This card allows the active player to gain command tokens and spend influence
+    for additional tokens. Other players can participate by spending influence.
     """
 
     def __init__(self) -> None:
@@ -40,7 +42,7 @@ class LeadershipStrategyCard(BaseStrategyCard):
         Returns:
             The initiative value (1)
 
-        LRR Reference: Rule 83 - Leadership has initiative value "1"
+        LRR Reference: Rule 52 - Leadership has initiative value "1"
         """
         return 1
 
@@ -59,7 +61,7 @@ class LeadershipStrategyCard(BaseStrategyCard):
         Args:
             player_id: The active player executing the primary ability
             game_state: Optional game state for full integration
-            **kwargs: Additional parameters (player, token_distribution, influence_to_spend)
+            **kwargs: Additional parameters (player, token_distribution, planets_to_exhaust, trade_goods_to_spend)
 
         Returns:
             Result of the primary ability execution
@@ -67,7 +69,8 @@ class LeadershipStrategyCard(BaseStrategyCard):
         # Extract required parameters
         player = kwargs.get("player")
         token_distribution = kwargs.get("token_distribution", {})
-        influence_to_spend = kwargs.get("influence_to_spend", 0)
+        planets_to_exhaust = kwargs.get("planets_to_exhaust", [])
+        trade_goods_to_spend = kwargs.get("trade_goods_to_spend", 0)
 
         if player is None:
             return StrategyCardAbilityResult(
@@ -80,63 +83,105 @@ class LeadershipStrategyCard(BaseStrategyCard):
             # Rule 52.2: Gain 3 base command tokens
             base_tokens = 3
 
-            # Calculate additional tokens from influence (3:1 ratio)
-            additional_tokens = influence_to_spend // 3
-            total_tokens = base_tokens + additional_tokens
+            # Validate planet exhaustion choices and calculate influence
+            total_influence = 0
+            if planets_to_exhaust and game_state:
+                validation_result = self._validate_planet_exhaustion(
+                    player, planets_to_exhaust, game_state
+                )
+                if not validation_result["valid"]:
+                    return StrategyCardAbilityResult(
+                        success=False,
+                        player_id=player_id,
+                        error_message=validation_result["error"],
+                    )
+                total_influence = validation_result["total_influence"]
 
-            # Validate we have enough reinforcements
-            if player.reinforcements < total_tokens:
-                # Rule 20.3a: Cannot gain tokens if none available in reinforcements
-                total_tokens = player.reinforcements
+            # Add trade goods to influence total (1 trade good = 1 influence)
+            trade_goods_to_spend = max(0, int(trade_goods_to_spend))
+            if trade_goods_to_spend > player.get_trade_goods():
+                return StrategyCardAbilityResult(
+                    success=False,
+                    player_id=player_id,
+                    error_message=f"Insufficient trade goods: cannot spend {trade_goods_to_spend}, player only has {player.get_trade_goods()}",
+                )
 
-            # Distribute tokens to pools as specified
+            total_influence += trade_goods_to_spend
+
+            # Calculate tokens: 3 base + 1 per 3 influence spent
+            max_base_tokens = min(base_tokens, player.reinforcements)
+            additional_tokens = total_influence // 3
+
+            # Check reinforcement limits
+            total_tokens_needed = max_base_tokens + additional_tokens
+            if total_tokens_needed > player.reinforcements:
+                return StrategyCardAbilityResult(
+                    success=False,
+                    player_id=player_id,
+                    error_message=f"Cannot gain {total_tokens_needed} tokens, player only has {player.reinforcements} reinforcements",
+                )
+
+            # Exhaust planets and spend trade goods (atomicity)
+            if planets_to_exhaust and game_state:
+                self._exhaust_planets(planets_to_exhaust, game_state)
+
+            if trade_goods_to_spend > 0:
+                player.command_sheet.spend_trade_goods(trade_goods_to_spend)
+
+            # Validate token_distribution
+            valid_pools = {"tactic", "fleet", "strategy"}
+            if any(
+                (k not in valid_pools) or (int(v) < 0)
+                for k, v in token_distribution.items()
+            ):
+                return StrategyCardAbilityResult(
+                    success=False,
+                    player_id=player_id,
+                    error_message="Invalid token_distribution; allowed keys: tactic, fleet, strategy; counts must be >= 0.",
+                )
+
+            # Check if player is requesting more tokens than they can get
+            requested_tokens = sum(int(v) for v in token_distribution.values())
+            if requested_tokens > total_tokens_needed:
+                return StrategyCardAbilityResult(
+                    success=False,
+                    player_id=player_id,
+                    error_message=f"Insufficient influence: requested {requested_tokens} tokens but can only gain {total_tokens_needed} tokens (3 base + {additional_tokens} from influence)",
+                )
+
+            if requested_tokens < total_tokens_needed:
+                return StrategyCardAbilityResult(
+                    success=False,
+                    player_id=player_id,
+                    error_message=f"token_distribution must allocate at least {total_tokens_needed} tokens.",
+                )
+
+            # Distribute tokens using Player.gain_command_token
             tokens_distributed = 0
             for pool_name, count in token_distribution.items():
-                if tokens_distributed + count > total_tokens:
-                    count = total_tokens - tokens_distributed
-
-                if count > 0:
-                    if pool_name == "tactic":
-                        object.__setattr__(
-                            player.command_sheet,
-                            "tactic_pool",
-                            player.command_sheet.tactic_pool + count,
+                for _ in range(
+                    min(int(count), total_tokens_needed - tokens_distributed)
+                ):
+                    success = player.gain_command_token(pool_name)
+                    if not success:
+                        return StrategyCardAbilityResult(
+                            success=False,
+                            player_id=player_id,
+                            error_message="Reinforcement limit reached while placing tokens.",
                         )
-                    elif pool_name == "fleet":
-                        object.__setattr__(
-                            player.command_sheet,
-                            "fleet_pool",
-                            player.command_sheet.fleet_pool + count,
-                        )
-                    elif pool_name == "strategy":
-                        object.__setattr__(
-                            player.command_sheet,
-                            "strategy_pool",
-                            player.command_sheet.strategy_pool + count,
-                        )
-
-                    tokens_distributed += count
-
-                if tokens_distributed >= total_tokens:
-                    break
-
-            # Update reinforcements
-            object.__setattr__(
-                player, "reinforcements", player.reinforcements - tokens_distributed
-            )
-
-            # Handle influence spending if any
-            if influence_to_spend > 0 and game_state:
-                self._spend_influence(player, influence_to_spend, game_state)
+                    tokens_distributed += 1
+                    if tokens_distributed >= total_tokens_needed:
+                        break
 
             return StrategyCardAbilityResult(
                 success=True,
                 player_id=player_id,
                 additional_data={
-                    "base_tokens_gained": base_tokens,
+                    "base_tokens_gained": max_base_tokens,
                     "influence_tokens_gained": additional_tokens,
                     "total_tokens_gained": tokens_distributed,
-                    "influence_spent": influence_to_spend,
+                    "influence_spent": total_influence,
+                    "trade_goods_spent": trade_goods_to_spend,
                 },
             )
 
@@ -162,7 +207,7 @@ class LeadershipStrategyCard(BaseStrategyCard):
         Args:
             player_id: The player executing the secondary ability
             game_state: Optional game state for full integration
-            **kwargs: Additional parameters (player, token_distribution, influence_to_spend, participate)
+            **kwargs: Additional parameters (player, token_distribution, planets_to_exhaust, trade_goods_to_spend, participate)
 
         Returns:
             Result of the secondary ability execution
@@ -179,7 +224,8 @@ class LeadershipStrategyCard(BaseStrategyCard):
         # Extract required parameters
         player = kwargs.get("player")
         token_distribution = kwargs.get("token_distribution", {})
-        influence_to_spend = kwargs.get("influence_to_spend", 0)
+        planets_to_exhaust = kwargs.get("planets_to_exhaust", [])
+        trade_goods_to_spend = kwargs.get("trade_goods_to_spend", 0)
 
         if player is None:
             return StrategyCardAbilityResult(
@@ -192,61 +238,101 @@ class LeadershipStrategyCard(BaseStrategyCard):
             # Rule 52.3: Only influence conversion, no base tokens
             # Rule 20.5a: Leadership secondary ability doesn't cost command token
 
-            # Calculate tokens from influence (3:1 ratio)
-            tokens_from_influence = influence_to_spend // 3
+            # Validate planet exhaustion choices and calculate influence
+            total_influence = 0
+            if planets_to_exhaust and game_state:
+                validation_result = self._validate_planet_exhaustion(
+                    player, planets_to_exhaust, game_state
+                )
+                if not validation_result["valid"]:
+                    return StrategyCardAbilityResult(
+                        success=False,
+                        player_id=player_id,
+                        error_message=validation_result["error"],
+                    )
+                total_influence = validation_result["total_influence"]
 
-            # Validate we have enough reinforcements
-            if player.reinforcements < tokens_from_influence:
-                # Rule 20.3a: Cannot gain tokens if none available in reinforcements
-                tokens_from_influence = player.reinforcements
-
-            # Distribute tokens to pools as specified
-            tokens_distributed = 0
-            for pool_name, count in token_distribution.items():
-                if tokens_distributed + count > tokens_from_influence:
-                    count = tokens_from_influence - tokens_distributed
-
-                if count > 0:
-                    if pool_name == "tactic":
-                        object.__setattr__(
-                            player.command_sheet,
-                            "tactic_pool",
-                            player.command_sheet.tactic_pool + count,
-                        )
-                    elif pool_name == "fleet":
-                        object.__setattr__(
-                            player.command_sheet,
-                            "fleet_pool",
-                            player.command_sheet.fleet_pool + count,
-                        )
-                    elif pool_name == "strategy":
-                        object.__setattr__(
-                            player.command_sheet,
-                            "strategy_pool",
-                            player.command_sheet.strategy_pool + count,
-                        )
-
-                    tokens_distributed += count
-
-                if tokens_distributed >= tokens_from_influence:
-                    break
-
-            # Update reinforcements
-            if tokens_distributed > 0:
-                object.__setattr__(
-                    player, "reinforcements", player.reinforcements - tokens_distributed
+            # Add trade goods to influence total (1 trade good = 1 influence)
+            trade_goods_to_spend = max(0, int(trade_goods_to_spend))
+            if trade_goods_to_spend > player.get_trade_goods():
+                return StrategyCardAbilityResult(
+                    success=False,
+                    player_id=player_id,
+                    error_message=f"Insufficient trade goods: cannot spend {trade_goods_to_spend}, player only has {player.get_trade_goods()}",
                 )
 
-            # Handle influence spending if any
-            if influence_to_spend > 0 and game_state:
-                self._spend_influence(player, influence_to_spend, game_state)
+            total_influence += trade_goods_to_spend
+
+            # Calculate tokens from influence (1 per 3 influence)
+            tokens_from_influence = total_influence // 3
+
+            # Check reinforcement limits
+            if tokens_from_influence > player.reinforcements:
+                return StrategyCardAbilityResult(
+                    success=False,
+                    player_id=player_id,
+                    error_message=f"Cannot gain {tokens_from_influence} tokens, player only has {player.reinforcements} reinforcements",
+                )
+
+            # Exhaust planets and spend trade goods (atomicity)
+            if planets_to_exhaust and game_state:
+                self._exhaust_planets(planets_to_exhaust, game_state)
+
+            if trade_goods_to_spend > 0:
+                player.command_sheet.spend_trade_goods(trade_goods_to_spend)
+
+            # Validate token_distribution
+            valid_pools = {"tactic", "fleet", "strategy"}
+            if any(
+                (k not in valid_pools) or (int(v) < 0)
+                for k, v in token_distribution.items()
+            ):
+                return StrategyCardAbilityResult(
+                    success=False,
+                    player_id=player_id,
+                    error_message="Invalid token_distribution; allowed keys: tactic, fleet, strategy; counts must be >= 0.",
+                )
+
+            # Check if player is requesting more tokens than they can get
+            requested_tokens = sum(int(v) for v in token_distribution.values())
+            if requested_tokens > tokens_from_influence:
+                return StrategyCardAbilityResult(
+                    success=False,
+                    player_id=player_id,
+                    error_message=f"Insufficient influence: requested {requested_tokens} tokens but can only gain {tokens_from_influence} tokens from influence",
+                )
+
+            if requested_tokens < tokens_from_influence:
+                return StrategyCardAbilityResult(
+                    success=False,
+                    player_id=player_id,
+                    error_message=f"token_distribution must allocate at least {tokens_from_influence} tokens.",
+                )
+
+            # Distribute tokens using Player.gain_command_token
+            tokens_distributed = 0
+            for pool_name, count in token_distribution.items():
+                for _ in range(
+                    min(int(count), tokens_from_influence - tokens_distributed)
+                ):
+                    success = player.gain_command_token(pool_name)
+                    if not success:
+                        return StrategyCardAbilityResult(
+                            success=False,
+                            player_id=player_id,
+                            error_message="Reinforcement limit reached while placing tokens.",
+                        )
+                    tokens_distributed += 1
+                    if tokens_distributed >= tokens_from_influence:
+                        break
 
             return StrategyCardAbilityResult(
                 success=True,
                 player_id=player_id,
                 additional_data={
                     "tokens_gained": tokens_distributed,
-                    "influence_spent": influence_to_spend,
+                    "influence_spent": total_influence,
+                    "trade_goods_spent": trade_goods_to_spend,
                     "participated": True,
                 },
             )
@@ -258,28 +344,71 @@ class LeadershipStrategyCard(BaseStrategyCard):
                 error_message=f"Error executing Leadership secondary ability: {str(e)}",
             )
 
-    def _spend_influence(
-        self, player: Any, influence_to_spend: int, game_state: "GameState"
-    ) -> None:
-        """Helper method to spend influence by exhausting planets.
+    def _validate_planet_exhaustion(
+        self, player: Any, planets_to_exhaust: list[str], game_state: "GameState"
+    ) -> dict[str, Any]:
+        """Validate that the player can exhaust the specified planets for influence.
 
         Args:
-            player: The player spending influence
-            influence_to_spend: Amount of influence to spend
+            player: The player attempting to exhaust planets
+            planets_to_exhaust: List of planet names to exhaust
             game_state: Game state to get player's planets
+
+        Returns:
+            dict with 'valid' (bool), 'total_influence' (int), and 'error' (str) keys
         """
-        if influence_to_spend <= 0:
-            return
+        if not planets_to_exhaust:
+            return {"valid": True, "total_influence": 0, "error": ""}
 
         # Get player's controlled planets from game state
-        controlled_planets = game_state.get_player_planets(player.id)
+        controlled_planets = {
+            p.name: p for p in game_state.get_player_planets(player.id)
+        }
 
-        remaining_influence = influence_to_spend
-        for planet in controlled_planets:
-            if remaining_influence <= 0:
-                break
+        total_influence = 0
+        for planet_name in planets_to_exhaust:
+            if planet_name not in controlled_planets:
+                return {
+                    "valid": False,
+                    "total_influence": 0,
+                    "error": f"Player does not control planet '{planet_name}'",
+                }
 
-            if not planet.is_exhausted() and planet.influence > 0:
-                # Exhaust this planet
-                planet.exhaust()
-                remaining_influence -= planet.influence
+            planet = controlled_planets[planet_name]
+            if planet.is_exhausted():
+                return {
+                    "valid": False,
+                    "total_influence": 0,
+                    "error": f"Planet '{planet_name}' is already exhausted",
+                }
+
+            if not hasattr(planet, "influence") or planet.influence <= 0:
+                return {
+                    "valid": False,
+                    "total_influence": 0,
+                    "error": f"Planet '{planet_name}' has no influence value",
+                }
+
+            total_influence += int(planet.influence)
+
+        return {"valid": True, "total_influence": total_influence, "error": ""}
+
+    def _exhaust_planets(
+        self, planets_to_exhaust: list[str], game_state: "GameState"
+    ) -> None:
+        """Exhaust the specified planets.
+
+        Args:
+            planets_to_exhaust: List of planet names to exhaust
+            game_state: Game state to get planets
+        """
+        if game_state.galaxy is None:
+            return
+
+        for planet_name in planets_to_exhaust:
+            # Find the planet in the game state and exhaust it
+            for system in game_state.galaxy.system_objects.values():
+                for planet in system.planets:
+                    if planet.name == planet_name:
+                        planet.exhaust()
+                        break
