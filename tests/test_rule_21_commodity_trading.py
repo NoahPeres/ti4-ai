@@ -1,5 +1,7 @@
 """Tests for Rule 21.5-21.6: Commodity trading and conversion mechanics."""
 
+import pytest
+
 from src.ti4.core.constants import Faction
 from src.ti4.core.player import Player
 
@@ -99,6 +101,21 @@ class TestRule21CommodityTrading:
         assert player.get_commodities() == 2
         assert player.get_trade_goods() == 2
 
+    def test_convert_commodities_invalid_amounts(self) -> None:
+        """Test that convert_commodities_to_trade_goods rejects negative amounts."""
+        player = Player("Player1", Faction.SOL)
+        player.add_commodities(2)
+
+        # Test negative amounts
+        with pytest.raises(ValueError, match="Cannot convert negative commodities"):
+            player.convert_commodities_to_trade_goods(-1)
+
+        # Test converting more than owned
+        with pytest.raises(
+            ValueError, match="Player only has 2 commodities, cannot convert 3"
+        ):
+            player.convert_commodities_to_trade_goods(3)
+
     def test_any_commodity_gift_converts_to_trade_good(self) -> None:
         """Test that any commodity given to another player converts to trade good.
 
@@ -117,3 +134,14 @@ class TestRule21CommodityTrading:
         # The commodity becomes a trade good for the receiver
         assert player2.get_trade_goods() == 1
         assert player2.get_commodities() == 0  # Not a commodity anymore
+
+    def test_cannot_give_more_commodities_than_owned(self) -> None:
+        """Test that players cannot give more commodities than they own."""
+        player1 = Player("Player1", Faction.SOL)
+        player2 = Player("Player2", Faction.HACAN)
+        player1.add_commodities(1)
+
+        with pytest.raises(
+            ValueError, match="Player only has 1 commodities, cannot give 2"
+        ):
+            player1.give_commodities_to_player(player2, 2)

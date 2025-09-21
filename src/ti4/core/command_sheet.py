@@ -90,7 +90,7 @@ class CommandSheet:
         """Spend trade goods (Rule 93.3, 93.4).
 
         Args:
-            amount: Number of trade goods to spend
+            amount: Number of trade goods to spend (0 is allowed and always succeeds)
 
         Returns:
             True if trade goods were spent, False if insufficient trade goods

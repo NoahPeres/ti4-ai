@@ -17,6 +17,7 @@ LRR Reference: Rule 21 - COMMODITIES
 import pytest
 
 from src.ti4.core.constants import Faction
+from src.ti4.core.faction_data import FactionData
 from src.ti4.core.player import Player
 
 
@@ -35,8 +36,8 @@ class TestRule21CommodityBasics:
         # Each faction should have a commodity value
         commodity_value = player.get_commodity_value()
 
-        # Sol Federation should have commodity value of 4
-        assert commodity_value == 4
+        # Sol Federation should have commodity value from faction data
+        assert commodity_value == FactionData.get_commodity_value(player.faction)
 
     def test_player_starts_with_zero_commodities(self) -> None:
         """Test that players start with zero commodities.
@@ -67,6 +68,21 @@ class TestRule21CommodityBasics:
         with pytest.raises(ValueError, match="Cannot exceed commodity limit"):
             player.add_commodities(1)
 
+    def test_add_commodities_invalid_amounts(self) -> None:
+        """Test that add_commodities rejects negative and zero amounts."""
+        player = Player("TestPlayer", Faction.SOL)
+
+        # Test negative amounts
+        with pytest.raises(ValueError, match="Cannot add negative commodities"):
+            player.add_commodities(-1)
+
+        with pytest.raises(ValueError, match="Cannot add negative commodities"):
+            player.add_commodities(-5)
+
+        # Zero should be allowed (no-op)
+        player.add_commodities(0)
+        assert player.get_commodities() == 0
+
 
 class TestRule21CommodityReplenishment:
     """Test commodity replenishment mechanics (Rule 21.3-21.4)."""
@@ -80,14 +96,14 @@ class TestRule21CommodityReplenishment:
         """
         player = Player("TestPlayer", Faction.SOL)
 
-        # Player starts with 0 commodities, Sol has commodity value 4
+        # Player starts with 0 commodities, Sol has commodity value from faction data
         assert player.get_commodities() == 0
 
         # Replenish commodities
         player.replenish_commodities()
 
         # Should now have commodities equal to faction value
-        assert player.get_commodities() == 4
+        assert player.get_commodities() == player.get_commodity_value()
 
     def test_partial_replenishment(self) -> None:
         """Test replenishing when player already has some commodities.
@@ -97,15 +113,15 @@ class TestRule21CommodityReplenishment:
         """
         player = Player("TestPlayer", Faction.SOL)
 
-        # Give player 2 commodities (Sol limit is 4)
+        # Give player 2 commodities (Sol limit from faction data)
         player.add_commodities(2)
         assert player.get_commodities() == 2
 
         # Replenish commodities
         player.replenish_commodities()
 
-        # Should now have full amount (4)
-        assert player.get_commodities() == 4
+        # Should now have full amount (faction commodity value)
+        assert player.get_commodities() == player.get_commodity_value()
 
     def test_no_replenishment_when_at_max(self) -> None:
         """Test that replenishment does nothing when already at maximum.
@@ -116,9 +132,9 @@ class TestRule21CommodityReplenishment:
         player = Player("TestPlayer", Faction.SOL)
 
         # Fill commodities to max
-        player.add_commodities(4)
-        assert player.get_commodities() == 4
+        player.add_commodities(player.get_commodity_value())
+        assert player.get_commodities() == player.get_commodity_value()
 
         # Replenish should not change anything
         player.replenish_commodities()
-        assert player.get_commodities() == 4
+        assert player.get_commodities() == player.get_commodity_value()

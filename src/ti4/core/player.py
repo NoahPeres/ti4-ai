@@ -68,11 +68,13 @@ class Player:
         """Add commodity tokens to this player.
 
         Args:
-            count: Number of commodity tokens to add
+            count: Number of commodity tokens to add (must be >= 0)
 
         Raises:
-            ValueError: If adding would exceed commodity limit
+            ValueError: If adding would exceed commodity limit or if count is negative
         """
+        if count < 0:
+            raise ValueError("Cannot add negative commodities")
         new_count = self._commodity_count + count
         max_commodities = self.get_commodity_value()
 
@@ -107,17 +109,19 @@ class Player:
             amount: Number of commodities to give
 
         Raises:
-            ValueError: If player doesn't have enough commodities
+            ValueError: If player doesn't have enough commodities or trying to give to self
         """
         if amount < 0:
             raise ValueError("Cannot give negative commodities")
+        if self is other_player:
+            raise ValueError("Cannot give commodities to yourself")
         if self._commodity_count < amount:
             raise ValueError(
                 f"Player only has {self._commodity_count} commodities, cannot give {amount}"
             )
 
         # Remove commodities from this player
-        object.__setattr__(self, "_commodity_count", self._commodity_count - amount)
+        self._remove_commodities(amount)
 
         # Convert to trade goods for the receiving player (Rule 21.5)
         other_player.gain_trade_goods(amount)
@@ -139,5 +143,9 @@ class Player:
             )
 
         # Remove commodities and add trade goods
-        object.__setattr__(self, "_commodity_count", self._commodity_count - amount)
+        self._remove_commodities(amount)
         self.gain_trade_goods(amount)
+
+    def _remove_commodities(self, amount: int) -> None:
+        """Helper method to remove commodities (DRY principle)."""
+        object.__setattr__(self, "_commodity_count", self._commodity_count - amount)

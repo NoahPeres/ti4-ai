@@ -1,112 +1,285 @@
-Latest review for PR #12 in NoahPeres/ti4-ai:
+Latest review for PR #13 in NoahPeres/ti4-ai:
 
 ============================================================
 GITHUB PR REVIEW SUMMARY
 ============================================================
 Reviewer: coderabbitai[bot]
 State: COMMENTED
-Submitted: 2025-09-20T14:58:30Z
-Review ID: 3249080644
+Submitted: 2025-09-21T01:13:33Z
+Review ID: 3249329778
 
 REVIEW BODY:
 ----------------------------------------
-**Actionable comments posted: 4**
-
-> [!CAUTION]
-> Some comments are outside the diff and can’t be posted inline due to platform limitations.
->
->
->
-> <details>
-> <summary>⚠️ Outside diff range comments (2)</summary><blockquote>
->
-> <details>
-> <summary>src/ti4/core/game_state.py (2)</summary><blockquote>
->
-> `724-760`: **Validate player ID in assign_strategy_card.**
->
-> Bring in the same existence checks used elsewhere to prevent assigning to unknown players.
->
-> ```diff
->          # Input validation
->          if player_id is None:
->              raise ValueError("Player ID cannot be None")
->          if not isinstance(player_id, str) or not player_id.strip():
->              raise ValueError("Player ID cannot be empty")
->          if strategy_card is None:
->              raise ValueError("Strategy card cannot be None")
-> +        if not any(p.id == player_id for p in self.players):
-> +            raise ValueError(f"Player {player_id} does not exist in the game")
-> ```
->
-> ---
->
-> `1-1294`: **Critical: remove in-place mutations of GameState internals (frozen dataclass)**
->
-> Found direct, in-place mutations of GameState fields that break snapshot/functional semantics. Convert these helpers to operate on copied containers and return a new GameState (or accept/return the copied containers); ensure mutable objects (e.g., PlanetCard) are copied or made functional (exhaust returns a new object) before mutating.
->
-> - src/ti4/core/game_state.py:1066-1072 — _transfer_planet_card_from_deck: deletes from self.planet_card_deck and appends to self.player_planet_cards (in-place).
-> - src/ti4/core/game_state.py:1085-1095 — _transfer_planet_card_between_players: reassigns/appends into self.player_planet_cards (in-place).
-> - src/ti4/core/game_state.py:1122-1124 — _place_control_token: mutates self.planet_control_tokens set (in-place).
-> - src/ti4/core/game_state.py:1133-1136 — _remove_control_token: mutates self.planet_control_tokens (discard/delete).
-> - src/ti4/core/game_state.py:800-821 — gain_planet_control: only shallow-copies dicts then calls planet_card.exhaust() (mutates shared PlanetCard objects).
->
-> Required fix: eliminate all self.* mutations — update these helpers to return updated copies or be rewritten to accept and modify prepared shallow/deep copies, then produce a new GameState via _create_new_state.
->
-> </blockquote></details>
->
-> </blockquote></details>
+**Actionable comments posted: 2**
 
 <details>
-<summary>🧹 Nitpick comments (3)</summary><blockquote>
+<summary>🧹 Nitpick comments (15)</summary><blockquote>
 
 <details>
-<summary>src/ti4/core/game_state.py (3)</summary><blockquote>
+<summary>.trae/lrr_analysis/21_commodities.md (3)</summary><blockquote>
 
-`1031-1055`: **_clone-or-factory preferred from _get_or_create_planet_card.**
+`7-21`: **Add language to fenced code block (markdownlint MD040).**
 
-Returning an existing object invites accidental cross‑state mutation. Consider returning a fresh instance consistently (or add a clone() on PlanetCard).
+Declare the code block language for the raw LRR excerpt.
 
----
-
-`671-708`: **Initialize planet-control maps for new players.**
-
-Optional: pre-initialize player_planets and player_planet_cards entries to empty lists to simplify callers.
+Apply this diff:
 
 ```diff
-         new_player_secret_objectives[player.id] = []
-+        # Optional: initialize planet-control collections for convenience
-+        new_player_planets = self.player_planets.copy()
-+        new_player_planet_cards = self.player_planet_cards.copy()
-+        new_player_planets[player.id] = new_player_planets.get(player.id, [])
-+        new_player_planet_cards[player.id] = new_player_planet_cards.get(player.id, [])
-@@
--        return self._create_new_state(
-+        return self._create_new_state(
-             players=new_players,
-             # player_resources parameter removed - incorrect implementation
-             player_technologies=new_player_technologies,
-             victory_points=new_victory_points,
-             completed_objectives=new_completed_objectives,
-             status_phase_scoring=new_status_phase_scoring,
-             combat_scoring=new_combat_scoring,
-             player_secret_objectives=new_player_secret_objectives,
-+            player_planets=new_player_planets,
-+            player_planet_cards=new_player_planet_cards,
-             # player_influence parameter removed - incorrect implementation
-         )
+-```
++```text
+ ...
+-```
++```
 ```
 
 ---
 
-`1243-1269`: **Do not remove/merge blindly — both stores are in active use; plan a deliberate refactor.**
+`15-17`: **Replace hard tabs with spaces (markdownlint MD010).**
 
-player_technologies (dict[str, list[str]]) is used as the simple ownership view (GameTechnologyManager, movement/validators, scenario builder/tests); player_technology_cards (dict[str, list[TechnologyCard]]) holds per-card state (ready/exhausted) used by status_phase and card logic.
+Tabs appear before items a/b/c; use spaces for indentation.
 
-- Preferred refactor: make player_technology_cards the canonical store and add a derived accessor (e.g., GameState.get_player_technologies(player_id) -> set[Technology]) so all callers consume a single source of truth; update GameTechnologyManager._sync_from_game_state, scenario builder, movement/rule callers and tests accordingly.
-- Short-term alternative: keep both but centralize one writer (GameTechnologyManager) to synchronize them and add tests that assert they never drift.
+Apply this diff:
 
-Files to act on: src/ti4/core/game_state.py, src/ti4/core/game_technology_manager.py, src/ti4/testing/scenario_builder.py, src/ti4/core/status_phase.py, src/ti4/core/rule89_validator.py, src/ti4/core/movement.py.
+```diff
+-a	That token is no longer a commodity token; it is a trade good token.
+-b  A player can trade commodity tokens before resolving a game effect that allows them to replenish commodities.
+-c	If a game effect instructs a player to convert a number of their own commodities to trade goods, those trade goods are not treated as being gained for the purpose of triggering other abilities.
++a  That token is no longer a commodity token; it is a trade good token.
++b  A player can trade commodity tokens before resolving a game effect that allows them to replenish commodities.
++c  If a game effect instructs a player to convert a number of their own commodities to trade goods, those trade goods are not treated as being gained for the purpose of triggering other abilities.
+```
+
+---
+
+`67-73`: **Doc/tests mismatch: missing “cannot give more than owned” test.**
+
+This section lists a test that doesn’t exist in tests/test_rule_21_commodity_trading.py. Add the test or update docs.
+
+</blockquote></details>
+<details>
+<summary>src/ti4/core/faction_data.py (2)</summary><blockquote>
+
+`11-24`: **Make COMMODITY_VALUES immutable and typed.**
+
+Prevent accidental mutation and improve type safety with Final + MappingProxyType.
+
+Apply this diff:
+
+```diff
+-from .constants import Faction
++from .constants import Faction
++from typing import Final, Mapping
++from types import MappingProxyType
+@@
+-    COMMODITY_VALUES = {
++    COMMODITY_VALUES: Final[Mapping[Faction, int]] = MappingProxyType({
+         Faction.SOL: 4,
+         Faction.HACAN: 6,  # Trade-focused faction
+         Faction.XXCHA: 4,
+         Faction.JORD: 4,
+         Faction.YSSARIL: 3,
+         Faction.NAALU: 3,
+         Faction.BARONY: 2,
+         Faction.SAAR: 3,
+         Faction.MUAAT: 4,
+         Faction.ARBOREC: 3,
+         Faction.L1Z1X: 2,
+         Faction.WINNU: 3,
+-    }
++    })
+```
+
+---
+
+`39-41`: **Minor: simplify lookup.**
+
+Use dict get with explicit error to reduce double indexing.
+
+Apply this diff:
+
+```diff
+-        if faction not in cls.COMMODITY_VALUES:
+-            raise ValueError(f"Unknown faction: {faction}")
+-        return cls.COMMODITY_VALUES[faction]
++        value = cls.COMMODITY_VALUES.get(faction)
++        if value is None:
++            raise ValueError(f"Unknown faction: {faction}")
++        return value
+```
+
+</blockquote></details>
+<details>
+<summary>IMPLEMENTATION_ROADMAP.md (1)</summary><blockquote>
+
+`91-119`: **Add fenced code languages for linting/readability.**
+
+Many code blocks use bare ```; prefer ```text or specific languages.
+
+
+I can open a follow‑up PR adding languages to all fenced blocks.
+
+
+Also applies to: 121-148, 204-246, 336-365, 566-599, 656-673, 970-1010, 1025-1046, 1116-1135
+
+</blockquote></details>
+<details>
+<summary>tests/test_rule_21_commodity_trading.py (2)</summary><blockquote>
+
+`81-101`: **Consider testing negative/zero amounts for self-conversion.**
+
+Add a small param test to ensure ValueError on invalid amounts.
+
+---
+
+`102-120`: **Add missing “cannot give more than owned” test.**
+
+Docs list this; include it here for completeness.
+
+Apply this diff:
+
+```diff
+@@
+ class TestRule21CommodityTrading:
+@@
+     def test_any_commodity_gift_converts_to_trade_good(self) -> None:
+         ...
+         assert player2.get_commodities() == 0  # Not a commodity anymore
++
++    def test_cannot_give_more_commodities_than_owned(self) -> None:
++        player1 = Player("Player1", Faction.SOL)
++        player2 = Player("Player2", Faction.HACAN)
++        player1.add_commodities(1)
++        with pytest.raises(ValueError):
++            player1.give_commodities_to_player(player2, 2)
+```
+
+</blockquote></details>
+<details>
+<summary>tests/test_rule_21_commodities.py (2)</summary><blockquote>
+
+`118-124`: **Avoid hard-coded “4”; derive from faction value.**
+
+Prevents drift if faction data changes.
+
+Apply this diff:
+
+```diff
+-        # Fill commodities to max
+-        player.add_commodities(4)
+-        assert player.get_commodities() == 4
++        # Fill commodities to max
++        max_val = player.get_commodity_value()
++        player.add_commodities(max_val)
++        assert player.get_commodities() == max_val
+@@
+-        assert player.get_commodities() == 4
++        assert player.get_commodities() == max_val
+```
+
+---
+
+`53-69`: **Add negative/zero input validation tests for add_commodities.**
+
+Covers input validation paths.
+
+Apply this diff:
+
+```diff
+@@ class TestRule21CommodityBasics:
+     def test_commodity_limit_enforcement(self) -> None:
+         ...
+         with pytest.raises(ValueError, match="Cannot exceed commodity limit"):
+             player.add_commodities(1)
++
++    def test_add_commodities_invalid_amounts(self) -> None:
++        player = Player("TestPlayer", Faction.SOL)
++        for amt in (0, -1, -5):
++            with pytest.raises(ValueError):
++                player.add_commodities(amt)
+```
+
+</blockquote></details>
+<details>
+<summary>src/ti4/core/command_sheet.py (2)</summary><blockquote>
+
+`89-104`: **Clarify zero‑spend behavior (bool return).**
+
+Current logic returns True for amount == 0. If that’s intended, consider a short note in the docstring to avoid ambiguity.
+
+
+```diff
+ def spend_trade_goods(self, amount: int) -> bool:
+-    """Spend trade goods (Rule 93.3, 93.4)."""
++    """Spend trade goods (Rule 93.3, 93.4). Returns True for amount==0 (no-op)."""
+```
+
+---
+
+`18-18`: **Rule numbering consistency.**
+
+Inline comment references Rule 19.2 while methods cite Rule 93.x. Standardize numbering to the project’s LRR mapping.
+
+
+
+
+Also applies to: 79-108
+
+</blockquote></details>
+<details>
+<summary>src/ti4/core/player.py (3)</summary><blockquote>
+
+`85-89`: **Reuse local API for clarity.**
+
+Minor: call self.get_commodity_value() instead of FactionData directly.
+
+```diff
+-commodity_value = FactionData.get_commodity_value(self.faction)
++commodity_value = self.get_commodity_value()
+ object.__setattr__(self, "_commodity_count", commodity_value)
+```
+
+---
+
+`102-124`: **Handle self‑gifting explicitly or disallow.**
+
+Currently, giving to yourself reduces commodities and adds equal trade goods—functionally identical to convert_commodities_to_trade_goods. Make this explicit (or raise), to avoid double‑processing if this method is extended later.
+
+```diff
+     if amount < 0:
+         raise ValueError("Cannot give negative commodities")
+     if self._commodity_count < amount:
+         raise ValueError(
+             f"Player only has {self._commodity_count} commodities, cannot give {amount}"
+         )
++    # Giving to self is equivalent to conversion.
++    if other_player is self:
++        self.convert_commodities_to_trade_goods(amount)
++        return
+
+     # Remove commodities from this player
+     object.__setattr__(self, "_commodity_count", self._commodity_count - amount)
+
+     # Convert to trade goods for the receiving player (Rule 21.5)
+     other_player.gain_trade_goods(amount)
+```
+
+---
+
+`125-143`: **DRY the commodity removal path (optional).**
+
+Both give_commodities_to_player and convert_commodities_to_trade_goods perform the same validations and subtraction. Consider a private helper to centralize this.
+
+```python
+def _remove_commodities(self, amount: int) -> None:
+    if amount < 0:
+        raise ValueError("Cannot remove negative commodities")
+    if self._commodity_count < amount:
+        raise ValueError(
+            f"Player only has {self._commodity_count} commodities, cannot remove {amount}"
+        )
+    object.__setattr__(self, "_commodity_count", self._commodity_count - amount)
+```
+Then call _remove_commodities from both methods.
 
 </blockquote></details>
 
@@ -124,49 +297,20 @@ Files to act on: src/ti4/core/game_state.py, src/ti4/core/game_technology_manage
 <details>
 <summary>📥 Commits</summary>
 
-Reviewing files that changed from the base of the PR and between 39a0ad181ca811563920b7bc8d65d965e15030db and 271733959406f4b9f0f7f9c0d6386325d91529ab.
+Reviewing files that changed from the base of the PR and between 0d548e12ba462121a3aab614df282c8a2ff4e48c and 440e9209eeee5bdaf783a63e4416e0ed3289dbf0.
 
 </details>
 
 <details>
-<summary>📒 Files selected for processing (10)</summary>
+<summary>📒 Files selected for processing (7)</summary>
 
-* `.gitignore` (1 hunks)
-* `latest_review.txt` (2 hunks)
-* `latest_review_pr11.txt` (0 hunks)
-* `latest_review_pr11_new.txt` (0 hunks)
-* `review_response.md` (1 hunks)
-* `review_response_final.md` (0 hunks)
-* `review_response_summary.md` (0 hunks)
-* `src/ti4/core/game_state.py` (8 hunks)
-* `src/ti4/core/planet_card.py` (1 hunks)
-* `tests/test_rule_25_control.py` (1 hunks)
-
-</details>
-
-<details>
-<summary>💤 Files with no reviewable changes (4)</summary>
-
-* review_response_summary.md
-* review_response_final.md
-* latest_review_pr11.txt
-* latest_review_pr11_new.txt
-
-</details>
-
-<details>
-<summary>✅ Files skipped from review due to trivial changes (1)</summary>
-
-* .gitignore
-
-</details>
-
-<details>
-<summary>🚧 Files skipped from review as they are similar to previous changes (3)</summary>
-
-* src/ti4/core/planet_card.py
-* tests/test_rule_25_control.py
-* latest_review.txt
+* `.trae/lrr_analysis/21_commodities.md` (1 hunks)
+* `IMPLEMENTATION_ROADMAP.md` (1 hunks)
+* `src/ti4/core/command_sheet.py` (2 hunks)
+* `src/ti4/core/faction_data.py` (1 hunks)
+* `src/ti4/core/player.py` (3 hunks)
+* `tests/test_rule_21_commodities.py` (1 hunks)
+* `tests/test_rule_21_commodity_trading.py` (1 hunks)
 
 </details>
 
@@ -174,149 +318,224 @@ Reviewing files that changed from the base of the PR and between 39a0ad181ca8115
 <summary>🧰 Additional context used</summary>
 
 <details>
-<summary>🧬 Code graph analysis (1)</summary>
+<summary>🧬 Code graph analysis (5)</summary>
 
 <details>
-<summary>src/ti4/core/game_state.py (3)</summary><blockquote>
+<summary>src/ti4/core/faction_data.py (2)</summary><blockquote>
 
 <details>
-<summary>src/ti4/core/planet_card.py (3)</summary>
+<summary>src/ti4/core/constants.py (1)</summary>
 
-* `PlanetCard` (6-92)
-* `is_exhausted` (25-27)
-* `exhaust` (33-37)
+* `Faction` (124-138)
 
 </details>
 <details>
-<summary>src/ti4/core/strategy_cards/coordinator.py (4)</summary>
+<summary>src/ti4/core/player.py (1)</summary>
 
-* `ready_strategy_card` (600-610)
-* `ready_all_strategy_cards` (612-619)
-* `get_player_strategy_card_assignments` (987-995)
-* `get_exhausted_cards` (997-1008)
+* `get_commodity_value` (48-57)
+
+</details>
+
+</blockquote></details>
+<details>
+<summary>tests/test_rule_21_commodity_trading.py (3)</summary><blockquote>
+
+<details>
+<summary>src/ti4/core/constants.py (1)</summary>
+
+* `Faction` (124-138)
 
 </details>
 <details>
-<summary>src/ti4/core/planet.py (3)</summary>
+<summary>src/ti4/core/player.py (7)</summary>
 
-* `Planet` (9-90)
-* `is_exhausted` (33-35)
-* `exhaust` (41-45)
+* `Player` (11-143)
+* `replenish_commodities` (85-88)
+* `get_commodities` (59-65)
+* `get_trade_goods` (90-92)
+* `give_commodities_to_player` (102-123)
+* `add_commodities` (67-83)
+* `convert_commodities_to_trade_goods` (125-143)
+
+</details>
+<details>
+<summary>src/ti4/core/command_sheet.py (1)</summary>
+
+* `get_trade_goods` (105-107)
+
+</details>
+
+</blockquote></details>
+<details>
+<summary>tests/test_rule_21_commodities.py (3)</summary><blockquote>
+
+<details>
+<summary>src/ti4/core/constants.py (1)</summary>
+
+* `Faction` (124-138)
+
+</details>
+<details>
+<summary>src/ti4/core/player.py (5)</summary>
+
+* `Player` (11-143)
+* `get_commodity_value` (48-57)
+* `get_commodities` (59-65)
+* `add_commodities` (67-83)
+* `replenish_commodities` (85-88)
+
+</details>
+<details>
+<summary>src/ti4/core/faction_data.py (1)</summary>
+
+* `get_commodity_value` (27-41)
+
+</details>
+
+</blockquote></details>
+<details>
+<summary>src/ti4/core/player.py (3)</summary><blockquote>
+
+<details>
+<summary>src/ti4/core/command_sheet.py (4)</summary>
+
+* `CommandSheet` (12-146)
+* `get_trade_goods` (105-107)
+* `gain_trade_goods` (79-87)
+* `spend_trade_goods` (89-103)
+
+</details>
+<details>
+<summary>src/ti4/core/constants.py (1)</summary>
+
+* `Faction` (124-138)
+
+</details>
+<details>
+<summary>src/ti4/core/faction_data.py (2)</summary>
+
+* `FactionData` (6-41)
+* `get_commodity_value` (27-41)
+
+</details>
+
+</blockquote></details>
+<details>
+<summary>src/ti4/core/command_sheet.py (1)</summary><blockquote>
+
+<details>
+<summary>src/ti4/core/player.py (3)</summary>
+
+* `gain_trade_goods` (94-96)
+* `spend_trade_goods` (98-100)
+* `get_trade_goods` (90-92)
 
 </details>
 
 </blockquote></details>
 
-</details>
-
-</details>
-
-<details>
-<summary>🔇 Additional comments (9)</summary><blockquote>
+</details><details>
+<summary>🪛 markdownlint-cli2 (0.18.1)</summary>
 
 <details>
-<summary>review_response.md (2)</summary><blockquote>
+<summary>.trae/lrr_analysis/21_commodities.md</summary>
 
-`60-67`: **Immutability claims don’t fully match the code.**
+7-7: Fenced code blocks should have a language specified
 
-You state “All dictionary modifications follow the immutable pattern” and rely on frozen dataclass, but:
-- gain_planet_control exhausts the retrieved PlanetCard instance in-place.
-- Helpers _transfer_planet_card_from_deck/_between_players/_place/_remove mutate self.* directly.
-
-Either update the doc or adjust code to be mutation-free (see suggestions on game_state.py).
+(MD040, fenced-code-language)
 
 ---
 
-`3-4`: **Please confirm the test/coverage numbers.**
+15-15: Hard tabs
+Column: 2
 
-“1063 passed, 2 skipped, 87% coverage” sounds good—confirm with the latest CI run ID to avoid drift.
+(MD010, no-hard-tabs)
+
+---
+
+17-17: Hard tabs
+Column: 2
+
+(MD010, no-hard-tabs)
+
+</details>
+
+</details>
+
+</details>
+
+<details>
+<summary>🔇 Additional comments (10)</summary><blockquote>
+
+<details>
+<summary>tests/test_rule_21_commodity_trading.py (2)</summary><blockquote>
+
+`10-35`: **LGTM: conversion-on-receipt behavior covered.**
+
+Good assertions for giver’s commodities and receiver’s trade goods.
+
+---
+
+`59-80`: **LGTM: trade before replenishment.**
+
+Validates timing rule cleanly.
 
 </blockquote></details>
 <details>
-<summary>src/ti4/core/game_state.py (7)</summary><blockquote>
+<summary>tests/test_rule_21_commodities.py (1)</summary><blockquote>
 
-`14-16`: **Correct coordinator import path.**
+`26-40`: **LGTM: verifies SOL commodity value.**
 
-Import under TYPE_CHECKING now matches module location. LGTM.
+Keeps a concrete check anchored to LRR.
 
----
+</blockquote></details>
+<details>
+<summary>src/ti4/core/faction_data.py (1)</summary><blockquote>
 
-`85-95`: **Planet-control state surfaces look consistent.**
+`1-24`: **Incorrect scope — COMMODITY_VALUES already covers all Faction members.**
+constants.py defines many non‑faction enum entries; COMMODITY_VALUES maps exactly the 12 faction members (SOL, HACAN, XXCHA, JORD, YSSARIL, NAALU, BARONY, SAAR, MUAAT, ARBOREC, L1Z1X, WINNU) and contains no extraneous keys — no faction is missing.
 
-New deck, play-area, token, and mapping fields are coherent with Rule 25 modeling.
+> Likely an incorrect or invalid review comment.
 
----
+</blockquote></details>
+<details>
+<summary>src/ti4/core/command_sheet.py (2)</summary><blockquote>
 
-`315-325`: **Create-new-state wiring includes planet-control fields.**
+`18-18`: **Good addition: explicit trade goods state on CommandSheet.**
 
-Good propagation of all new attributes in _create_new_state.
-
----
-
-`947-986`: **Deterministic controller selection looks good.**
-
-resolve_planet_control_change uses initiative ordering; this addresses prior nondeterminism.
-
----
-
-`1000-1018`: **Deck size helpers are fine.**
-
-API surface is clear.
+Field is well-scoped and defaults make sense.
 
 ---
 
-`836-844`: **Snapshot immutability breach: exhausting shared PlanetCard instance.**
+`79-88`: **Input validation for gains looks solid.**
 
-Exhausting planet_card here mutates the object that still exists in the prior GameState (deck/other player's list), breaking snapshots.
+Negative amounts raise early; zero is a no-op. LGTM.
 
-Apply:
+</blockquote></details>
+<details>
+<summary>src/ti4/core/player.py (4)</summary><blockquote>
 
-```diff
--        if player_id not in new_player_planet_cards:
--            new_player_planet_cards[player_id] = []
--        new_player_planet_cards[player_id].append(planet_card)
--
--        # Rule 25.1: Card is exhausted when gained
--        if not planet_card.is_exhausted():
--            planet_card.exhaust()
-+        if player_id not in new_player_planet_cards:
-+            new_player_planet_cards[player_id] = []
-+        # Create a fresh instance to avoid mutating prior-state references
-+        card_copy = type(planet_card)(
-+            planet_card.name,
-+            planet_card.resources,
-+            planet_card.influence,
-+            trait=getattr(planet_card, "trait", None),
-+        )
-+        # Rule 25.1: Card is exhausted when gained
-+        if not card_copy.is_exhausted():
-+            card_copy.exhaust()
-+        new_player_planet_cards[player_id].append(card_copy)
-```
+`20-20`: **Private commodity counter on a frozen dataclass is fine.**
+
+Pattern with object.__setattr__ matches existing reinforcements handling.
 
 ---
 
-`785-805`: **Add player-existence validation to gain_planet_control.**
+`48-58`: **FactionData delegation reads well.**
 
-Currently unknown player IDs can gain control and pollute mappings/tokens.
+Keeps commodity caps centralized.
 
-Apply this diff near the start of gain_planet_control:
+---
 
-```diff
- def gain_planet_control(
-     self, player_id: str, planet: "Planet"
- ) -> tuple[bool, "GameState"]:
-@@
--        # Rule 25.2: Cannot gain control of already controlled planet
-+        # Validate player exists
-+        if not any(p.id == player_id for p in self.players):
-+            raise ValueError(f"Player {player_id} does not exist in the game")
-+
-+        # Rule 25.2: Cannot gain control of already controlled planet
-         current_controller = self.planet_control_mapping.get(planet.name)
-         if current_controller == player_id:
-             raise ValueError("Player already controls this planet")
-```
+`59-66`: **Getter is straightforward.**
+
+No concerns.
+
+---
+
+`90-101`: **Trade goods delegation is clean.**
+
+Surface mirrors CommandSheet API; good separation.
 
 </blockquote></details>
 
@@ -329,44 +548,93 @@ Apply this diff near the start of gain_planet_control:
 DETAILED COMMENTS:
 ----------------------------------------
 Comment 1:
-  File: src/ti4/core/game_state.py
-  Line: 167
+  File: src/ti4/core/faction_data.py
+  Line: 16
+  Body: _🛠️ Refactor suggestion_
+
+<details>
+<summary>🧩 Analysis chain</summary>
+
+**Non-canonical faction name “JORD”.**
+
+TI4 uses Jol-Nar; confirm whether Faction.JORD is a placeholder. If so, plan a rename (alias + deprecation) to avoid long‑term confusion.
+
+
+Run to find usages:
+
+---
+
+🏁 Script executed:
+
+```shell
+#!/bin/bash
+rg -n -C2 '\bJORD\b' --type=py
+```
+
+Length of output: 819
+
+---
+
+
+
+</details>
+
+**Rename Faction.JORD → Faction.JOL_NAR and add a deprecated JORD alias.**
+
+Findings: JORD appears in src/ti4/core/constants.py (lines 130, 148) and src/ti4/core/faction_data.py (line 15). Action: add canonical enum member Faction.JOL_NAR (use the project’s slug convention for its value), update constants.py to export JOL_NAR and update faction_data.py to use Faction.JOL_NAR, then keep JORD = Faction.JOL_NAR as a backward-compatible alias with a deprecation comment and changelog/test updates.
+
+<details>
+<summary>🤖 Prompt for AI Agents</summary>
+
+```
+In src/ti4/core/faction_data.py around lines 15-16, replace usage of the old
+enum member Faction.JORD with the new canonical Faction.JOL_NAR (use the
+project's slug convention for its enum value), and in src/ti4/core/constants.py
+update exports to include JOL_NAR instead of JORD; then add a
+backward-compatible alias by setting JORD = Faction.JOL_NAR with a deprecation
+comment pointing to the changelog, and update any tests and the changelog to
+reference the new name (or note the alias) so callers are warned to migrate.
+```
+
+</details>
+
+<!-- fingerprinting:phantom:medusa:chinchilla -->
+
+<!-- This is an auto-generated comment by CodeRabbit -->
+
+Comment 2:
+  File: src/ti4/core/player.py
+  Line: 61
   Body: _⚠️ Potential issue_
 
-**Stale/duplicate control tokens possible when controller changes.**
+**Prevent negative adds and underflow in add_commodities.**
 
-When current_controller is not None, tokens for the previous controller aren’t cleared. Also ensure token exclusivity when no units.
-
-Apply:
+As written, passing a negative count silently subtracts commodities and can underflow below zero. Guard against negative input.
 
 ```diff
-@@
--        # Rule 25.1b: If another player controls it, take from their play area
-+        # Rule 25.1b: If another player controls it, take from their play area
-         if current_controller is not None:
-@@
--        # Add to new player's play area
-+        # Remove any prior controller token for this planet
-+        if current_controller is not None and planet.name in new_planet_control_tokens:
-+            new_planet_control_tokens[planet.name].discard(current_controller)
-+            if not new_planet_control_tokens[planet.name]:
-+                del new_planet_control_tokens[planet.name]
-+
-+        # Add to new player's play area
-@@
--        # Rule 25.4: If no units on planet, place control token
--        if len(planet.units) == 0:
--            if planet.name not in new_planet_control_tokens:
--                new_planet_control_tokens[planet.name] = set()
--            new_planet_control_tokens[planet.name].add(player_id)
-+        # Rule 25.4: Token placement is exclusive
-+        if len(planet.units) == 0:
-+            # Only the new controller’s token should remain
-+            new_planet_control_tokens[planet.name] = {player_id}
-+        else:
-+            # With units present, remove any residual tokens
-+            if planet.name in new_planet_control_tokens:
-+                del new_planet_control_tokens[planet.name]
+ def add_commodities(self, count: int) -> None:
+     """Add commodity tokens to this player.
+
+     Args:
+-        count: Number of commodity tokens to add
++        count: Number of commodity tokens to add (must be >= 0)
+
+     Raises:
+-        ValueError: If adding would exceed commodity limit
++        ValueError: If adding would exceed commodity limit or if count is negative
+     """
+-    new_count = self._commodity_count + count
+-    max_commodities = self.get_commodity_value()
++    if count < 0:
++        raise ValueError("Cannot add negative commodities")
++    new_count = self._commodity_count + count
++    max_commodities = self.get_commodity_value()
+
+     if new_count > max_commodities:
+         raise ValueError(f"Cannot exceed commodity limit of {max_commodities}")
+
+     # Since this is a frozen dataclass, we need to modify the field directly
+     object.__setattr__(self, "_commodity_count", new_count)
 ```
 
 <!-- suggestion_start -->
@@ -378,46 +646,25 @@ Apply:
 > Carefully review the code before committing. Ensure that it accurately replaces the highlighted code, contains no missing lines, and has no issues with indentation. Thoroughly test & benchmark the code to ensure it meets the requirements.
 
 ```suggestion
-        # Rule 25.1b: If another player controls it, take from their play area
-        if current_controller is not None:
-            # Remove from previous player
-            if current_controller in new_player_planet_cards:
-                new_player_planet_cards[current_controller] = [
-                    card
-                    for card in new_player_planet_cards[current_controller]
-                    if card.name != planet.name
-                ]
-        else:
-            # Rule 25.1a: First control, take from deck
-            if planet.name in new_planet_card_deck:
-                del new_planet_card_deck[planet.name]
+    def add_commodities(self, count: int) -> None:
+        """Add commodity tokens to this player.
 
-        # Remove any prior controller token for this planet
-        if current_controller is not None and planet.name in new_planet_control_tokens:
-            new_planet_control_tokens[planet.name].discard(current_controller)
-            if not new_planet_control_tokens[planet.name]:
-                del new_planet_control_tokens[planet.name]
+        Args:
+            count: Number of commodity tokens to add (must be >= 0)
 
-        # Add to new player's play area
-        if player_id not in new_player_planet_cards:
-            new_player_planet_cards[player_id] = []
-        new_player_planet_cards[player_id].append(planet_card)
+        Raises:
+            ValueError: If adding would exceed commodity limit or if count is negative
+        """
+        if count < 0:
+            raise ValueError("Cannot add negative commodities")
+        new_count = self._commodity_count + count
+        max_commodities = self.get_commodity_value()
 
-        # Rule 25.1: Card is exhausted when gained
-        if not planet_card.is_exhausted():
-            planet_card.exhaust()
+        if new_count > max_commodities:
+            raise ValueError(f"Cannot exceed commodity limit of {max_commodities}")
 
-        # Update planet control in centralized mapping (don't mutate Planet object)
-        new_planet_control_mapping[planet.name] = player_id
-
-        # Rule 25.4: Token placement is exclusive
-        if len(planet.units) == 0:
-            # Only the new controller's token should remain
-            new_planet_control_tokens[planet.name] = {player_id}
-        else:
-            # With units present, remove any residual tokens
-            if planet.name in new_planet_control_tokens:
-                del new_planet_control_tokens[planet.name]
+        # Since this is a frozen dataclass, we need to modify the field directly
+        object.__setattr__(self, "_commodity_count", new_count)
 ```
 
 </details>
@@ -428,127 +675,13 @@ Apply:
 <summary>🤖 Prompt for AI Agents</summary>
 
 ```
-In src/ti4/core/game_state.py around lines 822-853, when transferring control
-the code currently does not remove control tokens belonging to the previous
-controller and may allow multiple tokens to coexist; update the logic so that if
-current_controller is not None you remove that player’s entry from
-new_planet_control_tokens (or remove planet.name from their token set) before
-assigning to the new controller, and when handling the "no units" case ensure
-token exclusivity by replacing any existing token set for planet.name with a new
-set containing only player_id (create it if absent) instead of adding to the
-existing set; apply analogous clearing when taking from deck (first control) to
-ensure no stale tokens remain.
-```
-
-</details>
-
-<!-- fingerprinting:phantom:poseidon:chinchilla -->
-
-<!-- This is an auto-generated comment by CodeRabbit -->
-
-Comment 2:
-  File: src/ti4/core/game_state.py
-  Line: 261
-  Body: _⚠️ Potential issue_
-
-**Card is “lost” on lose_planet_control; should return to deck readied.**
-
-lose_planet_control removes the card from the player but doesn’t re-add it to the deck, so later gains fabricate a fresh copy, skewing deck size and exploration logic.
-
-Apply:
-
-```diff
--        # Create new state with updated control tokens and planet cards
-+        # Create new state with updated control tokens, planet cards, and deck
-         new_planet_control_tokens = {
-             name: tokens.copy() for name, tokens in self.planet_control_tokens.items()
-         }
-         new_player_planet_cards = {
-             pid: cards.copy() for pid, cards in self.player_planet_cards.items()
-         }
-         new_planet_control_mapping = self.planet_control_mapping.copy()
-+        new_planet_card_deck = self.planet_card_deck.copy()
-@@
--        # Remove planet card from player's play area
-+        # Remove planet card from player's play area and return a readied copy to deck
-         if player_id in new_player_planet_cards:
--            new_player_planet_cards[player_id] = [
-+            remaining = [
-                 card
-                 for card in new_player_planet_cards[player_id]
-                 if card.name != planet.name
-             ]
-+            # Find the removed card in the old state to clone its stats (not state)
-+            original = self._find_player_planet_card(player_id, planet.name)
-+            if original is None:
-+                original = self._get_or_create_planet_card(planet)
-+            card_copy = type(original)(
-+                original.name,
-+                original.resources,
-+                original.influence,
-+                trait=getattr(original, "trait", None),
-+            )
-+            # Cards in deck should be readied
-+            if card_copy.is_exhausted():
-+                card_copy.ready()
-+            new_planet_card_deck[planet.name] = card_copy
-+            new_player_planet_cards[player_id] = remaining
-@@
--        return self._create_new_state(
-+        return self._create_new_state(
-             player_planet_cards=new_player_planet_cards,
-             planet_control_tokens=new_planet_control_tokens,
-             planet_control_mapping=new_planet_control_mapping,
-             player_planets=new_player_planets,
-+            planet_card_deck=new_planet_card_deck,
-         )
-```
-
-
-> Committable suggestion skipped: line range outside the PR's diff.
-
-<!-- fingerprinting:phantom:poseidon:chinchilla -->
-
-<!-- This is an auto-generated comment by CodeRabbit -->
-
-Comment 3:
-  File: src/ti4/core/game_state.py
-  Line: 440
-  Body: _🛠️ Refactor suggestion_
-
-**Helpers mutate self.*; make them pure or remove.**
-
-_transfer_planet_card_from_deck/_between_players directly mutate self.player_planet_cards/deck, violating snapshot semantics if used.
-
-Apply one of:
-- Remove unused helpers.
-- Or return updated copies to pass into _create_new_state (no side effects).
-
-<!-- fingerprinting:phantom:poseidon:chinchilla -->
-
-<!-- This is an auto-generated comment by CodeRabbit -->
-
-Comment 4:
-  File: src/ti4/core/game_state.py
-  Line: 481
-  Body: _🛠️ Refactor suggestion_
-
-**Token helpers also mutate self.*; align with immutability.**
-
-_place_control_token/_remove_control_token mutate self.planet_control_tokens. Either rewrite to return updated dicts or delete if unused.
-
-<details>
-<summary>🤖 Prompt for AI Agents</summary>
-
-```
-In src/ti4/core/game_state.py around lines 1115 to 1137, the helper methods
-_place_control_token and _remove_control_token currently mutate
-self.planet_control_tokens; refactor them to follow immutability by returning an
-updated planet_control_tokens mapping (or the updated mapping plus any auxiliary
-value) instead of mutating state in-place, and have callers assign the returned
-mapping to self.planet_control_tokens; alternatively, if these helpers are not
-used elsewhere, delete them and inline the immutable update logic where needed
-so no in-place mutations remain.
+In src/ti4/core/player.py around lines 67 to 84, add input validation to prevent
+negative commodity changes: before computing new_count, check if count is
+negative and raise a ValueError (e.g., "count must be non-negative") or
+alternatively after computing new_count ensure new_count >= 0 and raise a
+ValueError if it would go below zero; keep the existing check against exceeding
+get_commodity_value() and retain the object.__setattr__ update for the frozen
+dataclass.
 ```
 
 </details>
