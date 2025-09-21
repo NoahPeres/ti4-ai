@@ -21,7 +21,8 @@ def test_full_turn_sequence_integration() -> None:
 
     # Verify state progression
     assert initial_phase == GamePhase.SETUP
-    assert final_phase == GamePhase.ACTION
+    # After action phase completes, it advances to STATUS phase
+    assert final_phase == GamePhase.STATUS
     assert final_controller.is_action_phase_complete()
 
 
@@ -54,9 +55,16 @@ def execute_full_turn_sequence(controller: GameController) -> GameController:
     # Start action phase
     controller.start_action_phase()
 
-    # Each player passes their turn
+    # Each player takes a strategic action first (Rule 3 requirement)
+    for i, player in enumerate(players):
+        if i < len(available_cards):
+            # Take strategic action using the card they selected
+            controller.take_strategic_action(player.id, str(available_cards[i].id))
+
+    # Now each player can pass their turn
     for player in players:
-        controller.pass_action_phase_turn(player.id)
+        if not controller.has_passed(player.id):
+            controller.pass_action_phase_turn(player.id)
 
     return controller
 
@@ -85,9 +93,13 @@ def simulate_complete_game(controller: GameController) -> Player:
             controller.start_strategy_phase()
         else:
             # For subsequent rounds, need to go through STATUS and AGENDA phases
-            controller.advance_to_phase(GamePhase.STATUS)
-            controller.advance_to_phase(GamePhase.AGENDA)
-            controller.advance_to_phase(GamePhase.STRATEGY)
+            current_phase = controller.get_current_phase()
+            if current_phase != GamePhase.STATUS:
+                controller.advance_to_phase(GamePhase.STATUS)
+            if controller.get_current_phase() != GamePhase.AGENDA:
+                controller.advance_to_phase(GamePhase.AGENDA)
+            if controller.get_current_phase() != GamePhase.STRATEGY:
+                controller.advance_to_phase(GamePhase.STRATEGY)
 
         available_cards = controller.get_available_strategy_cards()
         players = controller.get_turn_order()
@@ -98,8 +110,24 @@ def simulate_complete_game(controller: GameController) -> Player:
 
         # Action phase
         controller.start_action_phase()
+
+        # Each player takes a strategic action first (Rule 3 requirement)
+        for i, player in enumerate(players):
+            if i < len(available_cards):
+                # Ensure it's this player's turn before taking action
+                current_player = controller.get_current_player()
+                if current_player.id != player.id:
+                    # Advance turns until it's this player's turn
+                    while controller.get_current_player().id != player.id:
+                        controller.advance_turn()
+
+                # Take strategic action using the card they selected
+                controller.take_strategic_action(player.id, str(available_cards[i].id))
+
+        # Now each player can pass their turn
         for player in players:
-            controller.pass_action_phase_turn(player.id)
+            if not controller.has_passed(player.id):
+                controller.pass_action_phase_turn(player.id)
 
     # Return first player as winner (minimal implementation)
     return controller.get_turn_order()[0]
@@ -149,6 +177,12 @@ def test_concurrent_game_handling() -> None:
 
     # Verify all games completed successfully
     assert len(results) == num_games
+
+    # Debug: Print results to see what's failing
+    for result in results:
+        if not result["success"]:
+            print(f"Game {result['game_id']} failed: {result['error']}")
+
     assert all(result["success"] for result in results)
     assert all(result["winner"] is not None for result in results)
 

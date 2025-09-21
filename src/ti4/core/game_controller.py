@@ -1,6 +1,7 @@
 """Game controller for managing TI4 game flow."""
 
-from typing import Any, Optional
+# Import for type hints
+from typing import TYPE_CHECKING, Any, Optional, Union
 
 from src.ti4.commands.base import GameCommand
 from src.ti4.commands.manager import CommandManager
@@ -11,6 +12,9 @@ from src.ti4.core.game_state_machine import GameStateMachine
 from src.ti4.core.player import Player
 from src.ti4.core.strategy_card import STANDARD_STRATEGY_CARDS, StrategyCard
 from src.ti4.core.validation import ValidationError
+
+if TYPE_CHECKING:
+    from src.ti4.core.strategy_cards.strategic_action import StrategyCardType
 
 
 class GameController:
@@ -33,6 +37,11 @@ class GameController:
         self._game_id = "default_game"  # TODO: Make this configurable
         self._round_number = 1
         self._current_game_state: Optional[Any] = None  # Will be set when game starts
+        self._passed_players: set[str] = set()  # Track players who have passed
+        self._strategic_actions_taken: dict[
+            str, set[int]
+        ] = {}  # Track strategic actions taken by player
+        self._actions_taken_this_turn: set[str] = set()
 
     def get_turn_order(self) -> list[Player]:
         """Get the current turn order."""
@@ -43,10 +52,139 @@ class GameController:
         return self._players[self._current_player_index]
 
     def advance_turn(self) -> None:
-        """Advance to the next player in turn order."""
-        self._current_player_index = (self._current_player_index + 1) % len(
-            self._players
-        )
+        """Advance to the next player's turn."""
+        # Clear actions taken this turn when advancing
+        self._actions_taken_this_turn.clear()
+
+        # If all players have passed, don't advance
+        if self.is_action_phase_complete():
+            return
+
+        # Find next player who hasn't passed
+        attempts = 0
+        max_attempts = len(self._players)
+
+        while attempts < max_attempts:
+            self._current_player_index = (self._current_player_index + 1) % len(
+                self._players
+            )
+            current_player = self._players[self._current_player_index]
+            attempts += 1
+
+            # If this player hasn't passed, they get the turn
+            if not self.has_passed(current_player.id):
+                break
+
+        # If we couldn't find any non-passed player, phase should be complete
+        if attempts >= max_attempts:
+            # All players have passed, phase is complete
+            return
+
+    def advance_to_player(self, player_id: str) -> None:
+        """Advance to a specific player."""
+        for i, player in enumerate(self._players):
+            if player.id == player_id:
+                self._current_player_index = i
+                return
+        raise InvalidPlayerError(f"Player '{player_id}' not found")
+
+    def has_passed(self, player_id: str) -> bool:
+        """Check if a player has passed in the current action phase."""
+        return player_id in self._passed_players
+
+    def assign_strategy_card(
+        self, player_id: str, card_id: Union[int, "StrategyCardType"]
+    ) -> None:
+        """Assign a strategy card to a player."""
+        self._validate_player_exists(player_id)
+        if player_id not in self._selected_strategy_cards:
+            self._selected_strategy_cards[player_id] = []
+
+        # Handle both int and StrategyCardType inputs
+        if isinstance(card_id, int):
+            # Find the card by ID
+            for card in self._available_strategy_cards:
+                if card.id == card_id:
+                    self._selected_strategy_cards[player_id].append(card)
+                    self._available_strategy_cards.remove(card)
+                    return
+            raise ValidationError(f"Strategy card {card_id} not available")
+        else:
+            # Handle StrategyCardType enum with proper ID mapping
+            from src.ti4.core.strategy_card import StrategyCard as CoreStrategyCard
+
+            # Map strategy card types to proper IDs
+            card_type_to_id = {
+                "leadership": 1,
+                "diplomacy": 2,
+                "politics": 3,
+                "construction": 4,
+                "trade": 5,
+                "warfare": 6,
+                "technology": 7,
+                "imperial": 8,
+            }
+
+            # Create a core strategy card for consistency
+            card_id_value = card_type_to_id.get(card_id.value, 1)
+            mock_card = CoreStrategyCard(
+                id=card_id_value,
+                name=card_id.value.title(),
+                initiative=card_id_value,
+            )
+            self._selected_strategy_cards[player_id].append(mock_card)
+
+    def must_pass(self, player_id: str) -> bool:
+        """Check if a player must pass (cannot perform any action)."""
+        self._validate_player_exists(player_id)
+        return not self._can_perform_any_action(player_id)
+
+    def _can_perform_any_action(self, player_id: str) -> bool:
+        """Check if a player can perform any action."""
+        # For now, assume players can always perform actions unless they've passed
+        # This would be expanded with actual game logic
+        return not self.has_passed(player_id)
+
+    def resolve_start_of_turn_abilities(self, player_id: str) -> None:
+        """Resolve start of turn abilities for a player."""
+        # Placeholder for start of turn ability resolution
+        pass
+
+    def resolve_transactions(self, player_id: str) -> None:
+        """Resolve transactions for a player."""
+        # Placeholder for transaction resolution
+        pass
+
+    def can_resolve_secondary_ability(
+        self, player_id: str, card_type: "StrategyCardType"
+    ) -> bool:
+        """Check if a player can resolve a secondary ability."""
+        # Passed players can still resolve secondary abilities
+        return True
+
+    def can_pass(self, player_id: str) -> bool:
+        """Check if a player can pass according to Rule 3 requirements."""
+        self._validate_player_exists(player_id)
+
+        # Get player's strategy cards
+        player_cards = self._selected_strategy_cards.get(player_id, [])
+        if not player_cards:
+            return True  # No cards, can pass
+
+        # Check if player has performed strategic action of at least one card
+        strategic_actions = self._strategic_actions_taken.get(player_id, set())
+
+        # For 3-4 player games, must exhaust both cards
+        if len(self._players) <= 4 and len(player_cards) > 1:
+            # Must have taken strategic action for all cards
+            for card in player_cards:
+                card_id = getattr(card, "id", card.id)
+                if card_id not in strategic_actions:
+                    return False
+            return True
+
+        # For other games, must have taken at least one strategic action
+        return len(strategic_actions) > 0 or len(player_cards) == 0
 
     def _validate_player_exists(self, player_id: str) -> None:
         """Validate that a player exists in the game."""
@@ -143,6 +281,13 @@ class GameController:
         if self._state_machine.current_phase == GamePhase.SETUP:
             self._state_machine.transition_to(GamePhase.STRATEGY)
         self._state_machine.transition_to(GamePhase.ACTION)
+        # Reset pass state for new action phase
+        self._passed_players.clear()
+        self._consecutive_passes = 0
+        self._actions_taken_this_turn.clear()
+
+        # For now, skip event creation since we don't have game_id or round_number
+        # TODO: Add proper event handling when game state is fully implemented
 
     def get_current_phase(self) -> GamePhase:
         """Get the current game phase."""
@@ -152,45 +297,114 @@ class GameController:
         """Validate that a player can take an action."""
         self._validate_player_exists(player_id)
 
-        if not self.is_player_activated(player_id):
-            raise ValidationError(f"Player '{player_id}' is not currently active")
+        # Check if player has already passed
+        if self.has_passed(player_id):
+            raise ValidationError(
+                "Player has already passed and cannot take further actions"
+            )
 
-        if self._state_machine.current_phase != GamePhase.ACTION:
-            raise ValidationError("Not currently in action phase")
+        # Check if it's the player's turn
+        current_player = self.get_current_player()
+        if current_player.id != player_id:
+            raise ValidationError(f"It is not {player_id}'s turn")
+
+        # Check if player must pass
+        if self.must_pass(player_id):
+            raise ValidationError("Player must pass")
+
+        # Check if player has already taken an action this turn
+        if (
+            hasattr(self, "_actions_taken_this_turn")
+            and player_id in self._actions_taken_this_turn
+        ):
+            raise ValidationError("Already took action this turn")
 
     def _reset_consecutive_passes(self) -> None:
         """Reset the consecutive passes counter."""
         self._consecutive_passes = 0
 
-    def take_tactical_action(self, player_id: str, action_data: str) -> None:
+    def take_tactical_action(self, player_id: str, action_type: str) -> None:
         """Allow a player to take a tactical action."""
         self._validate_action_preconditions(player_id)
         self._reset_consecutive_passes()
 
-        # For now, just advance the turn after taking an action
+        # Track that this player took an action this turn
+        self._actions_taken_this_turn.add(player_id)
+
+        # Advance to next player after taking action
         self.advance_turn()
 
-    def take_strategic_action(self, player_id: str, action_type: str) -> None:
+    def take_strategic_action(
+        self, player_id: str, action_type: Union[str, "StrategyCardType"]
+    ) -> None:
         """Allow a player to take a strategic action."""
         self._validate_action_preconditions(player_id)
         self._reset_consecutive_passes()
 
-        # For now, just advance the turn after taking an action
+        # Track that this player took an action this turn
+        self._actions_taken_this_turn.add(player_id)
+
+        # Track that this player took a strategic action
+        if player_id not in self._strategic_actions_taken:
+            self._strategic_actions_taken[player_id] = set()
+
+        # Handle both string and StrategyCardType inputs
+        if isinstance(action_type, str):
+            try:
+                card_id = int(action_type)
+                self._strategic_actions_taken[player_id].add(card_id)
+            except ValueError:
+                # If action_type is not a card ID, we'll need to handle differently
+                pass
+        else:
+            # Handle StrategyCardType enum with proper ID mapping
+            card_type_to_id = {
+                "leadership": 1,
+                "diplomacy": 2,
+                "politics": 3,
+                "construction": 4,
+                "trade": 5,
+                "warfare": 6,
+                "technology": 7,
+                "imperial": 8,
+            }
+            card_id = card_type_to_id.get(action_type.value, 1)
+            self._strategic_actions_taken[player_id].add(card_id)
+
+        # Advance to next player after taking action
         self.advance_turn()
 
     def pass_action_phase_turn(self, player_id: str) -> None:
-        """Allow a player to pass their turn in action phase."""
+        """Allow a player to pass their turn in the action phase."""
         self._validate_action_preconditions(player_id)
 
-        # Increment consecutive passes
-        self._consecutive_passes += 1
+        # Check Rule 3 pass requirements
+        if not self.can_pass(player_id):
+            raise ValidationError("Must perform strategic action before passing")
 
-        # For now, just advance the turn
+        # Resolve start of turn abilities and transactions
+        self.resolve_start_of_turn_abilities(player_id)
+        self.resolve_transactions(player_id)
+
+        # Mark player as passed
+        self._passed_players.add(player_id)
+
+        # Increment consecutive passes and advance turn
+        self._consecutive_passes += 1
         self.advance_turn()
 
+        # Check if phase is complete and advance if so
+        if self.is_action_phase_complete():
+            self.advance_to_next_phase()
+
     def is_action_phase_complete(self) -> bool:
-        """Check if action phase is complete (all players passed consecutively)."""
-        return self._consecutive_passes >= len(self._players)
+        """Check if action phase is complete (all players passed)."""
+        return len(self._passed_players) >= len(self._players)
+
+    def advance_to_next_phase(self) -> None:
+        """Advance to the next phase when action phase is complete."""
+        if self.is_action_phase_complete():
+            self.advance_to_phase(GamePhase.STATUS)
 
     def undo_last_action(self) -> bool:
         """Undo the last action taken. Returns True if successful."""

@@ -6,7 +6,7 @@ Requirements: 9.1, 9.2, 9.3, 9.4, 9.5
 
 import pytest
 
-from src.ti4.core.exceptions import TI4GameError
+from src.ti4.core.exceptions import StrategyCardStateError
 from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
 from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
@@ -74,7 +74,7 @@ class TestRule83ErrorHandlingValidation:
         coordinator._card_assignments["player1"] = StrategyCardType.LEADERSHIP
         # Don't add corresponding state tracking - this creates inconsistency
 
-        with pytest.raises(TI4GameError) as exc_info:
+        with pytest.raises(StrategyCardStateError) as exc_info:
             coordinator.validate_system_state()
 
         assert "state inconsistency" in str(exc_info.value).lower()
@@ -191,7 +191,7 @@ class TestRule83ComprehensiveValidation:
             StrategyCardType.WARFARE: True
         }
 
-        with pytest.raises(TI4GameError) as exc_info:
+        with pytest.raises(StrategyCardStateError) as exc_info:
             coordinator.validate_system_state()
 
         assert "orphan_player" in str(exc_info.value)
