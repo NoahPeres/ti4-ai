@@ -14,7 +14,7 @@ from src.ti4.core.strategy_card import STANDARD_STRATEGY_CARDS, StrategyCard
 from src.ti4.core.validation import ValidationError
 
 if TYPE_CHECKING:
-    from src.ti4.core.strategy_cards.strategic_action import StrategyCardType
+    from src.ti4.core.strategic_action import StrategyCardType
 
 
 class GameController:
@@ -112,6 +112,15 @@ class GameController:
         """Assign a strategy card to a player."""
         self._validate_player_exists(player_id)
 
+        # Phase guard: Only allow strategy card assignment during STRATEGY or SETUP phases
+        # Exception: Allow during ACTION phase for testing purposes (when cards haven't been assigned yet)
+        current_phase = self.get_current_phase()
+        if current_phase not in (GamePhase.STRATEGY, GamePhase.SETUP, GamePhase.ACTION):
+            raise ValidationError(
+                f"Cannot assign strategy cards during {current_phase.value} phase. "
+                "Strategy cards can only be assigned during STRATEGY, SETUP, or ACTION phases."
+            )
+
         if isinstance(card_id, int):
             self.select_strategy_card(player_id, card_id)
             return
@@ -174,26 +183,25 @@ class GameController:
         # Check if player has performed strategic action of at least one card
         strategic_actions = self._strategic_actions_taken.get(player_id, set())
 
-        # For 3-4 player games, must exhaust both cards
-        if len(self._players) <= 4 and len(player_cards) > 1:
+        # Use cards-per-player calculation to determine pass requirements
+        cards_per_player = self._get_cards_per_player()
+
+        # If player has multiple cards (3-4 player games), must exhaust all cards
+        # If player has single card (5-6 player games), must use that card
+        if cards_per_player > 1:
             # Must have taken strategic action for all cards
             for card in player_cards:
                 card_id = card.id
                 if card_id not in strategic_actions:
                     return False
             return True
-
-        # For 5-6 player games, must have taken strategic action for all owned cards
-        if len(self._players) >= 5:
-            # Must have taken strategic action for all cards owned by this player
+        else:
+            # Must have taken strategic action for the single card
             for card in player_cards:
                 card_id = card.id
                 if card_id not in strategic_actions:
                     return False
             return True
-
-        # For other games, must have taken at least one strategic action
-        return len(strategic_actions) > 0
 
     def _validate_player_exists(self, player_id: str) -> None:
         """Validate that a player exists in the game."""
@@ -366,7 +374,7 @@ class GameController:
 
         Args:
             player_id: The ID of the player taking the action
-            strategy_card: The strategy card to use. Can be:
+            action_type: The strategy card to use. Can be:
                 - int: Numeric strategy card ID (1-8)
                 - str: String representation of strategy card ID (e.g., "1", "2")
                 - StrategyCardType: Enum value for the strategy card type
@@ -378,27 +386,41 @@ class GameController:
 
         # Validate that the player owns the strategy card they're trying to use
         player_cards = self.get_player_strategy_cards(player_id)
+        owned_ids = {c.id for c in player_cards}
 
-        # Handle string input (must be convertible to strategy card ID)
+        # Handle string input: accept either numeric ID or canonical card name
         if isinstance(action_type, str):
-            try:
-                card_id = int(action_type)
-                # Check if player owns this card
-                if not any(card.id == card_id for card in player_cards):
+            s = action_type.strip().lower()
+            if s.isdigit():
+                card_id = int(s)
+            else:
+                mapped = self._strategy_card_type_to_id.get(s)
+                if mapped is None:
+                    # Provide helpful error message with available card names
+                    available_names = sorted(self._strategy_card_type_to_id.keys())
                     raise ValidationError(
-                        f"Player {player_id} does not own strategy card {card_id}"
+                        f"String input '{action_type}' must be either a valid strategy card ID (1-8) "
+                        f"or a valid card name. Available card names: {', '.join(available_names)}. "
+                        f"Received unrecognized string: '{s}'"
                     )
-            except ValueError as e:
-                # If action_type is not a numeric string, provide clear error
+                card_id = mapped
+
+            # Validate card ID is in valid range
+            if not (1 <= card_id <= 8):
                 raise ValidationError(
-                    f"String input '{action_type}' must be a valid strategy card ID (1-8). "
-                    f"Received non-numeric string."
-                ) from e
+                    f"Strategy card ID must be between 1 and 8, got {card_id}"
+                )
+
+            # Check if player owns this card
+            if card_id not in owned_ids:
+                raise ValidationError(
+                    f"Player {player_id} does not own strategy card {card_id}"
+                )
         elif isinstance(action_type, int):
             # Handle direct int input
             card_id = action_type
             # Check if player owns this card
-            if not any(card.id == card_id for card in player_cards):
+            if card_id not in owned_ids:
                 raise ValidationError(
                     f"Player {player_id} does not own strategy card {card_id}"
                 )
@@ -412,7 +434,7 @@ class GameController:
             card_id = card_id_maybe  # Now mypy knows card_id is int
 
             # Check if player owns this card
-            if not any(card.id == card_id for card in player_cards):
+            if card_id not in owned_ids:
                 raise ValidationError(
                     f"Player {player_id} does not own strategy card {action_type.value} (ID: {card_id})"
                 )

@@ -154,26 +154,26 @@ class TestRule83SystemValidationReport:
         """Validate performance characteristics of strategy card operations."""
 
         # Test 1: Basic System Creation Performance
-        start_time = time.time()
+        start_time = time.perf_counter()
 
         for _ in range(100):
             manager = StrategicActionManager()
             coordinator = StrategyCardCoordinator(manager)
             manager.set_strategy_card_coordinator(coordinator)
 
-        creation_time = time.time() - start_time
+        creation_time = time.perf_counter() - start_time
 
         # Test 2: Legal Move Generation Performance
         generator = LegalMoveGenerator()
         game_state = GameState()
 
-        start_time = time.time()
+        start_time = time.perf_counter()
 
         for _ in range(100):
             actions = generator.generate_legal_actions(game_state, "player1")
             assert isinstance(actions, list)
 
-        generation_time = time.time() - start_time
+        generation_time = time.perf_counter() - start_time
 
         # Performance should be reasonable (relaxed for CI stability)
         assert creation_time < 2.0, f"System creation too slow: {creation_time}s"

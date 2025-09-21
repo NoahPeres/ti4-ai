@@ -244,7 +244,7 @@ class TestRule83PerformanceValidation:
 
     def test_basic_system_creation_performance(self) -> None:
         """Test that basic system creation is performant."""
-        start_time = time.time()
+        start_time = time.perf_counter()
 
         # Create multiple instances
         for _ in range(100):
@@ -252,7 +252,7 @@ class TestRule83PerformanceValidation:
             coordinator = StrategyCardCoordinator(manager)
             manager.set_strategy_card_coordinator(coordinator)
 
-        end_time = time.time()
+        end_time = time.perf_counter()
         elapsed_time = end_time - start_time
 
         # Should complete in reasonable time (relaxed for CI stability)
@@ -267,14 +267,14 @@ class TestRule83PerformanceValidation:
         game_state = game_state._create_new_state(strategy_card_coordinator=coordinator)
 
         # Measure legal move generation time
-        start_time = time.time()
+        start_time = time.perf_counter()
 
         # Generate legal moves multiple times
         for _ in range(100):
             actions = generator.generate_legal_actions(game_state, "player1")
             assert isinstance(actions, list)
 
-        end_time = time.time()
+        end_time = time.perf_counter()
         elapsed_time = end_time - start_time
 
         # Should complete in reasonable time (relaxed for CI stability)

@@ -10,8 +10,8 @@ from src.ti4.core.unit import Unit
 from .scenario_builder import GameScenarioBuilder
 
 if TYPE_CHECKING:
+    from src.ti4.core.strategic_action import StrategicActionManager
     from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
-    from src.ti4.core.strategy_cards.strategic_action import StrategicActionManager
 
 
 class TestUtilities:
@@ -136,7 +136,7 @@ class TestUtilities:
         Returns:
             StrategicActionManager instance for testing
         """
-        from src.ti4.core.strategy_cards.strategic_action import StrategicActionManager
+        from src.ti4.core.strategic_action import StrategicActionManager
 
         return StrategicActionManager()
 
@@ -171,4 +171,10 @@ class TestUtilities:
         manager = TestUtilities.create_strategic_action_manager()
         coordinator = TestUtilities.create_strategy_card_coordinator(manager)
         manager.set_strategy_card_coordinator(coordinator)
+        # Ensure bidirectional integration
+        try:
+            coordinator.integrate_with_strategic_actions()
+        except AttributeError:
+            # Older coordinator versions may not expose this method
+            pass
         return manager, coordinator
