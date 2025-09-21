@@ -20,18 +20,6 @@ if TYPE_CHECKING:
 class GameController:
     """Manages game flow and turn order for TI4."""
 
-    # Strategy card type to ID mapping - centralized for consistency
-    _STRATEGY_CARD_TYPE_TO_ID = {
-        "leadership": 1,
-        "diplomacy": 2,
-        "politics": 3,
-        "construction": 4,
-        "trade": 5,
-        "warfare": 6,
-        "technology": 7,
-        "imperial": 8,
-    }
-
     def __init__(self, players: list[Player]) -> None:
         """Initialize the game controller with players."""
         if not players:
@@ -54,6 +42,10 @@ class GameController:
             str, set[int]
         ] = {}  # Track strategic actions taken by player
         self._actions_taken_this_turn: set[str] = set()
+        # Dynamic strategy card type to ID mapping derived from STANDARD_STRATEGY_CARDS
+        self._strategy_card_type_to_id = {
+            c.name.lower(): c.id for c in STANDARD_STRATEGY_CARDS
+        }
 
     def get_turn_order(self) -> list[Player]:
         """Get the current turn order."""
@@ -94,6 +86,12 @@ class GameController:
 
     def advance_to_player(self, player_id: str) -> None:
         """Advance to a specific player."""
+        # Guard against misuse outside ACTION phase
+        if self.get_current_phase() != GamePhase.ACTION:
+            raise ValidationError(
+                f"advance_to_player can only be used in ACTION phase, current phase is {self.get_current_phase()}"
+            )
+
         for i, player in enumerate(self._players):
             if player.id == player_id:
                 if self.has_passed(player_id):
@@ -113,49 +111,16 @@ class GameController:
     ) -> None:
         """Assign a strategy card to a player."""
         self._validate_player_exists(player_id)
-        if player_id not in self._selected_strategy_cards:
-            self._selected_strategy_cards[player_id] = []
 
-        # Handle both int and StrategyCardType inputs
         if isinstance(card_id, int):
-            # Check if card is already assigned to any player
-            for existing_player_id, cards in self._selected_strategy_cards.items():
-                for card in cards:
-                    if card.id == card_id:
-                        raise ValidationError(
-                            f"Strategy card {card_id} is already assigned to player {existing_player_id}"
-                        )
+            self.select_strategy_card(player_id, card_id)
+            return
 
-            # Find the card by ID
-            for card in self._available_strategy_cards:
-                if card.id == card_id:
-                    self._selected_strategy_cards[player_id].append(card)
-                    self._available_strategy_cards.remove(card)
-                    return
-            raise ValidationError(f"Strategy card {card_id} not available")
-        else:
-            # Handle StrategyCardType enum with proper ID mapping
-
-            # Get the card ID and find the actual card in available cards
-            card_id_value = self._STRATEGY_CARD_TYPE_TO_ID.get(card_id.value)
-            if card_id_value is None:
-                raise ValidationError(f"Unknown strategy card type: {card_id.value}")
-
-            # Find and remove the card from available cards
-            card_to_assign = None
-            for card in self._available_strategy_cards:
-                if card.id == card_id_value:
-                    card_to_assign = card
-                    break
-
-            if card_to_assign is None:
-                raise ValidationError(
-                    f"Strategy card {card_id.value} (ID: {card_id_value}) not available"
-                )
-
-            # Remove from available and assign to player
-            self._available_strategy_cards.remove(card_to_assign)
-            self._selected_strategy_cards[player_id].append(card_to_assign)
+        # StrategyCardType
+        mapped = self._strategy_card_type_to_id.get(card_id.value)
+        if mapped is None:
+            raise ValidationError(f"Unknown strategy card type: {card_id.value}")
+        self.select_strategy_card(player_id, mapped)
 
     def must_pass(self, player_id: str) -> bool:
         """Check if a player must pass (cannot perform any action)."""
@@ -164,9 +129,17 @@ class GameController:
 
     def _can_perform_any_action(self, player_id: str) -> bool:
         """Check if a player can perform any action."""
-        # For now, assume players can always perform actions unless they've passed
-        # This would be expanded with actual game logic
-        return not self.has_passed(player_id)
+        # Player has passed, cannot perform actions
+        if self.has_passed(player_id):
+            return False
+
+        # In action phase, check if player has any available actions
+        if self.get_current_phase() == GamePhase.ACTION:
+            # Player can always take tactical actions unless they've passed
+            return True
+
+        # In other phases, assume no actions available
+        return False
 
     def resolve_start_of_turn_abilities(self, player_id: str) -> None:
         """Resolve start of turn abilities for a player."""
@@ -204,6 +177,15 @@ class GameController:
         # For 3-4 player games, must exhaust both cards
         if len(self._players) <= 4 and len(player_cards) > 1:
             # Must have taken strategic action for all cards
+            for card in player_cards:
+                card_id = card.id
+                if card_id not in strategic_actions:
+                    return False
+            return True
+
+        # For 5-6 player games, must have taken strategic action for all owned cards
+        if len(self._players) >= 5:
+            # Must have taken strategic action for all cards owned by this player
             for card in player_cards:
                 card_id = card.id
                 if card_id not in strategic_actions:
@@ -330,21 +312,29 @@ class GameController:
         # Check if we're in the ACTION phase
         current_phase = self.get_current_phase()
         if current_phase != GamePhase.ACTION:
+            action_type = "pass" if for_pass else "take action"
             raise ValidationError(
-                f"Actions can only be taken during the ACTION phase, "
-                f"currently in {current_phase.value} phase"
+                f"Cannot {action_type} during {current_phase.value} phase. "
+                f"Actions can only be taken during the ACTION phase. "
+                f"Current player: {player_id}"
             )
 
         # Check if player has already passed
         if self.has_passed(player_id):
+            action_type = "pass again" if for_pass else "take action"
             raise ValidationError(
-                "Player has already passed and cannot take further actions"
+                f"Player {player_id} has already passed and cannot {action_type}. "
+                f"Passed players: {list(self._passed_players)}"
             )
 
         # Check if it's the player's turn
         current_player = self.get_current_player()
         if current_player.id != player_id:
-            raise ValidationError(f"It is not {player_id}'s turn")
+            action_type = "pass" if for_pass else "take action"
+            raise ValidationError(
+                f"Cannot {action_type}: it is {current_player.id}'s turn, not {player_id}'s turn. "
+                f"Turn order: {[p.id for p in self._players]}"
+            )
 
         # Check if player must pass (but allow passing when for_pass=True)
         if self.must_pass(player_id) and not for_pass:
@@ -372,13 +362,24 @@ class GameController:
     def take_strategic_action(
         self, player_id: str, action_type: Union[int, str, "StrategyCardType"]
     ) -> None:
-        """Allow a player to take a strategic action."""
+        """Allow a player to take a strategic action.
+
+        Args:
+            player_id: The ID of the player taking the action
+            strategy_card: The strategy card to use. Can be:
+                - int: Numeric strategy card ID (1-8)
+                - str: String representation of strategy card ID (e.g., "1", "2")
+                - StrategyCardType: Enum value for the strategy card type
+
+        Raises:
+            ValidationError: If the player doesn't own the card or input is invalid
+        """
         self._validate_action_preconditions(player_id)
 
         # Validate that the player owns the strategy card they're trying to use
         player_cards = self.get_player_strategy_cards(player_id)
 
-        # Handle both string and StrategyCardType inputs
+        # Handle string input (must be convertible to strategy card ID)
         if isinstance(action_type, str):
             try:
                 card_id = int(action_type)
@@ -388,9 +389,10 @@ class GameController:
                         f"Player {player_id} does not own strategy card {card_id}"
                     )
             except ValueError as e:
-                # If action_type is not a card ID, raise error for unknown input
+                # If action_type is not a numeric string, provide clear error
                 raise ValidationError(
-                    f"Unknown strategic action type: {action_type}"
+                    f"String input '{action_type}' must be a valid strategy card ID (1-8). "
+                    f"Received non-numeric string."
                 ) from e
         elif isinstance(action_type, int):
             # Handle direct int input
@@ -402,7 +404,7 @@ class GameController:
                 )
         else:
             # Handle StrategyCardType enum with proper ID mapping
-            card_id_maybe = self._STRATEGY_CARD_TYPE_TO_ID.get(action_type.value)
+            card_id_maybe = self._strategy_card_type_to_id.get(action_type.value)
             if card_id_maybe is None:
                 raise ValidationError(
                     f"Unknown strategy card type: {action_type.value}"

@@ -26,6 +26,7 @@ from src.ti4.core.game_state import GameState
 from src.ti4.core.player import Player
 from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
 from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+from src.ti4.testing.test_utilities import TestUtilities
 
 
 class IntegrationTestHelper:
@@ -40,10 +41,7 @@ class IntegrationTestHelper:
         Returns:
             Tuple of (strategic_action_manager, coordinator)
         """
-        strategic_action_manager = StrategicActionManager()
-        coordinator = StrategyCardCoordinator(strategic_action_manager)
-        coordinator.integrate_with_strategic_actions()
-        return strategic_action_manager, coordinator
+        return TestUtilities.create_integrated_strategic_system()
 
     @staticmethod
     def setup_action_phase(

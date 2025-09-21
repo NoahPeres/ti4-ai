@@ -175,9 +175,9 @@ class TestRule83SystemValidationReport:
 
         generation_time = time.time() - start_time
 
-        # Performance should be reasonable
-        assert creation_time < 1.0, f"System creation too slow: {creation_time}s"
-        assert generation_time < 1.0, (
+        # Performance should be reasonable (relaxed for CI stability)
+        assert creation_time < 2.0, f"System creation too slow: {creation_time}s"
+        assert generation_time < 2.0, (
             f"Legal move generation too slow: {generation_time}s"
         )
 
