@@ -133,7 +133,9 @@ class GameController:
             }
 
             # Get the card ID and find the actual card in available cards
-            card_id_value = card_type_to_id.get(card_id.value, 1)
+            card_id_value = card_type_to_id.get(card_id.value)
+            if card_id_value is None:
+                raise ValidationError(f"Unknown strategy card type: {card_id.value}")
 
             # Find and remove the card from available cards
             card_to_assign = None
@@ -201,7 +203,7 @@ class GameController:
             return True
 
         # For other games, must have taken at least one strategic action
-        return len(strategic_actions) > 0 or len(player_cards) == 0
+        return len(strategic_actions) > 0
 
     def _validate_player_exists(self, player_id: str) -> None:
         """Validate that a player exists in the game."""
@@ -302,6 +304,7 @@ class GameController:
         self._passed_players.clear()
         self._consecutive_passes = 0
         self._actions_taken_this_turn.clear()
+        self._strategic_actions_taken.clear()
 
         # For now, skip event creation since we don't have game_id or round_number
         # TODO: Add proper event handling when game state is fully implemented
@@ -310,7 +313,9 @@ class GameController:
         """Get the current game phase."""
         return self._state_machine.current_phase
 
-    def _validate_action_preconditions(self, player_id: str) -> None:
+    def _validate_action_preconditions(
+        self, player_id: str, *, for_pass: bool = False
+    ) -> None:
         """Validate that a player can take an action."""
         self._validate_player_exists(player_id)
 
@@ -333,8 +338,8 @@ class GameController:
         if current_player.id != player_id:
             raise ValidationError(f"It is not {player_id}'s turn")
 
-        # Check if player must pass
-        if self.must_pass(player_id):
+        # Check if player must pass (but allow passing when for_pass=True)
+        if self.must_pass(player_id) and not for_pass:
             raise ValidationError("Player must pass")
 
         # Check if player has already taken an action this turn
@@ -382,6 +387,14 @@ class GameController:
                 raise ValidationError(
                     f"Unknown strategic action type: {action_type}"
                 ) from e
+        elif isinstance(action_type, int):
+            # Handle direct int input
+            card_id = action_type
+            # Check if player owns this card
+            if not any(card.id == card_id for card in player_cards):
+                raise ValidationError(
+                    f"Player {player_id} does not own strategy card {card_id}"
+                )
         else:
             # Handle StrategyCardType enum with proper ID mapping
             card_type_to_id = {
@@ -423,7 +436,7 @@ class GameController:
 
     def pass_action_phase_turn(self, player_id: str) -> None:
         """Allow a player to pass their turn in the action phase."""
-        self._validate_action_preconditions(player_id)
+        self._validate_action_preconditions(player_id, for_pass=True)
 
         # Check Rule 3 pass requirements
         if not self.can_pass(player_id):

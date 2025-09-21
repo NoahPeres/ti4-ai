@@ -290,7 +290,7 @@ def test_strategic_action() -> None:
     controller.start_action_phase()
 
     # Player can take a strategic action using the card ID
-    controller.take_strategic_action("player1", "1")
+    controller.take_strategic_action("player1", 1)
 
     # Should advance to next player
     assert controller.get_current_player().id == "player2"
