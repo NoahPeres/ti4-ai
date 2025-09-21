@@ -20,6 +20,18 @@ if TYPE_CHECKING:
 class GameController:
     """Manages game flow and turn order for TI4."""
 
+    # Strategy card type to ID mapping - centralized for consistency
+    _STRATEGY_CARD_TYPE_TO_ID = {
+        "leadership": 1,
+        "diplomacy": 2,
+        "politics": 3,
+        "construction": 4,
+        "trade": 5,
+        "warfare": 6,
+        "technology": 7,
+        "imperial": 8,
+    }
+
     def __init__(self, players: list[Player]) -> None:
         """Initialize the game controller with players."""
         if not players:
@@ -84,6 +96,10 @@ class GameController:
         """Advance to a specific player."""
         for i, player in enumerate(self._players):
             if player.id == player_id:
+                if self.has_passed(player_id):
+                    raise ValidationError(
+                        "Cannot activate a player who has already passed"
+                    )
                 self._current_player_index = i
                 return
         raise InvalidPlayerError(f"Player '{player_id}' not found")
@@ -120,20 +136,8 @@ class GameController:
         else:
             # Handle StrategyCardType enum with proper ID mapping
 
-            # Map strategy card types to proper IDs
-            card_type_to_id = {
-                "leadership": 1,
-                "diplomacy": 2,
-                "politics": 3,
-                "construction": 4,
-                "trade": 5,
-                "warfare": 6,
-                "technology": 7,
-                "imperial": 8,
-            }
-
             # Get the card ID and find the actual card in available cards
-            card_id_value = card_type_to_id.get(card_id.value)
+            card_id_value = self._STRATEGY_CARD_TYPE_TO_ID.get(card_id.value)
             if card_id_value is None:
                 raise ValidationError(f"Unknown strategy card type: {card_id.value}")
 
@@ -184,6 +188,10 @@ class GameController:
     def can_pass(self, player_id: str) -> bool:
         """Check if a player can pass according to Rule 3 requirements."""
         self._validate_player_exists(player_id)
+
+        # Future-proof: Always allow passing if player must pass (cannot perform any action)
+        if self.must_pass(player_id):
+            return True
 
         # Get player's strategy cards
         player_cards = self._selected_strategy_cards.get(player_id, [])
@@ -343,10 +351,7 @@ class GameController:
             raise ValidationError("Player must pass")
 
         # Check if player has already taken an action this turn
-        if (
-            hasattr(self, "_actions_taken_this_turn")
-            and player_id in self._actions_taken_this_turn
-        ):
+        if player_id in self._actions_taken_this_turn:
             raise ValidationError("Already took action this turn")
 
     def _reset_consecutive_passes(self) -> None:
@@ -365,7 +370,7 @@ class GameController:
         self.advance_turn()
 
     def take_strategic_action(
-        self, player_id: str, action_type: Union[str, "StrategyCardType"]
+        self, player_id: str, action_type: Union[int, str, "StrategyCardType"]
     ) -> None:
         """Allow a player to take a strategic action."""
         self._validate_action_preconditions(player_id)
@@ -397,17 +402,7 @@ class GameController:
                 )
         else:
             # Handle StrategyCardType enum with proper ID mapping
-            card_type_to_id = {
-                "leadership": 1,
-                "diplomacy": 2,
-                "politics": 3,
-                "construction": 4,
-                "trade": 5,
-                "warfare": 6,
-                "technology": 7,
-                "imperial": 8,
-            }
-            card_id_maybe = card_type_to_id.get(action_type.value)
+            card_id_maybe = self._STRATEGY_CARD_TYPE_TO_ID.get(action_type.value)
             if card_id_maybe is None:
                 raise ValidationError(
                     f"Unknown strategy card type: {action_type.value}"
