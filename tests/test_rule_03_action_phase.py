@@ -155,7 +155,9 @@ class TestRule03ActionPhase:
         self.controller.start_action_phase()
 
         # Assign strategy card to player
-        self.controller.assign_strategy_card("player1", StrategyCardType.LEADERSHIP)
+        self.controller.assign_strategy_card(
+            "player1", StrategyCardType.LEADERSHIP, allow_during_action=True
+        )
 
         # Player should not be able to pass without using strategic action
         assert self.controller.can_pass("player1") is False
@@ -179,10 +181,10 @@ class TestRule03ActionPhase:
 
         # Assign two strategy cards to player (as per 3-player rules)
         three_player_controller.assign_strategy_card(
-            "player1", StrategyCardType.LEADERSHIP
+            "player1", StrategyCardType.LEADERSHIP, allow_during_action=True
         )
         three_player_controller.assign_strategy_card(
-            "player1", StrategyCardType.WARFARE
+            "player1", StrategyCardType.WARFARE, allow_during_action=True
         )
 
         # Cannot pass with only one card exhausted

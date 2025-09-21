@@ -14,7 +14,7 @@ from src.ti4.core.strategy_card import STANDARD_STRATEGY_CARDS, StrategyCard
 from src.ti4.core.validation import ValidationError
 
 if TYPE_CHECKING:
-    from src.ti4.core.strategic_action import StrategyCardType
+    from src.ti4.core.strategy_cards.strategic_action import StrategyCardType
 
 
 class GameController:
@@ -64,23 +64,17 @@ class GameController:
         if self.is_action_phase_complete():
             return
 
-        # Find next player who hasn't passed
-        attempts = 0
-        max_attempts = len(self._players)
-
-        while attempts < max_attempts:
+        # Find next player who hasn't passed using for-loop with else clause
+        for _ in range(len(self._players)):
             self._current_player_index = (self._current_player_index + 1) % len(
                 self._players
             )
             current_player = self._players[self._current_player_index]
-            attempts += 1
 
             # If this player hasn't passed, they get the turn
             if not self.has_passed(current_player.id):
                 break
-
-        # If we couldn't find any non-passed player, phase should be complete
-        if attempts >= max_attempts:
+        else:
             # All players have passed, phase is complete
             return
 
@@ -107,18 +101,27 @@ class GameController:
         return player_id in self._passed_players
 
     def assign_strategy_card(
-        self, player_id: str, card_id: Union[int, "StrategyCardType"]
+        self,
+        player_id: str,
+        card_id: Union[int, "StrategyCardType"],
+        *,
+        allow_during_action: bool = False,
     ) -> None:
         """Assign a strategy card to a player."""
         self._validate_player_exists(player_id)
 
         # Phase guard: Only allow strategy card assignment during STRATEGY or SETUP phases
-        # Exception: Allow during ACTION phase for testing purposes (when cards haven't been assigned yet)
+        # Exception: Allow during ACTION phase when explicitly flagged (for testing purposes)
         current_phase = self.get_current_phase()
-        if current_phase not in (GamePhase.STRATEGY, GamePhase.SETUP, GamePhase.ACTION):
+        allowed_phases = [GamePhase.STRATEGY, GamePhase.SETUP]
+        if allow_during_action:
+            allowed_phases.append(GamePhase.ACTION)
+
+        if current_phase not in allowed_phases:
+            phase_names = ", ".join(phase.value for phase in allowed_phases)
             raise ValidationError(
                 f"Cannot assign strategy cards during {current_phase.value} phase. "
-                "Strategy cards can only be assigned during STRATEGY, SETUP, or ACTION phases."
+                f"Strategy cards can only be assigned during {phase_names} phases."
             )
 
         if isinstance(card_id, int):
@@ -132,12 +135,34 @@ class GameController:
         self.select_strategy_card(player_id, mapped)
 
     def must_pass(self, player_id: str) -> bool:
-        """Check if a player must pass (cannot perform any action)."""
+        """Check if a player must pass (cannot perform any action).
+
+        A player must pass when they have no available actions to take.
+        This is used as a future-proof mechanism for scenarios where
+        players might be forced to pass due to game state constraints.
+
+        Args:
+            player_id: The ID of the player to check
+
+        Returns:
+            True if the player must pass, False if they have available actions
+        """
         self._validate_player_exists(player_id)
         return not self._can_perform_any_action(player_id)
 
     def _can_perform_any_action(self, player_id: str) -> bool:
-        """Check if a player can perform any action."""
+        """Check if a player can perform any action.
+
+        This method determines whether a player has any available actions
+        they can take during their turn. Currently focuses on action phase
+        logic but can be extended for other phases.
+
+        Args:
+            player_id: The ID of the player to check
+
+        Returns:
+            True if the player can perform any action, False otherwise
+        """
         # Player has passed, cannot perform actions
         if self.has_passed(player_id):
             return False
@@ -151,13 +176,45 @@ class GameController:
         return False
 
     def resolve_start_of_turn_abilities(self, player_id: str) -> None:
-        """Resolve start of turn abilities for a player."""
+        """Resolve start of turn abilities for a player.
+
+        This method is called when a player passes their turn to resolve
+        any start-of-turn abilities they may have. Currently a placeholder
+        but includes logging for test verification.
+
+        Args:
+            player_id: The ID of the player whose abilities to resolve
+        """
+        # Log the invocation for test verification
+        # This helps prove the method was called during testing
+        import logging
+
+        logger = logging.getLogger(__name__)
+        logger.debug(f"Resolving start-of-turn abilities for player {player_id}")
+
         # Placeholder for start of turn ability resolution
+        # Future implementation will handle faction abilities, technology abilities, etc.
         pass
 
     def resolve_transactions(self, player_id: str) -> None:
-        """Resolve transactions for a player."""
+        """Resolve transactions for a player.
+
+        This method is called when a player passes their turn to resolve
+        any transactions they may want to make. Currently a placeholder
+        but includes logging for test verification.
+
+        Args:
+            player_id: The ID of the player whose transactions to resolve
+        """
+        # Log the invocation for test verification
+        # This helps prove the method was called during testing
+        import logging
+
+        logger = logging.getLogger(__name__)
+        logger.debug(f"Resolving transactions for player {player_id}")
+
         # Placeholder for transaction resolution
+        # Future implementation will handle trade goods, commodities, etc.
         pass
 
     def can_resolve_secondary_ability(
@@ -180,28 +237,11 @@ class GameController:
         if not player_cards:
             return True  # No cards, can pass
 
-        # Check if player has performed strategic action of at least one card
+        # Check if player has performed strategic action for all required cards
         strategic_actions = self._strategic_actions_taken.get(player_id, set())
 
-        # Use cards-per-player calculation to determine pass requirements
-        cards_per_player = self._get_cards_per_player()
-
-        # If player has multiple cards (3-4 player games), must exhaust all cards
-        # If player has single card (5-6 player games), must use that card
-        if cards_per_player > 1:
-            # Must have taken strategic action for all cards
-            for card in player_cards:
-                card_id = card.id
-                if card_id not in strategic_actions:
-                    return False
-            return True
-        else:
-            # Must have taken strategic action for the single card
-            for card in player_cards:
-                card_id = card.id
-                if card_id not in strategic_actions:
-                    return False
-            return True
+        # Must have taken strategic action for all cards (both single and multi-card games)
+        return all(card.id in strategic_actions for card in player_cards)
 
     def _validate_player_exists(self, player_id: str) -> None:
         """Validate that a player exists in the game."""
@@ -219,8 +259,11 @@ class GameController:
         if not self.is_player_activated(player_id):
             from .validation import ValidationError
 
+            current_player = self.get_current_player()
             raise ValidationError(
-                f"Player '{player_id}' is not currently active", "player_id", player_id
+                f"Player '{player_id}' is not currently active. Expected: '{current_player.id}', Actual: '{player_id}'",
+                "player_id",
+                player_id,
             )
 
         self.advance_turn()
@@ -414,7 +457,8 @@ class GameController:
             # Check if player owns this card
             if card_id not in owned_ids:
                 raise ValidationError(
-                    f"Player {player_id} does not own strategy card {card_id}"
+                    f"Player {player_id} does not own strategy card {card_id}. "
+                    f"Player owns cards: {sorted(owned_ids)}, Requested: {card_id}"
                 )
         elif isinstance(action_type, int):
             # Handle direct int input
@@ -422,7 +466,8 @@ class GameController:
             # Check if player owns this card
             if card_id not in owned_ids:
                 raise ValidationError(
-                    f"Player {player_id} does not own strategy card {card_id}"
+                    f"Player {player_id} does not own strategy card {card_id}. "
+                    f"Player owns cards: {sorted(owned_ids)}, Requested: {card_id}"
                 )
         else:
             # Handle StrategyCardType enum with proper ID mapping
@@ -436,8 +481,17 @@ class GameController:
             # Check if player owns this card
             if card_id not in owned_ids:
                 raise ValidationError(
-                    f"Player {player_id} does not own strategy card {action_type.value} (ID: {card_id})"
+                    f"Player {player_id} does not own strategy card {action_type.value} (ID: {card_id}). "
+                    f"Player owns cards: {sorted(owned_ids)}, Requested: {card_id}"
                 )
+
+        # Enforce once-per-phase use of each strategy card (Rule 3)
+        prev = self._strategic_actions_taken.get(player_id, set())
+        if card_id in prev:
+            raise ValidationError(
+                f"Strategy card {card_id} already used this phase by player {player_id}. "
+                f"Cards used this phase: {sorted(prev)}, Attempted: {card_id}"
+            )
 
         self._reset_consecutive_passes()
 
@@ -445,10 +499,7 @@ class GameController:
         self._actions_taken_this_turn.add(player_id)
 
         # Track that this player took a strategic action
-        if player_id not in self._strategic_actions_taken:
-            self._strategic_actions_taken[player_id] = set()
-
-        self._strategic_actions_taken[player_id].add(card_id)
+        self._strategic_actions_taken.setdefault(player_id, set()).add(card_id)
 
         # Advance to next player after taking action
         self.advance_turn()
