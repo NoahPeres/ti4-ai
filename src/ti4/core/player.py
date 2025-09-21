@@ -98,7 +98,18 @@ class Player:
         self.command_sheet.gain_trade_goods(amount)
 
     def spend_trade_goods(self, amount: int) -> bool:
-        """Spend trade goods (Rule 93.3, 93.4). Returns True for amount==0 (no-op)."""
+        """Spend trade goods for resources, influence, or game effects (Rule 19.2, 93.3, 93.4).
+
+        Trade goods can be spent as resources or influence, or consumed by specific game
+        effects that require trade goods. Returns True if successful, False if insufficient.
+        Passing amount==0 is a no-op and returns True.
+
+        Args:
+            amount: Number of trade goods to spend
+
+        Returns:
+            bool: True if successful or amount==0, False if insufficient trade goods
+        """
         return self.command_sheet.spend_trade_goods(amount)
 
     def give_commodities_to_player(self, other_player: "Player", amount: int) -> None:
@@ -129,18 +140,29 @@ class Player:
         # Convert to trade goods for the receiving player (Rule 21.5)
         other_player.gain_trade_goods(amount)
 
-    def convert_commodities_to_trade_goods(self, amount: int) -> None:
-        """Convert commodities to trade goods (Rule 21.7).
+    def convert_commodities_to_trade_goods(self, amount: int, game_effect: str) -> None:
+        """Convert commodities to trade goods when instructed by a game effect (Rule 21.5c).
+
+        Rule 21.5c: "If a game effect instructs a player to convert a number of their
+        own commodities to trade goods, those trade goods are not treated as being
+        gained for the purpose of triggering other abilities."
+
         Passing amount==0 is a no-op.
 
         Args:
             amount: Number of commodities to convert
+            game_effect: Description of the game effect instructing this conversion
+                        (e.g., "Action Card: Trade", "Technology: Sarween Tools")
 
         Raises:
-            ValueError: If player doesn't have enough commodities
+            ValueError: If player doesn't have enough commodities or game_effect is empty
         """
         if amount < 0:
             raise ValueError("Cannot convert negative commodities")
+        if not game_effect or not game_effect.strip():
+            raise ValueError(
+                "game_effect must be specified - conversion only allowed when instructed by game effect"
+            )
         if amount == 0:
             return
         if self._commodity_count < amount:

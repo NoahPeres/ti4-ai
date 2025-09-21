@@ -80,12 +80,15 @@ class TestRule21CommodityTrading:
         player1.replenish_commodities()
         assert player1.get_commodities() == 4  # Sol's max
 
-    def test_convert_own_commodities_to_trade_goods(self) -> None:
-        """Test converting own commodities to trade goods.
+    def test_convert_commodities_when_instructed_by_game_effect(self) -> None:
+        """Test converting commodities to trade goods when instructed by a game effect.
 
         LRR Reference: Rule 21.5c - If a game effect instructs a player to convert
         a number of their own commodities to trade goods, those trade goods are not
         treated as being gained for the purpose of triggering other abilities.
+
+        This test verifies that conversion only happens when a specific game effect
+        instructs it, not as a general player action.
         """
         player = Player("Player1", Faction.SOL)
 
@@ -94,27 +97,35 @@ class TestRule21CommodityTrading:
         assert player.get_commodities() == 4
         assert player.get_trade_goods() == 0
 
-        # Convert 2 commodities to trade goods
-        player.convert_commodities_to_trade_goods(2)
+        # Convert 2 commodities to trade goods via a game effect
+        player.convert_commodities_to_trade_goods(2, "Action Card: Trade")
 
         # Should have fewer commodities and more trade goods
         assert player.get_commodities() == 2
         assert player.get_trade_goods() == 2
 
     def test_convert_commodities_invalid_amounts(self) -> None:
-        """Test that convert_commodities_to_trade_goods rejects negative amounts."""
+        """Test that convert_commodities_to_trade_goods rejects invalid inputs."""
         player = Player("Player1", Faction.SOL)
         player.add_commodities(2)
 
         # Test negative amounts
         with pytest.raises(ValueError, match="Cannot convert negative commodities"):
-            player.convert_commodities_to_trade_goods(-1)
+            player.convert_commodities_to_trade_goods(-1, "Test Effect")
 
         # Test converting more than owned
         with pytest.raises(
             ValueError, match="Player only has 2 commodities, cannot convert 3"
         ):
-            player.convert_commodities_to_trade_goods(3)
+            player.convert_commodities_to_trade_goods(3, "Test Effect")
+
+        # Test missing game effect
+        with pytest.raises(ValueError, match="game_effect must be specified"):
+            player.convert_commodities_to_trade_goods(1, "")
+
+        # Test empty game effect
+        with pytest.raises(ValueError, match="game_effect must be specified"):
+            player.convert_commodities_to_trade_goods(1, "   ")
 
     def test_any_commodity_gift_converts_to_trade_good(self) -> None:
         """Test that any commodity given to another player converts to trade good.

@@ -52,11 +52,17 @@ c  If a game effect instructs a player to convert a number of their own commodit
   - `add_commodities()` - add commodities with limit enforcement
   - `replenish_commodities()` - set commodities to faction maximum
   - `give_commodities_to_player()` - trade commodities (converts to trade goods)
-  - `convert_commodities_to_trade_goods()` - self-conversion
+  - `convert_commodities_to_trade_goods()` - self-conversion when instructed by game effect
+
+**Note on Rule 21.7**: There is intentionally no `spend_commodities()` API method.
+Rule 21.7 states "A player cannot spend commodities unless otherwise specified;
+a player can only trade them during a transaction." Commodities can only be
+transferred via the transaction system (`give_commodities_to_player()`) or
+converted when instructed by specific game effects.
 
 ## Test Coverage
 
-### Basic Commodity Tests (`test_rule_21_commodities.py`)
+### Basic Commodity Tests (`tests/test_rule_21_commodities.py`)
 1. **`test_player_starts_with_zero_commodities`** - Rule 21.2 baseline
 2. **`test_sol_federation_commodity_value`** - Rule 21.2 faction-specific values
 3. **`test_add_commodities_within_limit`** - Rule 21.2 limit enforcement
@@ -64,11 +70,11 @@ c  If a game effect instructs a player to convert a number of their own commodit
 5. **`test_replenish_commodities_to_max`** - Rule 21.3 replenishment
 6. **`test_partial_replenishment`** - Rule 21.3 partial replenishment
 
-### Commodity Trading Tests (`test_rule_21_commodity_trading.py`)
+### Commodity Trading Tests (`tests/test_rule_21_commodity_trading.py`)
 1. **`test_commodity_converts_to_trade_good_when_received`** - Rule 21.5 conversion
 2. **`test_can_trade_before_replenishment`** - Rule 21.5b timing
 3. **`test_giving_commodity_converts_to_trade_good`** - Rule 21.6 gift conversion
-4. **`test_convert_own_commodities_to_trade_goods`** - Rule 21.5c self-conversion
+4. **`test_convert_commodities_when_instructed_by_game_effect`** - Rule 21.5c self-conversion
 5. **`test_cannot_give_more_commodities_than_owned`** - Validation
 
 ## Rule Coverage Analysis
@@ -91,7 +97,7 @@ c  If a game effect instructs a player to convert a number of their own commodit
 ## Integration Points
 
 ### Dependencies
-- **Rule 19**: Command Sheet (trade goods area)
+- **Rule 19.2**: Command Sheet (trade goods area)
 - **Rule 93**: Trade Goods (conversion target)
 - **Rule 94**: Transactions (trading mechanism)
 
@@ -104,12 +110,18 @@ c  If a game effect instructs a player to convert a number of their own commodit
 - **Total Tests**: 11 (6 basic + 5 trading) - see test files for verification
 - **Code Coverage**: High coverage for commodity functionality - see coverage reports
 - **Rule Coverage**: 7/8 sub-rules implemented (87.5%)
-- **Integration**: Fully integrated with command sheet and faction systems
+- **Integration**: Fully integrated with command sheet and faction systems (see `src/ti4/core/player.py`)
 
 ## Implementation Notes
 
 ### Design Decisions
 1. **Immutable Player**: Used `object.__setattr__()` for frozen dataclass modification
+   - **Rationale**: The Player class is frozen to prevent accidental mutations and ensure
+     data integrity. However, certain game mechanics (like commodity tracking) require
+     internal state updates. Using `object.__setattr__()` allows controlled mutations
+     while maintaining the immutable interface contract.
+   - **Alternative**: Could refactor to use a mutable internal state object, but the
+     current approach keeps the API simple while preserving immutability guarantees.
 2. **Faction Data Centralization**: Separate module for faction-specific constants
 3. **Command Sheet Integration**: Trade goods stored in command sheet per Rule 19.2
 4. **Validation**: Comprehensive input validation and error handling
