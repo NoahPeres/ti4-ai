@@ -48,6 +48,11 @@ coverage.xml
 *.cover
 *.py,cover
 .hypothesis/
+
+# Review artifacts (transient files)
+latest_review.txt
+latest_review*.txt
+.trae/**/latest_review*.txt
 .pytest_cache/
 cover/
 

@@ -86,7 +86,7 @@ class Player:
 
     def replenish_commodities(self) -> None:
         """Replenish commodities to faction's commodity value (Rule 21.3)."""
-        commodity_value = FactionData.get_commodity_value(self.faction)
+        commodity_value = self.get_commodity_value()
         object.__setattr__(self, "_commodity_count", commodity_value)
 
     def get_trade_goods(self) -> int:
@@ -98,11 +98,12 @@ class Player:
         self.command_sheet.gain_trade_goods(amount)
 
     def spend_trade_goods(self, amount: int) -> bool:
-        """Spend trade goods (Rule 93.3, 93.4)."""
+        """Spend trade goods (Rule 93.3, 93.4). Returns True for amount==0 (no-op)."""
         return self.command_sheet.spend_trade_goods(amount)
 
     def give_commodities_to_player(self, other_player: "Player", amount: int) -> None:
         """Give commodities to another player, converting them to trade goods (Rule 21.5, 21.6).
+        Passing amount==0 is a no-op.
 
         Args:
             other_player: The player receiving the commodities
@@ -113,6 +114,8 @@ class Player:
         """
         if amount < 0:
             raise ValueError("Cannot give negative commodities")
+        if amount == 0:
+            return
         if self is other_player:
             raise ValueError("Cannot give commodities to yourself")
         if self._commodity_count < amount:
@@ -127,7 +130,8 @@ class Player:
         other_player.gain_trade_goods(amount)
 
     def convert_commodities_to_trade_goods(self, amount: int) -> None:
-        """Convert own commodities to trade goods (Rule 21.5c).
+        """Convert commodities to trade goods (Rule 21.7).
+        Passing amount==0 is a no-op.
 
         Args:
             amount: Number of commodities to convert
@@ -137,6 +141,8 @@ class Player:
         """
         if amount < 0:
             raise ValueError("Cannot convert negative commodities")
+        if amount == 0:
+            return
         if self._commodity_count < amount:
             raise ValueError(
                 f"Player only has {self._commodity_count} commodities, cannot convert {amount}"
@@ -148,4 +154,10 @@ class Player:
 
     def _remove_commodities(self, amount: int) -> None:
         """Helper method to remove commodities (DRY principle)."""
+        if amount < 0:
+            raise ValueError("Cannot remove negative commodities")
+        if self._commodity_count < amount:
+            raise ValueError(
+                f"Player only has {self._commodity_count} commodities, cannot remove {amount}"
+            )
         object.__setattr__(self, "_commodity_count", self._commodity_count - amount)

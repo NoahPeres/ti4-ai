@@ -86,7 +86,7 @@ c  If a game effect instructs a player to convert a number of their own commodit
 - **Rule 21.7**: Spending restrictions (enforced through interface design)
 
 ### 📋 Not Implemented (Out of Scope)
-- **Rule 21.8**: Token denominations (1 and 3 values) - UI/physical concern
+- **Rule 21.8**: Token denominations (1 and 3 values) - UI/physical concern, out of scope for this implementation
 
 ## Integration Points
 
@@ -101,8 +101,8 @@ c  If a game effect instructs a player to convert a number of their own commodit
 - **Economic Engine**: Resource conversion and trading
 
 ## Quality Metrics
-- **Total Tests**: 11 (6 basic + 5 trading)
-- **Code Coverage**: 100% for commodity functionality
+- **Total Tests**: 11 (6 basic + 5 trading) - see test files for verification
+- **Code Coverage**: High coverage for commodity functionality - see coverage reports
 - **Rule Coverage**: 7/8 sub-rules implemented (87.5%)
 - **Integration**: Fully integrated with command sheet and faction systems
 
