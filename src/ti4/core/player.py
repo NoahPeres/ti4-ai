@@ -1,9 +1,10 @@
-"""Player management for TI4."""
+"""Player implementation for TI4 game state management."""
 
 from dataclasses import dataclass, field
 
 from .command_sheet import CommandSheet, PoolType
 from .constants import Faction
+from .faction_data import FactionData
 
 
 @dataclass(frozen=True)
@@ -16,6 +17,7 @@ class Player:
     reinforcements: int = (
         8  # Rule 20.3: 16 total tokens - 8 on sheet = 8 in reinforcements
     )
+    _commodity_count: int = field(default=0, init=False)  # Current commodity count
 
     def is_valid(self) -> bool:
         """Validate the player data."""
@@ -42,3 +44,100 @@ class Player:
             object.__setattr__(self, "reinforcements", self.reinforcements - 1)
 
         return success
+
+    def get_commodity_value(self) -> int:
+        """Get the commodity value for this player's faction.
+
+        LRR Reference: Rule 21.2 - The commodity value on a player's faction sheet
+        indicates the maximum number of commodities that player can have.
+
+        Returns:
+            The maximum number of commodities this player can have
+        """
+        return FactionData.get_commodity_value(self.faction)
+
+    def get_commodities(self) -> int:
+        """Get the current number of commodities this player has.
+
+        Returns:
+            Current number of commodity tokens
+        """
+        return self._commodity_count
+
+    def add_commodities(self, count: int) -> None:
+        """Add commodity tokens to this player.
+
+        Args:
+            count: Number of commodity tokens to add
+
+        Raises:
+            ValueError: If adding would exceed commodity limit
+        """
+        new_count = self._commodity_count + count
+        max_commodities = self.get_commodity_value()
+
+        if new_count > max_commodities:
+            raise ValueError(f"Cannot exceed commodity limit of {max_commodities}")
+
+        # Since this is a frozen dataclass, we need to modify the field directly
+        object.__setattr__(self, "_commodity_count", new_count)
+
+    def replenish_commodities(self) -> None:
+        """Replenish commodities to faction's commodity value (Rule 21.3)."""
+        commodity_value = FactionData.get_commodity_value(self.faction)
+        object.__setattr__(self, "_commodity_count", commodity_value)
+
+    def get_trade_goods(self) -> int:
+        """Get current number of trade goods (Rule 93.2)."""
+        return self.command_sheet.get_trade_goods()
+
+    def gain_trade_goods(self, amount: int) -> None:
+        """Gain trade goods (Rule 93.2)."""
+        self.command_sheet.gain_trade_goods(amount)
+
+    def spend_trade_goods(self, amount: int) -> bool:
+        """Spend trade goods (Rule 93.3, 93.4)."""
+        return self.command_sheet.spend_trade_goods(amount)
+
+    def give_commodities_to_player(self, other_player: "Player", amount: int) -> None:
+        """Give commodities to another player, converting them to trade goods (Rule 21.5, 21.6).
+
+        Args:
+            other_player: The player receiving the commodities
+            amount: Number of commodities to give
+
+        Raises:
+            ValueError: If player doesn't have enough commodities
+        """
+        if amount < 0:
+            raise ValueError("Cannot give negative commodities")
+        if self._commodity_count < amount:
+            raise ValueError(
+                f"Player only has {self._commodity_count} commodities, cannot give {amount}"
+            )
+
+        # Remove commodities from this player
+        object.__setattr__(self, "_commodity_count", self._commodity_count - amount)
+
+        # Convert to trade goods for the receiving player (Rule 21.5)
+        other_player.gain_trade_goods(amount)
+
+    def convert_commodities_to_trade_goods(self, amount: int) -> None:
+        """Convert own commodities to trade goods (Rule 21.5c).
+
+        Args:
+            amount: Number of commodities to convert
+
+        Raises:
+            ValueError: If player doesn't have enough commodities
+        """
+        if amount < 0:
+            raise ValueError("Cannot convert negative commodities")
+        if self._commodity_count < amount:
+            raise ValueError(
+                f"Player only has {self._commodity_count} commodities, cannot convert {amount}"
+            )
+
+        # Remove commodities and add trade goods
+        object.__setattr__(self, "_commodity_count", self._commodity_count - amount)
+        self.gain_trade_goods(amount)

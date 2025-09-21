@@ -8,13 +8,14 @@
 **Focus**: Complete advanced mechanics that enable complex strategic gameplay and AI decision-making
 
 ## 📊 Progress
-**Overall Progress**: 28.7%
-**Completed Rules**: 28/101
+**Overall Progress**: 29.7%
+**Completed Rules**: 29/101
 - **Rule 6: ADJACENCY** - Core spatial mechanics for system relationships
 - **Rule 14: BLOCKADED** - Blockade mechanics for space docks and production restrictions (Foundation Layer) ✅ **COMPLETED**
 - **Rule 17: CAPTURE** - Unit capture mechanics and faction sheet management (Foundation Layer) ✅ **COMPLETED**
 - **Rule 18: COMBAT** - General combat mechanics with burst icon support (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 20: COMMAND TOKENS** - Resource management and reinforcement system (Foundation Layer)
+- **Rule 21: COMMODITIES** - Commodity trading and conversion system (Economic Layer) ✅ **NEWLY COMPLETED**
 - **Rule 25: CONTROL** - Planet control mechanics with planet card management and control tokens (Core Game Layer) ✅ **COMPLETED**
 - **Rule 34: EXHAUSTED** - Card exhaustion mechanics for planets, technology, and strategy cards (Foundation Layer) ✅ **NEWLY COMPLETED**
 - **Rule 58: MOVEMENT** - Unit movement and fleet mechanics (Core Game Layer) ✅ **COMPLETED**
