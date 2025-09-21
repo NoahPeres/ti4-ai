@@ -49,7 +49,7 @@ class GameController:
 
     def get_turn_order(self) -> list[Player]:
         """Get the current turn order."""
-        return self._players
+        return list(self._players)
 
     def get_current_player(self) -> Player:
         """Get the currently active player."""
@@ -127,11 +127,18 @@ class GameController:
         if isinstance(card_id, int):
             self.select_strategy_card(player_id, card_id)
             return
-
-        # StrategyCardType
-        mapped = self._strategy_card_type_to_id.get(card_id.value)
+        # StrategyCardType-like (duck-typed via `.value`)
+        if hasattr(card_id, "value"):
+            key = str(card_id.value).lower()
+            mapped = self._strategy_card_type_to_id.get(key)
+        else:
+            raise ValidationError(
+                f"card_id must be int or StrategyCardType, got {type(card_id).__name__}"
+            )
         if mapped is None:
-            raise ValidationError(f"Unknown strategy card type: {card_id.value}")
+            raise ValidationError(
+                f"Unknown strategy card type: {getattr(card_id, 'value', card_id)}"
+            )
         self.select_strategy_card(player_id, mapped)
 
     def must_pass(self, player_id: str) -> bool:
@@ -175,11 +182,11 @@ class GameController:
         # In other phases, assume no actions available
         return False
 
-    def resolve_start_of_turn_abilities(self, player_id: str) -> None:
-        """Resolve start of turn abilities for a player.
+    def resolve_end_of_turn_abilities(self, player_id: str) -> None:
+        """Resolve end of turn abilities for a player.
 
         This method is called when a player passes their turn to resolve
-        any start-of-turn abilities they may have. Currently a placeholder
+        any end-of-turn abilities they may have. Currently a placeholder
         but includes logging for test verification.
 
         Args:
@@ -190,9 +197,9 @@ class GameController:
         import logging
 
         logger = logging.getLogger(__name__)
-        logger.debug(f"Resolving start-of-turn abilities for player {player_id}")
+        logger.debug(f"Resolving end-of-turn abilities for player {player_id}")
 
-        # Placeholder for start of turn ability resolution
+        # Placeholder for end of turn ability resolution
         # Future implementation will handle faction abilities, technology abilities, etc.
         pass
 
@@ -256,16 +263,17 @@ class GameController:
 
     def pass_turn(self, player_id: str) -> None:
         """Allow a player to pass their turn."""
+        # Preserve ACTION-phase invariants
+        if self.get_current_phase() == GamePhase.ACTION:
+            self.pass_action_phase_turn(player_id)
+            return
         if not self.is_player_activated(player_id):
-            from .validation import ValidationError
-
             current_player = self.get_current_player()
             raise ValidationError(
                 f"Player '{player_id}' is not currently active. Expected: '{current_player.id}', Actual: '{player_id}'",
                 "player_id",
                 player_id,
             )
-
         self.advance_turn()
 
     def start_strategy_phase(self) -> None:
@@ -300,7 +308,7 @@ class GameController:
 
     def get_player_strategy_cards(self, player_id: str) -> list[StrategyCard]:
         """Get the strategy cards selected by a player."""
-        return self._selected_strategy_cards.get(player_id, [])
+        return list(self._selected_strategy_cards.get(player_id, []))
 
     def get_strategy_phase_turn_order(self) -> list[Player]:
         """Get turn order based on strategy card initiative values."""
@@ -364,10 +372,11 @@ class GameController:
         current_phase = self.get_current_phase()
         if current_phase != GamePhase.ACTION:
             action_type = "pass" if for_pass else "take action"
+            current_active = self.get_current_player().id
             raise ValidationError(
                 f"Cannot {action_type} during {current_phase.value} phase. "
                 f"Actions can only be taken during the ACTION phase. "
-                f"Current player: {player_id}"
+                f"Current active player: {current_active}, attempted by: {player_id}"
             )
 
         # Check if player has already passed
@@ -512,8 +521,8 @@ class GameController:
         if not self.can_pass(player_id):
             raise ValidationError("Must perform strategic action before passing")
 
-        # Resolve start of turn abilities and transactions
-        self.resolve_start_of_turn_abilities(player_id)
+        # Resolve end of turn abilities and transactions
+        self.resolve_end_of_turn_abilities(player_id)
         self.resolve_transactions(player_id)
 
         # Mark player as passed

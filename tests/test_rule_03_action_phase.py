@@ -294,13 +294,13 @@ class TestRule03ActionPhase:
         # RED: This will fail until we implement turn ability handling
         self.controller.start_action_phase()
 
-        # Mock start of turn abilities
+        # Mock end of turn abilities
         with patch.object(
-            self.controller, "resolve_start_of_turn_abilities"
+            self.controller, "resolve_end_of_turn_abilities"
         ) as mock_abilities:
             self.controller.pass_action_phase_turn("player1")
 
-            # Should have resolved start of turn abilities
+            # Should have resolved end of turn abilities
             mock_abilities.assert_called_once_with("player1")
 
     def test_transactions_allowed_during_pass_turn(self) -> None:
