@@ -5,6 +5,9 @@ Core exceptions for the TI4 game system.
 import time
 from typing import Any, Optional
 
+# Re-export ValidationError from the validation module to avoid duplication and API drift
+from .validation import ValidationError  # noqa: F401
+
 
 class TI4Error(Exception):
     """Base exception for all TI4 game errors."""
@@ -26,12 +29,6 @@ class TI4GameError(TI4Error):
         self.timestamp = time.time()
         if cause:
             self.__cause__ = cause
-
-
-class ValidationError(TI4Error):
-    """Raised when validation fails."""
-
-    pass
 
 
 class InvalidPlayerError(TI4Error):
@@ -83,16 +80,28 @@ class AbilityPrecedenceError(AbilityError):
 
 
 class CommandExecutionError(TI4Error):
-    """Raised when a command fails to execute."""
+    """Raised when command execution fails."""
 
     def __init__(
-        self, command: Any, reason: str, context: Optional[dict[str, Any]] = None
+        self,
+        command: Any,
+        reason: str,
+        context: Optional[dict[str, Any]] = None,
+        cause: Optional[Exception] = None,
     ):
         self.command = command
         self.reason = reason
         self.context = context or {}
-        self.timestamp = None  # Will be set by the system
-        super().__init__(f"Command execution failed: {reason}")
+        self.timestamp = time.time()  # Set timestamp when error occurs
+        self.cause = cause  # Store the original exception for chaining
+
+        # Build error message without timestamp for consistency with tests
+        message = f"Command execution failed: {reason}"
+
+        # Chain the cause if provided
+        super().__init__(message)
+        if cause:
+            self.__cause__ = cause
 
 
 class PhaseTransitionError(TI4Error):
@@ -105,7 +114,10 @@ class PhaseTransitionError(TI4Error):
         self.to_phase = to_phase
         self.context = context or {}
         self.timestamp = time.time()
+
+        # Build simple error message to match test expectations
         message = f"Invalid transition from {from_phase} to {to_phase}"
+
         super().__init__(message)
 
 

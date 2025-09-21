@@ -58,12 +58,17 @@ def execute_full_turn_sequence(controller: GameController) -> GameController:
     # Each player takes a strategic action first (Rule 3 requirement)
     for i, player in enumerate(players):
         if i < len(available_cards):
+            # Advance to this player's turn before taking action
+            controller.advance_to_player(player.id)
+
             # Take strategic action using the card they selected
             controller.take_strategic_action(player.id, str(available_cards[i].id))
 
     # Now each player can pass their turn
     for player in players:
         if not controller.has_passed(player.id):
+            # Advance to this player's turn before passing
+            controller.advance_to_player(player.id)
             controller.pass_action_phase_turn(player.id)
 
     return controller
@@ -114,12 +119,8 @@ def simulate_complete_game(controller: GameController) -> Player:
         # Each player takes a strategic action first (Rule 3 requirement)
         for i, player in enumerate(players):
             if i < len(available_cards):
-                # Ensure it's this player's turn before taking action
-                current_player = controller.get_current_player()
-                if current_player.id != player.id:
-                    # Advance turns until it's this player's turn
-                    while controller.get_current_player().id != player.id:
-                        controller.advance_turn()
+                # Advance to this player's turn before taking action
+                controller.advance_to_player(player.id)
 
                 # Take strategic action using the card they selected
                 controller.take_strategic_action(player.id, str(available_cards[i].id))
@@ -127,6 +128,8 @@ def simulate_complete_game(controller: GameController) -> Player:
         # Now each player can pass their turn
         for player in players:
             if not controller.has_passed(player.id):
+                # Advance to this player's turn before passing
+                controller.advance_to_player(player.id)
                 controller.pass_action_phase_turn(player.id)
 
     # Return first player as winner (minimal implementation)

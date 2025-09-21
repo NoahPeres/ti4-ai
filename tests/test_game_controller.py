@@ -283,10 +283,14 @@ def test_strategic_action() -> None:
     """Test that players can take strategic actions."""
     players = create_test_players(3)
     controller = GameController(players)
+
+    # First assign a strategy card to the player
+    controller.start_strategy_phase()
+    controller.select_strategy_card("player1", 1)  # Leadership card
     controller.start_action_phase()
 
-    # Player can take a strategic action
-    controller.take_strategic_action("player1", "leadership_primary")
+    # Player can take a strategic action using the card ID
+    controller.take_strategic_action("player1", "1")
 
     # Should advance to next player
     assert controller.get_current_player().id == "player2"

@@ -102,6 +102,14 @@ class GameController:
 
         # Handle both int and StrategyCardType inputs
         if isinstance(card_id, int):
+            # Check if card is already assigned to any player
+            for existing_player_id, cards in self._selected_strategy_cards.items():
+                for card in cards:
+                    if card.id == card_id:
+                        raise ValidationError(
+                            f"Strategy card {card_id} is already assigned to player {existing_player_id}"
+                        )
+
             # Find the card by ID
             for card in self._available_strategy_cards:
                 if card.id == card_id:
@@ -111,7 +119,6 @@ class GameController:
             raise ValidationError(f"Strategy card {card_id} not available")
         else:
             # Handle StrategyCardType enum with proper ID mapping
-            from src.ti4.core.strategy_card import StrategyCard as CoreStrategyCard
 
             # Map strategy card types to proper IDs
             card_type_to_id = {
@@ -125,14 +132,24 @@ class GameController:
                 "imperial": 8,
             }
 
-            # Create a core strategy card for consistency
+            # Get the card ID and find the actual card in available cards
             card_id_value = card_type_to_id.get(card_id.value, 1)
-            mock_card = CoreStrategyCard(
-                id=card_id_value,
-                name=card_id.value.title(),
-                initiative=card_id_value,
-            )
-            self._selected_strategy_cards[player_id].append(mock_card)
+
+            # Find and remove the card from available cards
+            card_to_assign = None
+            for card in self._available_strategy_cards:
+                if card.id == card_id_value:
+                    card_to_assign = card
+                    break
+
+            if card_to_assign is None:
+                raise ValidationError(
+                    f"Strategy card {card_id.value} (ID: {card_id_value}) not available"
+                )
+
+            # Remove from available and assign to player
+            self._available_strategy_cards.remove(card_to_assign)
+            self._selected_strategy_cards[player_id].append(card_to_assign)
 
     def must_pass(self, player_id: str) -> bool:
         """Check if a player must pass (cannot perform any action)."""
@@ -178,7 +195,7 @@ class GameController:
         if len(self._players) <= 4 and len(player_cards) > 1:
             # Must have taken strategic action for all cards
             for card in player_cards:
-                card_id = getattr(card, "id", card.id)
+                card_id = card.id
                 if card_id not in strategic_actions:
                     return False
             return True
@@ -297,6 +314,14 @@ class GameController:
         """Validate that a player can take an action."""
         self._validate_player_exists(player_id)
 
+        # Check if we're in the ACTION phase
+        current_phase = self.get_current_phase()
+        if current_phase != GamePhase.ACTION:
+            raise ValidationError(
+                f"Actions can only be taken during the ACTION phase, "
+                f"currently in {current_phase.value} phase"
+            )
+
         # Check if player has already passed
         if self.has_passed(player_id):
             raise ValidationError(
@@ -339,23 +364,24 @@ class GameController:
     ) -> None:
         """Allow a player to take a strategic action."""
         self._validate_action_preconditions(player_id)
-        self._reset_consecutive_passes()
 
-        # Track that this player took an action this turn
-        self._actions_taken_this_turn.add(player_id)
-
-        # Track that this player took a strategic action
-        if player_id not in self._strategic_actions_taken:
-            self._strategic_actions_taken[player_id] = set()
+        # Validate that the player owns the strategy card they're trying to use
+        player_cards = self.get_player_strategy_cards(player_id)
 
         # Handle both string and StrategyCardType inputs
         if isinstance(action_type, str):
             try:
                 card_id = int(action_type)
-                self._strategic_actions_taken[player_id].add(card_id)
-            except ValueError:
-                # If action_type is not a card ID, we'll need to handle differently
-                pass
+                # Check if player owns this card
+                if not any(card.id == card_id for card in player_cards):
+                    raise ValidationError(
+                        f"Player {player_id} does not own strategy card {card_id}"
+                    )
+            except ValueError as e:
+                # If action_type is not a card ID, raise error for unknown input
+                raise ValidationError(
+                    f"Unknown strategic action type: {action_type}"
+                ) from e
         else:
             # Handle StrategyCardType enum with proper ID mapping
             card_type_to_id = {
@@ -368,8 +394,29 @@ class GameController:
                 "technology": 7,
                 "imperial": 8,
             }
-            card_id = card_type_to_id.get(action_type.value, 1)
-            self._strategic_actions_taken[player_id].add(card_id)
+            card_id_maybe = card_type_to_id.get(action_type.value)
+            if card_id_maybe is None:
+                raise ValidationError(
+                    f"Unknown strategy card type: {action_type.value}"
+                )
+            card_id = card_id_maybe  # Now mypy knows card_id is int
+
+            # Check if player owns this card
+            if not any(card.id == card_id for card in player_cards):
+                raise ValidationError(
+                    f"Player {player_id} does not own strategy card {action_type.value} (ID: {card_id})"
+                )
+
+        self._reset_consecutive_passes()
+
+        # Track that this player took an action this turn
+        self._actions_taken_this_turn.add(player_id)
+
+        # Track that this player took a strategic action
+        if player_id not in self._strategic_actions_taken:
+            self._strategic_actions_taken[player_id] = set()
+
+        self._strategic_actions_taken[player_id].add(card_id)
 
         # Advance to next player after taking action
         self.advance_turn()
