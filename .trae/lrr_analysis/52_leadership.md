@@ -31,22 +31,31 @@ The "Leadership" strategy card allows players to gain command tokens. This card'
 - **Implementation Notes**: Basic strategic action framework implemented
 
 ### 52.2 - Primary Ability (3 + Influence Conversion)
-- **Status**: ⚠️ Partially Implemented
-- **Location**: Strategy card system exists but specific Leadership implementation unclear
-- **Test Coverage**: Limited - no specific Leadership primary ability tests found
-- **Implementation Notes**: Framework exists but Leadership-specific logic not confirmed
+- **Status**: ✅ Implemented
+- **Location**: `src/ti4/core/strategy_cards/cards/leadership.py` - `execute_primary_ability`
+- **Test Coverage**: Comprehensive - 12 test cases covering all aspects
+- **Implementation Notes**:
+  - Gains 3 base command tokens automatically
+  - Allows influence spending at 3:1 ratio for additional tokens
+  - Handles token distribution to player's choice of pools
+  - Validates reinforcement availability per Rule 20.3a
+  - Exhausts planets when spending influence
 
 ### 52.3 - Secondary Ability (Influence Conversion Only)
-- **Status**: ⚠️ Partially Implemented
-- **Location**: Secondary ability framework exists
-- **Test Coverage**: Limited - no specific Leadership secondary ability tests found
-- **Implementation Notes**: Framework exists but Leadership-specific logic not confirmed
+- **Status**: ✅ Implemented
+- **Location**: `src/ti4/core/strategy_cards/cards/leadership.py` - `execute_secondary_ability`
+- **Test Coverage**: Comprehensive - included in 12 test cases
+- **Implementation Notes**:
+  - Only influence conversion (3:1 ratio), no base tokens
+  - Players can choose to participate or decline
+  - No command token cost for secondary ability (per Rule 20.5a)
+  - Handles token distribution to player's choice of pools
 
 ### 52.4 - Command Token Pool Choice
 - **Status**: ✅ Implemented
-- **Location**: Command token management system
-- **Test Coverage**: Good - command token pool management tested
-- **Implementation Notes**: Players can choose which pool to place tokens in
+- **Location**: Token distribution handled in both primary and secondary abilities
+- **Test Coverage**: Good - tested in `test_token_pool_choice_rule_52_4`
+- **Implementation Notes**: Players specify token distribution via `token_distribution` parameter
 
 ### Initiative Value "1"
 - **Status**: ✅ Implemented
@@ -149,21 +158,110 @@ The "Leadership" strategy card allows players to gain command tokens. This card'
 8. **Influence Validation**: Ensure players have enough influence to spend
 9. **Leadership Events**: Publish events when Leadership abilities are used
 
+## Implementation Status
+
+### Overall Status: ✅ COMPLETE
+- **Primary Ability**: ✅ Fully implemented with comprehensive test coverage
+- **Secondary Ability**: ✅ Fully implemented with comprehensive test coverage
+- **Token Pool Choice**: ✅ Fully implemented and tested
+- **Initiative Value**: ✅ Implemented (returns 1)
+
+### Test Cases Demonstrating Implementation
+
+The following test cases in `tests/test_rule_52_leadership.py` demonstrate complete Rule 52 implementation:
+
+1. **`test_leadership_card_basic_properties`** - Verifies initiative value is 1
+2. **`test_primary_ability_gains_three_command_tokens`** - Tests base 3 token gain (Rule 52.2)
+3. **`test_primary_ability_influence_conversion`** - Tests influence spending for additional tokens (Rule 52.2)
+4. **`test_primary_ability_partial_influence_spending`** - Tests partial influence spending (Rule 52.2)
+5. **`test_primary_ability_no_influence_spending`** - Tests choosing not to spend influence (Rule 52.2)
+6. **`test_primary_ability_insufficient_reinforcements`** - Tests reinforcement limits (Rule 20.3a)
+7. **`test_secondary_ability_influence_conversion_only`** - Tests secondary ability conversion (Rule 52.3)
+8. **`test_secondary_ability_no_command_token_cost`** - Tests no token cost for secondary (Rule 20.5a)
+9. **`test_secondary_ability_can_decline`** - Tests optional participation (Rule 52.3)
+10. **`test_token_pool_choice_rule_52_4`** - Tests token pool choice (Rule 52.4)
+11. **`test_influence_three_to_one_ratio`** - Tests exact 3:1 conversion ratio
+12. **`test_integration_with_coordinator`** - Tests integration with strategy card system
+
+### Key Implementation Details
+
+- **File**: `src/ti4/core/strategy_cards/cards/leadership.py`
+- **Primary Ability**: Gains 3 base tokens + optional influence conversion (3:1 ratio)
+- **Secondary Ability**: Optional influence conversion only (3:1 ratio), no base tokens
+- **Token Distribution**: Players specify distribution via `token_distribution` parameter
+- **Influence Spending**: Handled via `_spend_influence` helper method that exhausts planets
+- **Reinforcement Validation**: Respects Rule 20.3a - cannot gain tokens without reinforcements
+- **Participation**: Secondary ability allows players to decline participation
+
+### Dependencies Satisfied
+- ✅ Command Token system (Rule 20)
+- ✅ Influence system (Rule 47)
+- ✅ Strategy Card framework
+- ✅ Planet exhaustion mechanics
+- ✅ Strategic Action system
+
 ## Priority Assessment
 **Overall Priority**: High - Leadership is initiative 1 and fundamental to command token economy
 
-**Implementation Status**: Partial (60%)
+**Implementation Status**: Complete (100%)
 - Strategy card framework: ✅ Complete
 - Initiative system: ✅ Complete
 - Command token system: ✅ Complete
-- Leadership primary ability: ❌ Missing
-- Leadership secondary ability: ❌ Missing
-- Influence conversion: ❌ Missing
+- Leadership primary ability: ✅ Complete
+- Leadership secondary ability: ✅ Complete
+- Influence conversion: ✅ Complete
 
-**Recommended Focus**:
-1. Implement Leadership-specific primary and secondary abilities
-2. Add influence-to-command-token conversion logic
-3. Handle Leadership's unique secondary ability exception
-4. Add comprehensive tests for Leadership mechanics
+The Leadership strategy card is fully implemented with comprehensive test coverage. All aspects of Rule 52 are properly handled, including the 3-token base gain, influence conversion at 3:1 ratio, token pool choice, and the unique secondary ability that doesn't require command token spending. The implementation correctly integrates with the broader strategy card system and command token economy.
 
-The strategy card system has an excellent foundation with proper initiative handling and command token management. The main gap is the Leadership-specific ability implementations, which are critical since Leadership is the first strategy card in initiative order and central to the command token economy. The framework is well-designed and should make adding the Leadership-specific logic straightforward.
+## Implementation Approach: Strict Validation and Player Agency
+
+### Design Philosophy
+The Leadership strategy card implementation follows a **strict validation and player agency** approach, requiring explicit player choices and failing operations that cannot be completed as requested.
+
+### Key Implementation Principles
+
+1. **Explicit Planet Exhaustion**: Players must specify exactly which planets to exhaust via the `planets_to_exhaust` parameter. The system validates:
+   - All specified planets exist and are controlled by the player
+   - All specified planets are currently unexhausted
+   - The total influence from specified planets matches the intended spending amount
+   - No automatic planet selection or "graceful degradation" occurs
+
+2. **Strict Influence Validation**: The system performs exact influence calculations:
+   - Players must provide sufficient influence for their intended token gain
+   - Operations fail if insufficient influence is provided (no automatic capping)
+   - Trade goods can supplement influence at 1:1 ratio via `trade_goods_to_spend` parameter
+   - All influence spending must follow the exact 3:1 conversion ratio
+
+3. **Atomic Operations**: All abilities are strictly atomic:
+   - Either the entire operation succeeds exactly as requested, or it fails completely
+   - No partial execution or automatic adjustments
+   - Clear error messages indicate why operations failed
+
+4. **Player Agency**: The implementation respects player decision-making:
+   - Players choose exactly which planets to exhaust
+   - Players specify exact token distribution across pools
+   - Players can decline secondary ability participation
+   - No system-driven automatic choices or optimizations
+
+### Validation Requirements
+
+**Primary Ability (`execute_primary_ability`)**:
+- `planets_to_exhaust`: List of planet names to exhaust for influence
+- `trade_goods_to_spend`: Number of trade goods to convert to influence (optional)
+- `token_distribution`: Exact distribution of gained tokens across pools
+
+**Secondary Ability (`execute_secondary_ability`)**:
+- `participate`: Boolean indicating whether to participate (defaults to True)
+- `planets_to_exhaust`: List of planet names to exhaust for influence
+- `trade_goods_to_spend`: Number of trade goods to convert to influence (optional)
+- `token_distribution`: Exact distribution of gained tokens across pools
+
+### Error Handling
+The system provides clear, actionable error messages for:
+- Invalid planet choices (non-existent, not controlled, already exhausted)
+- Insufficient influence for requested token gain
+- Invalid token distribution (wrong totals, invalid pools)
+- Insufficient trade goods
+- Missing required parameters
+
+This approach ensures predictable behavior, respects player agency, and maintains strict adherence to game rules while providing clear feedback for invalid operations.

@@ -8,19 +8,20 @@
 **Focus**: Complete advanced mechanics that enable complex strategic gameplay and AI decision-making
 
 ## 📊 Progress
-**Overall Progress**: 29.7%
-**Completed Rules**: 29/101
+**Overall Progress**: 30.7%
+**Completed Rules**: 30/101
 - **Rule 6: ADJACENCY** - Core spatial mechanics for system relationships
 - **Rule 14: BLOCKADED** - Blockade mechanics for space docks and production restrictions (Foundation Layer) ✅ **COMPLETED**
 - **Rule 17: CAPTURE** - Unit capture mechanics and faction sheet management (Foundation Layer) ✅ **COMPLETED**
 - **Rule 18: COMBAT** - General combat mechanics with burst icon support (Core Game Layer) ✅ **NEWLY COMPLETED**
-- **Rule 20: COMMAND TOKENS** - Resource management and reinforcement system (Foundation Layer)
+- **Rule 20: COMMAND TOKENS - Resource management and reinforcement system (Foundation Layer) ✅
 - **Rule 21: COMMODITIES** - Commodity trading and conversion system (Economic Layer) ✅ **NEWLY COMPLETED**
 - **Rule 25: CONTROL** - Planet control mechanics with planet card management and control tokens (Core Game Layer) ✅ **COMPLETED**
 - **Rule 34: EXHAUSTED** - Card exhaustion mechanics for planets, technology, and strategy cards (Foundation Layer) ✅ **NEWLY COMPLETED**
+- **Rule 52: LEADERSHIP (STRATEGY CARD)** - Leadership strategy card with primary/secondary abilities and command token management (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 58: MOVEMENT** - Unit movement and fleet mechanics (Core Game Layer) ✅ **COMPLETED**
-- **Rule 60: NEIGHBORS** - Player neighbor determination for transactions
-- **Rule 61: OBJECTIVE CARDS** - Victory condition framework (Core Game Layer)
+- **Rule 60: NEIGHBORS** - Player neighbor determination for transactions ✅
+- **Rule 61: OBJECTIVE CARDS** - Victory condition framework (Core Game Layer) ✅
 - **Rule 67: PRODUCING UNITS** - Unit production system with blockade integration (Core Game Layer) ✅ **COMPLETED**
 - **Rule 69: PROMISSORY NOTES** - Promissory note mechanics and diplomatic system (Core Game Layer) ✅ **COMPLETED**
 - **Rule 76: SHIPS** - Ship unit mechanics, fleet pool limits, and ship attributes (Foundation Layer) ✅ **COMPLETED**
@@ -32,7 +33,7 @@
 - **Rule 94: TRANSACTIONS** - Player trading and exchange system (Core Game Layer) ✅ **COMPLETED**
 - **Rule 98: VICTORY POINTS** - Victory point tracking and win conditions (Victory & Objectives Layer) ✅ **NEWLY COMPLETED**
 - **Rule 99: WARFARE STRATEGY CARD** - Command token management and redistribution (Core Game Layer) ✅ **COMPLETED**
-- **Rule 101: WORMHOLES** - Wormhole adjacency mechanics (Foundation Layer)
+- **Rule 101: WORMHOLES** - Wormhole adjacency mechanics (Foundation Layer) ✅
 
 ### 🎯 Next Priority Rules
 1. ✅ **Rule 79: SPACE DOCK** - Space dock mechanics and production abilities (Foundation Layer) - **COMPLETE**
@@ -46,9 +47,11 @@
 8. ✅ **Rule 88: SYSTEM TILES** - Tile classification and board mechanics (Core Game Layer) - **COMPLETE** (95% → 100%, 11/11 tests passing)
 9. ✅ **Rule 98: VICTORY POINTS** - Victory point tracking and win conditions (Victory & Objectives Layer) - **COMPLETE** (75% → 100%, comprehensive tie resolution and variant support)
 10. ✅ **Rule 25: CONTROL** - Planet control mechanics with planet card management and control tokens (Core Game Layer) - **COMPLETE** (0% → 100%, 12/12 tests passing)
+11. ✅ **Rule 52: LEADERSHIP (STRATEGY CARD)** - Leadership strategy card with primary/secondary abilities and command token management (Core Game Layer) - **COMPLETE** (0% → 100%, 16/16 tests passing)
+   - **Implementation Approach**: Strict validation and player agency - requires explicit planet exhaustion choices, fails operations that cannot be completed as requested, respects player decision-making with atomic operations and clear error messages
 
 **Next Up:**
-11. **Rule [TBD]** - Next highest priority rule to be determined 🎯 **NEXT TARGET**
+12. **Rule [TBD]** - Next highest priority rule to be determined 🎯 **NEXT TARGET**
 
 ### 📈 Progress Metrics
 - Foundation Layer: 9 rules completed
@@ -56,7 +59,7 @@
 - Advanced Mechanics: 0/43 rules (0%)
 
 ### 📈 Current Metrics
-- **Tests**: 1065+ total tests, all passing (Rule 78: 17 tests, Rule 34: 15 tests, Rule 83: 50+ tests, Rule 25: 12 tests)
+- **Tests**: 1077+ total tests, all passing (Rule 52: 12 tests, Rule 78: 17 tests, Rule 34: 15 tests, Rule 83: 50+ tests, Rule 25: 12 tests)
 - **Coverage**: 30.2% overall (focused on core mechanics)
 - **Quality**: Strict TDD, type checking, linting standards maintained
 
@@ -1169,22 +1172,129 @@ This roadmap prioritizes **foundational spatial mechanics** that enable all high
 
 The **strict TDD approach** ensures each implementation is robust, testable, and maintainable, building toward a production-ready TI4 AI system.
 
-## 🚀 Next Action: Identify Next Priority Rule
+## 🚀 Next Steps: Priority Rule Implementation Plan
 
-**Immediate Next Step**: Determine next rule to implement after Rule 58 completion
-- **Status**: Rule 58 (MOVEMENT) has been completed ✅
-- **Dependencies**: All foundational rules (6, 60, 101, 61, 20, 58) now complete
-- **Approach**: Review roadmap priorities and select next high-impact rule
-- **Focus**: Continue with core game mechanics or strategic systems
+Based on comprehensive analysis of LRR analysis files, here are the next 10 rules prioritized for implementation, building on our strong foundation of spatial mechanics, command tokens, and movement systems:
+
+### **Phase 2: Core Game Mechanics (Next 10 Rules)**
+
+#### **Tier 1: Critical Action Phase & Combat Foundation (Rules 1-4)**
+
+**1. Rule 3: ACTION PHASE**
+- **Priority**: CRITICAL - Core game flow control
+- **Status**: ⚠️ PARTIAL (strategic/tactical actions exist, pass state missing)
+- **Dependencies**: ✅ All met (command tokens, movement complete)
+- **Key Gaps**: Pass state tracking, forced pass conditions, consecutive action handling
+- **Impact**: Enables proper turn management and game flow progression
+- **Estimated Effort**: Medium (build on existing action framework)
+
+**2. Rule 1: ABILITIES**
+- **Priority**: CRITICAL - Card precedence and ability framework
+- **Status**: ❌ NOT IMPLEMENTED (card precedence system missing)
+- **Dependencies**: ✅ Basic action framework exists
+- **Key Gaps**: Card vs rules precedence, ability duration tracking, multiple abilities per card
+- **Impact**: Essential for all card-based mechanics and rule interactions
+- **Estimated Effort**: Large (foundational ability system)
+- **⚠️ MANUAL TASK REQUIRED**: Enumerate all possible timing windows from LRR for ability system implementation support (e.g., "start of turn", "end of combat", "when a unit is destroyed", "after rolling dice", etc.)
+
+**3. Rule 13: ATTACKER**
+- **Priority**: HIGH - Combat role definition
+- **Status**: ⚠️ PARTIAL (active player tracking exists, combat roles missing)
+- **Dependencies**: ✅ Active player system, combat framework exists
+- **Key Gaps**: Explicit attacker/defender role assignment in combat
+- **Impact**: Required for proper combat resolution and retreat mechanics
+- **Estimated Effort**: Small (extend existing combat system)
+
+**4. Rule 29: DEFENDER**
+- **Priority**: MEDIUM-HIGH - Combat role completion
+- **Status**: ⚠️ PARTIAL (implicit in combat system)
+- **Dependencies**: ✅ Rule 13 (Attacker), combat system
+- **Key Gaps**: Defender-specific abilities and timing
+- **Impact**: Completes combat role system for proper rule interactions
+- **Estimated Effort**: Small (complement to Rule 13)
+
+#### **Tier 2: Unit Management & Destruction (Rules 5-7)**
+
+**5. Rule 31: DESTROYED**
+- **Priority**: HIGH - Core combat mechanic
+- **Status**: ⚠️ PARTIAL (hit assignment exists, removal vs destruction distinction missing)
+- **Dependencies**: ✅ Combat system, reinforcement pools
+- **Key Gaps**: Distinction between destruction (triggers effects) vs removal (no triggers)
+- **Impact**: Critical for proper combat resolution and ability triggering
+- **Estimated Effort**: Medium (extend existing combat system)
+
+**6. Rule 30: DEPLOY**
+- **Priority**: MEDIUM-HIGH - Unit placement abilities
+- **Status**: ⚠️ PARTIAL (deploy flag exists, mechanics missing)
+- **Dependencies**: ✅ Unit system, reinforcements
+- **Key Gaps**: Deploy ability conditions, placement logic, timing restrictions
+- **Impact**: Enables mech deployment and special unit placement abilities
+- **Estimated Effort**: Medium (new deployment system)
+
+**7. Rule 33: ELIMINATION**
+- **Priority**: MEDIUM-HIGH - Player elimination system
+- **Status**: ❌ NOT IMPLEMENTED
+- **Dependencies**: ✅ Ground forces, production, planet control systems
+- **Key Gaps**: Elimination condition checking, component cleanup, faction-specific rules
+- **Impact**: Complete game state management and endgame conditions
+- **Estimated Effort**: Large (complex cleanup system)
+
+#### **Tier 3: Advanced Mechanics (Rules 8-10)**
+
+**8. Rule 40: GROUND COMBAT**
+- **Priority**: HIGH - Combat completion
+- **Status**: ⚠️ PARTIAL (dice rolling exists, round management missing)
+- **Dependencies**: ✅ Combat system, Rules 13/29 (Attacker/Defender)
+- **Key Gaps**: Multi-round combat loop, ground combat controller
+- **Impact**: Completes invasion mechanics and ground-based combat
+- **Estimated Effort**: Medium (extend existing combat framework)
+
+**9. Rule 12: ATTACH**
+- **Priority**: MEDIUM - Card attachment system
+- **Status**: ❌ NOT IMPLEMENTED
+- **Dependencies**: ✅ Planet system, card management
+- **Key Gaps**: Card attachment mechanics, control transfer behavior, token placement
+- **Impact**: Enables exploration cards, agenda effects, and planet attachments
+- **Estimated Effort**: Medium (new attachment system)
+
+**10. Rule 35: EXPLORATION**
+- **Priority**: MEDIUM - Planet exploration system
+- **Status**: ❌ NOT IMPLEMENTED
+- **Dependencies**: ✅ Planet control, Rule 12 (Attach)
+- **Key Gaps**: Exploration decks, trait-based exploration, frontier tokens
+- **Impact**: Adds strategic depth through planet exploration rewards
+- **Estimated Effort**: Large (complex card system with multiple decks)
+
+### **Implementation Strategy**
+
+**Sequential Dependencies**:
+- Rules 1 & 3 can be implemented in parallel (different systems)
+- Rules 13 & 29 should be implemented together (combat roles)
+- Rule 31 depends on combat roles (13/29)
+- Rule 12 should precede Rule 35 (exploration needs attachment)
+
+**Quality Gates**:
+- Maintain 100% test coverage for new implementations
+- All existing tests must continue passing
+- Follow strict TDD methodology (RED-GREEN-REFACTOR)
+- Update LRR analysis documents after each rule completion
+
+**Success Metrics**:
+- Target: 40+ rules implemented (40%+ coverage)
+- Test Suite: 1200+ passing tests
+- Code Coverage: Maintain 30%+ overall coverage
+- Integration: Seamless interaction between all implemented rules
 
 **Context for Future Development**:
-With foundational spatial mechanics, victory conditions, and command token system complete, implementing movement mechanics will enable tactical gameplay, combat positioning, and strategic unit deployment across the galaxy:
-- Unit movement validation and path finding
-- Fleet capacity and movement restrictions
-- Tactical action system integration
-- Command token consumption for movement
-- AI decision-making for unit positioning
-- Strategic movement planning for objectives
+This phase focuses on completing core game mechanics that enable full tactical gameplay. After these 10 rules, we'll have:
+- Complete action phase management with proper pass states
+- Full combat system with attacker/defender roles and ground combat
+- Comprehensive unit management including deployment and destruction
+- Card-based mechanics through abilities and attachment systems
+- Strategic depth through exploration mechanics
+- Robust player elimination handling
+
+The next phase would focus on advanced systems like technology trees, agenda cards, and faction-specific abilities.
 
 ---
 
