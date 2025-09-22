@@ -298,7 +298,7 @@ class TestComponentActionManager:
         )
 
         assert can_perform is False
-        assert "not player2's turn" in error.lower()
+        assert "it is not player2's turn" in error.lower()
 
     def test_can_perform_action_card_component_action(self):
         """Test action card component action validation."""
