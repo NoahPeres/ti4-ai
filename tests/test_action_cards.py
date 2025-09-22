@@ -9,8 +9,6 @@ LRR References:
 - Rule 22: Component Action
 """
 
-import pytest
-
 from src.ti4.core.action_cards import (
     ActionCardContext,
     ActionCardManager,
@@ -490,7 +488,3 @@ class TestActionCardIntegration:
 
         assert can_perform is False
         assert "does not require component action" in error.lower()
-
-
-if __name__ == "__main__":
-    pytest.main([__file__])

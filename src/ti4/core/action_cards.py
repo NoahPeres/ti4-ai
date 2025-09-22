@@ -278,7 +278,7 @@ class DirectHitActionCard(ActionCard):
 class LeadershipRiderActionCard(ActionCard):
     """Leadership Rider action card implementation.
 
-    Example of an agenda timing action card.
+    Example of a component action timing action card.
     """
 
     def __init__(self) -> None:

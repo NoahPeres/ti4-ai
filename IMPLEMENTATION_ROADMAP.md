@@ -51,9 +51,9 @@
 9. ✅ **Rule 98: VICTORY POINTS** - Victory point tracking and win conditions (Victory & Objectives Layer) - **COMPLETE** (75% → 100%, comprehensive tie resolution and variant support)
 10. ✅ **Rule 25: CONTROL** - Planet control mechanics with planet card management and control tokens (Core Game Layer) - **COMPLETE** (0% → 100%, 12/12 tests passing)
 11. ✅ **Rule 52: LEADERSHIP (STRATEGY CARD)** - Leadership strategy card with primary/secondary abilities and command token management (Core Game Layer) - **COMPLETE** (0% → 100%, 16/16 tests passing)
-   - **Implementation Approach**: Strict validation and player agency - requires explicit planet exhaustion choices, fails operations that cannot be completed as requested, respects player decision-making with atomic operations and clear error messages
+    - **Implementation Approach**: Strict validation and player agency - requires explicit planet exhaustion choices, fails operations that cannot be completed as requested, respects player decision-making with atomic operations and clear error messages
 12. ✅ **Rule 2: ACTION CARDS** - Action card system with timing windows, component actions, and comprehensive card management (Core Game Layer) - **COMPLETE** (0% → 100%, 39/39 tests passing)
-   - **Implementation Approach**: Complete action card framework with timing validation, component action integration, duplicate prevention, and example card implementations (Direct Hit, Leadership Rider, Upgrade)
+    - **Implementation Approach**: Complete action card framework with timing validation, component action integration, duplicate prevention, and example card implementations (Direct Hit, Leadership Rider, Upgrade)
 
 **Next Up:**
 13. **Rule [TBD]** - Next highest priority rule to be determined 🎯 **NEXT TARGET**
@@ -1195,12 +1195,11 @@ Based on comprehensive analysis of LRR analysis files, here are the next 10 rule
 
 **2. Rule 1: ABILITIES**
 - **Priority**: CRITICAL - Card precedence and ability framework
-- **Status**: ❌ NOT IMPLEMENTED (card precedence system missing)
-- **Dependencies**: ✅ Basic action framework exists
-- **Key Gaps**: Card vs rules precedence, ability duration tracking, multiple abilities per card
+- **Status**: ✅ IMPLEMENTED (comprehensive ability system with timing windows and precedence)
+- **Dependencies**: ✅ All met (basic action framework exists)
+- **Key Features**: Core ability system with timing windows, precedence, costs, and resolution
 - **Impact**: Essential for all card-based mechanics and rule interactions
-- **Estimated Effort**: Large (foundational ability system)
-- **⚠️ MANUAL TASK REQUIRED**: Enumerate all possible timing windows from LRR for ability system implementation support (e.g., "start of turn", "end of combat", "when a unit is destroyed", "after rolling dice", etc.)
+- **Test Coverage**: Comprehensive test suite in `tests/test_rule_01_abilities.py`
 
 **3. Rule 13: ATTACKER**
 - **Priority**: HIGH - Combat role definition

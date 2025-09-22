@@ -96,12 +96,12 @@ A component action is a type of action that a player can perform during their tu
 ### Existing Files
 - `src/ti4/actions/action.py`: Base `Action` class
 - `src/ti4/actions/tactical_action.py`: `TacticalAction` implementation
-- ✅ `src/ti4/game/action_cards.py`: **COMPLETE ACTION CARD COMPONENT ACTION SYSTEM**
+- ✅ `src/ti4/core/action_cards.py`: **COMPLETE ACTION CARD COMPONENT ACTION SYSTEM**
 - `src/ti4/core/game_controller.py`: Basic action management
 - `tests/test_action.py`: Basic action tests
 - ✅ `tests/test_action_cards.py`: **COMPREHENSIVE ACTION CARD TESTS (39/39 passing)**
 
-### Missing Files
+### Missing Files (for non-action-card components)
 - Component action registry/factory
 - Action text parser and executor
 - Action validation system
