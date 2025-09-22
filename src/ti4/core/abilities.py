@@ -17,6 +17,7 @@ Key LRR Rules Implemented:
 - 1.18: Abilities resolve once per trigger occurrence
 """
 
+import itertools
 import logging
 from dataclasses import dataclass, field
 from enum import Enum, IntEnum
@@ -123,10 +124,10 @@ class AbilityCost:
         self, player: PlayerProtocol, cost_type: str, amount: int
     ) -> bool:
         """Check if player can pay a single cost type"""
-        cost_checkers: dict[str, Callable[[Any], bool]] = {
-            "resources": lambda p: getattr(p, "resources", 0) >= amount,
-            "trade_goods": lambda p: getattr(p, "trade_goods", 0) >= amount,
-            "command_tokens": lambda p: getattr(p, "command_tokens", 0) >= amount,
+        cost_checkers: dict[str, Callable[[PlayerProtocol], bool]] = {
+            "resources": lambda p: p.resources >= amount,
+            "trade_goods": lambda p: p.trade_goods >= amount,
+            "command_tokens": lambda p: p.command_tokens >= amount,
             "exhaust_card": lambda p: True,  # Simplified for now - would need card_id context
         }
 
@@ -134,17 +135,6 @@ class AbilityCost:
         if checker:
             return bool(checker(player))
         return False
-
-
-@dataclass
-class AbilityTrigger:
-    """
-    Defines when an ability can be triggered
-    """
-
-    event: str  # Event that triggers the ability
-    conditions: Optional[dict[str, Any]] = None  # Additional trigger conditions
-    context_required: bool = False  # Whether context is needed (Rule 1.27)
 
 
 @dataclass
@@ -235,10 +225,11 @@ class Ability:
 
     def _get_trigger_key(self, event: str, context: Optional[dict[str, Any]]) -> str:
         """Generate unique key for tracking trigger frequency"""
-        if context and "combat_id" in context:
-            return f"{event}_{context['combat_id']}"
-        if context and "turn_id" in context:
-            return f"{event}_{context['turn_id']}"
+        if context:
+            if "occurrence_id" in context:
+                return f"{event}_{context['occurrence_id']}"
+            if "combat_id" in context:
+                return f"{event}_{context['combat_id']}"
         return event
 
     def mark_used(self, event: str, context: Optional[dict[str, Any]] = None) -> None:
@@ -289,6 +280,7 @@ class AbilityManager:
         self.game_state = game_state
         self.abilities: list[Ability] = []
         self.pending_resolutions: list[Ability] = []
+        self._occurrence_counter = itertools.count(1)
 
     def add_ability(self, ability: Ability) -> None:
         """Add an ability to the manager"""
@@ -309,6 +301,14 @@ class AbilityManager:
 
         Implements timing precedence (Rule 1.16: when > after)
         """
+        if context is None:
+            context = {}
+
+        # Add occurrence_id for proper ONCE_PER_TRIGGER scoping
+        # Only add if no specific identifier is already present
+        if "occurrence_id" not in context and "combat_id" not in context:
+            context["occurrence_id"] = next(self._occurrence_counter)
+
         applicable_abilities = [
             ability
             for ability in self.abilities
@@ -389,24 +389,47 @@ class AbilityManager:
     def resolve_ability(
         self,
         ability: Ability,
-        player: Any = None,
+        player: Optional[PlayerProtocol] = None,
         context: Optional[dict[str, Any]] = None,
     ) -> AbilityResolutionResult:
         """
         Resolve a specific ability with cost checking and conditional effects
         """
-        # Check costs (Rules 1.11, 1.12)
-        if ability.cost and player and not ability.cost.can_pay(player):
-            return AbilityResolutionResult(
-                success=False, resolved_abilities=[], errors=["Cannot pay ability cost"]
-            )
+        # Check costs (Rules 1.11, 1.12) - player must be present for costs
+        if ability.cost:
+            if not player:
+                return AbilityResolutionResult(
+                    success=False,
+                    resolved_abilities=[],
+                    errors=["Player required for ability with cost"],
+                )
+            if not ability.cost.can_pay(player):
+                return AbilityResolutionResult(
+                    success=False,
+                    resolved_abilities=[],
+                    errors=["Cannot pay ability cost"],
+                )
 
         # Handle conditional effects (Rule 1.17: "then")
         if ability.effect.is_conditional():
-            return self._resolve_conditional_ability(ability, player, context)
+            result = self._resolve_conditional_ability(ability, player, context)
+            # Mark usage if successful
+            if result.success:
+                ability.mark_used(ability.trigger, context)
+            return result
 
         # Standard resolution
         success = self._resolve_single_ability(ability, context)
+
+        # Mark usage if successful
+        if success:
+            ability.mark_used(ability.trigger, context)
+
+        return AbilityResolutionResult(
+            success=success,
+            resolved_abilities=[ability] if success else [],
+            failed_abilities=[] if success else [ability],
+        )
 
         return AbilityResolutionResult(
             success=success,
@@ -438,7 +461,10 @@ class AbilityManager:
             return False
 
     def _resolve_conditional_ability(
-        self, ability: Ability, player: Any, context: Optional[dict[str, Any]]
+        self,
+        ability: Ability,
+        player: Optional[PlayerProtocol],
+        context: Optional[dict[str, Any]],
     ) -> AbilityResolutionResult:
         """
         Resolve ability with "then" conditions (Rule 1.17)
@@ -465,7 +491,10 @@ class AbilityManager:
         return AbilityResolutionResult(success=True, resolved_abilities=[ability])
 
     def _resolve_condition(
-        self, condition: dict[str, Any], player: Any, context: Optional[dict[str, Any]]
+        self,
+        condition: dict[str, Any],
+        player: Optional[PlayerProtocol],
+        context: Optional[dict[str, Any]],
     ) -> bool:
         """Resolve a single condition"""
         condition_type = condition.get("type")

@@ -115,42 +115,47 @@ Cards and faction sheets each have abilities that players can resolve to trigger
 **Sub-rule**: "For example, if an ability is resolved 'after a ship is destroyed,' the ability must be resolved as soon as the ship is destroyed and not later during that turn or round."
 
 **Priority**: CRITICAL - Core timing system
-**Implementation Status**: ❌ NOT IMPLEMENTED
-**Test References**: None found
-**Notes**: Foundation for all ability timing. Must be precise and immediate.
+**Implementation Status**: ⚠️ PARTIAL - Basic timing windows exist
+**Test References**: `tests/test_rule_01_abilities.py` - timing window tests
+**Implementation Files**: `src/ti4/core/abilities.py` - TimingWindow enum with BEFORE/AFTER
+**Notes**: Basic timing windows implemented but need full before/after resolution system
 
 ### 1.15 - When Timing
 **Raw LRR Text**: "If the timing of an ability uses the word 'when,' the ability's effect occurs at the moment of the described timing event."
 **Sub-rule**: "Such an ability typically modifies or replaces the timing event in some way."
 
 **Priority**: CRITICAL - Highest priority timing
-**Implementation Status**: ❌ NOT IMPLEMENTED
-**Test References**: None found
-**Notes**: "When" abilities can modify/replace events. Highest timing priority.
+**Implementation Status**: ⚠️ PARTIAL - Basic timing windows exist
+**Test References**: `tests/test_rule_01_abilities.py` - timing window tests
+**Implementation Files**: `src/ti4/core/abilities.py` - TimingWindow enum with WHEN
+**Notes**: Basic timing windows implemented but need full when resolution system
 
 ### 1.16 - Timing Priority
 **Raw LRR Text**: "Effects that occur 'when' an event happens take priority over effects that occur 'after' an event happens."
 
 **Priority**: CRITICAL - Timing precedence
-**Implementation Status**: ❌ NOT IMPLEMENTED
-**Test References**: None found
-**Notes**: Essential for proper ability resolution order
+**Implementation Status**: ⚠️ PARTIAL - Basic precedence system exists
+**Test References**: `tests/test_rule_01_abilities.py` - precedence tests
+**Implementation Files**: `src/ti4/core/abilities.py` - TimingWindow enum with priority values
+**Notes**: Basic precedence implemented but need full timing priority resolution
 
 ### 1.17 - Then Requirements
 **Raw LRR Text**: "If an ability uses the word 'then,' a player must resolve the effect that occurs before the word 'then' or they cannot resolve the effect that occurs after the word 'then.'"
 
 **Priority**: HIGH - Conditional effects
-**Implementation Status**: ❌ NOT IMPLEMENTED
-**Test References**: None found
-**Notes**: Sequential dependency validation required
+**Implementation Status**: ⚠️ PARTIAL - Basic conditional effects exist
+**Test References**: `tests/test_rule_01_abilities.py` - conditional effect tests
+**Implementation Files**: `src/ti4/core/abilities.py` - AbilityEffect.is_conditional() and _resolve_conditional_ability()
+**Notes**: Basic conditional effects implemented but need full "then" resolution system
 
 ### 1.18 - Ability Frequency
 **Raw LRR Text**: "Each ability can be resolved once for each occurrence of that ability's timing event. For example, if an ability is resolved 'At the start of combat,' it can be resolved at the start of each combat."
 
 **Priority**: HIGH - Trigger tracking
-**Implementation Status**: ❌ NOT IMPLEMENTED
-**Test References**: None found
-**Notes**: Need system to track ability usage per trigger event
+**Implementation Status**: ⚠️ PARTIAL - Basic frequency tracking exists
+**Test References**: `tests/test_rule_01_abilities.py` - frequency tests
+**Implementation Files**: `src/ti4/core/abilities.py` - AbilityFrequency enum and usage tracking
+**Notes**: Basic frequency tracking implemented but need full frequency restriction system
 
 ### 1.19 - Action Phase Ability Resolution
 **Raw LRR Text**: "If there are multiple abilities that players wish to resolve at the same time during the action phase, each player takes a turn resolving an ability in initiative order, beginning with the active player. This process continues until each player has resolved each ability that they wish to resolve during that window."
@@ -255,7 +260,7 @@ Cards and faction sheets each have abilities that players can resolve to trigger
 - **1.24**: Agenda card abilities
 - **1.27**: Context resolution
 
-## Key Timing Windows Identified from Compendium:
+## Key Timing Windows Identified from Compendium
 
 ### Action Phase Timing
 - "Action:" - Component actions
@@ -287,7 +292,7 @@ Cards and faction sheets each have abilities that players can resolve to trigger
 - "After you explore a planet"
 - "At the end of your turn"
 
-## Test Case Requirements:
+## Test Case Requirements
 
 Each sub-rule needs comprehensive test coverage:
 1. **Basic functionality tests** - Does the rule work as intended?
