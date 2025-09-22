@@ -95,7 +95,7 @@ Cards and faction sheets each have abilities that players can resolve to trigger
 **Test References**: None found
 **Notes**: Critical for ability system - must validate costs before allowing effects
 
-### 1.12 - Cost Examples
+### 1.12 - Cost Types
 **Raw LRR Text**: "Some examples of an ability's cost include spending resources, spending trade goods, spending command tokens, exhausting cards, purging cards, and activating specific systems."
 
 **Priority**: MEDIUM - Cost types
@@ -226,14 +226,14 @@ Cards and faction sheets each have abilities that players can resolve to trigger
 
 ## Implementation Priority Summary
 
-### CRITICAL (Must implement first):
+### CRITICAL (Must implement first)
 - **1.2**: Card ability precedence over rules
 - **1.6**: "Cannot" effects absolute precedence
 - **1.14**: Before/After timing system
 - **1.15**: "When" timing system
 - **1.16**: Timing priority (when > after)
 
-### HIGH (Core functionality):
+### HIGH (Core functionality)
 - **1.3**: Ability description and duration tracking
 - **1.5**: Action abilities integration
 - **1.7**: Complete ability resolution
@@ -248,7 +248,7 @@ Cards and faction sheets each have abilities that players can resolve to trigger
 - **1.25**: Faction abilities
 - **1.26**: Unit abilities
 
-### MEDIUM (Supporting features):
+### MEDIUM (Supporting features)
 - **1.4**: Multiple abilities per card
 - **1.9**: Partial resolution of "and" effects
 - **1.12**: Cost type examples
@@ -257,32 +257,32 @@ Cards and faction sheets each have abilities that players can resolve to trigger
 
 ## Key Timing Windows Identified from Compendium:
 
-### Action Phase Timing:
+### Action Phase Timing
 - "Action:" - Component actions
 - "At the start of your turn"
 - "After you perform an action"
 - "During the action phase"
 
-### Combat Timing:
+### Combat Timing
 - "At the start of combat"
 - "At the start of a space combat"
 - "At the start of an invasion"
 - "After you win a space combat"
 - "During a combat round"
 
-### Strategy/Agenda Timing:
+### Strategy/Agenda Timing
 - "After an agenda is revealed"
 - "When you are elected as the outcome"
 - "Before a player casts votes"
 - "At the end of the strategy phase"
 
-### Production/Movement Timing:
+### Production/Movement Timing
 - "After you activate a system"
 - "After you produce units"
 - "After a player moves ships into a system"
 - "When another player activates a system"
 
-### Technology/Research Timing:
+### Technology/Research Timing
 - "After the Jol-Nar player researches a technology"
 - "After you explore a planet"
 - "At the end of your turn"
@@ -305,15 +305,6 @@ Each sub-rule needs comprehensive test coverage:
 **Priority**: N/A - Section divider
 **Implementation Status**: N/A
 **Test References**: N/A
-
-### 1.14 - Before/After Timing
-**Raw LRR Text**: "If the timing of an ability uses the word 'before' or 'after,' the ability's effect occurs immediately before or after the described timing event, respectively."
-**Sub-rule**: "For example, if an ability is resolved 'after a ship is destroyed,' the ability must be resolved as soon as the ship is destroyed and not later during that turn or round."
-
-**Priority**: HIGH - Event system
-**Implementation Status**: ❌ NOT IMPLEMENTED
-**Test References**: None found
-**Notes**: Need event system with before/after hooks
 
 ### 1.15 - When Timing
 **Raw LRR Text**: "If the timing of an ability uses the word 'when,' the ability's effect occurs at the moment of the described timing event."

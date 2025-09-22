@@ -20,7 +20,10 @@ Key LRR Rules Implemented:
 import logging
 from dataclasses import dataclass, field
 from enum import Enum, IntEnum
-from typing import Any, Callable, Optional
+from typing import TYPE_CHECKING, Any, Callable, Optional, Protocol
+
+if TYPE_CHECKING:
+    from ti4.core.game_state import GameState  # type: ignore[import-untyped]
 
 logger = logging.getLogger(__name__)
 
@@ -83,6 +86,14 @@ class AbilityEffect:
         return self.conditions is not None
 
 
+class PlayerProtocol(Protocol):
+    """Protocol for player objects used in ability cost validation"""
+
+    resources: int
+    trade_goods: int
+    command_tokens: int
+
+
 @dataclass
 class AbilityCost:
     """
@@ -93,7 +104,7 @@ class AbilityCost:
     amount: Optional[int] = None  # Single cost amount
     costs: Optional[list[dict[str, Any]]] = None  # Multiple costs
 
-    def can_pay(self, player: Any) -> bool:
+    def can_pay(self, player: PlayerProtocol) -> bool:
         """Check if player can pay the ability cost"""
         if self.type and self.amount:
             # Single cost type
@@ -108,7 +119,9 @@ class AbilityCost:
 
         return True  # No cost
 
-    def _can_pay_single_cost(self, player: Any, cost_type: str, amount: int) -> bool:
+    def _can_pay_single_cost(
+        self, player: PlayerProtocol, cost_type: str, amount: int
+    ) -> bool:
         """Check if player can pay a single cost type"""
         cost_checkers: dict[str, Callable[[Any], bool]] = {
             "resources": lambda p: getattr(p, "resources", 0) >= amount,
@@ -198,6 +211,24 @@ class Ability:
 
         if self.frequency == AbilityFrequency.ONCE_PER_TRIGGER:
             return current_count == 0
+        elif self.frequency == AbilityFrequency.ONCE_PER_TURN:
+            # Use turn-specific key for turn-based frequency
+            turn_id = None
+            if context:
+                turn_id = context.get("turn") or context.get("turn_id")
+            if turn_id is not None:
+                turn_key = f"{trigger_key}|turn:{turn_id}"
+                return self._usage_count.get(turn_key, 0) == 0
+            return True  # Allow if no turn context available
+        elif self.frequency == AbilityFrequency.ONCE_PER_ROUND:
+            # Use round-specific key for round-based frequency
+            round_id = None
+            if context:
+                round_id = context.get("round") or context.get("round_id")
+            if round_id is not None:
+                round_key = f"{trigger_key}|round:{round_id}"
+                return self._usage_count.get(round_key, 0) == 0
+            return True  # Allow if no round context available
 
         # Other frequency types would need game state integration
         return True
@@ -214,6 +245,19 @@ class Ability:
         """Mark ability as used for frequency tracking"""
         trigger_key = self._get_trigger_key(event, context)
         self._usage_count[trigger_key] = self._usage_count.get(trigger_key, 0) + 1
+
+        # For turn/round-based frequencies, also track with specific keys
+        if self.frequency == AbilityFrequency.ONCE_PER_TURN and context:
+            turn_id = context.get("turn") or context.get("turn_id")
+            if turn_id is not None:
+                turn_key = f"{trigger_key}|turn:{turn_id}"
+                self._usage_count[turn_key] = self._usage_count.get(turn_key, 0) + 1
+        elif self.frequency == AbilityFrequency.ONCE_PER_ROUND and context:
+            round_id = context.get("round") or context.get("round_id")
+            if round_id is not None:
+                round_key = f"{trigger_key}|round:{round_id}"
+                self._usage_count[round_key] = self._usage_count.get(round_key, 0) + 1
+
         self._last_triggered = trigger_key
 
 
@@ -241,7 +285,7 @@ class AbilityManager:
     - 1.20: Strategy/agenda phase resolution
     """
 
-    def __init__(self, game_state: Any) -> None:
+    def __init__(self, game_state: "GameState") -> None:
         self.game_state = game_state
         self.abilities: list[Ability] = []
         self.pending_resolutions: list[Ability] = []
@@ -306,14 +350,16 @@ class AbilityManager:
             event_modified=event_modified,
         )
 
-    def resolve_conflict(self, event: str) -> AbilityResolutionResult:
+    def resolve_conflict(
+        self, event: str, context: Optional[dict[str, Any]] = None
+    ) -> AbilityResolutionResult:
         """
         Resolve conflicts between abilities (Rules 1.2, 1.6)
         """
         conflicting_abilities = [
             ability
             for ability in self.abilities
-            if ability.can_trigger(event) and ability.is_active()
+            if ability.can_trigger(event, context) and ability.is_active()
         ]
 
         if not conflicting_abilities:
@@ -326,12 +372,14 @@ class AbilityManager:
             success=True, resolved_abilities=[winner], winning_ability=winner
         )
 
-    def get_resolution_order(self, event: str) -> list[Ability]:
+    def get_resolution_order(
+        self, event: str, context: Optional[dict[str, Any]] = None
+    ) -> list[Ability]:
         """Get the order abilities would resolve for an event"""
         applicable_abilities = [
             ability
             for ability in self.abilities
-            if ability.can_trigger(event) and ability.is_active()
+            if ability.can_trigger(event, context) and ability.is_active()
         ]
 
         return sorted(
@@ -432,6 +480,14 @@ class AbilityManager:
                 return bool(getattr(player, "resources", 0) >= amount)
             elif resource == "command_tokens":
                 return bool(getattr(player, "command_tokens", 0) >= amount)
+        elif condition_type == "context_check":
+            # Future: Use context for contextual conditions like turn phase, combat state, etc.
+            # For now, context parameter is reserved for future condition types
+            if context:
+                required_key = condition.get("key")
+                required_value = condition.get("value")
+                if required_key is not None:
+                    return context.get(required_key) == required_value
 
         return False
 

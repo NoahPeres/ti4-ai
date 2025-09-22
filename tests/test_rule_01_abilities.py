@@ -332,8 +332,7 @@ class TestAbilityCostSystem:
     def test_resource_cost_validation(self):
         """Test spending resources as ability cost"""
         cost = AbilityCost(type="resources", amount=3)
-        player = Mock()
-        player.resources = 2
+        player = Mock(resources=2)
 
         assert not cost.can_pay(player)
 
@@ -350,9 +349,9 @@ class TestAbilityCostSystem:
             ]
         )
 
-        player = Mock()
-        player.trade_goods = 2
-        player.command_tokens = 1
-        player.exhausted_cards = []
+        player = Mock(
+            trade_goods=2,
+            command_tokens=1,
+        )
 
         assert cost.can_pay(player)
