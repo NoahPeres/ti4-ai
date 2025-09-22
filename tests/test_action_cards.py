@@ -237,7 +237,7 @@ class TestActionCardManager:
 
         result = manager.play_card(card, context)
         assert result.success is False
-        assert result.error_message is not None
+        assert "No valid targets available" in result.error_message
 
     def test_cancel_card(self):
         """Test card cancellation."""
