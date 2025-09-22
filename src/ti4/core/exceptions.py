@@ -1,118 +1,141 @@
-"""Custom exceptions for TI4 game framework."""
+"""
+Core exceptions for the TI4 game system.
+"""
 
 import time
-from typing import TYPE_CHECKING, Any, Optional
+from typing import Any, Optional
 
-if TYPE_CHECKING:
-    from ..commands.base import GameCommand
-    from .game_phase import GamePhase
+# Re-export ValidationError from the validation module to avoid duplication and API drift
+from .validation import ValidationError  # noqa: F401
 
 
-class TI4GameError(Exception):
-    """Base exception for TI4 game-related errors with enhanced context."""
+class TI4Error(Exception):
+    """Base exception for all TI4 game errors."""
+
+    pass
+
+
+class TI4GameError(TI4Error):
+    """Legacy alias for TI4Error to maintain compatibility."""
 
     def __init__(
         self,
         message: str,
         context: Optional[dict[str, Any]] = None,
         cause: Optional[Exception] = None,
-    ) -> None:
+    ):
         super().__init__(message)
         self.context = context or {}
         self.timestamp = time.time()
-
-        if cause is not None:
+        if cause:
             self.__cause__ = cause
 
 
-class CommandExecutionError(TI4GameError):
-    """Raised when command execution fails."""
-
-    def __init__(
-        self,
-        command: "GameCommand",
-        reason: str,
-        context: Optional[dict[str, Any]] = None,
-    ) -> None:
-        super().__init__(f"Command execution failed: {reason}", context)
-        self.command = command
-
-
-class PhaseTransitionError(TI4GameError):
-    """Raised when invalid phase transition is attempted."""
-
-    def __init__(
-        self,
-        from_phase: "GamePhase",
-        to_phase: "GamePhase",
-        context: Optional[dict[str, Any]] = None,
-    ) -> None:
-        super().__init__(f"Invalid transition from {from_phase} to {to_phase}", context)
-        self.from_phase = from_phase
-        self.to_phase = to_phase
-
-
-class InvalidPlayerError(TI4GameError):
+class InvalidPlayerError(TI4Error):
     """Raised when an invalid player is referenced."""
 
     pass
 
 
-class InvalidMovementError(TI4GameError):
-    """Raised when an invalid movement is attempted."""
+class InvalidPhaseError(TI4Error):
+    """Raised when an action is attempted in the wrong phase."""
 
     pass
 
 
-class InvalidPhaseTransitionError(TI4GameError):
-    """Raised when an invalid phase transition is attempted."""
+class InvalidActionError(TI4Error):
+    """Raised when an invalid action is attempted."""
 
     pass
 
 
-class FleetCapacityError(TI4GameError):
-    """Raised when fleet capacity rules are violated."""
+class GameStateError(TI4Error):
+    """Raised when the game state is invalid."""
 
     pass
 
 
-class FleetSupplyError(TI4GameError):
-    """Raised when fleet supply (command token) limits are exceeded."""
+class AbilityError(TI4Error):
+    """Base exception for ability-related errors."""
 
     pass
 
 
-class InvalidUnitTypeError(TI4GameError):
-    """Raised when an unknown unit type is referenced."""
+class InvalidAbilityError(AbilityError):
+    """Raised when an ability is invalid or cannot be resolved."""
 
     pass
 
 
-class InvalidSystemError(TI4GameError):
-    """Raised when an invalid system is referenced."""
+class AbilityCostError(AbilityError):
+    """Raised when an ability's cost cannot be paid."""
 
     pass
 
 
-class CombatError(TI4GameError):
-    """Raised when combat-related errors occur."""
+class AbilityPrecedenceError(AbilityError):
+    """Raised when ability precedence rules are violated."""
 
     pass
 
 
-class StrategyCardError(TI4GameError):
-    """Raised when strategy card-related errors occur."""
+class CommandExecutionError(TI4Error):
+    """Raised when command execution fails."""
+
+    def __init__(
+        self,
+        command: Any,
+        reason: str,
+        context: Optional[dict[str, Any]] = None,
+        cause: Optional[Exception] = None,
+    ):
+        self.command = command
+        self.reason = reason
+        self.context = context or {}
+        self.timestamp = time.time()  # Set timestamp when error occurs
+        self.cause = cause  # Store the original exception for chaining
+
+        # Build error message without timestamp for consistency with tests
+        message = f"Command execution failed: {reason}"
+
+        # Chain the cause if provided
+        super().__init__(message)
+        if cause:
+            self.__cause__ = cause
+
+
+class PhaseTransitionError(TI4Error):
+    """Raised when a phase transition fails."""
+
+    def __init__(
+        self, from_phase: Any, to_phase: Any, context: Optional[dict[str, Any]] = None
+    ):
+        self.from_phase = from_phase
+        self.to_phase = to_phase
+        self.context = context or {}
+        self.timestamp = time.time()
+
+        # Build simple error message to match test expectations
+        message = f"Invalid transition from {from_phase} to {to_phase}"
+
+        super().__init__(message)
+
+
+class FleetCapacityError(TI4Error):
+    """Raised when fleet capacity is exceeded."""
 
     pass
 
 
-class StrategyCardValidationError(StrategyCardError):
-    """Raised when strategy card validation fails."""
-
-    pass
-
-
-class StrategyCardStateError(StrategyCardError):
+class StrategyCardStateError(TI4Error):
     """Raised when strategy card state is inconsistent."""
+
+    def __init__(self, message: str, context: Optional[dict[str, Any]] = None):
+        super().__init__(message)
+        self.context = context or {}
+
+
+class InvalidSystemError(TI4Error):
+    """Raised when an invalid system is referenced."""
 
     pass

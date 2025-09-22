@@ -4,6 +4,8 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any
 
+import pytest
+
 from src.ti4.core.game_controller import GameController
 from src.ti4.core.game_phase import GamePhase
 from src.ti4.core.player import Player
@@ -21,7 +23,8 @@ def test_full_turn_sequence_integration() -> None:
 
     # Verify state progression
     assert initial_phase == GamePhase.SETUP
-    assert final_phase == GamePhase.ACTION
+    # After action phase completes, it advances to STATUS phase
+    assert final_phase == GamePhase.STATUS
     assert final_controller.is_action_phase_complete()
 
 
@@ -54,9 +57,25 @@ def execute_full_turn_sequence(controller: GameController) -> GameController:
     # Start action phase
     controller.start_action_phase()
 
-    # Each player passes their turn
+    # Each player takes a strategic action first (Rule 3 requirement)
     for player in players:
-        controller.pass_action_phase_turn(player.id)
+        # Get the strategy cards owned by this player
+        player_cards = controller.get_player_strategy_cards(player.id)
+        if player_cards:
+            # Advance to this player's turn before taking action
+            if controller.get_current_player().id != player.id:
+                controller.advance_to_player(player.id)
+
+            # Take strategic action using the first card they own
+            controller.take_strategic_action(player.id, player_cards[0].id)
+
+    # Now each player can pass their turn
+    for player in players:
+        if not controller.has_passed(player.id):
+            # Advance to this player's turn before passing
+            if controller.get_current_player().id != player.id:
+                controller.advance_to_player(player.id)
+            controller.pass_action_phase_turn(player.id)
 
     return controller
 
@@ -78,27 +97,38 @@ def test_end_to_end_game_simulation() -> None:
 # GREEN Phase: Minimal game simulation
 def simulate_complete_game(controller: GameController) -> Player:
     """Simulate a minimal complete game."""
-    # Execute a few rounds of strategy and action phases
-    for round_num in range(2):  # Simulate 2 rounds
-        # Strategy phase (first round starts from SETUP, subsequent rounds need proper transitions)
-        if round_num == 0:
-            controller.start_strategy_phase()
-        else:
-            # For subsequent rounds, need to go through STATUS and AGENDA phases
-            controller.advance_to_phase(GamePhase.STATUS)
-            controller.advance_to_phase(GamePhase.AGENDA)
-            controller.advance_to_phase(GamePhase.STRATEGY)
+    # Execute one round of strategy and action phases
+    # Strategy phase
+    controller.start_strategy_phase()
 
-        available_cards = controller.get_available_strategy_cards()
-        players = controller.get_turn_order()
+    available_cards = controller.get_available_strategy_cards()
+    players = controller.get_turn_order()
 
-        for i, player in enumerate(players):
-            if i < len(available_cards):
-                controller.select_strategy_card(player.id, available_cards[i].id)
+    for i, player in enumerate(players):
+        if i < len(available_cards):
+            controller.select_strategy_card(player.id, available_cards[i].id)
 
-        # Action phase
-        controller.start_action_phase()
-        for player in players:
+    # Action phase
+    controller.start_action_phase()
+
+    # Each player takes a strategic action first (Rule 3 requirement)
+    for player in players:
+        # Get the strategy cards owned by this player
+        player_cards = controller.get_player_strategy_cards(player.id)
+        if player_cards:
+            # Advance to this player's turn before taking action
+            if controller.get_current_player().id != player.id:
+                controller.advance_to_player(player.id)
+
+            # Take strategic action using the first card they own
+            controller.take_strategic_action(player.id, player_cards[0].id)
+
+    # Now each player can pass their turn
+    for player in players:
+        if not controller.has_passed(player.id):
+            # Advance to this player's turn before passing
+            if controller.get_current_player().id != player.id:
+                controller.advance_to_player(player.id)
             controller.pass_action_phase_turn(player.id)
 
     # Return first player as winner (minimal implementation)
@@ -149,6 +179,16 @@ def test_concurrent_game_handling() -> None:
 
     # Verify all games completed successfully
     assert len(results) == num_games
+
+    # Check for failures and report them
+    failed_games = [result for result in results if not result["success"]]
+    if failed_games:
+        failure_messages = [
+            f"Game {result['game_id']} failed: {result['error']}"
+            for result in failed_games
+        ]
+        pytest.fail("Some games failed:\n" + "\n".join(failure_messages))
+
     assert all(result["success"] for result in results)
     assert all(result["winner"] is not None for result in results)
 

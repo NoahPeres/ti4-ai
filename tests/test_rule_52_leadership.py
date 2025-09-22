@@ -11,8 +11,8 @@ from unittest.mock import Mock, patch
 from src.ti4.core.constants import Faction
 from src.ti4.core.game_state import GameState
 from src.ti4.core.player import Player
+from src.ti4.core.strategic_action import StrategyCardType
 from src.ti4.core.strategy_cards.cards.leadership import LeadershipStrategyCard
-from src.ti4.core.strategy_cards.strategic_action import StrategyCardType
 
 
 class TestRule52LeadershipStrategyCard:

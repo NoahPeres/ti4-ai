@@ -1,11 +1,17 @@
 """Test utilities for common testing patterns."""
 
+from typing import TYPE_CHECKING, Optional
+
 from src.ti4.core.constants import Faction, UnitType
 from src.ti4.core.game_state import GameState
 from src.ti4.core.system import System
 from src.ti4.core.unit import Unit
 
 from .scenario_builder import GameScenarioBuilder
+
+if TYPE_CHECKING:
+    from src.ti4.core.strategic_action import StrategicActionManager
+    from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
 
 class TestUtilities:
@@ -122,3 +128,53 @@ class TestUtilities:
             List of units matching the type
         """
         return [unit for unit in system.space_units if unit.unit_type == unit_type]
+
+    @staticmethod
+    def create_strategic_action_manager() -> "StrategicActionManager":
+        """Create a StrategicActionManager for testing.
+
+        Returns:
+            StrategicActionManager instance for testing
+        """
+        from src.ti4.core.strategic_action import StrategicActionManager
+
+        return StrategicActionManager()
+
+    @staticmethod
+    def create_strategy_card_coordinator(
+        strategic_action_manager: Optional["StrategicActionManager"] = None,
+    ) -> "StrategyCardCoordinator":
+        """Create a StrategyCardCoordinator for testing.
+
+        Args:
+            strategic_action_manager: Optional manager to use, creates new one if None
+
+        Returns:
+            StrategyCardCoordinator instance for testing
+        """
+        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+
+        if strategic_action_manager is None:
+            strategic_action_manager = TestUtilities.create_strategic_action_manager()
+
+        return StrategyCardCoordinator(strategic_action_manager)
+
+    @staticmethod
+    def create_integrated_strategic_system() -> tuple[
+        "StrategicActionManager", "StrategyCardCoordinator"
+    ]:
+        """Create integrated strategic action system for testing.
+
+        Returns:
+            Tuple of (strategic_action_manager, coordinator) with integration setup
+        """
+        manager = TestUtilities.create_strategic_action_manager()
+        coordinator = TestUtilities.create_strategy_card_coordinator(manager)
+        manager.set_strategy_card_coordinator(coordinator)
+        # Ensure bidirectional integration
+        try:
+            coordinator.integrate_with_strategic_actions()
+        except AttributeError:
+            # Older coordinator versions may not expose this method
+            pass
+        return manager, coordinator
