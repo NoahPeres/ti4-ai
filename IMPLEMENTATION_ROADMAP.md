@@ -13,6 +13,7 @@
 - **Rule 1: ABILITIES** - Core ability system with timing windows, precedence, costs, and resolution (Foundation Layer) ✅ **NEWLY COMPLETED**
 - **Rule 3: ACTION PHASE** - Core action phase mechanics with pass state tracking and phase transitions (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 6: ADJACENCY** - Core spatial mechanics for system relationships
+- **Rule 2: ACTION CARDS** - Action card system with timing windows, component actions, and comprehensive card management (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 14: BLOCKADED** - Blockade mechanics for space docks and production restrictions (Foundation Layer) ✅ **COMPLETED**
 - **Rule 17: CAPTURE** - Unit capture mechanics and faction sheet management (Foundation Layer) ✅ **COMPLETED**
 - **Rule 18: COMBAT** - General combat mechanics with burst icon support (Core Game Layer) ✅ **NEWLY COMPLETED**
@@ -51,17 +52,19 @@
 10. ✅ **Rule 25: CONTROL** - Planet control mechanics with planet card management and control tokens (Core Game Layer) - **COMPLETE** (0% → 100%, 12/12 tests passing)
 11. ✅ **Rule 52: LEADERSHIP (STRATEGY CARD)** - Leadership strategy card with primary/secondary abilities and command token management (Core Game Layer) - **COMPLETE** (0% → 100%, 16/16 tests passing)
    - **Implementation Approach**: Strict validation and player agency - requires explicit planet exhaustion choices, fails operations that cannot be completed as requested, respects player decision-making with atomic operations and clear error messages
+12. ✅ **Rule 2: ACTION CARDS** - Action card system with timing windows, component actions, and comprehensive card management (Core Game Layer) - **COMPLETE** (0% → 100%, 39/39 tests passing)
+   - **Implementation Approach**: Complete action card framework with timing validation, component action integration, duplicate prevention, and example card implementations (Direct Hit, Leadership Rider, Upgrade)
 
 **Next Up:**
-12. **Rule [TBD]** - Next highest priority rule to be determined 🎯 **NEXT TARGET**
+13. **Rule [TBD]** - Next highest priority rule to be determined 🎯 **NEXT TARGET**
 
 ### 📈 Progress Metrics
 - Foundation Layer: 9 rules completed
-- Core Game Layer: 14/15 rules (93.3%)
+- Core Game Layer: 15/15 rules (100%) 🎉
 - Advanced Mechanics: 0/43 rules (0%)
 
 ### 📈 Current Metrics
-- **Tests**: ~1095 total tests, all passing (Rule 52: 12 tests, Rule 78: 17 tests, Rule 34: 15 tests, Rule 83: 50+ tests, Rule 25: 12 tests)
+- **Tests**: ~1134 total tests, all passing (Rule 52: 12 tests, Rule 78: 17 tests, Rule 34: 15 tests, Rule 83: 50+ tests, Rule 25: 12 tests, Rule 2: 39 tests)
 - **Coverage**: 30.2% overall (focused on core mechanics)
 - **Quality**: Strict TDD, type checking, linting standards maintained
 

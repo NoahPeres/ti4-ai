@@ -271,3 +271,6 @@ logs/
 
 # Review files
 latest_review*.txt
+
+# Other apps
+*.numbers
