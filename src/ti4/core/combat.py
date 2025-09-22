@@ -60,11 +60,9 @@ class CombatRoleManager:
 
         if len(defenders) == 1:
             return defenders[0]
-        elif len(defenders) > 1:
-            # For multiple defenders, return the first one (tests can handle multiple)
-            return defenders[0]
-        else:
+        if len(defenders) == 0:
             raise ValueError("No defender found in combat")
+        raise ValueError("Multiple defenders present; use get_defender_ids()")
 
     def get_defender_ids(self, system: System) -> list[str]:
         """Get all defender player IDs (all non-active players in combat)."""
@@ -157,12 +155,15 @@ class CombatDetector:
 
     def should_initiate_combat(self, system: System) -> bool:
         """Check if combat should be initiated in a system."""
-        # Get all owners of units in the system
+        from .constants import GameConstants
+
+        # Get all owners of ships (not all space units) in the system
         owners = set()
         for unit in system.space_units:
-            owners.add(unit.owner)
+            if unit.unit_type in GameConstants.SHIP_TYPES:
+                owners.add(unit.owner)
 
-        # Combat occurs if there are units from different owners
+        # Combat occurs if there are ships from different owners
         return len(owners) > 1
 
 

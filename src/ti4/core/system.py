@@ -41,7 +41,11 @@ class System:
         ]
 
     def has_enemy_ships(self, player_id: str) -> bool:
-        """Check if this system contains ships belonging to other players (Rule 58.4b)."""
+        """Check if this system contains enemy movement-blocking ships (Rule 58.4b).
+
+        Fighters are intentionally excluded: they do not block movement.
+        For combat detection, use the combat-related API instead.
+        """
         from .constants import GameConstants
 
         # Use NON_FIGHTER_SHIP_TYPES for movement blocking rules
