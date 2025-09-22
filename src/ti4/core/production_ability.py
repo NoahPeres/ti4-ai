@@ -264,18 +264,10 @@ class ProductionAbilityManager:
         return False
 
     def are_units_ground_forces(self, units: list[UnitType]) -> bool:
-        """Check if units are ground forces.
+        """Check if all units are ground forces (infantry or mechs)."""
+        from .constants import GameConstants
 
-        Args:
-            units: List of unit types to check
-
-        Returns:
-            True if all units are ground forces
-
-        LRR Reference: Rule 68.3 - Ground force identification
-        """
-        ground_force_types = {UnitType.INFANTRY, UnitType.MECH}
-        return all(unit_type in ground_force_types for unit_type in units)
+        return all(unit_type in GameConstants.GROUND_FORCE_TYPES for unit_type in units)
 
     def can_space_production_place_ground_forces_on_planet(
         self, ground_forces: list[UnitType], planet: "Planet", player: str

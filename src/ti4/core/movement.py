@@ -214,7 +214,9 @@ class TransportValidator:
             return False
 
         # Check if all units are ground forces that can be transported
-        transportable_types = {UnitType.INFANTRY, UnitType.MECH}
+        from .constants import GameConstants
+
+        transportable_types = GameConstants.GROUND_FORCE_TYPES
         for unit in transport.ground_forces:
             if unit.unit_type not in transportable_types:
                 return False
@@ -284,3 +286,30 @@ class TransportExecutor:
             to_system.place_unit_in_space(unit)
         else:
             to_system.place_unit_on_planet(unit, to_location)
+
+    def can_transport_units(self, carrier: "Unit", units: list["Unit"]) -> bool:
+        """Check if a carrier can transport the given units."""
+        from .constants import GameConstants
+
+        # Only infantry and mechs can be transported
+        transportable_types = GameConstants.GROUND_FORCE_TYPES
+        for unit in units:
+            if unit.unit_type not in transportable_types:
+                return False
+
+        # Check capacity
+        return len(units) <= carrier.get_capacity()
+
+    def get_transportable_units(self, system: "System", player: str) -> list["Unit"]:
+        """Get all units that can be transported by this player."""
+        from .constants import GameConstants
+
+        transportable_units = []
+        for planet in system.planets:
+            for unit in planet.units:
+                if (
+                    unit.owner == player
+                    and unit.unit_type in GameConstants.GROUND_FORCE_TYPES
+                ):
+                    transportable_units.append(unit)
+        return transportable_units

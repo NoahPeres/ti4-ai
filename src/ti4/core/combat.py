@@ -1,32 +1,12 @@
-"""Combat system for TI4."""
+"""Combat system for Twilight Imperium 4."""
 
 import random
-from dataclasses import dataclass
 from typing import TYPE_CHECKING, Callable, Optional
 
 from .constants import UnitType
 from .system import System
 from .unit import Unit
 from .unit_stats import UnitStatsProvider
-
-
-@dataclass
-class CombatRoles:
-    """Represents combat roles for attacker and defender."""
-
-    attacker_id: str
-    defender_id: str
-    attacker_units: list[Unit]
-    defender_units: list[Unit]
-
-
-@dataclass
-class CombatTimingOrder:
-    """Represents the timing order for combat actions."""
-
-    first_player_id: str
-    second_player_id: str
-
 
 if TYPE_CHECKING:
     from .game_controller import GameController
@@ -40,10 +20,15 @@ class CombatRoleManager:
         self.game_controller = game_controller
 
     def has_combat(self, system: System) -> bool:
-        """Check if combat should occur in the system."""
-        owners = set()
+        """Check if there is combat in the system (multiple players with ships)."""
+        from .constants import GameConstants
+
+        # Count unique owners of ships in space
+        owners: set[str] = set()
         for unit in system.space_units:
-            owners.add(unit.owner)
+            if unit.unit_type in GameConstants.SHIP_TYPES:
+                owners.add(unit.owner)
+
         return len(owners) > 1
 
     def get_attacker_id(self, system: System) -> str:
@@ -56,17 +41,22 @@ class CombatRoleManager:
 
     def get_defender_id(self, system: System) -> str:
         """Get the defender player ID (non-active player in two-player combat)."""
+        from .constants import GameConstants
+
         if not self.has_combat(system):
             raise ValueError("No combat in system")
 
         attacker_id = self.get_attacker_id(system)
 
-        # Find the other player(s) in combat
-        owners: set[str] = set()
+        # Find the other player(s) in combat (preserve encounter order)
+        owners_ordered: list[str] = []
+        seen: set[str] = set()
         for unit in system.space_units:
-            owners.add(unit.owner)
+            if unit.unit_type in GameConstants.SHIP_TYPES and unit.owner not in seen:
+                owners_ordered.append(unit.owner)
+                seen.add(unit.owner)
 
-        defenders = [owner for owner in owners if owner != attacker_id]
+        defenders = [o for o in owners_ordered if o != attacker_id]
 
         if len(defenders) == 1:
             return defenders[0]
@@ -83,12 +73,25 @@ class CombatRoleManager:
 
         attacker_id = self.get_attacker_id(system)
 
-        # Find all other players in combat
-        owners = set()
+        # Find all other players in combat (preserve encounter order)
+        ship_types = {
+            UnitType.CARRIER,
+            UnitType.CRUISER,
+            UnitType.CRUISER_II,
+            UnitType.DREADNOUGHT,
+            UnitType.DESTROYER,
+            UnitType.FIGHTER,
+            UnitType.FLAGSHIP,
+            UnitType.WAR_SUN,
+        }
+        owners_ordered: list[str] = []
+        seen: set[str] = set()
         for unit in system.space_units:
-            owners.add(unit.owner)
+            if unit.unit_type in ship_types and unit.owner not in seen:
+                owners_ordered.append(unit.owner)
+                seen.add(unit.owner)
 
-        return [owner for owner in owners if owner != attacker_id]
+        return [o for o in owners_ordered if o != attacker_id]
 
     def get_ground_combat_attacker_id(self, system: System, planet_name: str) -> str:
         """Get the attacker player ID for ground combat (always the active player)."""
@@ -107,12 +110,15 @@ class CombatRoleManager:
         """Get the defender player ID for ground combat."""
         attacker_id = self.get_ground_combat_attacker_id(system, planet_name)
 
-        # Find the other player(s) in ground combat
-        owners: set[str] = set()
+        # Find the other player(s) in ground combat (preserve encounter order)
+        owners_ordered: list[str] = []
+        seen: set[str] = set()
         for unit in system.get_ground_forces_on_planet(planet_name):
-            owners.add(unit.owner)
+            if unit.owner not in seen:
+                owners_ordered.append(unit.owner)
+                seen.add(unit.owner)
 
-        defenders = [owner for owner in owners if owner != attacker_id]
+        defenders = [o for o in owners_ordered if o != attacker_id]
 
         if len(defenders) == 1:
             return defenders[0]
@@ -215,7 +221,7 @@ class CombatResolver:
             return 0
 
         # Roll dice and calculate hits
-        dice_results = [random.randint(1, 10) for _ in range(actual_dice_count)]
+        dice_results = [random.randint(1, 10) for _ in range(actual_dice_count)]  # nosec B311 - game RNG, not crypto
         return self.calculate_hits(dice_results, stats.combat_value)
 
     def roll_dice_for_unit_with_burst_icons(self, unit: Unit) -> int:
@@ -386,7 +392,7 @@ class CombatResolver:
         if dice_count <= 0:
             return 0
 
-        dice_results = [random.randint(1, 10) for _ in range(dice_count)]
+        dice_results = [random.randint(1, 10) for _ in range(dice_count)]  # nosec B311 - game RNG, not crypto
         return self.calculate_hits(dice_results, stats.combat_value)
 
     def perform_anti_fighter_barrage(self, unit: Unit, target_units: list[Unit]) -> int:

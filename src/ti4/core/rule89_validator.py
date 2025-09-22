@@ -1,25 +1,15 @@
-"""Rule 89 validation system for TI4 TACTICAL ACTION compliance.
-
-This module validates Rule 89: TACTICAL ACTION mechanics according to the TI4 LRR.
-Validates the 5-step tactical action sequence: Activation, Movement, Space Combat, Invasion, Production.
-
-This is the RULE VALIDATION layer - it checks what's allowed by Rule 89.
-For complex movement execution, use the MovementEngine in actions/movement_engine.py.
-"""
+"""Rule 89 validator for ground force placement."""
 
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
-from .constants import UnitType
+from .constants import GameConstants
 
 if TYPE_CHECKING:
     from .command_sheet import CommandSheet
     from .galaxy import Galaxy
     from .system import System
     from .unit import Unit
-
-# Constants for ground force types
-GROUND_FORCE_TYPES = {UnitType.INFANTRY, UnitType.MECH}
 
 
 @dataclass
@@ -334,7 +324,9 @@ class Rule89Validator:
 
         # Check if player has ground forces in space area
         player_units = self._get_player_units_in_space(system, player)
-        return any(unit.unit_type in GROUND_FORCE_TYPES for unit in player_units)
+        return any(
+            unit.unit_type in GameConstants.GROUND_FORCE_TYPES for unit in player_units
+        )
 
     def can_resolve_production_abilities(self, system: "System", player: str) -> bool:
         """Check if a player can resolve production abilities in a system.

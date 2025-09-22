@@ -169,13 +169,14 @@ class System:
 
     def get_ground_forces_on_planet(self, planet_name: str) -> list[Unit]:
         """Get all ground force units on a specific planet in this system."""
-        from .constants import UnitType
+        from .constants import GameConstants
 
         planet = self.get_planet_by_name(planet_name)
         if planet:
             # Filter for ground force units (infantry, mechs, etc.)
-            ground_force_types = {UnitType.INFANTRY, UnitType.MECH}
             return [
-                unit for unit in planet.units if unit.unit_type in ground_force_types
+                unit
+                for unit in planet.units
+                if unit.unit_type in GameConstants.GROUND_FORCE_TYPES
             ]
         return []

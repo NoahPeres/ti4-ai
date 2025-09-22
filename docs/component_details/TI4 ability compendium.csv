@@ -105,7 +105,7 @@ AGAINST : At the start of the next strategy phase, each player chooses and exha
 Classified Document Leaks,1,When this agenda is revealed,,"When this agenda is revealed, if there are no scored secret objectives, discard this card and reveal another agenda from the top of the deck.
 
 Elect Scored Secret Objective
-The elected secret objective becomes a public objective; place it near the other public objectives in the common play area.
+ The elected secret objective becomes a public objective; place it near the other public objectives in the common play area.
 ",,Agenda,Base,Any,
 Committee Formation,1,Before players vote on an agenda that requires a player to be elected:,,The owner of this card may discard this card to choose a player to be elected. Players do not vote on that agenda.,,Agenda,Base,Any,
 Conventions of War,1,,,"FOR : Players cannot use BOMBARDMENT against units that are on cultural planets.
@@ -307,74 +307,175 @@ Self Assembly Routines,,After 1 or more of your units use PRODUCTION,After 1 of 
 After 1 of your mechs is destroyed, gain 1 trade good",,Technology,Prophecy of Kings,Any,
 Supercharge,,At the start of a combat round,,"At the start of a combat round, you may exhaust this card to apply +1 to the result of each of your unit's combat rolls during this combat round",,Technology,Prophecy of Kings,Naaz-Rokha Alliance,
 Vortex,,ACTION,,ACTION: Exhaust this card to choose another player's non-structure unit in a system that is adjacent to 1 or more of your space docks. Capture 1 unit of that type from that player's reinforcements,,Technology,Prophecy of Kings,Vuil’Raith Cabal,
-Carrier II,,,,Cost=3 | Combat=9 | Move=2 | Capacity=6,,Technology,Base,Any,
-Advanced Carrier II,,,,"Cost=3 | Combat=9 | Move=2 | Capacity=8
+Carrier II,4,,,Cost=3 | Combat=9 | Move=2 | Capacity=6,,Technology,Base,Any,
+Advanced Carrier II,4,,,"Cost=3 | Combat=9 | Move=2 | Capacity=8
 SUSTAIN DAMAGE",,Technology,Base,Federation of Sol,
-Cruiser II,,,,Cost=2 | Combat=6 | Move=3 | Capacity=1,,Technology,Base,Any,
-Saturn Engine II,,,,"Cost=2 | Combat=6 | Move=3 | Capacity=2
+Cruiser II,8,,,Cost=2 | Combat=6 | Move=3 | Capacity=1,,Technology,Base,Any,
+Saturn Engine II,8,,,"Cost=2 | Combat=6 | Move=3 | Capacity=2
 SUSTAIN DAMAGE",,Technology,Prophecy of Kings,Titans of Ul,
-Destroyer II,,,,"Cost=1 | Combat=8 | Move=2 | Capacity=0
+Destroyer II,8,,,"Cost=1 | Combat=8 | Move=2 | Capacity=0
 ANTI-FIGHTER BARRAGE 6(x3)",,Technology,Base,Any,
-Strike Wing Alpha II,,When this unit uses ANTI-FIGTHER BARRAGE,,"Cost=1 | Combat=7 | Move=2 | Capacity=0
+Strike Wing Alpha II,8,When this unit uses ANTI-FIGTHER BARRAGE,,"Cost=1 | Combat=7 | Move=2 | Capacity=0
 ANTI-FIGHTER BARRAGE 6(x3)
 When this unit uses ANTI-FIGHTER BARRAGE, each result of 9 or 10 also destroys 1 of your opponents infantry in the space area of the active system.",,Technology,Prophecy of Kings,Argent Flight,
-Dreadnought II,,,,"Cost=4 | Combat=5 | Move=2 | Capacity = 1
+Dreadnought II,5,,,"Cost=4 | Combat=5 | Move=2 | Capacity = 1
 SUSTAIN DAMAGE
 BOMBARDMENT 5
 This unit cannot be destroyed by ""Direct Hit"" action cards.",,Technology,Base,Any,
-Super-Dreadnought II,,,,"Cost=4 | Combat=4 | Move=2 | Capacity=2
+Super-Dreadnought II,5,,,"Cost=4 | Combat=4 | Move=2 | Capacity=2
 SUSTAIN DAMAGE
 BOMBARDMENT 4
 This unit cannot be destroyed by ""Direct Hit"" action cards.",,Technology,Base,L1Z1X mindnet,
-Exotrireme II,,After a round of space combat,,"Cost=4 | Combat=5 | Move=2 | Capacity = 1
+Exotrireme II,5,After a round of space combat,,"Cost=4 | Combat=5 | Move=2 | Capacity = 1
 SUSTAIN DAMAGE
 BOMBARDMENT 4(x2)
 This unit cannot be destroyed by ""Direct Hit"" action cards.
 After a round of space combat, you may destroy this unit to destroy up to 2 ships in this system.",,Technology,Base,Sardakk N’orr,
-Fighter II,,,,"Cost=1(x2) | Combat=8 | Move=2 | Capacity=0
+Fighter II,10,,,"Cost=1(x2) | Combat=8 | Move=2 | Capacity=0
 This unit may move without being transported.
 Fighters in excess of your ships' capacity count against your fleet pool",,Technology,Base,Any,
-Hybrid Crystal Fighter II,,,,"Cost=1(x2) | Combat=7 | Move=2 | Capacity=0
+Hybrid Crystal Fighter II,10,,,"Cost=1(x2) | Combat=7 | Move=2 | Capacity=0
 This unit may move without being transported.
 Each fighter in excess of your ships' capacity count as 1/2 of a ship against your fleet pool",,Technology,Base,Naalu Collective,
-Infantry II,,After this unit is destroyed,At the start of your next turn,"Cost=1(x2) | Combat=7
+Infantry II,12,After this unit is destroyed,At the start of your next turn,"Cost=1(x2) | Combat=7
 After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system",,Technology,Base,Any,
-Spec Ops II,,After this unit is destroyed,At the start of your next turn,"Cost=1(x2) | Combat=6
+Spec Ops II,12,After this unit is destroyed,At the start of your next turn,"Cost=1(x2) | Combat=6
 After this unit is destroyed, roll 1 die. If the result is 5 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system",,Technology,Base,Federation of Sol,
-Letani Warrior II,,After this unit is destroyed,At the start of your next turn,"Cost=1(x2) | Combat=7
+Letani Warrior II,12,After this unit is destroyed,At the start of your next turn,"Cost=1(x2) | Combat=7
 After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system
 PRODUCTION 2",,Technology,Base,Arborec,
-Crimson Legionnaire II,,After this unit is destroyed,At the start of your next turn,"Cost=1(x2) | Combat=7
+Crimson Legionnaire II,12,After this unit is destroyed,At the start of your next turn,"Cost=1(x2) | Combat=7
 After this unit is destroyed, gain 1 commodity or convert 1 of your commodities to a trade good. Then, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system",,Technology,Prophecy of Kings,Mahact Gene-Sorcerers,
-PDS II,,,,"PLANETARY SHIELD
+PDS II,6,,,"PLANETARY SHIELD
 SPACE CANNON 5
 You may use this unit's SPACE CANNON against ships that are adjacent to this unit's system.",,Technology,Base,Any,
-Hel Titan II,,,,"This unit is treated as both a structure and a ground force. It cannot be transported
+Hel Titan II,6,,,"This unit is treated as both a structure and a ground force. It cannot be transported
 You may use this unit's SPACE CANNON against ships that are adjacent to this unit's system
 PLANETARY SHIELD
 SPACE CANNON 5
 SUSTAIN DAMAGE
 PRODUCTION 1",,Technology,Prophecy of Kings,Titans of Ul,
-Space Dock II,,,,"This unit's PRODUCTION value is equal to 4 more than the resource value of this planet.
+Space Dock II,3,,,"This unit's PRODUCTION value is equal to 4 more than the resource value of this planet.
 Up to 3 fighters in this system do not count towards your ships' capacity.
 PRODUCTION X",,Technology,Base,Any,
-Floating Factory II,,,,"This unit is placed in the space area instead of on a planet.
+Floating Factory II,3,,,"This unit is placed in the space area instead of on a planet.
 This unit can move and retreat as if it were a ship.
 If this unit is blockaded, it is destroyed
 PRODUCTION 7",,Technology,Base,Clan of Saar,
-Dimensional Tear II,,,,"This system is a gravity rift; your ships do not roll for this gravity rift.
+Dimensional Tear II,3,,,"This system is a gravity rift; your ships do not roll for this gravity rift.
 Place a dimensional tear token beneath this unit as a reminder.
 Up to 12 fighters in this system do not count against your ships' capacity.
 PRODUCTION 7",,Technology,Prophecy of Kings,Vuil’Raith Cabal,
-War Sun,,,,"Cost=12 | Combat=3(x3) | Move=2 | Capacity=6
+War Sun,2,,,"Cost=12 | Combat=3(x3) | Move=2 | Capacity=6
 Other players' units in this system lose their Planetary Shield Ability.
 SUSTAIN DAMAGE
 BOMBARDMENT 3(x3)",,Technology,Base,Any,
-Prototype War Sun II,,,,"Cost=10 | Combat=3(x3) | Move=3 | Capacity=6
+Prototype War Sun II,2,,,"Cost=10 | Combat=3(x3) | Move=3 | Capacity=6
 Other players' units in this system lose their Planetary Shield Ability.
 SUSTAIN DAMAGE
 BOMBARDMENT 3(x3)",,Technology,Base,Embers of Muaat,
-Memoria II,,,,"Cost=8 | Combat=5(x2) | Move=2 | Capacity=6
+Memoria II,1,,,"Cost=8 | Combat=5(x2) | Move=2 | Capacity=6
 You may treat this unit as if it were adjacent to systems that contain one or more of your mechs
 SUSTAIN DAMAGE
 ANTI-FIGHTER BARRAGE 5(x3)",,Technology,Prophecy of Kings,Nomad,
+Carrier,4,,,Cost=3 | Combat=9 | Move=1 | Capacity=4,,Unit,Base,Any,
+Advanced Carrier,4,,,Cost=3 | Combat=9 | Move=1 | Capacity=6,,Unit,Base,Federation of Sol,
+Cruiser,8,,,Cost=2 | Combat=7 | Move=2 | Capacity=0,,Unit,Base,Any,
+Saturn Engine,8,,,Cost=2 | Combat=7 | Move=2 | Capacity=1,,Unit,Prophecy of Kings,Titans of Ul,
+Destroyer,8,,,"Cost=1 | Combat=9 | Move=2 | Capacity=0
+ANTI-FIGHTER BARRAGE 9(x2)",,Unit,Base,Any,
+Strike Wing Alpha,8,,,"Cost=1 | Combat=8 | Move=2 | Capacity=1
+ANTI-FIGHTER BARRAGE 9(x2)",,Unit,Prophecy of Kings,Argent Flight,
+Dreadnought,5,,,"Cost=4 | Combat=5 | Move=1 | Capacity=1
+SUSTAIN DAMAGE
+BOMBARDMENT 5",,Unit,Base,Any,
+Super-Dreadnought,5,,,"Cost=4 | Combat=5 | Move=1 | Capacity=2
+SUSTAIN DAMAGE
+BOMBARDMENT 5",,Unit,Base,L1Z1X mindnet,
+Exotrireme,5,,,"Cost=4 | Combat=5 | Move=1 | Capacity=1
+SUSTAIN DAMAGE
+BOMBARDMENT 4(x2)",,Unit,Base,Sardakk N’orr,
+Fighter,10,,,Cost=1(x2) | Combat=9 | Move=0 | Capacity=0,,Unit,Base,Any,
+Hybrid Crystal Fighter,10,,,Cost=1(x2) | Combat=8 | Move=0 | Capacity=0,,Unit,Base,Naalu Collective,
+Duha Menaimon,1,After you activate this system,,"Cost=8 | Combat=7(x2) | Move=1 | Capacity=5
+After you activate this system, you may produce up to 5 units in this system.
+SUSTAIN DAMAGE",,Unit,Base,Arborec,
+Quetzecoatl,1,,,"Cost=8 | Combat=7(x2) | Move=1 | Capacity=3
+Other players cannot use SPACE CANNON against your ships in this system
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Argent Flight,
+Arc Secundus,1,At the start of each combat round,,"Cost=8 | Combat=5(x2) | Move=1 | Capacity=3
+Other players' units in this system lose PLANETARY SHIELD
+At the start of each space combat round, repair this ship
+SUSTAIN DAMAGE",,Unit,Base,Barony of Letnev,
+Son of Ragh,1,,,"Cost=8 | Combat=5(x2) | Move=1 | Capacity=3
+ANTI-FIGHTER BARRAGE 6(x4)
+SUSTAIN DAMAGE",,Unit,Base,Clan of Saar,
+Artemiris,1,,,"Cost=8 | Combat=7(x2) | Move=1 | Capacity=3
+Other players must spend 2 influence to activate the system that contains this ship.
+SUSTAIN DAMAGE",,Unit,Codex III,Council Keleres,
+The Inferno,1,ACTION,,"Cost=8 | Combat=5(x2) | Move=1 | Capacity=3
+ACTION: Spend 1 token from your strategy pool to place 1 cruiser in this unit's system.
+SUSTAIN DAMAGE",,Unit,Base,Embers of Muaat,
+Wrath of Kenara,1,After you roll a die during space combat in this system,,"Cost=8 | Combat=7(x2) | Move=1 | Capacity=3
+After you roll a die during space combat in this system, you may spend 1 trade good to apply +1 to the result.
+SUSTAIN DAMAGE",,Unit,Base,Emirates of Hacan,
+Dynamo,1,After any player's unit in this system or an adjacent system uses SUSTAIN DAMAGE,,"Cost=8 | Combat=5(x2) | Move=1 | Capacity=3
+After any player's unit in this system or an adjacent system uses SUSTAIN DAMAGE, you may spend 2 influence to repair that unit.
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Empyrean,
+Genesis,1,At the end of the status phase,,"Cost=8 | Combat=5(x2) | Move=1 | Capacity=12
+At the end of the status phase, place 1 infantry from your reinforcements in this system's space area.
+SUSTAIN DAMAGE",,Unit,Base,Federation of Sol,
+Hil Colish,1,During movement,,"Cost=8 | Combat=5 | Move=1 | Capacity=3
+This ship's system contains a delta wormhole
+During movement, this ship may move before or after your other ships
+SUSTAIN DAMAGE",,Unit,Base,Ghosts of Creuss,
+[0.0.1],1,During a space combat,,"Cost=8 | Combat=5(x2) | Move=1 | Capacity=5
+During a space combat, hits produced by this ship and by your dreadnoughts in this system must be assigned to non-fighter ships if able.
+SUSTAIN DAMAGE",,Unit,Base,L1Z1X mindnet,
+Arvicon Rex,1,During combat against an opponent whose command token is not in your fleet pool,,"Cost=8 | Combat=5(x2) | Move=1 | Capacity=3
+During combat against an opponent whose command token is not in your fleet pool, apply +2 to the results of this unit's combat rolls
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Mahact Gene-Sorcerers,
+Fourth Moon,1,,,"Cost=8 | Combat=7(x2) | Move=1 | Capacity=3
+Other players' ships in this system cannot use SUSTAIN DAMAGE
+SUSTAIN DAMAGE",,Unit,Base,Mentak Coalition,
+Matriarch,1,During an invasion in this system,When combat ends,"Cost=8 | Combat=9(x2) | Move=1 | Capacity=6
+During an invasion in this system, you may commit fighters to planets as if they were ground forces. When combat ends, return those units to the space area.
+SUSTAIN DAMAGE",,Unit,Base,Naalu Collective,
+Visz el Vir,1,,,"Cost=8 | Combat=9(x2) | Move=1 | Capacity=4
+Your mechs in this system roll 1 additional die during combat
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Naaz-Rokha Alliance,
+The Alastor,1,At the start of a space combat,,"Cost=8 | Combat=9(x2) | Move=1 | Capacity=3
+At the start of a space combat, choose any number of your ground forces in this system to participate in that combat as if they were ships.
+SUSTAIN DAMAGE",,Unit,Base,Nekro Virus,
+Memoria,1,,,"Cost=8 | Combat=7(x2) | Move=1 | Capacity=3
+You may treat this unit as if it were adjacent to systems that contain one or more of your mechs
+ANTI-FIGHTER BARRAGE 8(x3)
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Nomad,
+C'Morran N'orr,1,,,"Cost=8 | Combat=6(x2) | Move=1 | Capacity=3
+Apply +1 to the result of each of your other ship's combat rolls in this system.
+SUSTAIN DAMAGE",,Unit,Base,Sardakk N’orr,
+Ouranos,1,After you active a system that contains 1 or more of your PDS,,"Cost=8 | Combat=7(x2) | Move=1 | Capacity=3
+DEPLOY: After you activate a system that contains 1 or more of your PDS, you may replace 1 of those PDS with this unit
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Titans of Ul,
+J.N.S. Hylarim,1,When making a combat roll for this ship,,"Cost=8 | Combat=6(x2) | Move=1 | Capacity=3
+When making a combat roll for this ship, each result of a 9 or 10, before applying modifiers, produces 2 additional hits.
+SUSTAIN DAMAGE",,Unit,Base,Universities of Jol-Nar,
+The Terror Between,1,,,"Cost=8 | Combat=5(x2) | Move=1 | Capacity=3
+Capture all other non-structure units that are destroyed in this unit's system, including your own
+BOMBARDMENT 5
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Vuil’Raith Cabal,
+Salai Sai Corian,1,When this unit makes a combat roll,,"Cost=8 | Combat=7 | Move=1 | Capacity=3
+When this unit makes a combat roll, it rolls a number of dice equal to the number of your opponent's non-fighter ships in this system.
+SUSTAIN DAMAGE",,Unit,Base,Winnu,
+Loncarra Ssodu,1,,,"Cost=8 | Combat=7(x2) | Move=1 | Capacity=3
+You may use this unit's SPACE CANNON against ships that are in adjacent systems.
+SPACE CANNON 5(x3)
+SUSTAIN DAMAGE",,Unit,Base,Xxcha Kingdom,
+Van Hauge,1,When this ship is destroyed,,"Cost=8 | Combat=9(x2) | Move=1 | Capacity=3
+When this ship is destroyed, destroy all ships in this system.
+SUSTAIN DAMAGE",,Unit,Base,Yin Brotherhood,
+Y'sia Y'ssrila,1,,,"Cost=8 | Combat=5(x2) | Move=2 | Capacity=3
+This ship can move through systems that contain other player's ships.
+SUSTAIN DAMAGE",,Unit,Base,Yssaril Tribes,
+Valefar Assimilator X,,When you would gain another player’s technology using 1 of your faction abilities,,"When you would gain another player's technology using 1 of your faction abilities, you may place the ""X"" assimilator token on a faction technology owned by that player instead.  While that token is on a technology, this card gains that technology's text.  You cannot place an assimilator token on technology that already has an assimilator token.",,Technology,Base,Nekro Virus,
+Valefar Assimilator Y,,When you would gain another player’s technology using 1 of your faction abilities,,"When you would gain another player's technology using 1 of your faction abilities, you may place the “Y"" assimilator token on a faction technology owned by that player instead.  While that token is on a technology, this card gains that technology's text.  You cannot place an assimilator token on technology that already has an assimilator token.",,Technology,Base,Nekro Virus,
