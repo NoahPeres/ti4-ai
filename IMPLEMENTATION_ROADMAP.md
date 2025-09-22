@@ -8,8 +8,9 @@
 **Focus**: Complete advanced mechanics that enable complex strategic gameplay and AI decision-making
 
 ## 📊 Progress
-**Overall Progress**: 30.7%
-**Completed Rules**: 31/101
+**Overall Progress**: 31.7%
+**Completed Rules**: 32/101
+- **Rule 1: ABILITIES** - Core ability system with timing windows, precedence, costs, and resolution (Foundation Layer) ✅ **NEWLY COMPLETED**
 - **Rule 3: ACTION PHASE** - Core action phase mechanics with pass state tracking and phase transitions (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 6: ADJACENCY** - Core spatial mechanics for system relationships
 - **Rule 14: BLOCKADED** - Blockade mechanics for space docks and production restrictions (Foundation Layer) ✅ **COMPLETED**

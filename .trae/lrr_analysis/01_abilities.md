@@ -17,8 +17,9 @@ Cards and faction sheets each have abilities that players can resolve to trigger
 **Raw LRR Text**: "If a card ability contradicts information in the Rules Reference, the card takes precedence. If both the card and the rules can be followed at the same time, they should be."
 
 **Priority**: CRITICAL - Core game mechanic
-**Implementation Status**: ❌ NOT IMPLEMENTED
-**Test References**: None found
+**Implementation Status**: ✅ IMPLEMENTED
+**Test References**: `tests/test_rule_01_abilities.py` - 14 tests passing covering timing windows, precedence, costs, and ability resolution
+**Implementation Files**: `src/ti4/core/abilities.py` - Complete ability system with timing, precedence, and resolution
 **Notes**: Essential for card-based game mechanics. Need ability precedence system.
 
 ### 1.3 - Ability Description
@@ -98,6 +99,202 @@ Cards and faction sheets each have abilities that players can resolve to trigger
 **Raw LRR Text**: "Some examples of an ability's cost include spending resources, spending trade goods, spending command tokens, exhausting cards, purging cards, and activating specific systems."
 
 **Priority**: MEDIUM - Cost types
+**Implementation Status**: ❌ NOT IMPLEMENTED
+**Test References**: None found
+**Notes**: Need comprehensive cost validation system for all resource types
+
+### 1.13 - Timing Section Header
+**Raw LRR Text**: "TIMING" (section header)
+
+**Priority**: N/A - Section divider
+**Implementation Status**: N/A
+**Test References**: N/A
+
+### 1.14 - Before/After Timing
+**Raw LRR Text**: "If the timing of an ability uses the word 'before' or 'after,' the ability's effect occurs immediately before or after the described timing event, respectively."
+**Sub-rule**: "For example, if an ability is resolved 'after a ship is destroyed,' the ability must be resolved as soon as the ship is destroyed and not later during that turn or round."
+
+**Priority**: CRITICAL - Core timing system
+**Implementation Status**: ❌ NOT IMPLEMENTED
+**Test References**: None found
+**Notes**: Foundation for all ability timing. Must be precise and immediate.
+
+### 1.15 - When Timing
+**Raw LRR Text**: "If the timing of an ability uses the word 'when,' the ability's effect occurs at the moment of the described timing event."
+**Sub-rule**: "Such an ability typically modifies or replaces the timing event in some way."
+
+**Priority**: CRITICAL - Highest priority timing
+**Implementation Status**: ❌ NOT IMPLEMENTED
+**Test References**: None found
+**Notes**: "When" abilities can modify/replace events. Highest timing priority.
+
+### 1.16 - Timing Priority
+**Raw LRR Text**: "Effects that occur 'when' an event happens take priority over effects that occur 'after' an event happens."
+
+**Priority**: CRITICAL - Timing precedence
+**Implementation Status**: ❌ NOT IMPLEMENTED
+**Test References**: None found
+**Notes**: Essential for proper ability resolution order
+
+### 1.17 - Then Requirements
+**Raw LRR Text**: "If an ability uses the word 'then,' a player must resolve the effect that occurs before the word 'then' or they cannot resolve the effect that occurs after the word 'then.'"
+
+**Priority**: HIGH - Conditional effects
+**Implementation Status**: ❌ NOT IMPLEMENTED
+**Test References**: None found
+**Notes**: Sequential dependency validation required
+
+### 1.18 - Ability Frequency
+**Raw LRR Text**: "Each ability can be resolved once for each occurrence of that ability's timing event. For example, if an ability is resolved 'At the start of combat,' it can be resolved at the start of each combat."
+
+**Priority**: HIGH - Trigger tracking
+**Implementation Status**: ❌ NOT IMPLEMENTED
+**Test References**: None found
+**Notes**: Need system to track ability usage per trigger event
+
+### 1.19 - Action Phase Ability Resolution
+**Raw LRR Text**: "If there are multiple abilities that players wish to resolve at the same time during the action phase, each player takes a turn resolving an ability in initiative order, beginning with the active player. This process continues until each player has resolved each ability that they wish to resolve during that window."
+
+**Priority**: HIGH - Multi-player timing
+**Implementation Status**: ❌ NOT IMPLEMENTED
+**Test References**: None found
+**Notes**: Complex multi-player ability resolution system needed
+
+### 1.20 - Strategy/Agenda Phase Ability Resolution
+**Raw LRR Text**: "If there are multiple abilities that players wish to resolve at the same time during the strategy or agenda phases, players take turns resolving abilities starting with the speaker and proceeding clockwise. This process continues until each player has resolved each ability that they wish to resolve during that window."
+
+**Priority**: HIGH - Phase-specific resolution
+**Implementation Status**: ❌ NOT IMPLEMENTED
+**Test References**: None found
+**Notes**: Different resolution order for different phases
+
+### 1.21 - Component-Specific Rules Header
+**Raw LRR Text**: "COMPONENT-SPECIFIC RULES" (section header)
+
+**Priority**: N/A - Section divider
+**Implementation Status**: N/A
+**Test References**: N/A
+
+### 1.22 - Action Card Abilities
+**Raw LRR Text**: "The opening paragraph of each ability found on an action card describes when a player can resolve that card's ability."
+
+**Priority**: HIGH - Action card system
+**Implementation Status**: ⚠️ PARTIAL - Basic action cards exist
+**Test References**: Various action card tests
+**Notes**: Need comprehensive action card ability system
+
+### 1.23 - Promissory Note Abilities
+**Raw LRR Text**: "The opening paragraph of most abilities found on promissory notes describes when a player can resolve that card's ability."
+**Sub-rule**: "Some promissory notes have abilities that trigger as soon as a player receives the card."
+
+**Priority**: HIGH - Promissory note system
+**Implementation Status**: ⚠️ PARTIAL - Basic promissory notes exist
+**Test References**: `tests/test_rule_69_promissory_notes.py`
+**Notes**: Need immediate trigger system for some promissory notes
+
+### 1.24 - Agenda Card Abilities
+**Raw LRR Text**: "Abilities on agenda cards correspond to an outcome. Players resolve these abilities during the agenda phase after players vote for a particular outcome."
+
+**Priority**: MEDIUM - Agenda system
+**Implementation Status**: ❌ NOT IMPLEMENTED
+**Test References**: None found
+**Notes**: Agenda phase integration needed
+
+### 1.25 - Faction Abilities
+**Raw LRR Text**: "Each faction has faction abilities presented on its faction sheet. Each faction's flagship has one or more unique abilities. Some abilities provide players with perpetual effects."
+
+**Priority**: HIGH - Faction system
+**Implementation Status**: ❌ NOT IMPLEMENTED
+**Test References**: None found
+**Notes**: Faction-specific abilities and flagship abilities needed
+
+### 1.26 - Unit Abilities
+**Raw LRR Text**: "Some units have unit abilities. These abilities are named and presented above a unit's attributes on a player's faction sheet or on a unit upgrade card. Each unit ability has unique rules for when a player can resolve that ability. The following abilities are unit abilities:"
+
+**Priority**: HIGH - Unit system
+**Implementation Status**: ⚠️ PARTIAL - Basic unit abilities exist
+**Test References**: Various unit tests
+**Notes**: Unit abilities partially implemented but need full ability system integration
+
+### 1.27 - System/Planet References
+**Raw LRR Text**: "If a unit's ability uses the phrase 'this system' or 'this planet,' the ability is referring to the system or planet that contains that unit."
+
+**Priority**: MEDIUM - Context resolution
+**Implementation Status**: ❌ NOT IMPLEMENTED
+**Test References**: None found
+**Notes**: Context-aware ability resolution needed
+
+## Implementation Priority Summary
+
+### CRITICAL (Must implement first):
+- **1.2**: Card ability precedence over rules
+- **1.6**: "Cannot" effects absolute precedence
+- **1.14**: Before/After timing system
+- **1.15**: "When" timing system
+- **1.16**: Timing priority (when > after)
+
+### HIGH (Core functionality):
+- **1.3**: Ability description and duration tracking
+- **1.5**: Action abilities integration
+- **1.7**: Complete ability resolution
+- **1.8**: Mandatory ability triggers
+- **1.11**: Cost validation system
+- **1.17**: "Then" conditional effects
+- **1.18**: Ability frequency tracking
+- **1.19**: Action phase multi-player resolution
+- **1.20**: Strategy/agenda phase resolution
+- **1.22**: Action card abilities
+- **1.23**: Promissory note abilities
+- **1.25**: Faction abilities
+- **1.26**: Unit abilities
+
+### MEDIUM (Supporting features):
+- **1.4**: Multiple abilities per card
+- **1.9**: Partial resolution of "and" effects
+- **1.12**: Cost type examples
+- **1.24**: Agenda card abilities
+- **1.27**: Context resolution
+
+## Key Timing Windows Identified from Compendium:
+
+### Action Phase Timing:
+- "Action:" - Component actions
+- "At the start of your turn"
+- "After you perform an action"
+- "During the action phase"
+
+### Combat Timing:
+- "At the start of combat"
+- "At the start of a space combat"
+- "At the start of an invasion"
+- "After you win a space combat"
+- "During a combat round"
+
+### Strategy/Agenda Timing:
+- "After an agenda is revealed"
+- "When you are elected as the outcome"
+- "Before a player casts votes"
+- "At the end of the strategy phase"
+
+### Production/Movement Timing:
+- "After you activate a system"
+- "After you produce units"
+- "After a player moves ships into a system"
+- "When another player activates a system"
+
+### Technology/Research Timing:
+- "After the Jol-Nar player researches a technology"
+- "After you explore a planet"
+- "At the end of your turn"
+
+## Test Case Requirements:
+
+Each sub-rule needs comprehensive test coverage:
+1. **Basic functionality tests** - Does the rule work as intended?
+2. **Edge case tests** - Boundary conditions and error cases
+3. **Integration tests** - How does it interact with other rules?
+4. **Precedence tests** - Conflict resolution between abilities
+5. **Timing tests** - Proper sequencing of ability resolution
 **Implementation Status**: ⚠️ PARTIAL - Individual systems exist
 **Test References**: Basic resource tests exist
 **Notes**: Individual cost types partially exist but not unified
