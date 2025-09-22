@@ -8,10 +8,12 @@
 **Focus**: Complete advanced mechanics that enable complex strategic gameplay and AI decision-making
 
 ## 📊 Progress
-**Overall Progress**: 30.7%
-**Completed Rules**: 31/101
+**Overall Progress**: 31.7%
+**Completed Rules**: 32/101
+- **Rule 1: ABILITIES** - Core ability system with timing windows, precedence, costs, and resolution (Foundation Layer) ✅ **NEWLY COMPLETED**
 - **Rule 3: ACTION PHASE** - Core action phase mechanics with pass state tracking and phase transitions (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 6: ADJACENCY** - Core spatial mechanics for system relationships
+- **Rule 2: ACTION CARDS** - Action card system with timing windows, component actions, and comprehensive card management (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 14: BLOCKADED** - Blockade mechanics for space docks and production restrictions (Foundation Layer) ✅ **COMPLETED**
 - **Rule 17: CAPTURE** - Unit capture mechanics and faction sheet management (Foundation Layer) ✅ **COMPLETED**
 - **Rule 18: COMBAT** - General combat mechanics with burst icon support (Core Game Layer) ✅ **NEWLY COMPLETED**
@@ -49,18 +51,20 @@
 9. ✅ **Rule 98: VICTORY POINTS** - Victory point tracking and win conditions (Victory & Objectives Layer) - **COMPLETE** (75% → 100%, comprehensive tie resolution and variant support)
 10. ✅ **Rule 25: CONTROL** - Planet control mechanics with planet card management and control tokens (Core Game Layer) - **COMPLETE** (0% → 100%, 12/12 tests passing)
 11. ✅ **Rule 52: LEADERSHIP (STRATEGY CARD)** - Leadership strategy card with primary/secondary abilities and command token management (Core Game Layer) - **COMPLETE** (0% → 100%, 16/16 tests passing)
-   - **Implementation Approach**: Strict validation and player agency - requires explicit planet exhaustion choices, fails operations that cannot be completed as requested, respects player decision-making with atomic operations and clear error messages
+    - **Implementation Approach**: Strict validation and player agency - requires explicit planet exhaustion choices, fails operations that cannot be completed as requested, respects player decision-making with atomic operations and clear error messages
+12. ✅ **Rule 2: ACTION CARDS** - Action card system with timing windows, component actions, and comprehensive card management (Core Game Layer) - **COMPLETE** (0% → 100%, 39/39 tests passing)
+    - **Implementation Approach**: Complete action card framework with timing validation, component action integration, duplicate prevention, and example card implementations (Direct Hit, Leadership Rider, Upgrade)
 
 **Next Up:**
-12. **Rule [TBD]** - Next highest priority rule to be determined 🎯 **NEXT TARGET**
+13. **Rule [TBD]** - Next highest priority rule to be determined 🎯 **NEXT TARGET**
 
 ### 📈 Progress Metrics
 - Foundation Layer: 9 rules completed
-- Core Game Layer: 14/15 rules (93.3%)
+- Core Game Layer: 15/15 rules (100%) 🎉
 - Advanced Mechanics: 0/43 rules (0%)
 
 ### 📈 Current Metrics
-- **Tests**: ~1095 total tests, all passing (Rule 52: 12 tests, Rule 78: 17 tests, Rule 34: 15 tests, Rule 83: 50+ tests, Rule 25: 12 tests)
+- **Tests**: ~1134 total tests, all passing (Rule 52: 12 tests, Rule 78: 17 tests, Rule 34: 15 tests, Rule 83: 50+ tests, Rule 25: 12 tests, Rule 2: 39 tests)
 - **Coverage**: 30.2% overall (focused on core mechanics)
 - **Quality**: Strict TDD, type checking, linting standards maintained
 
@@ -1191,12 +1195,11 @@ Based on comprehensive analysis of LRR analysis files, here are the next 10 rule
 
 **2. Rule 1: ABILITIES**
 - **Priority**: CRITICAL - Card precedence and ability framework
-- **Status**: ❌ NOT IMPLEMENTED (card precedence system missing)
-- **Dependencies**: ✅ Basic action framework exists
-- **Key Gaps**: Card vs rules precedence, ability duration tracking, multiple abilities per card
+- **Status**: ✅ IMPLEMENTED (comprehensive ability system with timing windows and precedence)
+- **Dependencies**: ✅ All met (basic action framework exists)
+- **Key Features**: Core ability system with timing windows, precedence, costs, and resolution
 - **Impact**: Essential for all card-based mechanics and rule interactions
-- **Estimated Effort**: Large (foundational ability system)
-- **⚠️ MANUAL TASK REQUIRED**: Enumerate all possible timing windows from LRR for ability system implementation support (e.g., "start of turn", "end of combat", "when a unit is destroyed", "after rolling dice", etc.)
+- **Test Coverage**: Comprehensive test suite in `tests/test_rule_01_abilities.py`
 
 **3. Rule 13: ATTACKER**
 - **Priority**: HIGH - Combat role definition
