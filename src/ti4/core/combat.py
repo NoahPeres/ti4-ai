@@ -1,12 +1,152 @@
 """Combat system for TI4."""
 
 import random
-from typing import Callable, Optional
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Callable, Optional
 
 from .constants import UnitType
 from .system import System
 from .unit import Unit
 from .unit_stats import UnitStatsProvider
+
+
+@dataclass
+class CombatRoles:
+    """Represents combat roles for attacker and defender."""
+
+    attacker_id: str
+    defender_id: str
+    attacker_units: list[Unit]
+    defender_units: list[Unit]
+
+
+@dataclass
+class CombatTimingOrder:
+    """Represents the timing order for combat actions."""
+
+    first_player_id: str
+    second_player_id: str
+
+
+if TYPE_CHECKING:
+    from .game_controller import GameController
+
+
+class CombatRoleManager:
+    """Manages combat role assignment according to Rule 13: ATTACKER."""
+
+    def __init__(self, game_controller: "GameController") -> None:
+        """Initialize with game controller for active player tracking."""
+        self.game_controller = game_controller
+
+    def has_combat(self, system: System) -> bool:
+        """Check if combat should occur in the system."""
+        owners = set()
+        for unit in system.space_units:
+            owners.add(unit.owner)
+        return len(owners) > 1
+
+    def get_attacker_id(self, system: System) -> str:
+        """Get the attacker player ID (always the active player)."""
+        if not self.has_combat(system):
+            raise ValueError("No combat in system")
+
+        # Rule 13: During combat, the active player is the attacker
+        return self.game_controller.get_current_player().id
+
+    def get_defender_id(self, system: System) -> str:
+        """Get the defender player ID (non-active player in two-player combat)."""
+        if not self.has_combat(system):
+            raise ValueError("No combat in system")
+
+        attacker_id = self.get_attacker_id(system)
+
+        # Find the other player(s) in combat
+        owners: set[str] = set()
+        for unit in system.space_units:
+            owners.add(unit.owner)
+
+        defenders = [owner for owner in owners if owner != attacker_id]
+
+        if len(defenders) == 1:
+            return defenders[0]
+        elif len(defenders) > 1:
+            # For multiple defenders, return the first one (tests can handle multiple)
+            return defenders[0]
+        else:
+            raise ValueError("No defender found in combat")
+
+    def get_defender_ids(self, system: System) -> list[str]:
+        """Get all defender player IDs (all non-active players in combat)."""
+        if not self.has_combat(system):
+            raise ValueError("No combat in system")
+
+        attacker_id = self.get_attacker_id(system)
+
+        # Find all other players in combat
+        owners = set()
+        for unit in system.space_units:
+            owners.add(unit.owner)
+
+        return [owner for owner in owners if owner != attacker_id]
+
+    def get_ground_combat_attacker_id(self, system: System, planet_name: str) -> str:
+        """Get the attacker player ID for ground combat (always the active player)."""
+        # Check if ground combat should occur
+        owners = set()
+        for unit in system.get_ground_forces_on_planet(planet_name):
+            owners.add(unit.owner)
+
+        if len(owners) <= 1:
+            raise ValueError("No ground combat on planet")
+
+        # Rule 13: During combat, the active player is the attacker
+        return self.game_controller.get_current_player().id
+
+    def get_ground_combat_defender_id(self, system: System, planet_name: str) -> str:
+        """Get the defender player ID for ground combat."""
+        attacker_id = self.get_ground_combat_attacker_id(system, planet_name)
+
+        # Find the other player(s) in ground combat
+        owners: set[str] = set()
+        for unit in system.get_ground_forces_on_planet(planet_name):
+            owners.add(unit.owner)
+
+        defenders = [owner for owner in owners if owner != attacker_id]
+
+        if len(defenders) == 1:
+            return defenders[0]
+        else:
+            raise ValueError("Invalid ground combat configuration")
+
+
+class RetreatManager:
+    """Manages retreat mechanics with attacker/defender role restrictions."""
+
+    def __init__(self, attacker_id: str, defender_id: str) -> None:
+        """Initialize with combat roles."""
+        self.attacker_id = attacker_id
+        self.defender_id = defender_id
+        self.announced_retreats: set[str] = set()
+
+    def can_announce_retreat(self, player_id: str) -> bool:
+        """Check if a player can announce retreat."""
+        # Defender can always announce retreat first
+        if player_id == self.defender_id:
+            return True
+
+        # Attacker cannot retreat if defender has announced retreat
+        if player_id == self.attacker_id:
+            return self.defender_id not in self.announced_retreats
+
+        return False
+
+    def announce_retreat(self, player_id: str) -> None:
+        """Announce retreat for a player."""
+        if not self.can_announce_retreat(player_id):
+            raise ValueError(f"Player {player_id} cannot announce retreat")
+
+        self.announced_retreats.add(player_id)
 
 
 class CombatDetector:
