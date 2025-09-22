@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from .constants import LocationType, Technology, UnitType
+from .constants import GameConstants, LocationType, Technology, UnitType
 from .galaxy import Galaxy
 from .movement_rules import MovementContext, MovementRuleEngine
 from .system import System
@@ -214,8 +214,6 @@ class TransportValidator:
             return False
 
         # Check if all units are ground forces that can be transported
-        from .constants import GameConstants
-
         transportable_types = GameConstants.GROUND_FORCE_TYPES
         for unit in transport.ground_forces:
             if unit.unit_type not in transportable_types:
@@ -289,7 +287,6 @@ class TransportExecutor:
 
     def can_transport_units(self, carrier: "Unit", units: list["Unit"]) -> bool:
         """Check if a carrier can transport the given units."""
-        from .constants import GameConstants
 
         # Only infantry and mechs can be transported
         transportable_types = GameConstants.GROUND_FORCE_TYPES
@@ -297,8 +294,16 @@ class TransportExecutor:
             if unit.unit_type not in transportable_types:
                 return False
 
-        # Check capacity
-        return len(units) <= carrier.get_capacity()
+        # Check capacity using explicit per-unit costs
+        cost_by_type = {
+            UnitType.FIGHTER: GameConstants.FIGHTER_CAPACITY_COST,
+            UnitType.INFANTRY: GameConstants.INFANTRY_CAPACITY_COST,
+            UnitType.MECH: GameConstants.MECH_CAPACITY_COST,
+        }
+        used = 0
+        for u in units:
+            used += cost_by_type.get(u.unit_type, 1)
+        return used <= carrier.get_capacity()
 
     def get_transportable_units(self, system: "System", player: str) -> list["Unit"]:
         """Get all units that can be transported by this player."""

@@ -42,17 +42,10 @@ class System:
 
     def has_enemy_ships(self, player_id: str) -> bool:
         """Check if this system contains ships belonging to other players (Rule 58.4b)."""
-        from .constants import UnitType
+        from .constants import GameConstants
 
-        ship_types = {
-            UnitType.CARRIER,
-            UnitType.CRUISER,
-            UnitType.CRUISER_II,
-            UnitType.DREADNOUGHT,
-            UnitType.DESTROYER,
-            UnitType.FLAGSHIP,
-            UnitType.WAR_SUN,
-        }
+        # Use NON_FIGHTER_SHIP_TYPES for movement blocking rules
+        ship_types = GameConstants.NON_FIGHTER_SHIP_TYPES
 
         for unit in self.space_units:
             if unit.owner != player_id and unit.unit_type in ship_types:

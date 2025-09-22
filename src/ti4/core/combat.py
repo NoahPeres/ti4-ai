@@ -74,16 +74,9 @@ class CombatRoleManager:
         attacker_id = self.get_attacker_id(system)
 
         # Find all other players in combat (preserve encounter order)
-        ship_types = {
-            UnitType.CARRIER,
-            UnitType.CRUISER,
-            UnitType.CRUISER_II,
-            UnitType.DREADNOUGHT,
-            UnitType.DESTROYER,
-            UnitType.FIGHTER,
-            UnitType.FLAGSHIP,
-            UnitType.WAR_SUN,
-        }
+        from .constants import GameConstants
+
+        ship_types = GameConstants.SHIP_TYPES
         owners_ordered: list[str] = []
         seen: set[str] = set()
         for unit in system.space_units:

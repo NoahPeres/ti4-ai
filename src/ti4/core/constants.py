@@ -73,6 +73,7 @@ class GameConstants:
     # Capacity costs
     FIGHTER_CAPACITY_COST = 1
     INFANTRY_CAPACITY_COST = 1
+    MECH_CAPACITY_COST = 1
 
     # Unit type sets for common operations
     GROUND_FORCE_TYPES = frozenset({UnitType.INFANTRY, UnitType.MECH})
@@ -88,6 +89,8 @@ class GameConstants:
             UnitType.WAR_SUN,
         }
     )
+    # Optional: for rules that treat fighters differently (e.g., movement blocking)
+    NON_FIGHTER_SHIP_TYPES = SHIP_TYPES - frozenset({UnitType.FIGHTER})
 
 
 class Technology(Enum):
