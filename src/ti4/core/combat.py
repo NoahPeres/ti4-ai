@@ -3,7 +3,7 @@
 import random
 from typing import TYPE_CHECKING, Callable, Optional
 
-from .constants import UnitType
+from .constants import GameConstants, UnitType
 from .system import System
 from .unit import Unit
 from .unit_stats import UnitStatsProvider
@@ -13,23 +13,22 @@ if TYPE_CHECKING:
 
 
 class CombatRoleManager:
-    """Manages combat role assignment according to Rule 13: ATTACKER."""
+    """Manages combat roles and participant identification."""
 
     def __init__(self, game_controller: "GameController") -> None:
-        """Initialize with game controller for active player tracking."""
         self.game_controller = game_controller
 
-    def has_combat(self, system: System) -> bool:
-        """Check if there is combat in the system (multiple players with ships)."""
-        from .constants import GameConstants
-
-        # Count unique owners of ships in space
+    def _get_ship_owners(self, system: System) -> set[str]:
+        """Helper method to get unique owners of ships in a system."""
         owners: set[str] = set()
         for unit in system.space_units:
             if unit.unit_type in GameConstants.SHIP_TYPES:
                 owners.add(unit.owner)
+        return owners
 
-        return len(owners) > 1
+    def has_combat(self, system: System) -> bool:
+        """Check if there is combat in the system (multiple players with ships)."""
+        return len(self._get_ship_owners(system)) > 1
 
     def get_attacker_id(self, system: System) -> str:
         """Get the attacker player ID (always the active player)."""
@@ -37,7 +36,15 @@ class CombatRoleManager:
             raise ValueError("No combat in system")
 
         # Rule 13: During combat, the active player is the attacker
-        return self.game_controller.get_current_player().id
+        active_id = self.game_controller.get_current_player().id
+        from .constants import GameConstants
+
+        if not any(
+            u.owner == active_id and u.unit_type in GameConstants.SHIP_TYPES
+            for u in system.space_units
+        ):
+            raise ValueError(f"Active player {active_id} has no ships in this system")
+        return active_id
 
     def get_defender_id(self, system: System) -> str:
         """Get the defender player ID (non-active player in two-player combat)."""
@@ -95,7 +102,15 @@ class CombatRoleManager:
             raise ValueError("No ground combat on planet")
 
         # Rule 13: During combat, the active player is the attacker
-        return self.game_controller.get_current_player().id
+        active_id = self.game_controller.get_current_player().id
+        if not any(
+            u.owner == active_id
+            for u in system.get_ground_forces_on_planet(planet_name)
+        ):
+            raise ValueError(
+                f"Active player {active_id} has no ground forces on {planet_name}"
+            )
+        return active_id
 
     def get_ground_combat_defender_id(self, system: System, planet_name: str) -> str:
         """Get the defender player ID for ground combat."""
@@ -113,8 +128,11 @@ class CombatRoleManager:
 
         if len(defenders) == 1:
             return defenders[0]
-        else:
-            raise ValueError("Invalid ground combat configuration")
+        if len(defenders) == 0:
+            raise ValueError("No defender found in ground combat")
+        raise ValueError(
+            "Multiple defenders present on planet; disambiguation required"
+        )
 
 
 class RetreatManager:
@@ -155,8 +173,6 @@ class CombatDetector:
 
     def should_initiate_combat(self, system: System) -> bool:
         """Check if combat should be initiated in a system."""
-        from .constants import GameConstants
-
         # Get all owners of ships (not all space units) in the system
         owners = set()
         for unit in system.space_units:
@@ -215,7 +231,10 @@ class CombatResolver:
             return 0
 
         # Roll dice and calculate hits
-        dice_results = [random.randint(1, 10) for _ in range(actual_dice_count)]  # nosec B311 - game RNG, not crypto
+        dice_results = [
+            random.randint(1, GameConstants.DEFAULT_COMBAT_DICE_SIDES)
+            for _ in range(actual_dice_count)
+        ]  # nosec B311 - game RNG, not crypto
         return self.calculate_hits(dice_results, stats.combat_value)
 
     def roll_dice_for_unit_with_burst_icons(self, unit: Unit) -> int:
@@ -242,7 +261,7 @@ class CombatResolver:
 
     def calculate_hits(self, dice_results: list[int], combat_value: int) -> int:
         """Calculate hits from dice results given a combat value."""
-        if combat_value < 1 or combat_value > 10:
+        if combat_value < 1 or combat_value > GameConstants.DEFAULT_COMBAT_DICE_SIDES:
             raise ValueError("combat_value must be between 1 and 10")
 
         hits = 0
@@ -386,7 +405,10 @@ class CombatResolver:
         if dice_count <= 0:
             return 0
 
-        dice_results = [random.randint(1, 10) for _ in range(dice_count)]  # nosec B311 - game RNG, not crypto
+        dice_results = [
+            random.randint(1, GameConstants.DEFAULT_COMBAT_DICE_SIDES)
+            for _ in range(dice_count)
+        ]  # nosec B311 - game RNG, not crypto
         return self.calculate_hits(dice_results, stats.combat_value)
 
     def perform_anti_fighter_barrage(self, unit: Unit, target_units: list[Unit]) -> int:
@@ -404,7 +426,7 @@ class CombatResolver:
             return [u for u in units if u.unit_type == UnitType.FIGHTER]
 
         return self._perform_ability_attack(
-            unit, target_units, Unit.has_anti_fighter_barrage, filter_fighters
+            unit, target_units, lambda u: u.has_anti_fighter_barrage(), filter_fighters
         )
 
     def perform_space_cannon(self, unit: Unit, target_units: list[Unit]) -> int:
@@ -417,4 +439,6 @@ class CombatResolver:
         Returns:
             Number of hits scored
         """
-        return self._perform_ability_attack(unit, target_units, Unit.has_space_cannon)
+        return self._perform_ability_attack(
+            unit, target_units, lambda u: u.has_space_cannon()
+        )
