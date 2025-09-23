@@ -44,15 +44,14 @@ class Fleet:
 
     def _unit_needs_capacity(self, unit: Unit) -> bool:
         """Check if a unit needs to be carried (no independent movement)."""
-        stats = unit.get_stats()
-        # Fighters and infantry need capacity unless they have independent movement
-        # Fighter II has movement > 0 and doesn't need capacity
+        # Fighters always require capacity in space (including Fighter II).
         if unit.unit_type == UnitType.FIGHTER:
-            return stats.movement == 0  # Base fighters need capacity, Fighter II don't
-        elif unit.unit_type == UnitType.INFANTRY:
-            return True  # Infantry always need capacity (no independent space movement)
-        else:
-            return False  # Ships don't need capacity
+            return True
+        # Ground forces (infantry and mechs) require capacity while in space.
+        if unit.unit_type in (UnitType.INFANTRY, UnitType.MECH):
+            return True
+        # Ships do not consume capacity.
+        return False
 
     def get_ships_with_capacity(self) -> list[Unit]:
         """Get all ships that provide capacity."""
@@ -137,6 +136,8 @@ class FleetCapacityEnforcer:
 
         # Validate that all chosen units are in the fleet
         for unit in chosen_units_to_remove:
+            if not isinstance(unit, Unit):
+                raise FleetCapacityError("Invalid unit provided for removal selection.")
             if unit not in fleet.units:
                 raise FleetCapacityError(
                     f"Cannot remove unit not in fleet: {unit.unit_type}"
@@ -148,7 +149,7 @@ class FleetCapacityEnforcer:
         ]
 
         # Reject duplicate selections among valid units
-        if len({id(u) for u in valid_units_to_remove}) != len(valid_units_to_remove):
+        if len({u.id for u in valid_units_to_remove}) != len(valid_units_to_remove):
             raise FleetCapacityError("Duplicate units selected for removal.")
 
         if len(valid_units_to_remove) < excess_count:

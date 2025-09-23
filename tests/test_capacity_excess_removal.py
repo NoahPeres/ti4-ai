@@ -286,7 +286,7 @@ class TestCapacityExcessRemoval:
         fleet.add_unit(carrier)
         fleet.add_unit(cruiser)
 
-        # Add 6 fighters (exceeds capacity of 5)
+        # Add 6 fighters (exceeds capacity of 4)
         fighters = []
         for _ in range(6):
             fighter = Unit(unit_type=UnitType.FIGHTER, owner="player1")
