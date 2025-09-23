@@ -461,8 +461,8 @@ class TestRule15TechnologyIntegration:
     def test_plasma_scoring_technology_interaction(self) -> None:
         """Test Plasma Scoring technology interaction with bombardment.
 
-        LRR: "The 'Plasma Scoring' technology allows a player's units to use
-        their 'Bombardment' ability against units that have 'Sustain Damage'."
+        LRR: "The 'Plasma Scoring' technology allows a player to roll 1
+        additional die when using 'Bombardment' ability."
         """
         # Create system with planet
         system = System("test_system")
@@ -478,7 +478,7 @@ class TestRule15TechnologyIntegration:
         system.place_unit_in_space(dreadnought)
 
         from src.ti4.core.bombardment import BombardmentSystem
-        from src.ti4.core.technology import TechnologyEnum
+        from src.ti4.core.constants import Technology
 
         bombardment = BombardmentSystem()
 
@@ -490,7 +490,7 @@ class TestRule15TechnologyIntegration:
                 attacking_player="attacker",
                 planet_targets={"test_planet": [dreadnought]},
                 # Pass string or enum.name to match BombardmentRoll
-                player_technologies={TechnologyEnum.PLASMA_SCORING.name},
+                player_technologies={Technology.PLASMA_SCORING.value},
             )
             # If Plasma Scoring is implemented, bombardment should work differently
             assert isinstance(result, dict)

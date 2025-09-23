@@ -54,9 +54,9 @@ Rule 15 defines the bombardment unit ability, which allows ships to destroy grou
 ### 15.1e - Faction-Specific Rules
 **Raw LRR Text**: "The L1Z1X's 'Harrow' ability does not affect the L1Z1X player's own ground forces."
 
-**Implementation Status**: ⚠️ **DEFERRED** (Advanced Feature)
+**Implementation Status**: ⚠️ **PARTIAL** (Basic Framework)
 **Priority**: Low
-**Details**: Faction-specific bombardment rules deferred until faction system implementation.
+**Details**: Basic L1Z1X Harrow restriction implemented - prevents L1Z1X from bombarding own ground forces.
 
 ### 15.1f - Planetary Shield Interaction
 **Raw LRR Text**: "Planets that contain a unit with the 'Planetary Shield' ability cannot be bombarded."
@@ -83,22 +83,24 @@ Rule 15 defines the bombardment unit ability, which allows ships to destroy grou
 
 ### Core Classes Implemented
 - **BombardmentSystem**: Main orchestrator for bombardment mechanics
-- **BombardmentRoll**: Handles dice rolling and hit calculation
+- **BombardmentRoll**: Handles bombardment roll mechanics and hit calculation
 - **BombardmentHitAssignment**: Manages ground force destruction
-- **BombardmentTargeting**: Handles multi-planet targeting (framework)
+- **BombardmentTargeting**: Handles planet targeting for bombardment
 
 ### Test Cases Demonstrating Implementation
 - **test_bombardment_roll_basic_mechanics**: Verifies basic bombardment execution
 - **test_bombardment_values_by_unit_type**: Tests bombardment values for different units
 - **test_bombardment_hit_calculation**: Validates hit calculation logic
+- **test_multi_planet_bombardment_targeting**: Tests multi-planet targeting mechanics
+- **test_bombardment_target_validation**: Tests target validation logic
 - **test_planetary_shield_blocks_bombardment**: Tests planetary shield prevention
 - **test_bombardment_without_planetary_shield**: Tests bombardment when no shields present
-- **test_ground_force_destruction_basic**: Tests ground force destruction mechanics
-- **test_excess_hits_have_no_effect**: Tests excess hit handling
-- **test_player_choice_in_unit_destruction**: Tests player choice in unit destruction
+- **test_sustain_damage_vs_bombardment**: Tests Sustain Damage interaction
+- **test_bombardment_timing_in_invasion**: Tests bombardment timing during invasion
+- **test_bombardment_affects_ground_combat**: Tests bombardment impact on ground combat
 
 ## Related Topics
-- Invasion (Rule 52)
+- Invasion (Rule 49)
 - Planetary Shield (Unit Ability)
 - Ground Forces (Rule 44)
 - Tactical Action (Rule 89)

@@ -7,6 +7,7 @@ LRR Reference: Rule 15 - BOMBARDMENT (UNIT ABILITY)
 """
 
 import random
+from collections.abc import Iterable
 from typing import TYPE_CHECKING, Any, Optional, Union
 
 from .constants import Technology
@@ -69,10 +70,8 @@ class BombardmentRoll:
         total_dice = self.dice_count
 
         # Plasma Scoring adds +1 die to bombardment rolls
-        if (
-            "plasma_scoring" in self.technologies
-            or "PLASMA_SCORING" in self.technologies
-        ):
+        normalized_technologies = {tech.lower() for tech in self.technologies}
+        if Technology.PLASMA_SCORING.value in normalized_technologies:
             total_dice += 1
 
         return total_dice
@@ -96,13 +95,18 @@ class BombardmentRoll:
         return hits
 
     def roll_dice(self) -> list[int]:
-        """Roll bombardment dice.
+        """Roll dice for bombardment.
 
         Returns:
             List of dice results
         """
+        from .constants import GameConstants
+
         total_dice = self.get_total_dice_count()
-        return [random.randint(1, 10) for _ in range(total_dice)]
+        return [
+            random.randint(1, GameConstants.DEFAULT_COMBAT_DICE_SIDES)
+            for _ in range(total_dice)
+        ]  # nosec B311
 
     def is_affected_by_combat_modifier(self, modifier: Any) -> bool:
         """Check if bombardment is affected by combat modifiers.
@@ -137,10 +141,16 @@ class BombardmentTargeting:
         Returns:
             Dictionary mapping planet names to assigned bombardment units
 
+        Raises:
+            ValueError: If no planets are available for bombardment
+
         LRR Reference: Rule 15.1d - "Multiple planets in a system may be
         bombarded, but a player must declare which planet a unit is bombarding
         before making a bombardment roll."
         """
+        if not available_planets:
+            raise ValueError("No planets available for bombardment targeting")
+
         # For now, return a simple assignment - this would be enhanced
         # with player choice mechanics in a full implementation
         targets: dict[str, list[Unit]] = {}
@@ -205,12 +215,12 @@ class BombardmentHitAssignment:
                 if i < len(player_choice) and player_choice[i] in ground_forces:
                     destroyed_units.append(player_choice[i])
                     ground_forces.remove(player_choice[i])
-        else:
-            # Default assignment - take first available units
-            # In a full implementation, this would prompt the player for choice
-            for _i in range(actual_hits):
-                if ground_forces:
-                    destroyed_units.append(ground_forces.pop(0))
+
+        # Assign any remaining hits to available ground forces
+        remaining_hits = actual_hits - len(destroyed_units)
+        for _i in range(remaining_hits):
+            if ground_forces:
+                destroyed_units.append(ground_forces.pop(0))
 
         # Remove destroyed units from planet
         for unit in destroyed_units:
@@ -255,7 +265,7 @@ class BombardmentSystem:
         attacking_player: str,
         planet_targets: dict[str, list["Unit"]],
         player_faction: Optional[Any] = None,
-        player_technologies: Optional[set[str]] = None,
+        player_technologies: Optional[Iterable[str]] = None,
     ) -> dict[str, dict[str, Any]]:
         """Execute bombardment against specified planet targets.
 
