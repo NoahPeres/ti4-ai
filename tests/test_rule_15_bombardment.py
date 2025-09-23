@@ -273,6 +273,7 @@ class TestRule15GroundForceDestruction:
         planet.place_unit(infantry1)
         planet.place_unit(infantry2)
         planet.place_unit(mech)
+        planet.set_control("defender")
 
         # Add bombardment ship
         war_sun = Unit(
@@ -488,7 +489,8 @@ class TestRule15TechnologyIntegration:
                 system=system,
                 attacking_player="attacker",
                 planet_targets={"test_planet": [dreadnought]},
-                player_technologies={TechnologyEnum.PLASMA_SCORING},
+                # Pass string or enum.name to match BombardmentRoll
+                player_technologies={TechnologyEnum.PLASMA_SCORING.name},
             )
             # If Plasma Scoring is implemented, bombardment should work differently
             assert isinstance(result, dict)

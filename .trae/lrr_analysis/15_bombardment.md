@@ -89,10 +89,10 @@ Rule 15 defines the bombardment unit ability, which allows ships to destroy grou
 
 ### Test Cases Demonstrating Implementation
 - **test_bombardment_roll_basic_mechanics**: Verifies basic bombardment execution
-- **test_bombardment_value_and_dice_count**: Tests bombardment values for different units
+- **test_bombardment_values_by_unit_type**: Tests bombardment values for different units
 - **test_bombardment_hit_calculation**: Validates hit calculation logic
-- **test_planetary_shield_prevents_bombardment**: Tests planetary shield prevention
-- **test_bombardment_allowed_without_planetary_shield**: Tests bombardment when no shields present
+- **test_planetary_shield_blocks_bombardment**: Tests planetary shield prevention
+- **test_bombardment_without_planetary_shield**: Tests bombardment when no shields present
 - **test_ground_force_destruction_basic**: Tests ground force destruction mechanics
 - **test_excess_hits_have_no_effect**: Tests excess hit handling
 - **test_player_choice_in_unit_destruction**: Tests player choice in unit destruction
@@ -118,61 +118,7 @@ Rule 15 defines the bombardment unit ability, which allows ships to destroy grou
 - **Missing**: Planetary shield prevention tests
 
 ## Implementation Files
+- `src/ti4/core/bombardment.py`: Complete bombardment system implementation
 - `src/ti4/core/unit.py`: Bombardment ability detection (lines 62-65)
+- `src/ti4/core/unit_stats.py`: Bombardment value and dice handling
 - `UNIT_ABILITIES_IMPLEMENTATION.md`: Bombardment ability documentation
-- **Missing**: Bombardment roll system
-- **Missing**: Invasion step integration
-- **Missing**: Ground force destruction mechanics
-
-## Action Items
-
-1. **Implement Bombardment Roll System**
-   - Create dice rolling mechanics for bombardment
-   - Add bombardment value and dice count support
-   - Implement hit calculation based on bombardment values
-
-2. **Add Planet Targeting System**
-   - Allow players to select which planets to bombard
-   - Support multi-planet bombardment in same system
-   - Add validation for bombardment target selection
-
-3. **Create Ground Force Destruction Logic**
-   - Implement hit assignment to ground forces
-   - Add player choice for which units to destroy
-   - Handle excess hits properly
-
-4. **Integrate Planetary Shield Prevention**
-   - Check for planetary shield units on target planets
-   - Prevent bombardment of shielded planets
-   - Add clear feedback for blocked bombardment attempts
-
-5. **Add Invasion Step Integration**
-   - Integrate bombardment into tactical action sequence
-   - Ensure proper timing with other invasion mechanics
-   - Add bombardment step to invasion process
-
-6. **Implement Faction-Specific Rules**
-   - Add L1Z1X Harrow ability exception
-   - Support other faction-specific bombardment rules
-   - Create extensible faction rule system
-
-7. **Create Combat Roll Separation**
-   - Ensure bombardment rolls are separate from combat rolls
-   - Prevent combat modifiers from affecting bombardment
-   - Add distinct bombardment roll handling
-
-8. **Implement Comprehensive Test Suite**
-   - Add bombardment roll mechanics tests
-   - Test ground force destruction logic
-   - Test planetary shield prevention
-   - Test multi-planet bombardment scenarios
-
-9. **Add Technology Integration**
-   - Support bombardment-enhancing technologies
-   - Add technology effects to bombardment rolls
-   - Implement Plasma Scoring technology interaction
-
-10. **Create UI and Feedback Systems**
-    - Add bombardment targeting interface
-    - Show bombardment results clearly
-    - Provide feedback for blocked bombardment attempts

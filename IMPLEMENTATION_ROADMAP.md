@@ -8,8 +8,8 @@
 **Focus**: Complete advanced mechanics that enable complex strategic gameplay and AI decision-making
 
 ## 📊 Progress
-**Overall Progress**: 100%
-**Completed Rules**: 29/29
+**Overall Progress**: 28.7%
+**Completed Rules**: 29/101
 - **Rule 1: ABILITIES** - Core ability system with timing windows, precedence, costs, and resolution (Foundation Layer) ✅ **NEWLY COMPLETED**
 - **Rule 3: ACTION PHASE** - Core action phase mechanics with pass state tracking and phase transitions (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 6: ADJACENCY** - Core spatial mechanics for system relationships ✅
@@ -704,7 +704,7 @@ Core game flow and player actions:
    ✅ Test: Player hands are separate and private
    ✅ Implementation: add_note_to_hand() and get_player_hand() methods (Rule 69.6)
 
-1.3 Card Return and Reuse System (IMPLEMENTED)
+1.3 Card Return and Reuse System (COMPLETED)
    ✅ Test: Promissory notes can be returned after use
    ✅ Test: Returned notes can be given to other players again
    ✅ Implementation: return_note_after_use() and availability tracking (Rules 69.3, 69.4)
@@ -1318,7 +1318,7 @@ We have successfully implemented the **foundational core** of TI4, establishing 
 **Timeline: 3-4 months**
 
 #### **Immediate Priority (Next 4 Rules)**
-1. **Rule 42: GROUND COMBAT** - Complete the combat system
+1. **Rule 40: GROUND COMBAT** - Complete the combat system
    - Multi-round ground combat resolution
    - Integration with bombardment and invasion
    - Essential for tactical action completion

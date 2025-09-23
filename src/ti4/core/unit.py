@@ -118,7 +118,8 @@ class Unit:
             raise AttributeError(
                 f"Unit {self.unit_type} does not have bombardment ability"
             )
-        return stats.bombardment_dice
+        # Default to 1 dice if bombardment ability is present but dice count is 0
+        return stats.bombardment_dice if stats.bombardment_dice > 0 else 1
 
     def has_deploy(self) -> bool:
         """Check if this unit has deploy ability."""

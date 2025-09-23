@@ -226,6 +226,12 @@ class UnitStatsProvider:
             anti_fighter_barrage=base.anti_fighter_barrage
             or modifications.anti_fighter_barrage,
             bombardment=base.bombardment or modifications.bombardment,
+            bombardment_value=modifications.bombardment_value
+            if modifications.bombardment_value is not None
+            else base.bombardment_value,
+            bombardment_dice=max(
+                0, base.bombardment_dice + modifications.bombardment_dice
+            ),
             deploy=base.deploy or modifications.deploy,
             planetary_shield=base.planetary_shield or modifications.planetary_shield,
             space_cannon=base.space_cannon or modifications.space_cannon,

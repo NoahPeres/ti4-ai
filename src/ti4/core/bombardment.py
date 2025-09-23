@@ -7,7 +7,9 @@ LRR Reference: Rule 15 - BOMBARDMENT (UNIT ABILITY)
 """
 
 import random
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any, Optional, Union
+
+from .constants import Technology
 
 if TYPE_CHECKING:
     from .planet import Planet
@@ -25,7 +27,7 @@ class BombardmentRoll:
         self,
         bombardment_value: int,
         dice_count: int,
-        technologies: Optional[list[str]] = None,
+        technologies: Optional[list[Union[str, Technology]]] = None,
     ) -> None:
         """Initialize bombardment roll.
 
@@ -36,7 +38,27 @@ class BombardmentRoll:
         """
         self.bombardment_value = bombardment_value
         self.dice_count = dice_count
-        self.technologies = technologies or []
+        # Normalize technologies to support both string and enum inputs
+        self.technologies = self._normalize_technologies(technologies or [])
+
+    def _normalize_technologies(
+        self, technologies: list[Union[str, Technology]]
+    ) -> list[str]:
+        """Normalize technology inputs to consistent string format.
+
+        Args:
+            technologies: List of technologies as strings or enums
+
+        Returns:
+            List of technology names as strings
+        """
+        normalized = []
+        for tech in technologies:
+            if isinstance(tech, Technology):
+                normalized.append(tech.value)
+            else:
+                normalized.append(tech)
+        return normalized
 
     def get_total_dice_count(self) -> int:
         """Get total dice count including technology bonuses.
@@ -47,7 +69,10 @@ class BombardmentRoll:
         total_dice = self.dice_count
 
         # Plasma Scoring adds +1 die to bombardment rolls
-        if "PLASMA_SCORING" in self.technologies:
+        if (
+            "plasma_scoring" in self.technologies
+            or "PLASMA_SCORING" in self.technologies
+        ):
             total_dice += 1
 
         return total_dice
@@ -275,8 +300,8 @@ class BombardmentSystem:
             for unit in bombardment_units:
                 bombardment_value, dice_count = self._get_unit_bombardment_stats(unit)
                 if bombardment_value > 0:  # Unit has bombardment ability
-                    technologies = (
-                        list(player_technologies) if player_technologies else []
+                    technologies: Optional[list[Union[str, Technology]]] = (
+                        list(player_technologies) if player_technologies else None
                     )
                     roll = BombardmentRoll(bombardment_value, dice_count, technologies)
                     dice_results = roll.roll_dice()
@@ -286,10 +311,31 @@ class BombardmentSystem:
             # Assign hits to ground forces
             destroyed_units = []
             if total_hits > 0:
-                defending_player = planet.controlled_by or "neutral"
-                destroyed_units = self.hit_assignment.assign_bombardment_hits(
-                    planet, total_hits, defending_player
-                )
+                defending_player = planet.controlled_by
+                if not defending_player:
+                    from .constants import GameConstants
+
+                    defender_owners = {
+                        u.owner
+                        for u in planet.units
+                        if u.unit_type in GameConstants.GROUND_FORCE_TYPES
+                        and u.owner != attacking_player
+                    }
+                    defending_player = next(iter(defender_owners), None)
+
+                # Check if faction can bombard own ground forces (L1Z1X Harrow exception)
+                if defending_player == attacking_player:
+                    from .constants import Faction
+
+                    if player_faction == Faction.L1Z1X:
+                        # L1Z1X Harrow ability cannot affect own ground forces
+                        if not self.can_bombard_own_ground_forces("L1Z1X", "harrow"):
+                            defending_player = None  # Skip bombardment of own forces
+
+                if defending_player:
+                    destroyed_units = self.hit_assignment.assign_bombardment_hits(
+                        planet, total_hits, defending_player
+                    )
 
             # Store results with hits information
             results[planet_name] = {
@@ -306,7 +352,7 @@ class BombardmentSystem:
         Raises:
             ValueError: Always raises as targets must be declared
         """
-        raise ValueError("Bombardment targets must declare targets before execution")
+        raise ValueError("Bombardment targets must be declared before execution")
 
     def can_bombard_own_ground_forces(self, faction: str, ability: str) -> bool:
         """Check if faction can bombard their own ground forces.
