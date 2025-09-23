@@ -102,6 +102,20 @@ class Unit:
         """Check if this unit has bombardment ability."""
         return self.get_stats().bombardment
 
+    def get_bombardment_value(self) -> int:
+        """Get the bombardment value of this unit."""
+        stats = self.get_stats()
+        if not stats.bombardment or stats.bombardment_value is None:
+            raise AttributeError(f"Unit {self.unit_type} does not have bombardment ability")
+        return stats.bombardment_value
+
+    def get_bombardment_dice_count(self) -> int:
+        """Get the number of bombardment dice this unit rolls."""
+        stats = self.get_stats()
+        if not stats.bombardment:
+            raise AttributeError(f"Unit {self.unit_type} does not have bombardment ability")
+        return stats.bombardment_dice
+
     def has_deploy(self) -> bool:
         """Check if this unit has deploy ability."""
         return self.get_stats().deploy
