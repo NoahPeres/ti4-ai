@@ -8,14 +8,15 @@
 **Focus**: Complete advanced mechanics that enable complex strategic gameplay and AI decision-making
 
 ## 📊 Progress
-**Overall Progress**: 96.6%
-**Completed Rules**: 28/29
+**Overall Progress**: 28.7%
+**Completed Rules**: 29/101
 - **Rule 1: ABILITIES** - Core ability system with timing windows, precedence, costs, and resolution (Foundation Layer) ✅ **NEWLY COMPLETED**
 - **Rule 3: ACTION PHASE** - Core action phase mechanics with pass state tracking and phase transitions (Core Game Layer) ✅ **NEWLY COMPLETED**
-- **Rule 6: ADJACENCY** - Core spatial mechanics for system relationships
+- **Rule 6: ADJACENCY** - Core spatial mechanics for system relationships ✅
 - **Rule 2: ACTION CARDS** - Action card system with timing windows, component actions, and comprehensive card management (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 13: ATTACKER** - Combat role definition with attacker/defender assignment (Foundation Layer) ✅ **NEWLY COMPLETED**
 - **Rule 14: BLOCKADED** - Blockade mechanics for space docks and production restrictions (Foundation Layer) ✅ **COMPLETED**
+- **Rule 15: BOMBARDMENT** - Bombardment unit ability with roll mechanics, planetary shield interaction, and ground force destruction (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 17: CAPTURE** - Unit capture mechanics and faction sheet management (Foundation Layer) ✅ **COMPLETED**
 - **Rule 18: COMBAT** - General combat mechanics with burst icon support (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 20: COMMAND TOKENS** - Resource management and reinforcement system (Foundation Layer) ✅
@@ -703,7 +704,7 @@ Core game flow and player actions:
    ✅ Test: Player hands are separate and private
    ✅ Implementation: add_note_to_hand() and get_player_hand() methods (Rule 69.6)
 
-1.3 Card Return and Reuse System (IMPLEMENTED)
+1.3 Card Return and Reuse System (COMPLETED)
    ✅ Test: Promissory notes can be returned after use
    ✅ Test: Returned notes can be given to other players again
    ✅ Implementation: return_note_after_use() and availability tracking (Rules 69.3, 69.4)
@@ -1303,6 +1304,156 @@ This phase focuses on completing core game mechanics that enable full tactical g
 - Robust player elimination handling
 
 The next phase would focus on advanced systems like technology trees, agenda cards, and faction-specific abilities.
+
+---
+
+## 🎯 Strategic Plan: Path to Full 101 Rule Coverage
+
+### **Current Status: 29/101 Rules (28.7% Coverage)**
+
+We have successfully implemented the **foundational core** of TI4, establishing a solid base for advanced mechanics. The next phase requires strategic prioritization to achieve full rule coverage efficiently.
+
+### **Phase 2: Combat & Tactical Completion (Priority Tier 1)**
+**Target: 10 additional rules → 39/101 (38.6% coverage)**
+**Timeline: 3-4 months**
+
+#### **Immediate Priority (Next 4 Rules)**
+1. **Rule 40: GROUND COMBAT** - Complete the combat system
+   - Multi-round ground combat resolution
+   - Integration with bombardment and invasion
+   - Essential for tactical action completion
+
+2. **Rule 49: INVASION** - Enable planet conquest mechanics
+   - Ground force landing and combat initiation
+   - Capacity and transport integration
+   - Critical for territorial control
+
+3. **Rule 77: SPACE CANNON** - Defensive unit abilities
+   - PDS and unit-based space cannon attacks
+   - Anti-fighter barrage completion
+   - Combat system enhancement
+
+4. **Rule 31: DESTROYED** - Proper unit destruction mechanics
+   - Distinction between destruction vs removal
+   - Ability triggering on unit loss
+   - Combat resolution completion
+
+#### **Secondary Priority (Next 6 Rules)**
+5. **Rule 30: DEPLOY** - Advanced unit placement
+6. **Rule 33: ELIMINATION** - Player elimination system
+7. **Rule 12: ATTACH** - Card attachment mechanics
+8. **Rule 35: EXPLORATION** - Planet exploration system
+9. **Rule 87: SUSTAIN DAMAGE** - Unit damage mechanics
+10. **Rule 74: REROLLS** - Dice reroll mechanics
+
+### **Phase 3: Political & Economic Systems (Priority Tier 2)**
+**Target: 15 additional rules → 54/101 (53.5% coverage)**
+**Timeline: 4-5 months**
+
+#### **Political Framework**
+- **Rule 8: AGENDA PHASE** - Voting and law system
+- **Rule 7: AGENDA CARDS** - Political cards and outcomes
+- **Rule 66: POLITICS** - Political strategy card
+- **Rule 80: SPEAKER** - Speaker token and privileges
+- **Rule 28: DEALS** - Binding agreements system
+
+#### **Economic Enhancement**
+- **Rule 47: INFLUENCE** - Influence spending mechanics
+- **Rule 75: RESOURCES** - Resource management
+- **Rule 26: COST** - Cost calculation system
+- **Rule 70: PURGE** - Card purging mechanics
+
+#### **Advanced Unit Systems**
+- **Rule 16: CAPACITY** - Transport capacity mechanics
+- **Rule 95: TRANSPORT** - Unit transportation
+- **Rule 55: MECHS** - Mech unit abilities
+- **Rule 85: STRUCTURES** - Structure placement and abilities
+- **Rule 79: SPACE DOCK** - Space dock mechanics
+
+### **Phase 4: Faction & Technology Systems (Priority Tier 3)**
+**Target: 20 additional rules → 74/101 (73.3% coverage)**
+**Timeline: 5-6 months**
+
+#### **Technology Tree**
+- **Rule 91: TECHNOLOGY (Strategy Card)** - Already implemented ✅
+- **Rule 97: UNIT UPGRADES** - Unit upgrade system
+- **Rule 4: ACTION CARDS** - Advanced action card mechanics
+- **Rule 22: COMPONENT ACTION** - Component-based actions
+
+#### **Faction Systems**
+- **Rule 51: LEADERS** - Leader abilities and mechanics
+- **Rule 73: RELICS** - Relic cards and effects
+- **Rule 24: COMPONENT LIMITATIONS** - Component limits
+- **Rule 37: FLEET POOL** - Already implemented ✅
+
+#### **Advanced Mechanics**
+- **Rule 56: MODIFIERS** - Combat and ability modifiers
+- **Rule 1: ABILITIES** - Already implemented ✅
+- **Rule 71: READIED** - Card readying mechanics
+- **Rule 62: OPPONENT** - Opponent targeting rules
+
+### **Phase 5: Anomalies & Special Systems (Priority Tier 4)**
+**Target: 15 additional rules → 89/101 (88.1% coverage)**
+**Timeline: 3-4 months**
+
+#### **Anomaly Systems**
+- **Rule 9: ANOMALIES** - Anomaly effects and interactions
+- **Rule 59: NEBULA** - Nebula movement and combat effects
+- **Rule 41: GRAVITY RIFT** - Gravity rift mechanics
+- **Rule 86: SUPERNOVA** - Supernova effects
+- **Rule 11: ASTEROID FIELD** - Asteroid field mechanics
+
+#### **Advanced Movement**
+- **Rule 44: HYPERLANES** - Hyperlane movement
+- **Rule 95: TRANSPORT** - Advanced transport rules
+- **Rule 58: MOVEMENT** - Already implemented ✅
+
+#### **Special Mechanics**
+- **Rule 63: PDS** - PDS unit mechanics
+- **Rule 64: PLANETS** - Advanced planet mechanics
+- **Rule 68: PRODUCTION** - Already implemented ✅
+- **Rule 88: SYSTEM TILES** - System tile mechanics
+- **Rule 96: UNITS** - Advanced unit rules
+
+### **Phase 6: Final Systems & Edge Cases (Priority Tier 5)**
+**Target: 12 additional rules → 101/101 (100% coverage)**
+**Timeline: 2-3 months**
+
+#### **Remaining Systems**
+- **Rule 5: ACTIVE PLAYER** - Active player mechanics
+- **Rule 10: ANTI-FIGHTER BARRAGE** - Anti-fighter combat
+- **Rule 19: COMMAND SHEET** - Command sheet mechanics
+- **Rule 32: DIPLOMACY** - Diplomacy strategy card
+- **Rule 36: FACTION SHEET** - Faction sheet management
+- **Rule 38: GAME ROUND** - Game round structure
+- **Rule 39: GAME BOARD** - Game board setup
+- **Rule 43: HYPERLANE** - Hyperlane tile mechanics
+- **Rule 45: IMPERIAL** - Imperial strategy card
+- **Rule 46: INITIATIVE ORDER** - Initiative mechanics
+- **Rule 48: INFLUENCE** - Influence system completion
+- **Rule 50: INVASION COMBAT** - Invasion combat specifics
+
+### **Implementation Strategy & Success Metrics**
+
+#### **Quality Gates**
+- **Test Coverage**: Maintain 95%+ test coverage for each new rule
+- **Integration Testing**: Comprehensive cross-rule interaction tests
+- **Performance**: Sub-100ms response time for all game actions
+- **Documentation**: Complete LRR analysis for each implemented rule
+
+#### **Development Approach**
+- **TDD Methodology**: Red-Green-Refactor for all implementations
+- **Incremental Integration**: Each rule must integrate seamlessly with existing systems
+- **Backward Compatibility**: All existing functionality must remain intact
+- **Code Quality**: Maintain strict typing, linting, and formatting standards
+
+#### **Milestone Targets**
+- **6 months**: 50% rule coverage (50/101 rules)
+- **12 months**: 75% rule coverage (75/101 rules)
+- **18 months**: 100% rule coverage (101/101 rules)
+- **Final Goal**: Complete, tournament-ready TI4 engine
+
+This strategic plan provides a clear path from our current 29% coverage to full 101 rule implementation, prioritizing combat completion, political systems, and advanced mechanics in logical dependency order.
 
 ---
 

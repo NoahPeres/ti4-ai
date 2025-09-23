@@ -4,7 +4,9 @@ This module implements Rule 68: PRODUCTION (UNIT ABILITY) mechanics according to
 Handles production values, combined production, placement rules, and special cases.
 """
 
-from typing import TYPE_CHECKING, Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from .constants import Faction, GameConstants, UnitType
 
@@ -33,9 +35,7 @@ class ProductionAbilityManager:
         """Initialize the production ability manager."""
         pass
 
-    def get_production_value(
-        self, unit: "Unit", planet: Optional["Planet"] = None
-    ) -> int:
+    def get_production_value(self, unit: Unit, planet: Planet | None = None) -> int:
         """Get the production value of a unit.
 
         Args:
@@ -58,7 +58,7 @@ class ProductionAbilityManager:
         # Other units with production will be added via faction-specific mechanics
         return 0
 
-    def get_combined_production_in_system(self, system: "System", player: str) -> int:
+    def get_combined_production_in_system(self, system: System, player: str) -> int:
         """Get the combined production value for a player in a system.
 
         Args:
@@ -112,9 +112,9 @@ class ProductionAbilityManager:
 
     def can_produce_units(
         self,
-        producing_unit: "Unit",
+        producing_unit: Unit,
         units_to_produce: list[UnitType],
-        planet: Optional["Planet"] = None,
+        planet: Planet | None = None,
     ) -> bool:
         """Check if a unit can produce the specified units.
 
@@ -204,7 +204,7 @@ class ProductionAbilityManager:
         return 1
 
     def can_place_produced_ships_in_system(
-        self, ships: list[UnitType], target_system: "System", active_system: "System"
+        self, ships: list[UnitType], target_system: System, active_system: System
     ) -> bool:
         """Check if produced ships can be placed in target system.
 
@@ -235,7 +235,7 @@ class ProductionAbilityManager:
         return all(unit_type in GameConstants.SHIP_TYPES for unit_type in units)
 
     def can_place_produced_ground_forces_on_planet(
-        self, ground_forces: list[UnitType], planet: "Planet"
+        self, ground_forces: list[UnitType], planet: Planet
     ) -> bool:
         """Check if produced ground forces can be placed on planet.
 
@@ -260,7 +260,7 @@ class ProductionAbilityManager:
         return all(unit_type in GameConstants.GROUND_FORCE_TYPES for unit_type in units)
 
     def can_space_production_place_ground_forces_on_planet(
-        self, ground_forces: list[UnitType], planet: "Planet", player: str
+        self, ground_forces: list[UnitType], planet: Planet, player: str
     ) -> bool:
         """Check if space-based production can place ground forces on planet.
 
@@ -278,7 +278,7 @@ class ProductionAbilityManager:
         return planet.controlled_by == player
 
     def can_space_production_place_ground_forces_in_space(
-        self, ground_forces: list[UnitType], system: "System"
+        self, ground_forces: list[UnitType], system: System
     ) -> bool:
         """Check if space-based production can place ground forces in space.
 
@@ -295,7 +295,7 @@ class ProductionAbilityManager:
         return True
 
     def can_use_production_in_tactical_action(
-        self, system: "System", player: str
+        self, system: System, player: str
     ) -> bool:
         """Check if player can use production in tactical action.
 
@@ -312,7 +312,7 @@ class ProductionAbilityManager:
         return self.get_combined_production_in_system(system, player) > 0
 
     def is_production_blockaded(
-        self, unit: "Unit", blockade_manager: "BlockadeManager"
+        self, unit: Unit, blockade_manager: BlockadeManager
     ) -> bool:
         """Check if production unit is blockaded.
 

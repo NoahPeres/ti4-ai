@@ -4,7 +4,9 @@ This module implements Rule 14: BLOCKADED mechanics according to the TI4 LRR.
 Handles blockade detection, production restrictions, unit return, and capture prevention.
 """
 
-from typing import TYPE_CHECKING, Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from .constants import UnitType
 
@@ -27,8 +29,8 @@ class BlockadeManager:
 
     def __init__(
         self,
-        galaxy: Optional["Galaxy"] = None,
-        capture_manager: Optional["CaptureManager"] = None,
+        galaxy: Galaxy | None = None,
+        capture_manager: CaptureManager | None = None,
     ):
         """Initialize the blockade manager.
 
@@ -39,7 +41,7 @@ class BlockadeManager:
         self._galaxy = galaxy
         self._capture_manager = capture_manager
 
-    def is_unit_blockaded(self, unit: "Unit") -> bool:
+    def is_unit_blockaded(self, unit: Unit) -> bool:
         """Check if a unit is blockaded according to Rule 14.0.
 
         Args:
@@ -73,7 +75,7 @@ class BlockadeManager:
 
         return has_enemy_ships and not has_friendly_ships
 
-    def can_produce_ships(self, unit: "Unit") -> bool:
+    def can_produce_ships(self, unit: Unit) -> bool:
         """Check if a unit can produce ships according to Rule 14.1.
 
         Args:
@@ -85,7 +87,7 @@ class BlockadeManager:
         # Rule 14.1: Blockaded units cannot produce ships
         return not self.is_unit_blockaded(unit)
 
-    def can_produce_ground_forces(self, unit: "Unit") -> bool:
+    def can_produce_ground_forces(self, unit: Unit) -> bool:
         """Check if a unit can produce ground forces according to Rule 14.1.
 
         Args:
@@ -97,7 +99,7 @@ class BlockadeManager:
         # Rule 14.1: Blockaded units can still produce ground forces
         return True
 
-    def apply_blockade_effects(self, unit: "Unit") -> None:
+    def apply_blockade_effects(self, unit: Unit) -> None:
         """Apply blockade effects including unit return according to Rule 14.2.
 
         Args:
@@ -114,7 +116,7 @@ class BlockadeManager:
         for blockading_player in blockading_players:
             self._return_captured_units_from_player(unit.owner, blockading_player)
 
-    def can_capture_unit(self, target_unit: "Unit", capturing_player: str) -> bool:
+    def can_capture_unit(self, target_unit: Unit, capturing_player: str) -> bool:
         """Check if a unit can be captured according to Rule 14.2a.
 
         Args:
@@ -140,7 +142,7 @@ class BlockadeManager:
 
         return True
 
-    def get_blockading_players(self, unit: "Unit") -> set[str]:
+    def get_blockading_players(self, unit: Unit) -> set[str]:
         """Get the set of players blockading the given unit.
 
         Args:
@@ -167,7 +169,7 @@ class BlockadeManager:
 
         return blockading_players
 
-    def _has_production_ability(self, unit: "Unit") -> bool:
+    def _has_production_ability(self, unit: Unit) -> bool:
         """Check if a unit has production ability.
 
         Args:
@@ -179,7 +181,7 @@ class BlockadeManager:
         # Space docks have production ability
         return unit.unit_type == UnitType.SPACE_DOCK
 
-    def _find_unit_system(self, unit: "Unit") -> Optional["System"]:
+    def _find_unit_system(self, unit: Unit) -> System | None:
         """Find the system containing the given unit.
 
         Args:
@@ -204,7 +206,7 @@ class BlockadeManager:
 
         return None
 
-    def _system_has_friendly_ships(self, system: "System", player_id: str) -> bool:
+    def _system_has_friendly_ships(self, system: System, player_id: str) -> bool:
         """Check if system has friendly ships.
 
         Args:
@@ -219,7 +221,7 @@ class BlockadeManager:
                 return True
         return False
 
-    def _system_has_enemy_ships(self, system: "System", player_id: str) -> bool:
+    def _system_has_enemy_ships(self, system: System, player_id: str) -> bool:
         """Check if system has enemy ships.
 
         Args:
@@ -234,7 +236,7 @@ class BlockadeManager:
                 return True
         return False
 
-    def _is_ship(self, unit: "Unit") -> bool:
+    def _is_ship(self, unit: Unit) -> bool:
         """Check if a unit is a ship.
 
         Args:
@@ -275,7 +277,7 @@ class BlockadeManager:
         for unit in captured_units:
             self._capture_manager.return_unit(unit, capturing_player)
 
-    def _find_blockaded_systems_for_player(self, player_id: str) -> list["System"]:
+    def _find_blockaded_systems_for_player(self, player_id: str) -> list[System]:
         """Find systems where player has blockaded production units.
 
         Args:
@@ -303,7 +305,7 @@ class BlockadeManager:
         return blockaded_systems
 
     def _is_player_blockading_system(
-        self, potential_blockader: str, system: "System", blockaded_player: str
+        self, potential_blockader: str, system: System, blockaded_player: str
     ) -> bool:
         """Check if a player is blockading a system.
 

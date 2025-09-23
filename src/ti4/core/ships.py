@@ -4,6 +4,8 @@ This module implements Rule 76: SHIPS mechanics according to the TI4 LRR.
 Handles ship identification, fleet pool limits, placement validation, and ship attributes.
 """
 
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from .constants import UnitType
@@ -29,7 +31,7 @@ class ShipManager:
         """Initialize the ship manager."""
         pass
 
-    def is_ship(self, unit: "Unit") -> bool:
+    def is_ship(self, unit: Unit) -> bool:
         """Check if a unit is a ship.
 
         Args:
@@ -52,7 +54,7 @@ class ShipManager:
         }
         return unit.unit_type in ship_types
 
-    def can_place_ship_in_space(self, unit: "Unit", system: "System") -> bool:
+    def can_place_ship_in_space(self, unit: Unit, system: System) -> bool:
         """Check if a ship can be placed in space.
 
         Args:
@@ -67,7 +69,7 @@ class ShipManager:
         # Rule 76.1: Ships are always placed in space
         return self.is_ship(unit)
 
-    def can_place_ship_on_planet(self, unit: "Unit", planet: "Planet") -> bool:
+    def can_place_ship_on_planet(self, unit: Unit, planet: Planet) -> bool:
         """Check if a ship can be placed on a planet.
 
         Args:
@@ -83,7 +85,7 @@ class ShipManager:
         return False
 
     def can_add_ship_to_system(
-        self, unit: "Unit", system: "System", player_id: str, fleet_pool_size: int
+        self, unit: Unit, system: System, player_id: str, fleet_pool_size: int
     ) -> bool:
         """Check if a ship can be added to a system based on fleet pool limits.
 
@@ -111,9 +113,7 @@ class ShipManager:
         # Rule 76.2: Can have ships equal to or less than fleet pool size
         return current_ships < fleet_pool_size
 
-    def count_non_fighter_ships_in_system(
-        self, system: "System", player_id: str
-    ) -> int:
+    def count_non_fighter_ships_in_system(self, system: System, player_id: str) -> int:
         """Count non-fighter ships in a system for a player.
 
         Args:
@@ -135,7 +135,7 @@ class ShipManager:
                 count += 1
         return count
 
-    def ship_has_cost_attribute(self, unit: "Unit") -> bool:
+    def ship_has_cost_attribute(self, unit: Unit) -> bool:
         """Check if a ship has a cost attribute.
 
         Args:
@@ -152,7 +152,7 @@ class ShipManager:
         # Rule 76.3: Ships can have cost attribute
         return unit.get_cost() > 0
 
-    def ship_has_combat_attribute(self, unit: "Unit") -> bool:
+    def ship_has_combat_attribute(self, unit: Unit) -> bool:
         """Check if a ship has a combat attribute.
 
         Args:
@@ -169,7 +169,7 @@ class ShipManager:
         # Rule 76.3: Ships can have combat attribute
         return unit.get_combat_dice() > 0
 
-    def ship_has_move_attribute(self, unit: "Unit") -> bool:
+    def ship_has_move_attribute(self, unit: Unit) -> bool:
         """Check if a ship has a move attribute.
 
         Args:
@@ -186,7 +186,7 @@ class ShipManager:
         # Rule 76.3: Ships can have move attribute
         return unit.get_movement() > 0
 
-    def ship_has_capacity_attribute(self, unit: "Unit") -> bool:
+    def ship_has_capacity_attribute(self, unit: Unit) -> bool:
         """Check if a ship has a capacity attribute.
 
         Args:
@@ -204,7 +204,7 @@ class ShipManager:
         return unit.get_capacity() > 0
 
     def validate_fleet_pool_limits(
-        self, fleets: list["Fleet"], fleet_pool_size: int
+        self, fleets: list[Fleet], fleet_pool_size: int
     ) -> bool:
         """Validate that fleets don't exceed fleet pool limits.
 
@@ -225,7 +225,7 @@ class ShipManager:
         return validator.is_fleet_supply_valid(fleets, fleet_pool_size)
 
     def can_add_ship_to_fleet(
-        self, unit: "Unit", fleet: "Fleet", fleet_pool_size: int
+        self, unit: Unit, fleet: Fleet, fleet_pool_size: int
     ) -> bool:
         """Check if a ship can be added to a fleet based on fleet pool limits.
 

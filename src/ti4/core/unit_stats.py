@@ -27,6 +27,8 @@ class UnitStats:
     sustain_damage: bool = False
     anti_fighter_barrage: bool = False
     bombardment: bool = False
+    bombardment_value: Optional[int] = None
+    bombardment_dice: int = 0
     deploy: bool = False
     planetary_shield: bool = False
     space_cannon: bool = False
@@ -52,6 +54,8 @@ class UnitStats:
                 "anti_fighter_barrage", self.anti_fighter_barrage
             ),
             bombardment=kwargs.get("bombardment", self.bombardment),
+            bombardment_value=kwargs.get("bombardment_value", self.bombardment_value),
+            bombardment_dice=kwargs.get("bombardment_dice", self.bombardment_dice),
             deploy=kwargs.get("deploy", self.deploy),
             planetary_shield=kwargs.get("planetary_shield", self.planetary_shield),
             space_cannon=kwargs.get("space_cannon", self.space_cannon),
@@ -85,6 +89,8 @@ class UnitStatsProvider:
             capacity=1,
             sustain_damage=True,
             bombardment=True,
+            bombardment_value=5,
+            bombardment_dice=1,
         ),
         UnitType.DESTROYER: UnitStats(
             cost=1,
@@ -141,6 +147,8 @@ class UnitStatsProvider:
             capacity=6,
             sustain_damage=True,
             bombardment=True,
+            bombardment_value=3,
+            bombardment_dice=3,
         ),
     }
 
@@ -218,6 +226,12 @@ class UnitStatsProvider:
             anti_fighter_barrage=base.anti_fighter_barrage
             or modifications.anti_fighter_barrage,
             bombardment=base.bombardment or modifications.bombardment,
+            bombardment_value=modifications.bombardment_value
+            if modifications.bombardment_value is not None
+            else base.bombardment_value,
+            bombardment_dice=max(
+                0, base.bombardment_dice + modifications.bombardment_dice
+            ),
             deploy=base.deploy or modifications.deploy,
             planetary_shield=base.planetary_shield or modifications.planetary_shield,
             space_cannon=base.space_cannon or modifications.space_cannon,

@@ -1,8 +1,9 @@
 """Advanced movement rules for TI4."""
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional
 
 from .constants import Technology
 from .galaxy import Galaxy
@@ -19,7 +20,7 @@ class MovementContext:
     to_coordinate: HexCoordinate
     player_technologies: set[Technology]
     galaxy: Galaxy
-    path: Optional[list[HexCoordinate]] = None
+    path: list[HexCoordinate] | None = None
 
 
 class MovementRule(ABC):

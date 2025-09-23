@@ -4,6 +4,8 @@ This module implements Rule 67: PRODUCING UNITS mechanics according to the TI4 L
 Handles unit production, cost validation, reinforcement limits, and production restrictions.
 """
 
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from .constants import UnitType
@@ -66,7 +68,7 @@ class ProductionManager:
         else:
             return 1
 
-    def can_produce_ships_in_system(self, system: "System", player_id: str) -> bool:
+    def can_produce_ships_in_system(self, system: System, player_id: str) -> bool:
         """Check if a player can produce ships in a system.
 
         Args:
@@ -84,7 +86,7 @@ class ProductionManager:
                 return False
         return True
 
-    def _is_ship(self, unit: "Unit") -> bool:
+    def _is_ship(self, unit: Unit) -> bool:
         """Check if a unit is a ship.
 
         Args:
@@ -127,7 +129,7 @@ class ProductionManager:
         return available_reinforcements >= total_units_needed
 
     def can_produce_ships_with_blockade_check(
-        self, unit: "Unit", blockade_manager: "BlockadeManager"
+        self, unit: Unit, blockade_manager: BlockadeManager
     ) -> bool:
         """Check if a unit can produce ships considering blockade restrictions.
 

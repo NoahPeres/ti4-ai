@@ -1,6 +1,8 @@
 """System structure for TI4 game board."""
 
-from typing import TYPE_CHECKING, Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from .unit import Unit
 
@@ -76,18 +78,18 @@ class System:
         if planet:
             planet.remove_unit(unit)
 
-    def get_planet_by_name(self, planet_name: str) -> Optional["Planet"]:
+    def get_planet_by_name(self, planet_name: str) -> Planet | None:
         """Get a planet by name from this system."""
         for planet in self.planets:
             if planet.name == planet_name:
                 return planet
         return None
 
-    def add_planet(self, planet: "Planet") -> None:
+    def add_planet(self, planet: Planet) -> None:
         """Add a planet to this system."""
         self.planets.append(planet)
 
-    def add_fleet(self, fleet: "Fleet") -> None:
+    def add_fleet(self, fleet: Fleet) -> None:
         """Add a fleet to this system."""
         self.fleets.append(fleet)
 

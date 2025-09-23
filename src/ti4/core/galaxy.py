@@ -1,6 +1,8 @@
 """Galaxy structure for TI4 game board."""
 
-from typing import TYPE_CHECKING, Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from .hex_coordinate import HexCoordinate
 from .system import System
@@ -27,11 +29,11 @@ class Galaxy:
         """Register a system object in the galaxy."""
         self.system_objects[system.system_id] = system
 
-    def get_system_coordinate(self, system_id: str) -> Optional[HexCoordinate]:
+    def get_system_coordinate(self, system_id: str) -> HexCoordinate | None:
         """Get the coordinate of a system by its ID."""
         return self.system_coordinates.get(system_id)
 
-    def get_system(self, system_id: str) -> Optional[System]:
+    def get_system(self, system_id: str) -> System | None:
         """Get a system object by its ID."""
         return self.system_objects.get(system_id)
 
@@ -147,7 +149,7 @@ class Galaxy:
         self.hyperlane_connections.add((system_id1, system_id2))
         self.hyperlane_connections.add((system_id2, system_id1))
 
-    def is_unit_adjacent_to_system(self, unit: "Unit", target_system_id: str) -> bool:
+    def is_unit_adjacent_to_system(self, unit: Unit, target_system_id: str) -> bool:
         """
         Check if a unit is adjacent to a target system according to LRR Rule 6.2.
 
@@ -174,7 +176,7 @@ class Galaxy:
         return self.are_systems_adjacent(containing_system_id, target_system_id)
 
     def is_planet_adjacent_to_system(
-        self, planet: "Planet", target_system_id: str
+        self, planet: Planet, target_system_id: str
     ) -> bool:
         """
         Check if a planet is adjacent to a target system according to LRR Rules 6.2 and 6.3.
@@ -202,7 +204,7 @@ class Galaxy:
         # Rule 6.2: Planet is adjacent to systems adjacent to its containing system
         return self.are_systems_adjacent(containing_system_id, target_system_id)
 
-    def _find_unit_system(self, unit: "Unit") -> Optional[str]:
+    def _find_unit_system(self, unit: Unit) -> str | None:
         """
         Find which system contains the given unit.
 
@@ -224,7 +226,7 @@ class Galaxy:
 
         return None
 
-    def _find_planet_system(self, planet: "Planet") -> Optional[str]:
+    def _find_planet_system(self, planet: Planet) -> str | None:
         """
         Find which system contains the given planet.
 

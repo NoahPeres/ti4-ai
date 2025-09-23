@@ -1,7 +1,8 @@
 """Centralized game state management for TI4."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
-from typing import Optional
 
 from .fleet import Fleet
 from .galaxy import Galaxy
@@ -52,7 +53,7 @@ class GameState:
     """Represents the complete state of a TI4 game."""
 
     players: dict[str, PlayerState] = field(default_factory=dict)
-    galaxy: Optional[Galaxy] = None
+    galaxy: Galaxy | None = None
     systems: dict[str, System] = field(default_factory=dict)
     current_phase: GamePhase = GamePhase.SETUP
     current_player_index: int = field(
@@ -67,7 +68,7 @@ class GameState:
     )
     unit_stats_provider: UnitStatsProvider = field(default_factory=UnitStatsProvider)
 
-    def get_current_player(self) -> Optional[PlayerState]:
+    def get_current_player(self) -> PlayerState | None:
         """Get the currently active player state."""
         if not self.players:
             return None
@@ -76,7 +77,7 @@ class GameState:
             return self.players[player_ids[self.current_player_index]]
         return None
 
-    def get_player_state(self, player_id: str) -> Optional[PlayerState]:
+    def get_player_state(self, player_id: str) -> PlayerState | None:
         """Get the state for a specific player."""
         return self.players.get(player_id)
 
@@ -92,7 +93,7 @@ class GameState:
 class GameStateManager:
     """Manages game state transitions and validation."""
 
-    def __init__(self, game_state: Optional[GameState] = None) -> None:
+    def __init__(self, game_state: GameState | None = None) -> None:
         """Initialize with optional existing game state."""
         self.game_state = game_state or GameState()
 
