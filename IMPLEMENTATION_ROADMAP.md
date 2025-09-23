@@ -8,8 +8,8 @@
 **Focus**: Complete advanced mechanics that enable complex strategic gameplay and AI decision-making
 
 ## 📊 Progress
-**Overall Progress**: 28.7%
-**Completed Rules**: 29/101
+**Overall Progress**: 29.7%
+**Completed Rules**: 30/101
 - **Rule 1: ABILITIES** - Core ability system with timing windows, precedence, costs, and resolution (Foundation Layer) ✅ **NEWLY COMPLETED**
 - **Rule 3: ACTION PHASE** - Core action phase mechanics with pass state tracking and phase transitions (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 6: ADJACENCY** - Core spatial mechanics for system relationships ✅
@@ -24,6 +24,7 @@
 - **Rule 25: CONTROL** - Planet control mechanics with planet card management and control tokens (Core Game Layer) ✅ **COMPLETED**
 - **Rule 29: DEFENDER** - Combat role definition with defender identification for space and ground combat (Foundation Layer) ✅ **NEWLY COMPLETED**
 - **Rule 34: EXHAUSTED** - Card exhaustion mechanics for planets, technology, and strategy cards (Foundation Layer) ✅ **NEWLY COMPLETED**
+- **Rule 40: GROUND COMBAT** - Ground combat resolution with multi-round mechanics, dice rolling, hit assignment, and combat ending conditions. Core mechanics completed; sustain damage player choice integration pending (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 52: LEADERSHIP (STRATEGY CARD)** - Leadership strategy card with primary/secondary abilities and command token management (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 58: MOVEMENT** - Unit movement and fleet mechanics (Core Game Layer) ✅ **COMPLETED**
 - **Rule 60: NEIGHBORS** - Player neighbor determination for transactions ✅
@@ -1252,11 +1253,11 @@ Based on comprehensive analysis of LRR analysis files, here are the next 10 rule
 
 **8. Rule 40: GROUND COMBAT**
 - **Priority**: HIGH - Combat completion
-- **Status**: ⚠️ PARTIAL (dice rolling exists, round management missing)
+- **Status**: ✅ COMPLETED (multi-round combat with proper unit removal)
 - **Dependencies**: ✅ Combat system, Rules 13/29 (Attacker/Defender)
-- **Key Gaps**: Multi-round combat loop, ground combat controller
+- **Implementation**: GroundCombatController with round management, dice rolling, hit assignment, and combat ending conditions
 - **Impact**: Completes invasion mechanics and ground-based combat
-- **Estimated Effort**: Medium (extend existing combat framework)
+- **Estimated Effort**: Medium (extend existing combat framework) - **COMPLETED**
 
 **9. Rule 12: ATTACH**
 - **Priority**: MEDIUM - Card attachment system
@@ -1318,25 +1319,25 @@ We have successfully implemented the **foundational core** of TI4, establishing 
 **Timeline: 3-4 months**
 
 #### **Immediate Priority (Next 4 Rules)**
-1. **Rule 40: GROUND COMBAT** - Complete the combat system
-   - Multi-round ground combat resolution
-   - Integration with bombardment and invasion
-   - Essential for tactical action completion
-
-2. **Rule 49: INVASION** - Enable planet conquest mechanics
+1. **Rule 49: INVASION** - Enable planet conquest mechanics
    - Ground force landing and combat initiation
    - Capacity and transport integration
    - Critical for territorial control
 
-3. **Rule 77: SPACE CANNON** - Defensive unit abilities
+2. **Rule 77: SPACE CANNON** - Defensive unit abilities
    - PDS and unit-based space cannon attacks
    - Anti-fighter barrage completion
    - Combat system enhancement
 
-4. **Rule 31: DESTROYED** - Proper unit destruction mechanics
+3. **Rule 31: DESTROYED** - Proper unit destruction mechanics
    - Distinction between destruction vs removal
    - Ability triggering on unit loss
    - Combat resolution completion
+
+4. **Rule 12: ATTACH** - Card attachment system
+   - Card attachment mechanics and control transfer behavior
+   - Token placement and exploration card support
+   - Enables agenda effects and planet attachments
 
 #### **Secondary Priority (Next 6 Rules)**
 5. **Rule 30: DEPLOY** - Advanced unit placement

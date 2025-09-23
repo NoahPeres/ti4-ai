@@ -5,6 +5,7 @@
 **Complexity:** High
 **Frequency:** High (occurs during invasions)
 **Dependencies:** Ground Forces, Invasion, Sustain Damage, Combat Modifiers
+**Implementation Status:** ✅ **COMPLETED** (December 2024)
 
 ## Raw LRR Text
 ```
@@ -29,26 +30,26 @@ b During the last round of a combat, "end of combat" and "end of combat round" e
 ### 42.1 - Roll Dice (WELL IMPLEMENTED)
 - **Implementation Status:** ✅ COMPLETE
 - **Code Location:** `CombatResolver.roll_dice_for_unit()`, `CombatResolver.calculate_hits()`
-- **Test Coverage:** ✅ Comprehensive (`test_combat.py`)
+- **Test Coverage:** ✅ Comprehensive (`test_rule_40_ground_combat.py`)
 - **Details:** Dice rolling mechanics fully implemented with proper hit calculation based on combat values
 
 ### 42.2 - Assign Hits (WELL IMPLEMENTED)
 - **Implementation Status:** ✅ COMPLETE
-- **Code Location:** `CombatResolver.resolve_sustain_damage_abilities()`
-- **Test Coverage:** ✅ Comprehensive (`test_combat.py`)
-- **Details:** Hit assignment with sustain damage resolution properly implemented
+- **Code Location:** `GroundCombatController._assign_hits_to_forces()`
+- **Test Coverage:** ✅ Comprehensive (`test_rule_40_ground_combat.py`)
+- **Details:** Hit assignment with hooks for sustain damage resolution and player choice. Player input for sustain and hit assignments is not yet passed into the controller API.
 
-### 42.3 - Combat Rounds (PARTIALLY IMPLEMENTED)
-- **Implementation Status:** ⚠️ PARTIAL
-- **Code Location:** Individual combat mechanics exist but no round management
-- **Test Coverage:** ❌ Missing round-based tests
-- **Details:** Combat resolution exists but lacks multi-round combat loop
+### 42.3 - Combat Rounds (WELL IMPLEMENTED)
+- **Implementation Status:** ✅ COMPLETE
+- **Code Location:** `GroundCombatController.resolve_combat_round()`, `GroundCombatController.resolve_ground_combat()`
+- **Test Coverage:** ✅ Comprehensive (`test_rule_40_ground_combat.py`)
+- **Details:** Multi-round combat loop with proper round management and continuation logic
 
-### 42.4 - Combat End Conditions (NOT IMPLEMENTED)
-- **Implementation Status:** ❌ MISSING
-- **Code Location:** No dedicated ground combat controller
-- **Test Coverage:** ❌ Missing
-- **Details:** No implementation of combat end detection or timing effects
+### 42.4 - Combat End Conditions (WELL IMPLEMENTED)
+- **Implementation Status:** ✅ COMPLETE
+- **Code Location:** `GroundCombatController.resolve_combat_round()`, `GroundCombatController.resolve_ground_combat()`, `GroundCombatController._combat_should_continue()`
+- **Test Coverage:** ✅ Comprehensive (`test_rule_40_ground_combat.py`)
+- **Details:** Combat ending conditions implemented with winner determination. Timing effects not implemented.
 
 ## Related Topics
 - **Rule 49: INVASION** - Ground combat occurs during invasion step
@@ -67,29 +68,26 @@ b During the last round of a combat, "end of combat" and "end of combat round" e
 ## Test References
 
 ### Existing Tests ✅
-- `test_combat.py::test_roll_dice_for_unit()` - Basic dice rolling
-- `test_combat.py::test_calculate_hits()` - Hit calculation from dice
-- `test_combat.py::test_resolve_sustain_damage_abilities()` - Sustain damage resolution
-- `test_combat.py::test_apply_combat_modifiers()` - Combat modifiers
+- `test_rule_40_ground_combat.py::test_ground_combat_basic_resolution()` - Complete ground combat scenarios
+- `test_rule_40_ground_combat.py::test_ground_combat_with_sustain_damage()` - Sustain damage in ground combat
+- `test_rule_40_ground_combat.py::test_ground_combat_multiple_rounds()` - Multi-round combat scenarios
+- `test_rule_40_ground_combat.py::test_ground_combat_end_conditions()` - Combat end condition detection
 - `test_unit.py::test_sustain_damage_*()` - Sustain damage mechanics
 
 ### Missing Tests ❌
-- Ground combat round management
-- Multi-round combat scenarios
-- Combat end condition detection
-- Ground combat integration with invasion
+- Ground combat integration with invasion system
 - Combat timing effects ("start of combat", "end of combat")
+- Complex multi-faction ground combat scenarios
 
 ## Implementation Files
 
 ### Core Implementation ✅
 - `src/ti4/core/combat.py` - `CombatResolver` class with dice and hit mechanics
+- `src/ti4/core/ground_combat.py` - `GroundCombatController` class for complete ground combat management
 - `src/ti4/core/unit.py` - Unit combat stats and sustain damage
 - `src/ti4/core/unit_stats.py` - Combat values and dice counts
 
 ### Missing Implementation ❌
-- Ground combat controller/manager
-- Combat round state management
 - Integration with invasion system
 - Combat timing effect system
 
@@ -101,30 +99,32 @@ b During the last round of a combat, "end of combat" and "end of combat round" e
 3. **Sustain Damage** - Complete sustain damage mechanics with state management
 4. **Combat Modifiers** - Support for +/- modifiers to combat rolls
 5. **Unit Combat Stats** - All ground forces have proper combat values
+6. **Combat Round Management** - Complete system to manage multiple combat rounds
+7. **Combat State Tracking** - Full tracking of combat progression and round state
+8. **End Condition Detection** - Automatic detection of combat end conditions
+9. **Ground Combat Controller** - Dedicated controller for orchestrating ground combat
 
 ### Implementation Gaps ❌
-1. **Combat Round Management** - No system to manage multiple combat rounds
-2. **Combat State Tracking** - No tracking of combat progression
-3. **End Condition Detection** - No automatic detection of combat end
-4. **Timing Effects** - No support for "start/end of combat" effects
-5. **Integration Layer** - No connection between combat mechanics and invasion system
+1. **Timing Effects** - No support for "start/end of combat" effects
+2. **Integration Layer** - No connection between combat mechanics and invasion system
+3. **Multi-faction Combat** - Limited support for complex multi-faction scenarios
+4. **Sustain Damage Choices in Ground Combat** - Player choice for sustaining damage not yet integrated into round flow
 
 ## Action Items
 
-1. **HIGH PRIORITY** - Create `GroundCombatController` class to manage combat rounds
-2. **HIGH PRIORITY** - Implement combat state tracking and round progression
-3. **HIGH PRIORITY** - Add combat end condition detection
-4. **MEDIUM PRIORITY** - Integrate ground combat with invasion system
-5. **MEDIUM PRIORITY** - Implement combat timing effects system
-6. **MEDIUM PRIORITY** - Add comprehensive ground combat integration tests
-7. **LOW PRIORITY** - Create ground combat UI components
-8. **LOW PRIORITY** - Add combat animation and visual feedback
-9. **LOW PRIORITY** - Implement combat replay functionality
-10. **LOW PRIORITY** - Add combat statistics and analytics
+1. **HIGH PRIORITY** - Integrate ground combat with invasion system
+2. **MEDIUM PRIORITY** - Implement combat timing effects system ("start/end of combat")
+3. **MEDIUM PRIORITY** - Add support for complex multi-faction ground combat scenarios
+4. **MEDIUM PRIORITY** - Add comprehensive ground combat integration tests with invasion
+5. **LOW PRIORITY** - Create ground combat UI components
+6. **LOW PRIORITY** - Add combat animation and visual feedback
+7. **LOW PRIORITY** - Implement combat replay functionality
+8. **LOW PRIORITY** - Add combat statistics and analytics
 
 ## Priority Assessment
-**PRIORITY: HIGH**
 
-Ground combat is a core game mechanic that occurs frequently during invasions. While the fundamental combat mechanics (dice rolling, hit calculation, sustain damage) are well implemented, the system lacks the higher-level orchestration needed for complete ground combat resolution. The missing round management and integration with the invasion system represent significant gaps in gameplay functionality.
+### PRIORITY: MEDIUM
 
-The existing foundation is solid and extensible, making implementation of the missing pieces straightforward but essential for complete game functionality.
+Ground combat is a core game mechanic that occurs frequently during invasions. The fundamental combat mechanics (dice rolling, hit calculation, sustain damage) are well implemented, and the system now includes complete round management and combat orchestration through the `GroundCombatController`. The main remaining work involves integrating ground combat with the invasion system and adding support for combat timing effects. While important, these are integration tasks rather than core functionality gaps.
+
+The existing foundation is solid and extensible, making implementation of the remaining integration pieces straightforward and well-defined.
