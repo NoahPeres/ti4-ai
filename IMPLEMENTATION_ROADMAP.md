@@ -8,8 +8,8 @@
 **Focus**: Complete advanced mechanics that enable complex strategic gameplay and AI decision-making
 
 ## 📊 Progress
-**Overall Progress**: 33.7%
-**Completed Rules**: 34/101
+**Overall Progress**: 27.7%
+**Completed Rules**: 28/101
 - **Rule 1: ABILITIES** - Core ability system with timing windows, precedence, costs, and resolution (Foundation Layer) ✅ **NEWLY COMPLETED**
 - **Rule 3: ACTION PHASE** - Core action phase mechanics with pass state tracking and phase transitions (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 6: ADJACENCY** - Core spatial mechanics for system relationships
@@ -1219,7 +1219,7 @@ Based on comprehensive analysis of LRR analysis files, here are the next 10 rule
 - **Implementation**: Complete defender identification for space and ground combat
 - **Test Coverage**: 11 comprehensive tests in `tests/test_rule_29_defender.py` covering all combat scenarios
 - **Files**: `src/ti4/core/combat.py` (CombatRoleManager with get_defender_id/get_defender_ids methods)
-- **Remaining**: Defender retreat priority and nebula combat bonus (enhancement features)
+- **Remaining**: Nebula combat bonus (enhancement feature)
 
 #### **Tier 2: Unit Management & Destruction (Rules 5-7)**
 

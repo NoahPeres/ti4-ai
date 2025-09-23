@@ -5,12 +5,12 @@ from unittest.mock import Mock
 import pytest
 
 from src.ti4.core.combat import CombatRoleManager, RetreatManager
-from src.ti4.core.constants import Faction
+from src.ti4.core.constants import Faction, UnitType
 from src.ti4.core.game_controller import GameController
 from src.ti4.core.planet import Planet
 from src.ti4.core.player import Player
 from src.ti4.core.system import System
-from src.ti4.core.unit import Unit, UnitType
+from src.ti4.core.unit import Unit
 
 
 class TestRule29Defender:
@@ -266,3 +266,23 @@ class TestRule29Defender:
 
         assert defender_p1 == "player2"
         assert defender_p2 == "player3"
+
+    def test_get_defender_id_fails_with_multiple_defenders(self) -> None:
+        """Test that get_defender_id() raises error when multiple defenders exist."""
+        # Setup three-player space combat
+        system = System(system_id="test_system")
+
+        # Add ships from all three players
+        cruiser1 = Unit(unit_type=UnitType.CRUISER, owner="player1")  # Active player
+        cruiser2 = Unit(unit_type=UnitType.CRUISER, owner="player2")  # Defender 1
+        cruiser3 = Unit(unit_type=UnitType.CRUISER, owner="player3")  # Defender 2
+
+        system.place_unit_in_space(cruiser1)
+        system.place_unit_in_space(cruiser2)
+        system.place_unit_in_space(cruiser3)
+
+        role_manager = CombatRoleManager(self.game_controller)
+
+        # Test that get_defender_id() fails with multiple defenders
+        with pytest.raises(ValueError, match="Multiple defenders present"):
+            role_manager.get_defender_id(system)

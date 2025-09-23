@@ -6,7 +6,7 @@
 **Implementation Status:** ✅ IMPLEMENTED
 
 ## Raw LRR Text
-```
+```text
 29 DEFENDER
 In a space or ground combat, the non-active player is the defender.
 
@@ -22,7 +22,7 @@ RELATED TOPICS: Attacker, Invasion, Nebula, Space Combat
 
 ### Related Combat Mechanics
 
-#### 1. Retreat Priority (Rule 67.2)
+#### 1. Retreat Priority (Rule 78.4)
 - Defenders announce retreats first during the "Announce Retreat" step
 - If defender retreats, attacker cannot retreat in that combat round
 
@@ -43,7 +43,7 @@ RELATED TOPICS: Attacker, Invasion, Nebula, Space Combat
 - **Methods**:
   - `get_defender_id()`: Returns single defender ID for two-player combat
   - `get_defender_ids()`: Returns all defender IDs for multi-player combat
-  - `get_ground_combat_defender_id()`: Returns defender ID for ground combat
+  - `get_ground_combat_defender_id(system, planet_name)`: Returns defender ID for ground combat
 
 #### Implementation Details
 ```python
@@ -60,8 +60,8 @@ def get_defender_ids(self, system: System) -> list[str]:
 ### 🔄 Partial Implementation
 
 #### Retreat Priority Mechanics
-- **Status**: Basic retreat functionality exists but defender-first priority not explicitly implemented
-- **Location**: `RetreatManager` class exists but needs defender priority logic
+- **Status**: ✅ IMPLEMENTED via RetreatManager class
+- **Location**: `RetreatManager` class with defender priority logic
 
 #### Nebula Combat Bonus
 - **Status**: Not yet implemented
@@ -122,7 +122,7 @@ def get_defender_ids(self, system: System) -> list[str]:
 
 ### System Dependencies
 - **CombatRoleManager**: Core defender identification logic
-- **RetreatManager**: Retreat priority implementation needed
+- **RetreatManager**: ✅ IMPLEMENTED - Retreat priority functionality complete
 - **System/Anomaly**: Nebula detection for combat bonuses
 - **CombatResolver**: Combat modifier application
 
@@ -131,48 +131,7 @@ def get_defender_ids(self, system: System) -> list[str]:
 Rule 29 (DEFENDER) is **substantially implemented** with core functionality complete and comprehensive test coverage. The basic defender identification mechanics work correctly for both space and ground combat scenarios.
 
 **Remaining work**:
-1. Implement defender-first retreat priority
-2. Add nebula combat bonus for defenders
-3. These are enhancements to the core rule rather than fundamental requirements
+1. Add nebula combat bonus for defenders
+2. These are enhancements to the core rule rather than fundamental requirements
 
 The implementation correctly follows the LRR definition that "the non-active player is the defender" in all combat scenarios.
-  - `CombatInitiator.get_combat_participants()`: Groups units by owner
-  - Combat mechanics present but role distinction unclear
-
-### Missing Implementation
-- Explicit defender/attacker role assignment
-- Defender-specific combat abilities
-- Role-based combat timing and restrictions
-
-## Notable Implementation Details
-
-### Well-Implemented
-- Combat participant identification system
-- Basic combat mechanics framework
-- Unit combat capabilities
-
-### Gaps
-- **No explicit defender role tracking:** Combat system doesn't distinguish attacker/defender
-- **Missing role-based mechanics:** No defender-specific abilities or restrictions
-- **Unclear combat initiation:** Active player determination in combat context
-- **No retreat mechanics:** Defender retreat rules not implemented
-
-## Action Items
-
-1. **Add explicit attacker/defender role tracking** to combat system
-2. **Implement defender-specific combat mechanics** and timing rules
-3. **Create defender role identification** in CombatInitiator class
-4. **Add defender retreat mechanics** with proper restrictions
-5. **Implement role-based ability timing** (defender announces retreats first)
-6. **Create comprehensive defender tests** covering all combat scenarios
-7. **Add multi-player combat** defender determination logic
-8. **Implement nebula effects** on defender roles if applicable
-9. **Add defender-specific UI indicators** for combat clarity
-10. **Document combat role mechanics** in game rules and help system
-
-## Priority Assessment
-**MEDIUM Priority** - While combat roles are fundamental, the basic combat system works without explicit role distinction. However, proper implementation is needed for:
-- Retreat mechanics (defenders retreat first)
-- Role-specific abilities
-- Tournament/competitive play accuracy
-- Advanced combat scenarios
