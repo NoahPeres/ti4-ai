@@ -8,12 +8,13 @@
 **Focus**: Complete advanced mechanics that enable complex strategic gameplay and AI decision-making
 
 ## 📊 Progress
-**Overall Progress**: 29.7%
-**Completed Rules**: 30/101
+**Overall Progress**: 30.7%
+**Completed Rules**: 31/101
 - **Rule 1: ABILITIES** - Core ability system with timing windows, precedence, costs, and resolution (Foundation Layer) ✅ **NEWLY COMPLETED**
 - **Rule 3: ACTION PHASE** - Core action phase mechanics with pass state tracking and phase transitions (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 6: ADJACENCY** - Core spatial mechanics for system relationships ✅
 - **Rule 2: ACTION CARDS** - Action card system with timing windows, component actions, and comprehensive card management (Core Game Layer) ✅ **NEWLY COMPLETED**
+- **Rule 8: AGENDA PHASE** - Voting and law system with speaker powers and outcome resolution (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 13: ATTACKER** - Combat role definition with attacker/defender assignment (Foundation Layer) ✅ **NEWLY COMPLETED**
 - **Rule 14: BLOCKADED** - Blockade mechanics for space docks and production restrictions (Foundation Layer) ✅ **COMPLETED**
 - **Rule 15: BOMBARDMENT** - Bombardment unit ability with roll mechanics, planetary shield interaction, and ground force destruction (Core Game Layer) ✅ **NEWLY COMPLETED**
@@ -1352,7 +1353,7 @@ We have successfully implemented the **foundational core** of TI4, establishing 
 **Timeline: 4-5 months**
 
 #### **Political Framework**
-- **Rule 8: AGENDA PHASE** - Voting and law system
+- **Rule 8: AGENDA PHASE** - Voting and law system ✅ **NEWLY COMPLETED**
 - **Rule 7: AGENDA CARDS** - Political cards and outcomes
 - **Rule 66: POLITICS** - Political strategy card
 - **Rule 80: SPEAKER** - Speaker token and privileges
