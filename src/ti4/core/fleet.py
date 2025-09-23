@@ -29,18 +29,12 @@ class Fleet:
         self.units.append(unit)
 
     def get_total_capacity(self) -> int:
-        """Get the total capacity of all ships in the fleet."""
+        """Get the total capacity of all capacity‑providing units in the fleet."""
         total_capacity = 0
         for unit in self.units:
-            # Only ships (not fighters or infantry) provide capacity
-            if unit.unit_type in [
-                UnitType.CARRIER,
-                UnitType.CRUISER,
-                UnitType.CRUISER_II,
-                UnitType.DREADNOUGHT,
-                UnitType.WAR_SUN,
-            ]:
-                total_capacity += unit.get_capacity()
+            cap = unit.get_capacity()
+            if cap > 0:
+                total_capacity += cap
         return total_capacity
 
     def get_carried_units_count(self) -> int:
@@ -141,28 +135,33 @@ class FleetCapacityEnforcer:
 
         excess_count = carried_units - total_capacity
 
-        # Validate player choice
-        if len(chosen_units_to_remove) < excess_count:
-            raise FleetCapacityError(
-                f"Insufficient units chosen for removal. Need to remove {excess_count}, "
-                f"but only {len(chosen_units_to_remove)} chosen."
-            )
-
-        # Validate that chosen units are valid for removal (count against capacity)
+        # Validate that all chosen units are in the fleet
         for unit in chosen_units_to_remove:
-            if not fleet._unit_needs_capacity(unit):
-                raise FleetCapacityError(
-                    f"Cannot remove unit that doesn't count against capacity: {unit.unit_type}"
-                )
-
             if unit not in fleet.units:
                 raise FleetCapacityError(
                     f"Cannot remove unit not in fleet: {unit.unit_type}"
                 )
 
+        # Filter to only units that count against capacity
+        valid_units_to_remove = [
+            unit for unit in chosen_units_to_remove if fleet._unit_needs_capacity(unit)
+        ]
+
+        # Reject duplicate selections among valid units
+        if len({id(u) for u in valid_units_to_remove}) != len(valid_units_to_remove):
+            raise FleetCapacityError("Duplicate units selected for removal.")
+
+        if len(valid_units_to_remove) < excess_count:
+            raise FleetCapacityError(
+                f"Insufficient units chosen for removal. Need to remove {excess_count}, "
+                f"but only {len(valid_units_to_remove)} chosen."
+            )
+
+        # Consider only the exact number needed; ignore any extra provided
+        units_to_remove = valid_units_to_remove[:excess_count]
+
         # Remove the chosen units (only the exact number needed)
-        units_to_remove = chosen_units_to_remove[:excess_count]
-        removed_units = []
+        removed_units: list[Unit] = []
 
         for unit in units_to_remove:
             fleet.units.remove(unit)

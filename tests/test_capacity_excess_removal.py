@@ -24,8 +24,9 @@ class TestCapacityExcessRemoval:
         # Add 6 fighters - 2 more than capacity
         fighters = []
         for i in range(6):
-            fighter = Unit(unit_type=UnitType.FIGHTER, owner="player1")
-            fighter.unit_id = f"fighter_{i}"  # Give unique IDs for choice testing
+            fighter = Unit(
+                unit_type=UnitType.FIGHTER, owner="player1", unit_id=f"fighter_{i}"
+            )
             fighters.append(fighter)
             fleet.add_unit(fighter)
 
@@ -80,16 +81,18 @@ class TestCapacityExcessRemoval:
         # Add 3 fighters
         fighters = []
         for i in range(3):
-            fighter = Unit(unit_type=UnitType.FIGHTER, owner="player1")
-            fighter.unit_id = f"fighter_{i}"
+            fighter = Unit(
+                unit_type=UnitType.FIGHTER, owner="player1", unit_id=f"fighter_{i}"
+            )
             fighters.append(fighter)
             fleet.add_unit(fighter)
 
         # Add 3 infantry
         infantry_units = []
         for i in range(3):
-            infantry = Unit(unit_type=UnitType.INFANTRY, owner="player1")
-            infantry.unit_id = f"infantry_{i}"
+            infantry = Unit(
+                unit_type=UnitType.INFANTRY, owner="player1", unit_id=f"infantry_{i}"
+            )
             infantry_units.append(infantry)
             fleet.add_unit(infantry)
 
@@ -176,7 +179,7 @@ class TestCapacityExcessRemoval:
 
         with pytest.raises(
             FleetCapacityError,
-            match="Cannot remove unit that doesn't count against capacity",
+            match="Insufficient units chosen for removal",
         ):
             enforcer.remove_excess_units_with_choice(fleet, chosen_units_to_remove)
 
@@ -208,3 +211,106 @@ class TestCapacityExcessRemoval:
         assert len(removed_units) == 0
         assert fleet.get_carried_units_count() == 3
         assert len(fleet.units) == 4  # carrier + 3 fighters
+
+    def test_unit_not_in_fleet_error(self) -> None:
+        """Test error when trying to remove a unit not in the fleet.
+
+        LRR Reference: Rule 16.3a - Player choice must be from units in the fleet.
+        """
+        # Create fleet with excess capacity
+        fleet = Fleet(owner="player1", system_id="system1")
+
+        carrier = Unit(unit_type=UnitType.CARRIER, owner="player1")
+        fleet.add_unit(carrier)
+
+        # Add 6 fighters (exceeds capacity of 4)
+        fighters_in_fleet = []
+        for _ in range(6):
+            fighter = Unit(unit_type=UnitType.FIGHTER, owner="player1")
+            fighters_in_fleet.append(fighter)
+            fleet.add_unit(fighter)
+
+        # Create a fighter NOT in the fleet
+        external_fighter = Unit(unit_type=UnitType.FIGHTER, owner="player1")
+
+        from src.ti4.core.exceptions import FleetCapacityError
+        from src.ti4.core.fleet import FleetCapacityEnforcer
+
+        enforcer = FleetCapacityEnforcer()
+
+        # Try to remove the external fighter - should fail
+        with pytest.raises(FleetCapacityError, match="Cannot remove unit not in fleet"):
+            enforcer.remove_excess_units_with_choice(
+                fleet, [external_fighter, fighters_in_fleet[0]]
+            )
+
+    def test_duplicate_unit_selection_error(self) -> None:
+        """Test error when player selects the same unit twice.
+
+        LRR Reference: Rule 16.3a - Each unit can only be removed once.
+        """
+        # Create fleet with excess capacity
+        fleet = Fleet(owner="player1", system_id="system1")
+
+        carrier = Unit(unit_type=UnitType.CARRIER, owner="player1")
+        fleet.add_unit(carrier)
+
+        # Add 6 fighters (exceeds capacity of 4)
+        fighters = []
+        for _ in range(6):
+            fighter = Unit(unit_type=UnitType.FIGHTER, owner="player1")
+            fighters.append(fighter)
+            fleet.add_unit(fighter)
+
+        from src.ti4.core.exceptions import FleetCapacityError
+        from src.ti4.core.fleet import FleetCapacityEnforcer
+
+        enforcer = FleetCapacityEnforcer()
+
+        # Try to remove the same fighter twice - should fail
+        with pytest.raises(
+            FleetCapacityError, match="Duplicate units selected for removal"
+        ):
+            enforcer.remove_excess_units_with_choice(fleet, [fighters[0], fighters[0]])
+
+    def test_extra_invalid_picks_after_valid_ones(self) -> None:
+        """Test that extra invalid picks after valid ones don't block removal.
+
+        LRR Reference: Rule 16.3a - Only the required number of units are considered.
+        """
+        # Create fleet with excess capacity
+        fleet = Fleet(owner="player1", system_id="system1")
+
+        carrier = Unit(unit_type=UnitType.CARRIER, owner="player1")
+        cruiser = Unit(unit_type=UnitType.CRUISER, owner="player1")
+        fleet.add_unit(carrier)
+        fleet.add_unit(cruiser)
+
+        # Add 6 fighters (exceeds capacity of 5)
+        fighters = []
+        for _ in range(6):
+            fighter = Unit(unit_type=UnitType.FIGHTER, owner="player1")
+            fighters.append(fighter)
+            fleet.add_unit(fighter)
+
+        from src.ti4.core.fleet import FleetCapacityEnforcer
+
+        enforcer = FleetCapacityEnforcer()
+
+        # Choose 2 valid fighters first, then the cruiser (invalid)
+        # Should succeed because only first 2 units are considered (excess_count = 2)
+        chosen_units = [
+            fighters[0],
+            fighters[1],
+            cruiser,
+        ]  # cruiser doesn't count against capacity
+
+        removed_units = enforcer.remove_excess_units_with_choice(fleet, chosen_units)
+
+        # Should remove only the first two fighters
+        assert len(removed_units) == 2
+        assert fighters[0] in removed_units
+        assert fighters[1] in removed_units
+        assert fighters[0] not in fleet.units
+        assert fighters[1] not in fleet.units
+        assert cruiser in fleet.units  # cruiser should still be in fleet

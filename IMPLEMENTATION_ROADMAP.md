@@ -1364,7 +1364,7 @@ We have successfully implemented the **foundational core** of TI4, establishing 
 - **Rule 70: PURGE** - Card purging mechanics
 
 #### **Advanced Unit Systems**
-- **Rule 16: CAPACITY** - Transport capacity mechanics ✅ **PARTIALLY COMPLETE** (83% - missing combat exception)
+- **Rule 16: CAPACITY** - Transport capacity mechanics ✅ **PARTIALLY COMPLETE** (86% - missing combat exception)
 - **Rule 95: TRANSPORT** - Unit transportation
 - **Rule 55: MECHS** - Mech unit abilities
 - **Rule 85: STRUCTURES** - Structure placement and abilities
