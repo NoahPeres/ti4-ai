@@ -41,18 +41,15 @@ class System:
         ]
 
     def has_enemy_ships(self, player_id: str) -> bool:
-        """Check if this system contains ships belonging to other players (Rule 58.4b)."""
-        from .constants import UnitType
+        """Check if this system contains enemy movement-blocking ships (Rule 58.4b).
 
-        ship_types = {
-            UnitType.CARRIER,
-            UnitType.CRUISER,
-            UnitType.CRUISER_II,
-            UnitType.DREADNOUGHT,
-            UnitType.DESTROYER,
-            UnitType.FLAGSHIP,
-            UnitType.WAR_SUN,
-        }
+        Fighters are intentionally excluded: they do not block movement.
+        For combat detection, use the combat-related API instead.
+        """
+        from .constants import GameConstants
+
+        # Use NON_FIGHTER_SHIP_TYPES for movement blocking rules
+        ship_types = GameConstants.NON_FIGHTER_SHIP_TYPES
 
         for unit in self.space_units:
             if unit.owner != player_id and unit.unit_type in ship_types:
@@ -165,4 +162,18 @@ class System:
         planet = self.get_planet_by_name(planet_name)
         if planet:
             return planet.units.copy()
+        return []
+
+    def get_ground_forces_on_planet(self, planet_name: str) -> list[Unit]:
+        """Get all ground force units on a specific planet in this system."""
+        from .constants import GameConstants
+
+        planet = self.get_planet_by_name(planet_name)
+        if planet:
+            # Filter for ground force units (infantry, mechs, etc.)
+            return [
+                unit
+                for unit in planet.units
+                if unit.unit_type in GameConstants.GROUND_FORCE_TYPES
+            ]
         return []

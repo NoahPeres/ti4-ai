@@ -8,12 +8,13 @@
 **Focus**: Complete advanced mechanics that enable complex strategic gameplay and AI decision-making
 
 ## 📊 Progress
-**Overall Progress**: 31.7%
-**Completed Rules**: 32/101
+**Overall Progress**: 32.7%
+**Completed Rules**: 33/101
 - **Rule 1: ABILITIES** - Core ability system with timing windows, precedence, costs, and resolution (Foundation Layer) ✅ **NEWLY COMPLETED**
 - **Rule 3: ACTION PHASE** - Core action phase mechanics with pass state tracking and phase transitions (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 6: ADJACENCY** - Core spatial mechanics for system relationships
 - **Rule 2: ACTION CARDS** - Action card system with timing windows, component actions, and comprehensive card management (Core Game Layer) ✅ **NEWLY COMPLETED**
+- **Rule 13: ATTACKER** - Combat role definition with attacker/defender assignment (Foundation Layer) ✅ **NEWLY COMPLETED**
 - **Rule 14: BLOCKADED** - Blockade mechanics for space docks and production restrictions (Foundation Layer) ✅ **COMPLETED**
 - **Rule 17: CAPTURE** - Unit capture mechanics and faction sheet management (Foundation Layer) ✅ **COMPLETED**
 - **Rule 18: COMBAT** - General combat mechanics with burst icon support (Core Game Layer) ✅ **NEWLY COMPLETED**
@@ -1203,11 +1204,12 @@ Based on comprehensive analysis of LRR analysis files, here are the next 10 rule
 
 **3. Rule 13: ATTACKER**
 - **Priority**: HIGH - Combat role definition
-- **Status**: ⚠️ PARTIAL (active player tracking exists, combat roles missing)
+- **Status**: ✅ **COMPLETED** - Full attacker role implementation with comprehensive test coverage
 - **Dependencies**: ✅ Active player system, combat framework exists
-- **Key Gaps**: Explicit attacker/defender role assignment in combat
+- **Implementation**: Complete CombatRoleManager with attacker/defender role assignment for space and ground combat
 - **Impact**: Required for proper combat resolution and retreat mechanics
-- **Estimated Effort**: Small (extend existing combat system)
+- **Test Coverage**: 8 comprehensive tests in `tests/test_rule_13_attacker.py` covering all combat scenarios
+- **Files**: `src/ti4/core/combat.py` (CombatRoleManager), `src/ti4/core/system.py` (ground forces detection)
 
 **4. Rule 29: DEFENDER**
 - **Priority**: MEDIUM-HIGH - Combat role completion

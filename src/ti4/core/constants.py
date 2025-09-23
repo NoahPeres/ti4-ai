@@ -48,13 +48,12 @@ class GameConstants:
 
     # Starting command tokens per player (TI4 rules 20.1)
     # "Each player begins the game with eight tokens on their command sheet"
+    STARTING_COMMAND_TOKENS = 8
     STARTING_TACTIC_TOKENS = 3  # For tactical actions (activating systems)
     STARTING_FLEET_TOKENS = 3  # For fleet supply (max separate fleets allowed)
     STARTING_STRATEGY_TOKENS = 2  # For secondary abilities of strategy cards
 
-    # Total starting tokens = 8 (3 + 3 + 2)
-
-    # Maximum number of players
+    # Player limits
     MAX_PLAYERS = 6
     MIN_PLAYERS = 3  # TI4 requires at least 3 players
 
@@ -64,16 +63,34 @@ class GameConstants:
     # Combat
     DEFAULT_COMBAT_DICE_SIDES = 10
 
-    # Resources
+    # Starting values
     STARTING_RESOURCES = 0
     STARTING_INFLUENCE = 0
 
     # Movement
     DEFAULT_MOVEMENT_RANGE = 1
 
-    # Fleet capacity
+    # Capacity costs
     FIGHTER_CAPACITY_COST = 1
     INFANTRY_CAPACITY_COST = 1
+    MECH_CAPACITY_COST = 1
+
+    # Unit type sets for common operations
+    GROUND_FORCE_TYPES = frozenset({UnitType.INFANTRY, UnitType.MECH})
+    SHIP_TYPES = frozenset(
+        {
+            UnitType.CARRIER,
+            UnitType.CRUISER,
+            UnitType.CRUISER_II,
+            UnitType.DREADNOUGHT,
+            UnitType.DESTROYER,
+            UnitType.FIGHTER,
+            UnitType.FLAGSHIP,
+            UnitType.WAR_SUN,
+        }
+    )
+    # Optional: for rules that treat fighters differently (e.g., movement blocking)
+    NON_FIGHTER_SHIP_TYPES = SHIP_TYPES - frozenset({UnitType.FIGHTER})
 
 
 class Technology(Enum):

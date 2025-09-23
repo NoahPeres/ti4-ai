@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from .constants import LocationType, Technology, UnitType
+from .constants import GameConstants, LocationType, Technology, UnitType
 from .galaxy import Galaxy
 from .movement_rules import MovementContext, MovementRuleEngine
 from .system import System
@@ -214,7 +214,7 @@ class TransportValidator:
             return False
 
         # Check if all units are ground forces that can be transported
-        transportable_types = {UnitType.INFANTRY, UnitType.MECH}
+        transportable_types = GameConstants.GROUND_FORCE_TYPES
         for unit in transport.ground_forces:
             if unit.unit_type not in transportable_types:
                 return False
@@ -284,3 +284,37 @@ class TransportExecutor:
             to_system.place_unit_in_space(unit)
         else:
             to_system.place_unit_on_planet(unit, to_location)
+
+    def can_transport_units(self, carrier: "Unit", units: list["Unit"]) -> bool:
+        """Check if a carrier can transport the given units."""
+
+        # Only infantry and mechs can be transported
+        transportable_types = GameConstants.GROUND_FORCE_TYPES
+        for unit in units:
+            if unit.unit_type not in transportable_types:
+                return False
+
+        # Check capacity using explicit per-unit costs
+        cost_by_type = {
+            UnitType.FIGHTER: GameConstants.FIGHTER_CAPACITY_COST,
+            UnitType.INFANTRY: GameConstants.INFANTRY_CAPACITY_COST,
+            UnitType.MECH: GameConstants.MECH_CAPACITY_COST,
+        }
+        used = 0
+        for u in units:
+            used += cost_by_type.get(u.unit_type, 1)
+        return used <= carrier.get_capacity()
+
+    def get_transportable_units(self, system: "System", player: str) -> list["Unit"]:
+        """Get all units that can be transported by this player."""
+        from .constants import GameConstants
+
+        transportable_units = []
+        for planet in system.planets:
+            for unit in planet.units:
+                if (
+                    unit.owner == player
+                    and unit.unit_type in GameConstants.GROUND_FORCE_TYPES
+                ):
+                    transportable_units.append(unit)
+        return transportable_units

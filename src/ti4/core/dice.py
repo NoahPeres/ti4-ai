@@ -18,7 +18,7 @@ def roll_dice(count: int) -> list[int]:
     if count == 0:
         return []
 
-    return [random.randint(1, 10) for _ in range(count)]
+    return [random.randint(1, 10) for _ in range(count)]  # nosec B311 - game RNG, not crypto
 
 
 def calculate_hits(dice_results: list[int], target_value: int) -> int:

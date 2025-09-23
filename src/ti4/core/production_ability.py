@@ -6,7 +6,7 @@ Handles production values, combined production, placement rules, and special cas
 
 from typing import TYPE_CHECKING, Optional
 
-from .constants import Faction, UnitType
+from .constants import Faction, GameConstants, UnitType
 
 if TYPE_CHECKING:
     from .blockade import BlockadeManager
@@ -232,16 +232,7 @@ class ProductionAbilityManager:
 
         LRR Reference: Rule 68.2 - Ship identification
         """
-        ship_types = {
-            UnitType.CARRIER,
-            UnitType.CRUISER,
-            UnitType.DESTROYER,
-            UnitType.DREADNOUGHT,
-            UnitType.FIGHTER,
-            UnitType.FLAGSHIP,
-            UnitType.WAR_SUN,
-        }
-        return all(unit_type in ship_types for unit_type in units)
+        return all(unit_type in GameConstants.SHIP_TYPES for unit_type in units)
 
     def can_place_produced_ground_forces_on_planet(
         self, ground_forces: list[UnitType], planet: "Planet"
@@ -264,18 +255,9 @@ class ProductionAbilityManager:
         return False
 
     def are_units_ground_forces(self, units: list[UnitType]) -> bool:
-        """Check if units are ground forces.
+        """Check if all units are ground forces (infantry or mechs)."""
 
-        Args:
-            units: List of unit types to check
-
-        Returns:
-            True if all units are ground forces
-
-        LRR Reference: Rule 68.3 - Ground force identification
-        """
-        ground_force_types = {UnitType.INFANTRY, UnitType.MECH}
-        return all(unit_type in ground_force_types for unit_type in units)
+        return all(unit_type in GameConstants.GROUND_FORCE_TYPES for unit_type in units)
 
     def can_space_production_place_ground_forces_on_planet(
         self, ground_forces: list[UnitType], planet: "Planet", player: str

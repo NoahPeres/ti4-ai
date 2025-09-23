@@ -1,12 +1,159 @@
-"""Combat system for TI4."""
+"""Combat system for Twilight Imperium 4."""
 
 import random
-from typing import Callable, Optional
+from typing import TYPE_CHECKING, Callable, Optional
 
-from .constants import UnitType
+from .constants import GameConstants, UnitType
 from .system import System
 from .unit import Unit
 from .unit_stats import UnitStatsProvider
+
+if TYPE_CHECKING:
+    from .game_controller import GameController
+
+
+class CombatRoleManager:
+    """Manages combat roles and participant identification."""
+
+    def __init__(self, game_controller: "GameController") -> None:
+        self.game_controller = game_controller
+
+    def _get_ship_owners(self, system: System) -> set[str]:
+        """Helper method to get unique owners of ships in a system."""
+        owners: set[str] = set()
+        for unit in system.space_units:
+            if unit.unit_type in GameConstants.SHIP_TYPES:
+                owners.add(unit.owner)
+        return owners
+
+    def has_combat(self, system: System) -> bool:
+        """Check if there is combat in the system (multiple players with ships)."""
+        return len(self._get_ship_owners(system)) > 1
+
+    def get_attacker_id(self, system: System) -> str:
+        """Get the attacker player ID (always the active player)."""
+        if not self.has_combat(system):
+            raise ValueError("No combat in system")
+
+        # Rule 13: During combat, the active player is the attacker
+        active_id = self.game_controller.get_current_player().id
+
+        if not any(
+            u.owner == active_id and u.unit_type in GameConstants.SHIP_TYPES
+            for u in system.space_units
+        ):
+            raise ValueError(f"Active player {active_id} has no ships in this system")
+        return active_id
+
+    def get_defender_id(self, system: System) -> str:
+        """Get the defender player ID (non-active player in two-player combat)."""
+        if not self.has_combat(system):
+            raise ValueError("No combat in system")
+
+        attacker_id = self.get_attacker_id(system)
+
+        # Find the other player(s) in combat (preserve encounter order)
+        owners_ordered: list[str] = []
+        seen: set[str] = set()
+        for unit in system.space_units:
+            if unit.unit_type in GameConstants.SHIP_TYPES and unit.owner not in seen:
+                owners_ordered.append(unit.owner)
+                seen.add(unit.owner)
+
+        defenders = [o for o in owners_ordered if o != attacker_id]
+
+        if len(defenders) == 1:
+            return defenders[0]
+        if len(defenders) == 0:
+            raise ValueError("No defender found in combat")
+        raise ValueError("Multiple defenders present; use get_defender_ids()")
+
+    def get_defender_ids(self, system: System) -> list[str]:
+        """Get all defender player IDs (all non-active players in combat)."""
+        if not self.has_combat(system):
+            raise ValueError("No combat in system")
+
+        attacker_id = self.get_attacker_id(system)
+
+        # Find all other players in combat (preserve encounter order)
+        ship_types = GameConstants.SHIP_TYPES
+        owners_ordered: list[str] = []
+        seen: set[str] = set()
+        for unit in system.space_units:
+            if unit.unit_type in ship_types and unit.owner not in seen:
+                owners_ordered.append(unit.owner)
+                seen.add(unit.owner)
+
+        return [o for o in owners_ordered if o != attacker_id]
+
+    def get_ground_combat_attacker_id(self, system: System, planet_name: str) -> str:
+        """Get the attacker player ID for ground combat (always the active player)."""
+        # Check if ground combat should occur
+        ground_units = system.get_ground_forces_on_planet(planet_name)
+        owners = {u.owner for u in ground_units}
+
+        if len(owners) <= 1:
+            raise ValueError("No ground combat on planet")
+
+        # Rule 13: During combat, the active player is the attacker
+        active_id = self.game_controller.get_current_player().id
+        if not any(u.owner == active_id for u in ground_units):
+            raise ValueError(
+                f"Active player {active_id} has no ground forces on {planet_name}"
+            )
+        return active_id
+
+    def get_ground_combat_defender_id(self, system: System, planet_name: str) -> str:
+        """Get the defender player ID for ground combat."""
+        attacker_id = self.get_ground_combat_attacker_id(system, planet_name)
+
+        # Find the other player(s) in ground combat (preserve encounter order)
+        ground_units = system.get_ground_forces_on_planet(planet_name)
+        owners_ordered: list[str] = []
+        seen: set[str] = set()
+        for unit in ground_units:
+            if unit.owner not in seen:
+                owners_ordered.append(unit.owner)
+                seen.add(unit.owner)
+
+        defenders = [o for o in owners_ordered if o != attacker_id]
+
+        if len(defenders) == 1:
+            return defenders[0]
+        if len(defenders) == 0:
+            raise ValueError("No defender found in ground combat")
+        raise ValueError(
+            "Multiple defenders present on planet; disambiguation required"
+        )
+
+
+class RetreatManager:
+    """Manages retreat mechanics with attacker/defender role restrictions."""
+
+    def __init__(self, attacker_id: str, defender_id: str) -> None:
+        """Initialize with combat roles."""
+        self.attacker_id = attacker_id
+        self.defender_id = defender_id
+        self.announced_retreats: set[str] = set()
+
+    def can_announce_retreat(self, player_id: str) -> bool:
+        """Check if a player can announce retreat."""
+        # Defender can always announce retreat first
+        if player_id == self.defender_id:
+            return True
+
+        # Attacker cannot retreat if defender has announced retreat
+        if player_id == self.attacker_id:
+            return self.defender_id not in self.announced_retreats
+
+        return False
+
+    def announce_retreat(self, player_id: str) -> None:
+        """Announce retreat for a player."""
+        if not self.can_announce_retreat(player_id):
+            raise ValueError(f"Player {player_id} cannot announce retreat")
+
+        self.announced_retreats.add(player_id)
 
 
 class CombatDetector:
@@ -18,12 +165,13 @@ class CombatDetector:
 
     def should_initiate_combat(self, system: System) -> bool:
         """Check if combat should be initiated in a system."""
-        # Get all owners of units in the system
+        # Get all owners of ships (not all space units) in the system
         owners = set()
         for unit in system.space_units:
-            owners.add(unit.owner)
+            if unit.unit_type in GameConstants.SHIP_TYPES:
+                owners.add(unit.owner)
 
-        # Combat occurs if there are units from different owners
+        # Combat occurs if there are ships from different owners
         return len(owners) > 1
 
 
@@ -35,14 +183,20 @@ class CombatInitiator:
         pass
 
     def get_combat_participants(self, system: System) -> dict[str, list[Unit]]:
-        """Get combat participants grouped by owner."""
+        """Get combat participants grouped by owner.
+
+        Only includes ships for space combat, filtering out ground forces
+        that may be in the space area during transport.
+        """
         participants: dict[str, list[Unit]] = {}
 
         for unit in system.space_units:
-            owner = unit.owner
-            if owner not in participants:
-                participants[owner] = []
-            participants[owner].append(unit)
+            # Only include ships in space combat
+            if unit.unit_type in GameConstants.SHIP_TYPES:
+                owner = unit.owner
+                if owner not in participants:
+                    participants[owner] = []
+                participants[owner].append(unit)
 
         return participants
 
@@ -75,7 +229,10 @@ class CombatResolver:
             return 0
 
         # Roll dice and calculate hits
-        dice_results = [random.randint(1, 10) for _ in range(actual_dice_count)]
+        dice_results = [
+            random.randint(1, GameConstants.DEFAULT_COMBAT_DICE_SIDES)  # nosec B311 - game RNG, not crypto
+            for _ in range(actual_dice_count)
+        ]
         return self.calculate_hits(dice_results, stats.combat_value)
 
     def roll_dice_for_unit_with_burst_icons(self, unit: Unit) -> int:
@@ -102,8 +259,10 @@ class CombatResolver:
 
     def calculate_hits(self, dice_results: list[int], combat_value: int) -> int:
         """Calculate hits from dice results given a combat value."""
-        if combat_value < 1 or combat_value > 10:
-            raise ValueError("combat_value must be between 1 and 10")
+        if combat_value < 1 or combat_value > GameConstants.DEFAULT_COMBAT_DICE_SIDES:
+            raise ValueError(
+                f"combat_value must be between 1 and {GameConstants.DEFAULT_COMBAT_DICE_SIDES}"
+            )
 
         hits = 0
         for roll in dice_results:
@@ -204,7 +363,9 @@ class CombatResolver:
             Number of hits scored
         """
         # Apply modifier by adjusting the effective combat value
-        effective_combat_value = max(1, min(10, combat_value - modifier))
+        effective_combat_value = max(
+            1, min(GameConstants.DEFAULT_COMBAT_DICE_SIDES, combat_value - modifier)
+        )
         return self.calculate_hits(dice_results, effective_combat_value)
 
     def _perform_ability_attack(
@@ -246,7 +407,10 @@ class CombatResolver:
         if dice_count <= 0:
             return 0
 
-        dice_results = [random.randint(1, 10) for _ in range(dice_count)]
+        dice_results = [
+            random.randint(1, GameConstants.DEFAULT_COMBAT_DICE_SIDES)  # nosec B311 - game RNG, not crypto
+            for _ in range(dice_count)
+        ]
         return self.calculate_hits(dice_results, stats.combat_value)
 
     def perform_anti_fighter_barrage(self, unit: Unit, target_units: list[Unit]) -> int:
@@ -264,7 +428,7 @@ class CombatResolver:
             return [u for u in units if u.unit_type == UnitType.FIGHTER]
 
         return self._perform_ability_attack(
-            unit, target_units, Unit.has_anti_fighter_barrage, filter_fighters
+            unit, target_units, lambda u: u.has_anti_fighter_barrage(), filter_fighters
         )
 
     def perform_space_cannon(self, unit: Unit, target_units: list[Unit]) -> int:
@@ -277,4 +441,6 @@ class CombatResolver:
         Returns:
             Number of hits scored
         """
-        return self._perform_ability_attack(unit, target_units, Unit.has_space_cannon)
+        return self._perform_ability_attack(
+            unit, target_units, lambda u: u.has_space_cannon()
+        )
