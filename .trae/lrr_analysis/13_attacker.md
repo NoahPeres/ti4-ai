@@ -52,7 +52,7 @@ Rule 13 defines the fundamental combat role assignment in TI4, establishing that
   - `get_attacker_id()`: Returns active player as attacker in space combat
   - `get_defender_id()`: Returns non-active player as defender in space combat
   - `get_ground_combat_attacker_id()`: Returns active player as attacker in ground combat
-  - `get_ground_combat_defender_id()`: Returns non-active player as defender in ground combat
+  - `get_ground_combat_defender_id(system, planet_name)`: Returns non-active player as defender in ground combat
   - `has_combat()`: Detects combat scenarios in systems
 - `src/ti4/core/system.py`: Added `get_ground_forces_on_planet()` method for ground combat detection
 - `tests/test_rule_13_attacker.py`: Complete test suite with 8 passing tests

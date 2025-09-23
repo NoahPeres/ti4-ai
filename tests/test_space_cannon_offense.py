@@ -7,10 +7,11 @@ in a tactical action, as defined in Rules 58.7 and 77.2-77.5.
 from unittest.mock import Mock, patch
 
 from src.ti4.actions.movement_engine import SpaceCannonOffenseStep, TacticalAction
+from src.ti4.core.constants import UnitType
 from src.ti4.core.galaxy import Galaxy, HexCoordinate
 from src.ti4.core.planet import Planet
 from src.ti4.core.system import System
-from src.ti4.core.unit import Unit, UnitType
+from src.ti4.core.unit import Unit
 
 
 class TestRule58SpaceCannonOffenseStep:

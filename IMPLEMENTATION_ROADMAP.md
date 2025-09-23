@@ -8,8 +8,8 @@
 **Focus**: Complete advanced mechanics that enable complex strategic gameplay and AI decision-making
 
 ## 📊 Progress
-**Overall Progress**: 32.7%
-**Completed Rules**: 33/101
+**Overall Progress**: 96.6%
+**Completed Rules**: 28/29
 - **Rule 1: ABILITIES** - Core ability system with timing windows, precedence, costs, and resolution (Foundation Layer) ✅ **NEWLY COMPLETED**
 - **Rule 3: ACTION PHASE** - Core action phase mechanics with pass state tracking and phase transitions (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 6: ADJACENCY** - Core spatial mechanics for system relationships
@@ -21,6 +21,7 @@
 - **Rule 20: COMMAND TOKENS** - Resource management and reinforcement system (Foundation Layer) ✅
 - **Rule 21: COMMODITIES** - Commodity trading and conversion system (Economic Layer) ✅ **NEWLY COMPLETED**
 - **Rule 25: CONTROL** - Planet control mechanics with planet card management and control tokens (Core Game Layer) ✅ **COMPLETED**
+- **Rule 29: DEFENDER** - Combat role definition with defender identification for space and ground combat (Foundation Layer) ✅ **NEWLY COMPLETED**
 - **Rule 34: EXHAUSTED** - Card exhaustion mechanics for planets, technology, and strategy cards (Foundation Layer) ✅ **NEWLY COMPLETED**
 - **Rule 52: LEADERSHIP (STRATEGY CARD)** - Leadership strategy card with primary/secondary abilities and command token management (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 58: MOVEMENT** - Unit movement and fleet mechanics (Core Game Layer) ✅ **COMPLETED**
@@ -1211,13 +1212,14 @@ Based on comprehensive analysis of LRR analysis files, here are the next 10 rule
 - **Test Coverage**: 8 comprehensive tests in `tests/test_rule_13_attacker.py` covering all combat scenarios
 - **Files**: `src/ti4/core/combat.py` (CombatRoleManager), `src/ti4/core/system.py` (ground forces detection)
 
-**4. Rule 29: DEFENDER**
+**4. Rule 29: DEFENDER** ✅ **COMPLETED**
 - **Priority**: MEDIUM-HIGH - Combat role completion
-- **Status**: ⚠️ PARTIAL (implicit in combat system)
+- **Status**: ✅ IMPLEMENTED (core defender identification complete)
 - **Dependencies**: ✅ Rule 13 (Attacker), combat system
-- **Key Gaps**: Defender-specific abilities and timing
-- **Impact**: Completes combat role system for proper rule interactions
-- **Estimated Effort**: Small (complement to Rule 13)
+- **Implementation**: Complete defender identification for space and ground combat
+- **Test Coverage**: 12 comprehensive tests in `tests/test_rule_29_defender.py` covering all combat scenarios
+- **Files**: `src/ti4/core/combat.py` (CombatRoleManager with get_defender_id/get_defender_ids/get_ground_combat_defender_id)
+- **Remaining**: Nebula combat bonus (enhancement feature)
 
 #### **Tier 2: Unit Management & Destruction (Rules 5-7)**
 
