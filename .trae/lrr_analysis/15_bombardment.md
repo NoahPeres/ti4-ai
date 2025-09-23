@@ -21,7 +21,7 @@ Rule 15 defines the bombardment unit ability, which allows ships to destroy grou
 
 **Implementation Status**: ✅ **COMPLETED**
 **Priority**: High
-**Details**: Complete bombardment roll system implemented with BombardmentRoll class handling planet targeting, dice rolling, and hit calculation.
+**Details**: Complete bombardment roll system implemented. BombardmentRoll handles dice rolling and hit calculation; planet targeting is handled by BombardmentTargeting.
 
 ### 15.1a - Ability Presentation
 **Raw LRR Text**: "A unit's 'Bombardment' ability is presented along with a unit's attributes on faction sheets and unit upgrade technology cards."
@@ -117,7 +117,6 @@ Rule 15 defines the bombardment unit ability, which allows ships to destroy grou
 - `test_rule_15_bombardment.py`: Comprehensive bombardment mechanics tests
 - `test_unit.py`: Bombardment ability detection tests (lines 89-103, 146-149, 180-183)
 - `test_unit.py`: Planetary shield ability tests (lines 118-129)
-- **Missing**: Planetary shield prevention tests
 
 ## Implementation Files
 - `src/ti4/core/bombardment.py`: Complete bombardment system implementation

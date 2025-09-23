@@ -104,9 +104,9 @@ class BombardmentRoll:
 
         total_dice = self.get_total_dice_count()
         return [
-            random.randint(1, GameConstants.DEFAULT_COMBAT_DICE_SIDES)
+            random.randint(1, GameConstants.DEFAULT_COMBAT_DICE_SIDES)  # nosec B311
             for _ in range(total_dice)
-        ]  # nosec B311
+        ]
 
     def is_affected_by_combat_modifier(self, modifier: Any) -> bool:
         """Check if bombardment is affected by combat modifiers.
