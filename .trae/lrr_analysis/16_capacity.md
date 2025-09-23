@@ -31,11 +31,32 @@
 **Details**: Fleet capacity validation prevents invalid fleet compositions
 **Test Coverage**: ✅ Tests for capacity validation and excess unit detection
 
+## Implementation Status Summary
+**Overall Rule Status**: 🟡 PARTIALLY IMPLEMENTED (6/7 sub-rules complete)
+**Completion Percentage**: 86%
+
+### Completed Sub-Rules:
+- ✅ 16.0 - Core Definition
+- ✅ 16.1 - Transport Limits
+- ✅ 16.2 - System Space Area Capacity
+- ✅ 16.3 - Excess Unit Removal (validation)
+- ✅ 16.3a - Player Choice in Removal
+- ✅ 16.3b - Planetary Units Exception
+
+### Remaining Sub-Rules:
+- ❌ 16.3c - Combat Exception (capacity doesn't apply during combat)
+
 ### 16.3a - Player Choice in Removal
 **Raw LRR Text**: "A player can choose which of their excess units to remove."
-**Implementation Status**: ❌ NOT IMPLEMENTED
-**Details**: No mechanism for player to choose which excess units to remove
-**Test Coverage**: ❌ No tests for excess unit removal choice
+**Implementation Status**: ✅ IMPLEMENTED
+**Details**: FleetCapacityEnforcer.remove_excess_units_with_choice() allows player to specify which units to remove
+**Test Coverage**: ✅ Comprehensive tests in test_capacity_excess_removal.py
+**Test Cases Demonstrating Implementation**:
+- `test_player_choice_remove_excess_fighters`: Player chooses which fighters to remove when capacity exceeded
+- `test_player_choice_remove_mixed_excess_units`: Player chooses mix of fighters and ground forces to remove
+- `test_invalid_choice_insufficient_units`: Error handling when player doesn't choose enough units
+- `test_invalid_choice_non_capacity_units`: Error handling when player tries to remove units that don't count against capacity
+- `test_no_removal_when_within_capacity`: No removal occurs when fleet is within capacity limits
 
 ### 16.3b - Planetary Units Exception
 **Raw LRR Text**: "Ground forces on planets do not count against capacity."
