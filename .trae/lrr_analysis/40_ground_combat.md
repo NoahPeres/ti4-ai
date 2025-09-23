@@ -35,9 +35,9 @@ b During the last round of a combat, "end of combat" and "end of combat round" e
 
 ### 42.2 - Assign Hits (WELL IMPLEMENTED)
 - **Implementation Status:** ✅ COMPLETE
-- **Code Location:** `GroundCombatController._assign_hits_to_forces()`, `CombatResolver.resolve_sustain_damage_abilities()`
+- **Code Location:** `GroundCombatController._assign_hits_to_forces()`
 - **Test Coverage:** ✅ Comprehensive (`test_combat.py`, `test_rule_40_ground_combat.py`)
-- **Details:** Hit assignment with sustain damage resolution and proper unit removal implemented
+- **Details:** Hit assignment with hooks for sustain damage resolution and player choice, but integration not yet wired into combat flow
 
 ### 42.3 - Combat Rounds (WELL IMPLEMENTED)
 - **Implementation Status:** ✅ COMPLETE
@@ -47,10 +47,9 @@ b During the last round of a combat, "end of combat" and "end of combat round" e
 
 ### 42.4 - Combat End Conditions (WELL IMPLEMENTED)
 - **Implementation Status:** ✅ COMPLETE
-- **Code Location:** `GroundCombatController.resolve_ground_combat()`, `GroundCombatController._combat_should_continue()`
+- **Code Location:** `GroundCombatController.resolve_combat_round()`, `GroundCombatController.resolve_ground_combat()`, `GroundCombatController._combat_should_continue()`
 - **Test Coverage:** ✅ Comprehensive (`test_rule_40_ground_combat.py`)
-- **Details:** Combat ending conditions properly implemented with winner determination
-- **Details:** No implementation of combat end detection or timing effects
+- **Details:** Combat ending conditions implemented with winner determination. Timing effects not implemented.
 
 ## Related Topics
 - **Rule 49: INVASION** - Ground combat occurs during invasion step
@@ -113,6 +112,7 @@ b During the last round of a combat, "end of combat" and "end of combat round" e
 1. **Timing Effects** - No support for "start/end of combat" effects
 2. **Integration Layer** - No connection between combat mechanics and invasion system
 3. **Multi-faction Combat** - Limited support for complex multi-faction scenarios
+4. **Sustain Damage Choices in Ground Combat** - Player choice for sustaining damage not yet integrated into round flow
 
 ## Action Items
 
@@ -126,7 +126,8 @@ b During the last round of a combat, "end of combat" and "end of combat round" e
 8. **LOW PRIORITY** - Add combat statistics and analytics
 
 ## Priority Assessment
-**PRIORITY: MEDIUM**
+
+### PRIORITY: MEDIUM
 
 Ground combat is a core game mechanic that occurs frequently during invasions. The fundamental combat mechanics (dice rolling, hit calculation, sustain damage) are well implemented, and the system now includes complete round management and combat orchestration through the `GroundCombatController`. The main remaining work involves integrating ground combat with the invasion system and adding support for combat timing effects. While important, these are integration tasks rather than core functionality gaps.
 

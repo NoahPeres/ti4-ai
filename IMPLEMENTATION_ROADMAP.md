@@ -24,7 +24,7 @@
 - **Rule 25: CONTROL** - Planet control mechanics with planet card management and control tokens (Core Game Layer) ✅ **COMPLETED**
 - **Rule 29: DEFENDER** - Combat role definition with defender identification for space and ground combat (Foundation Layer) ✅ **NEWLY COMPLETED**
 - **Rule 34: EXHAUSTED** - Card exhaustion mechanics for planets, technology, and strategy cards (Foundation Layer) ✅ **NEWLY COMPLETED**
-- **Rule 40: GROUND COMBAT** - Ground combat resolution with multi-round mechanics, dice rolling, hit assignment, and combat ending conditions (Core Game Layer) ✅ **NEWLY COMPLETED**
+- **Rule 40: GROUND COMBAT** - Ground combat resolution with multi-round mechanics, dice rolling, hit assignment, and combat ending conditions. Core mechanics completed; sustain damage player choice integration pending (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 52: LEADERSHIP (STRATEGY CARD)** - Leadership strategy card with primary/secondary abilities and command token management (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 58: MOVEMENT** - Unit movement and fleet mechanics (Core Game Layer) ✅ **COMPLETED**
 - **Rule 60: NEIGHBORS** - Player neighbor determination for transactions ✅

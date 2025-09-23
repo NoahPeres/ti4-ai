@@ -83,12 +83,10 @@ class TestRule40GroundCombat:
         assert len(result.round_results) == result.rounds_fought
 
         # Verify final state - one side should be eliminated
-        final_attackers = controller._get_ground_forces(
-            system, "Test Planet", "attacker"
-        )
-        final_defenders = controller._get_ground_forces(
-            system, "Test Planet", "defender"
-        )
+        final_attackers = system.get_ground_forces_on_planet("Test Planet")
+        final_attackers = [unit for unit in final_attackers if unit.owner == "attacker"]
+        final_defenders = system.get_ground_forces_on_planet("Test Planet")
+        final_defenders = [unit for unit in final_defenders if unit.owner == "defender"]
 
         # At least one side should be eliminated
         assert len(final_attackers) == 0 or len(final_defenders) == 0

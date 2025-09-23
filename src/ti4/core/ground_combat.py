@@ -43,11 +43,8 @@ class GroundCombatController:
         self, system: System, planet_name: str, player_id: str
     ) -> list[Unit]:
         """Get all ground forces for a specific player on a planet."""
-        planet = system.get_planet_by_name(planet_name)
-        if not planet:
-            return []
-
-        return [unit for unit in planet.units if unit.owner == player_id]
+        ground_units = system.get_ground_forces_on_planet(planet_name)
+        return [u for u in ground_units if u.owner == player_id]
 
     def _roll_dice_for_forces(self, units: list[Unit]) -> int:
         """Roll dice for all ground forces and return total hits."""
@@ -58,22 +55,53 @@ class GroundCombatController:
         return total_hits
 
     def _assign_hits_to_forces(
-        self, units: list[Unit], hits: int, system: System, planet_name: str
+        self,
+        units: list[Unit],
+        hits: int,
+        system: System,
+        planet_name: str,
+        sustain_choices: dict[str, bool] | None = None,
+        hit_assignments: list[str] | None = None,
     ) -> list[Unit]:
         """Assign hits to ground forces and return destroyed units."""
         if hits <= 0 or not units:
             return []
 
-        destroyed_units = []
-        remaining_hits = hits
+        # First, resolve sustain damage if choices provided
+        remaining_hits = (
+            self.combat_resolver.resolve_sustain_damage_abilities(
+                units, hits, sustain_choices
+            )
+            if sustain_choices is not None
+            else hits
+        )
 
-        # Simple assignment: destroy units one by one until hits are exhausted
+        # If player provided explicit assignments, honor them
+        if hit_assignments is not None and remaining_hits > 0:
+            player_destroyed_units: list[Unit] = (
+                self.combat_resolver.assign_hits_by_player_choice(
+                    units, hit_assignments[:remaining_hits]
+                )
+            )
+            for unit in player_destroyed_units:
+                system.remove_unit_from_planet(unit, planet_name)
+            return player_destroyed_units
+
+        # Fallback: simple assignment in list order
+        destroyed_units: list[Unit] = []
         for unit in units[:remaining_hits]:
             destroyed_units.append(unit)
-            # Remove the unit from the planet using the system API
             system.remove_unit_from_planet(unit, planet_name)
-
         return destroyed_units
+
+    def _combat_should_continue(
+        self, system: System, planet_name: str, attacker_id: str, defender_id: str
+    ) -> bool:
+        """Check if combat should continue based on remaining forces."""
+        return (
+            len(self._get_ground_forces(system, planet_name, attacker_id)) > 0
+            and len(self._get_ground_forces(system, planet_name, defender_id)) > 0
+        )
 
     def resolve_combat_round(
         self, system: System, planet_name: str, attacker_id: str, defender_id: str
@@ -106,9 +134,9 @@ class GroundCombatController:
         )
 
         # Check if combat continues (both sides must have units remaining)
-        remaining_attackers = self._get_ground_forces(system, planet_name, attacker_id)
-        remaining_defenders = self._get_ground_forces(system, planet_name, defender_id)
-        combat_continues = len(remaining_attackers) > 0 and len(remaining_defenders) > 0
+        combat_continues = self._combat_should_continue(
+            system, planet_name, attacker_id, defender_id
+        )
 
         return CombatRoundResult(
             attacker_hits=attacker_hits,
