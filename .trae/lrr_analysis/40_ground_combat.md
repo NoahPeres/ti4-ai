@@ -30,14 +30,14 @@ b During the last round of a combat, "end of combat" and "end of combat round" e
 ### 42.1 - Roll Dice (WELL IMPLEMENTED)
 - **Implementation Status:** ✅ COMPLETE
 - **Code Location:** `CombatResolver.roll_dice_for_unit()`, `CombatResolver.calculate_hits()`
-- **Test Coverage:** ✅ Comprehensive (`test_combat.py`, `test_rule_40_ground_combat.py`)
+- **Test Coverage:** ✅ Comprehensive (`test_rule_40_ground_combat.py`)
 - **Details:** Dice rolling mechanics fully implemented with proper hit calculation based on combat values
 
 ### 42.2 - Assign Hits (WELL IMPLEMENTED)
 - **Implementation Status:** ✅ COMPLETE
 - **Code Location:** `GroundCombatController._assign_hits_to_forces()`
-- **Test Coverage:** ✅ Comprehensive (`test_combat.py`, `test_rule_40_ground_combat.py`)
-- **Details:** Hit assignment with hooks for sustain damage resolution and player choice, but integration not yet wired into combat flow
+- **Test Coverage:** ✅ Comprehensive (`test_rule_40_ground_combat.py`)
+- **Details:** Hit assignment with hooks for sustain damage resolution and player choice. Player input for sustain and hit assignments is not yet passed into the controller API.
 
 ### 42.3 - Combat Rounds (WELL IMPLEMENTED)
 - **Implementation Status:** ✅ COMPLETE
@@ -68,15 +68,11 @@ b During the last round of a combat, "end of combat" and "end of combat round" e
 ## Test References
 
 ### Existing Tests ✅
-- `test_combat.py::test_roll_dice_for_unit()` - Basic dice rolling
-- `test_combat.py::test_calculate_hits()` - Hit calculation from dice
-- `test_combat.py::test_resolve_sustain_damage_abilities()` - Sustain damage resolution
-- `test_combat.py::test_apply_combat_modifiers()` - Combat modifiers
-- `test_unit.py::test_sustain_damage_*()` - Sustain damage mechanics
 - `test_rule_40_ground_combat.py::test_ground_combat_basic_resolution()` - Complete ground combat scenarios
 - `test_rule_40_ground_combat.py::test_ground_combat_with_sustain_damage()` - Sustain damage in ground combat
 - `test_rule_40_ground_combat.py::test_ground_combat_multiple_rounds()` - Multi-round combat scenarios
 - `test_rule_40_ground_combat.py::test_ground_combat_end_conditions()` - Combat end condition detection
+- `test_unit.py::test_sustain_damage_*()` - Sustain damage mechanics
 
 ### Missing Tests ❌
 - Ground combat integration with invasion system

@@ -48,11 +48,7 @@ class GroundCombatController:
 
     def _roll_dice_for_forces(self, units: list[Unit]) -> int:
         """Roll dice for all ground forces and return total hits."""
-        total_hits = 0
-        for unit in units:
-            hits = self.combat_resolver.roll_dice_for_unit(unit)
-            total_hits += hits
-        return total_hits
+        return sum(self.combat_resolver.roll_dice_for_unit(unit) for unit in units)
 
     def _assign_hits_to_forces(
         self,
@@ -78,14 +74,33 @@ class GroundCombatController:
 
         # If player provided explicit assignments, honor them
         if hit_assignments is not None and remaining_hits > 0:
-            player_destroyed_units: list[Unit] = (
-                self.combat_resolver.assign_hits_by_player_choice(
-                    units, hit_assignments[:remaining_hits]
-                )
+            # De-duplicate while preserving order and cap to feasible count
+            max_needed = min(remaining_hits, len(units))
+            unique_assignments = []
+            seen: set[str] = set()
+            for uid in hit_assignments:
+                if uid not in seen:
+                    seen.add(uid)
+                    unique_assignments.append(uid)
+                if len(unique_assignments) >= max_needed:
+                    break
+
+            chosen: list[Unit] = self.combat_resolver.assign_hits_by_player_choice(
+                units, unique_assignments
             )
-            for unit in player_destroyed_units:
+            # If not enough choices provided or invalid IDs present, fill the rest
+            if len(chosen) < max_needed:
+                remaining = max_needed - len(chosen)
+                # Sort fallback units for deterministic assignment
+                fallback = sorted(
+                    [u for u in units if u not in chosen],
+                    key=lambda unit: (unit.unit_type, unit.unit_id),
+                )[:remaining]
+                chosen.extend(fallback)
+
+            for unit in chosen:
                 system.remove_unit_from_planet(unit, planet_name)
-            return player_destroyed_units
+            return chosen
 
         # Fallback: simple assignment in list order
         destroyed_units: list[Unit] = []
