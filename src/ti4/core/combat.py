@@ -37,7 +37,6 @@ class CombatRoleManager:
 
         # Rule 13: During combat, the active player is the attacker
         active_id = self.game_controller.get_current_player().id
-        from .constants import GameConstants
 
         if not any(
             u.owner == active_id and u.unit_type in GameConstants.SHIP_TYPES
@@ -48,8 +47,6 @@ class CombatRoleManager:
 
     def get_defender_id(self, system: System) -> str:
         """Get the defender player ID (non-active player in two-player combat)."""
-        from .constants import GameConstants
-
         if not self.has_combat(system):
             raise ValueError("No combat in system")
 
@@ -79,8 +76,6 @@ class CombatRoleManager:
         attacker_id = self.get_attacker_id(system)
 
         # Find all other players in combat (preserve encounter order)
-        from .constants import GameConstants
-
         ship_types = GameConstants.SHIP_TYPES
         owners_ordered: list[str] = []
         seen: set[str] = set()
@@ -94,19 +89,15 @@ class CombatRoleManager:
     def get_ground_combat_attacker_id(self, system: System, planet_name: str) -> str:
         """Get the attacker player ID for ground combat (always the active player)."""
         # Check if ground combat should occur
-        owners = set()
-        for unit in system.get_ground_forces_on_planet(planet_name):
-            owners.add(unit.owner)
+        ground_units = system.get_ground_forces_on_planet(planet_name)
+        owners = {u.owner for u in ground_units}
 
         if len(owners) <= 1:
             raise ValueError("No ground combat on planet")
 
         # Rule 13: During combat, the active player is the attacker
         active_id = self.game_controller.get_current_player().id
-        if not any(
-            u.owner == active_id
-            for u in system.get_ground_forces_on_planet(planet_name)
-        ):
+        if not any(u.owner == active_id for u in ground_units):
             raise ValueError(
                 f"Active player {active_id} has no ground forces on {planet_name}"
             )
@@ -117,9 +108,10 @@ class CombatRoleManager:
         attacker_id = self.get_ground_combat_attacker_id(system, planet_name)
 
         # Find the other player(s) in ground combat (preserve encounter order)
+        ground_units = system.get_ground_forces_on_planet(planet_name)
         owners_ordered: list[str] = []
         seen: set[str] = set()
-        for unit in system.get_ground_forces_on_planet(planet_name):
+        for unit in ground_units:
             if unit.owner not in seen:
                 owners_ordered.append(unit.owner)
                 seen.add(unit.owner)
@@ -191,14 +183,20 @@ class CombatInitiator:
         pass
 
     def get_combat_participants(self, system: System) -> dict[str, list[Unit]]:
-        """Get combat participants grouped by owner."""
+        """Get combat participants grouped by owner.
+
+        Only includes ships for space combat, filtering out ground forces
+        that may be in the space area during transport.
+        """
         participants: dict[str, list[Unit]] = {}
 
         for unit in system.space_units:
-            owner = unit.owner
-            if owner not in participants:
-                participants[owner] = []
-            participants[owner].append(unit)
+            # Only include ships in space combat
+            if unit.unit_type in GameConstants.SHIP_TYPES:
+                owner = unit.owner
+                if owner not in participants:
+                    participants[owner] = []
+                participants[owner].append(unit)
 
         return participants
 
@@ -232,9 +230,9 @@ class CombatResolver:
 
         # Roll dice and calculate hits
         dice_results = [
-            random.randint(1, GameConstants.DEFAULT_COMBAT_DICE_SIDES)
+            random.randint(1, GameConstants.DEFAULT_COMBAT_DICE_SIDES)  # nosec B311 - game RNG, not crypto
             for _ in range(actual_dice_count)
-        ]  # nosec B311 - game RNG, not crypto
+        ]
         return self.calculate_hits(dice_results, stats.combat_value)
 
     def roll_dice_for_unit_with_burst_icons(self, unit: Unit) -> int:
@@ -262,7 +260,9 @@ class CombatResolver:
     def calculate_hits(self, dice_results: list[int], combat_value: int) -> int:
         """Calculate hits from dice results given a combat value."""
         if combat_value < 1 or combat_value > GameConstants.DEFAULT_COMBAT_DICE_SIDES:
-            raise ValueError("combat_value must be between 1 and 10")
+            raise ValueError(
+                f"combat_value must be between 1 and {GameConstants.DEFAULT_COMBAT_DICE_SIDES}"
+            )
 
         hits = 0
         for roll in dice_results:
@@ -363,7 +363,9 @@ class CombatResolver:
             Number of hits scored
         """
         # Apply modifier by adjusting the effective combat value
-        effective_combat_value = max(1, min(10, combat_value - modifier))
+        effective_combat_value = max(
+            1, min(GameConstants.DEFAULT_COMBAT_DICE_SIDES, combat_value - modifier)
+        )
         return self.calculate_hits(dice_results, effective_combat_value)
 
     def _perform_ability_attack(
@@ -406,9 +408,9 @@ class CombatResolver:
             return 0
 
         dice_results = [
-            random.randint(1, GameConstants.DEFAULT_COMBAT_DICE_SIDES)
+            random.randint(1, GameConstants.DEFAULT_COMBAT_DICE_SIDES)  # nosec B311 - game RNG, not crypto
             for _ in range(dice_count)
-        ]  # nosec B311 - game RNG, not crypto
+        ]
         return self.calculate_hits(dice_results, stats.combat_value)
 
     def perform_anti_fighter_barrage(self, unit: Unit, target_units: list[Unit]) -> int:
