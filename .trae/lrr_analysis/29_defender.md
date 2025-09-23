@@ -74,29 +74,22 @@ def get_defender_ids(self, system: System) -> list[str]:
 **File**: `tests/test_rule_29_defender.py`
 
 #### Test Cases Implemented:
-1. **Basic Defender Identification**
-   - `test_defender_is_non_active_player_space_combat`
-   - `test_defender_is_non_active_player_ground_combat`
-
-2. **Multi-Player Combat**
-   - `test_multiple_defenders_in_space_combat`
-   - `test_ground_combat_defender_with_multiple_planets`
-
-3. **Edge Cases**
-   - `test_no_combat_raises_error`
-   - `test_single_player_no_defender`
-   - `test_defender_identification_with_mixed_units`
-
-4. **Combat Role Consistency**
-   - `test_attacker_defender_roles_consistent`
-   - `test_ground_combat_roles_consistent`
-
-5. **Integration Tests**
-   - `test_defender_role_in_actual_combat_scenario`
-   - `test_defender_changes_with_active_player`
+Tests include:
+- `test_defender_is_non_active_player_space_combat`
+- `test_defender_is_non_active_player_ground_combat`
+- `test_multiple_defenders_in_space_combat`
+- `test_defender_role_changes_with_active_player`
+- `test_defender_retreat_priority`
+- `test_attacker_cannot_retreat_after_defender_announces`
+- `test_attacker_can_retreat_if_defender_does_not`
+- `test_no_combat_raises_error_for_defender`
+- `test_defender_role_consistency_across_combat_rounds`
+- `test_defender_identification_with_mixed_unit_types`
+- `test_ground_combat_defender_with_multiple_planets`
+- `test_get_defender_id_fails_with_multiple_defenders`
 
 ### Test Results
-- **Status**: All 11 tests passing ✅
+- **Status**: All 12 tests passing ✅
 - **Coverage**: Core defender identification functionality fully tested
 - **Validation**: Confirms Rule 29 implementation is correct
 
@@ -109,15 +102,13 @@ def get_defender_ids(self, system: System) -> list[str]:
 - **Multi-Player**: Multiple defenders handled appropriately
 
 ### 🔄 Pending Implementation
-- **Retreat Priority**: Defender-first retreat announcement
 - **Nebula Bonus**: +1 combat modifier for defenders in nebula systems
 
 ## Integration Points
 
 ### Related Rules
 - **Rule 13 (ATTACKER)**: Complementary rule defining active player as attacker
-- **Rule 67 (RETREAT)**: Defender retreat priority mechanics
-- **Rule 78 (SPACE COMBAT)**: Combat roll order and defender bonuses
+- **Rule 78 (SPACE COMBAT)**: Includes retreat step (e.g., 78.4) and combat sequencing
 - **Rule 59 (NEBULA)**: Defender combat bonus in nebula systems
 
 ### System Dependencies

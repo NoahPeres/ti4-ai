@@ -27,21 +27,7 @@ class TestRule29Defender:
         self.player3 = Player(id="player3", faction=Faction.HACAN)
 
         # Set player1 as active player by default
-        self.game_controller.active_player_id = self.player1.id
         self.game_controller.get_current_player.return_value = self.player1
-
-        # Mock get_player method
-        def mock_get_player(player_id: str) -> Player:
-            if player_id == "player1":
-                return self.player1
-            elif player_id == "player2":
-                return self.player2
-            elif player_id == "player3":
-                return self.player3
-            else:
-                raise ValueError(f"Unknown player: {player_id}")
-
-        self.game_controller.get_player = mock_get_player
 
     def test_defender_is_non_active_player_space_combat(self) -> None:
         """Test Rule 29: Non-active player is defender in space combat."""
