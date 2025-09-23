@@ -4,8 +4,10 @@ This module implements Rule 37: FLEET POOL mechanics according to the TI4 LRR.
 Handles fleet pool token management, ship limits, exclusions, and enforcement.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from .constants import UnitType
 
@@ -71,7 +73,7 @@ class FleetPoolManager:
         pass
 
     def is_fleet_pool_valid(
-        self, system: "System", player: str, fleet_tokens: int
+        self, system: System, player: str, fleet_tokens: int
     ) -> bool:
         """Check if fleet pool limits are respected in a system.
 
@@ -89,7 +91,7 @@ class FleetPoolManager:
         non_fighter_ships = self._count_non_fighter_ships_in_system(system, player)
         return non_fighter_ships <= fleet_tokens
 
-    def _count_non_fighter_ships_in_system(self, system: "System", player: str) -> int:
+    def _count_non_fighter_ships_in_system(self, system: System, player: str) -> int:
         """Count non-fighter ships belonging to a player in a system.
 
         Args:
@@ -112,7 +114,7 @@ class FleetPoolManager:
 
         return count
 
-    def _is_non_fighter_ship(self, unit: "Unit") -> bool:
+    def _is_non_fighter_ship(self, unit: Unit) -> bool:
         """Check if a unit is a non-fighter ship.
 
         Args:
@@ -134,7 +136,7 @@ class FleetPoolManager:
         }
         return unit.unit_type in ship_types
 
-    def _counts_against_capacity(self, unit: "Unit") -> bool:
+    def _counts_against_capacity(self, unit: Unit) -> bool:
         """Check if a unit counts against capacity.
 
         Args:
@@ -152,10 +154,10 @@ class FleetPoolManager:
 
     def is_fleet_pool_valid_with_transport(
         self,
-        system: "System",
+        system: System,
         player: str,
         fleet_tokens: int,
-        transported_units: list["Unit"],
+        transported_units: list[Unit],
     ) -> bool:
         """Check fleet pool validity excluding transported units.
 
@@ -230,8 +232,8 @@ class FleetPoolManager:
         return token.is_ship_silhouette_faceup() and token.is_in_fleet_pool()
 
     def enforce_fleet_pool_limit(
-        self, system: "System", player: str, fleet_tokens: int
-    ) -> list["Unit"]:
+        self, system: System, player: str, fleet_tokens: int
+    ) -> list[Unit]:
         """Enforce fleet pool limits by removing excess ships.
 
         Args:
@@ -266,11 +268,11 @@ class FleetPoolManager:
 
     def enforce_fleet_pool_limit_with_choice(
         self,
-        system: "System",
+        system: System,
         player: str,
         fleet_tokens: int,
-        ships_to_remove: list["Unit"],
-    ) -> list["Unit"]:
+        ships_to_remove: list[Unit],
+    ) -> list[Unit]:
         """Enforce fleet pool limits with player choice of which ships to remove.
 
         Args:
@@ -293,7 +295,7 @@ class FleetPoolManager:
 
     def enforce_fleet_pool_limit_and_return_to_reinforcements(
         self,
-        system: "System",
+        system: System,
         player: str,
         fleet_tokens: int,
         reinforcements: dict[UnitType, int],
@@ -323,7 +325,7 @@ class FleetPoolManager:
         return updated_reinforcements
 
     def can_spend_fleet_pool_token(
-        self, fleet_pool: FleetPool, game_effect: Optional[str]
+        self, fleet_pool: FleetPool, game_effect: str | None
     ) -> bool:
         """Check if a fleet pool token can be spent.
 
@@ -356,7 +358,7 @@ class FleetPoolManager:
         return False
 
     def attempt_spend_fleet_pool_token(
-        self, fleet_pool: FleetPool, game_effect: Optional[str]
+        self, fleet_pool: FleetPool, game_effect: str | None
     ) -> SpendResult:
         """Attempt to spend a fleet pool token.
 
@@ -401,7 +403,7 @@ class FleetPoolManager:
 
     def create_command_sheet_with_fleet_pool(
         self, strategy_tokens: int, tactic_tokens: int, fleet_tokens: int
-    ) -> "CommandSheet":
+    ) -> CommandSheet:
         """Create a command sheet with fleet pool.
 
         Args:
@@ -424,7 +426,7 @@ class FleetPoolManager:
             fleet_pool=fleet_tokens,
         )
 
-    def is_command_sheet_fleet_pool_valid(self, command_sheet: "CommandSheet") -> bool:
+    def is_command_sheet_fleet_pool_valid(self, command_sheet: CommandSheet) -> bool:
         """Validate command sheet fleet pool state.
 
         Args:

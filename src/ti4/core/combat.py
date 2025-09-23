@@ -1,7 +1,9 @@
 """Combat system for Twilight Imperium 4."""
 
+from __future__ import annotations
+
 import random
-from typing import TYPE_CHECKING, Callable, Optional
+from typing import TYPE_CHECKING, Callable
 
 from .constants import GameConstants, UnitType
 from .system import System
@@ -15,7 +17,7 @@ if TYPE_CHECKING:
 class CombatRoleManager:
     """Manages combat roles and participant identification."""
 
-    def __init__(self, game_controller: "GameController") -> None:
+    def __init__(self, game_controller: GameController) -> None:
         self.game_controller = game_controller
 
     def _get_ship_owners(self, system: System) -> set[str]:
@@ -208,7 +210,7 @@ class CombatResolver:
         """Initialize the combat resolver."""
         self.unit_stats_provider = UnitStatsProvider()
 
-    def roll_dice_for_unit(self, unit: Unit, dice_count: Optional[int] = None) -> int:
+    def roll_dice_for_unit(self, unit: Unit, dice_count: int | None = None) -> int:
         """Roll dice for a unit and return number of hits.
 
         Args:
@@ -373,7 +375,7 @@ class CombatResolver:
         unit: Unit,
         target_units: list[Unit],
         ability_check_func: Callable[[Unit], bool],
-        target_filter_func: Optional[Callable[[list[Unit]], list[Unit]]] = None,
+        target_filter_func: Callable[[list[Unit]], list[Unit]] | None = None,
     ) -> int:
         """Generic method for performing ability-based attacks.
 

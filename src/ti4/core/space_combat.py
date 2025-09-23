@@ -5,9 +5,10 @@ After resolving the "Space Cannon Offense" step of a tactical action,
 if two players have ships in the active system, those players must resolve a space combat.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional
 
 from .constants import UnitType
 from .system import System
@@ -35,7 +36,7 @@ class CombatRound:
     defender_id: str
     attacker_units: list[Unit]
     defender_units: list[Unit]
-    system: "System"
+    system: System
     attacker_announced_retreat: bool = False
     defender_announced_retreat: bool = False
     attacker_hits: int = 0
@@ -139,8 +140,8 @@ class SpaceCombatResult:
     defender_id: str
     attacker_units: list[Unit]
     defender_units: list[Unit]
-    winner: Optional[str] = None
-    loser: Optional[str] = None
+    winner: str | None = None
+    loser: str | None = None
     is_draw: bool = False
     rounds_fought: int = 0
     units_destroyed: list[Unit] = field(default_factory=list)
@@ -155,7 +156,7 @@ class SpaceCombat:
         self.defender_id = defender_id
         self.current_round = 0
         self.combat_ended = False
-        self.result: Optional[SpaceCombatResult] = None
+        self.result: SpaceCombatResult | None = None
 
     def start_combat(self) -> CombatRound:
         """Start the first round of combat."""
@@ -212,7 +213,7 @@ class SpaceCombat:
             system=self.system,
         )
 
-    def end_combat(self, winner: Optional[str] = None) -> SpaceCombatResult:
+    def end_combat(self, winner: str | None = None) -> SpaceCombatResult:
         """End combat and return result."""
         self.combat_ended = True
 

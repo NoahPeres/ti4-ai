@@ -349,7 +349,7 @@ After this unit is destroyed, gain 1 commodity or convert 1 of your commodities 
 PDS II,6,,,"PLANETARY SHIELD
 SPACE CANNON 5
 You may use this unit's SPACE CANNON against ships that are adjacent to this unit's system.",,Technology,Base,Any,
-Hel Titan II,6,,,"This unit is treated as both a structure and a ground force. It cannot be transported
+Hel-Titan II,6,,,"This unit is treated as both a structure and a ground force. It cannot be transported
 You may use this unit's SPACE CANNON against ships that are adjacent to this unit's system
 PLANETARY SHIELD
 SPACE CANNON 5
@@ -479,3 +479,112 @@ This ship can move through systems that contain other player's ships.
 SUSTAIN DAMAGE",,Unit,Base,Yssaril Tribes,
 Valefar Assimilator X,,When you would gain another player’s technology using 1 of your faction abilities,,"When you would gain another player's technology using 1 of your faction abilities, you may place the ""X"" assimilator token on a faction technology owned by that player instead.  While that token is on a technology, this card gains that technology's text.  You cannot place an assimilator token on technology that already has an assimilator token.",,Technology,Base,Nekro Virus,
 Valefar Assimilator Y,,When you would gain another player’s technology using 1 of your faction abilities,,"When you would gain another player's technology using 1 of your faction abilities, you may place the “Y"" assimilator token on a faction technology owned by that player instead.  While that token is on a technology, this card gains that technology's text.  You cannot place an assimilator token on technology that already has an assimilator token.",,Technology,Base,Nekro Virus,
+Infantry,12,,,Cost=1(x2) | Combat=8,,Unit,Base,Any,
+Spec Ops,12,,,Cost=1(x2) | Combat=7,,Unit,Base,Federation of Sol,
+Letani Warrior,12,,,"Cost=1(x2) | Combat=8
+PRODUCTION 1",,Unit,Base,Arborec,
+Crimson Legionnaire,12,After this unit is destroyed,,"Cost=1(x2) | Combat=8
+After this unit is destroyed, gain 1 commodity or convert 1 of your commodities to a trade good.",,Unit,Prophecy of Kings,Mahact Gene-Sorcerers,
+Letani Behemoth,4,When you use MITOSIS faction ability,,"Cost=2 | Combat=6
+DEPLOY: When you use MITOSIS faction ability you may replace 1 of your infantry with 1 mech from your reinforcements instead
+SUSTAIN DAMAGE
+PRODUCTION 2
+PLANETARY SHIELD",,Unit,Prophecy of Kings,Arborec,
+Aerie Sentinel,4,,,"Cost=2 | Combat=6
+This unit does not count against capacity if it is being transported or if it is in a space area with 1 or more of your ships that has capacity values.
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Argent Flight,
+Dunlain Reaper,4,At the start of a round of ground combat,,"Cost=2 | Combat=6
+DEPLOY: At the start of a round of ground combat, you may spend 2 resources to replace 1 of your infantry in that combat with 1 mech.
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Barony of Letnev,
+Scavenger Zeta,4,After you gain control of a planet,,"Cost=2 | Combat=6
+DEPLOY: After you gain control of a planet, you may spend 1 trade good to place 1 mech on that planet.
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Clan of Saar,
+Omniopiares,4,,,"Cost=2 | Combat=6
+Other players must spend 1 influence to commit ground forces to the planet that contains this unit.
+SUSTAIN DAMAGE",,Unit,Codex III,Council Keleres,
+Ember Colossus,4,When you use your STAR FORGE faction ability in this system or an adjacent system,,"Cost=2 | Combat=6
+When you use your STAR FORGE faction ability in this system or an adjacent system, you may place 1 infantry from your reinforcements with this unit.
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Embers of Muaat,
+Pride of Kenara,4,,,"Cost=2 | Combat=6
+This planet's card may be traded as part of a transaction; if you do, move all of your units from this planet to another planet you control.
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Emirates of Hacan,
+Watcher,4,,,"Cost=2 | Combat=6
+You may remove this unit from a system that contains or is adjacent to another player's units to cancel an action card played by that player.
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Empyrean,
+ZS Thunderbolt M2,4,After you use your ORBITAL DROP faction ability,,"Cost=2 | Combat=6
+DEPLOY: After you use your ORBITAL DROP faction ability you may spend 3 resources to place 1 mech on that planet.
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Federation of Sol,
+Icarus Drive,4,After any player activates a system,,"Cost=2 | Combat=6
+After any player activates a system, you may remove this unit from the game board to place or move a Creuss wormhole token into this system.
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Ghosts of Creuss,
+Annihilator,4,,,"Cost=2 | Combat=6
+While not participating in ground combat, this unit can use its BOMBARDMENT ability on planets in its system as if it were a ship.
+SUSTAIN DAMAGE
+BOMBARDMENT 8",,Unit,Prophecy of Kings,L1Z1X mindnet,
+Starlancer,4,After a player whose command token is in your fleet pool activates this system,,"Cost=2 | Combat=6
+After a player whose command token is in your fleet pool activates this system, you may spend their token from your fleet pool to end their turn; they gain that token.
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Mahact Gene-Sorcerers,
+Moll Terminus,4,,,"Cost=2 | Combat=6
+Other players' ground forces on this planet cannot use SUSTAIN DAMAGE.
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Mentak Coalition,
+Iconoclast Ω,4,,,"Cost=2 | Combat=6
+Other players cannot use ANTI-FIGHTER BARRAGE against your units in this system.
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Naalu Collective,
+Eidolon,4,At the start of a space combat in this unit’s system,,"Cost=2 | Combat=6(x2)
+If this unit is in the space area of the active system at the start of a space combat, flip this card (to Z-Grav Eidolon).
+SUSTAIN DAMAGE
+(This card begins the game with this side face up)",,Unit,Prophecy of Kings,Naaz-Rokha Alliance,
+Z-Grav Eidolon,4,At the end of a space combat in the active system,,"Cost=2 | Combat=8(x2)
+If this unit is in the space area of the active system, it is also a ship. At the end of a space battle in the active system, flip this card (to Eidolon).
+(This card begins the game with this side face down)
+",,Unit,Prophecy of Kings,Naaz-Rokha Alliance,
+Mordred,4,,,"Cost=2 | Combat=6
+During combat against an opponent who has an ""X"" or ""Y"" token on 1 or more of their technologies, apply +2 to the result of each of this unit's combat rolls.
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Nekro Virus,
+Quantum Manipulator,4,,,"Cost=2 | Combat=6
+While this unit is in a space area during combat, you may use its SUSTAIN DAMAGE ability to cancel a hit that is produced against your ships in this system.
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Nomad,
+Valkyrie Exoskeleton,4,After this unit uses its SUSTAIN DAMAGE ability during Ground Combat,,"Cost=2 | Combat=6
+After this unit uses its SUSTAIN DAMAGE ability during Ground Combat, it produces 1 hit against your opponent's ground forces on this planet.
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Sardakk N’orr,
+Hecatoncheires,4,When you would place a PDS on a planet,,"Cost=2 | Combat=6
+DEPLOY: When you would place a PDS on a planet, you may place 1 mech and 1 infantry on that planet instead.
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Titans of Ul,
+Shield Paling,4,,,"Cost=2 | Combat=6
+Your infantry on this planet are not affected by your FRAGILE faction ability.
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Universities of Jol-Nar,
+Reanimator,4,When your infantry on this planet are destroyed,,"Cost=2 | Combat=6
+When your infantry on this planet are destroyed, place them on your faction sheet; those units are captured.
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Vuil’Raith Cabal,
+Reclaimer,4,After you resolve a tactical action where you gained control of this planet,,"Cost=2 | Combat=6
+After you resolve a tactical action where you gained control of this planet, you may place 1 PDS or 1 Space Dock from your reinforcements on this planet.
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Winnu,
+Indomitus,4,,,"Cost=2 | Combat=6
+You may use this unit's SPACE CANNON against ships that are in adjacent systems.
+SUSTAIN DAMAGE
+SPACE CANNON 8",,Unit,Prophecy of Kings,Xxcha Kingdom,
+Moyin's ashes,4,When you use your INDOCTRINATION faction ability,,"Cost=2 | Combat=6
+DEPLOY: When you use your INDOCTRINATION faction ability, you may spend 1 additional influence to replace your opponent's unit with 1 mech instead of 1 infantry.
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Yin Brotherhood,
+Blackshade Infiltrator,4,After you use your STALL TACTICS faction ability,,"Cost=2 | Combat=6
+DEPLOY: After you use your STALL TACTICS faction ability, you may place 1 mech on a planet you control.
+SUSTAIN DAMAGE",,Unit,Prophecy of Kings,Yssaril Tribes,
+Space Dock,3,,,"This unit's PRODUCTION value is equal to 2 more than the resource value of this planet.
+Up to 3 fighters in this system do not count towards your ships' capacity.
+PRODUCTION X",,Unit,Base,Any,
+Floating Factory,3,,,"This unit is placed in the space area instead of on a planet.
+This unit can move and retreat as if it were a ship.
+If this unit is blockaded, it is destroyed.
+PRODUCTION 5",,Unit,Base,Clan of Saar,
+Dimensional Tear,3,,,"This system is a gravity rift; your ships do not roll for this gravity rift.
+Place a dimensional tear token beneath this unit as a reminder.
+Up to 6 fighters in this system do not count against your ships' capacity.
+PRODUCTION 5",,Unit,Prophecy of Kings,Vuil’Raith Cabal,
+PDS,6,,,"PLANETARY SHIELD
+SPACE CANNON 6",,Unit,Base,Any,
+Hel-Titan,6,,,"Combat=7
+This unit is treated as both a structure and a ground force. It cannot be transported.
+PLANETARY SHIELD
+SPACE CANNON 6
+SUSTAIN DAMAGE
+PRODUCTION 1",,Unit,Prophecy of Kings,Titans of Ul,

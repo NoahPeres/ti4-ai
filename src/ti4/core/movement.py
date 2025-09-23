@@ -1,7 +1,8 @@
 """Movement system for TI4 units."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import Optional
 
 from .constants import GameConstants, LocationType, Technology, UnitType
 from .galaxy import Galaxy
@@ -24,8 +25,8 @@ class MovementOperation:
     player_id: str
     from_location: str = "space"  # "space" or planet name
     to_location: str = "space"  # "space" or planet name
-    player_technologies: Optional[set[Technology]] = None
-    transport_ship: Optional[Unit] = None  # For ground force transport
+    player_technologies: set[Technology] | None = None
+    transport_ship: Unit | None = None  # For ground force transport
 
 
 def _is_space_location(location: str) -> bool:
@@ -37,7 +38,7 @@ class MovementValidator:
     """Validates unit movement actions."""
 
     def __init__(
-        self, galaxy: Galaxy, rule_engine: Optional[MovementRuleEngine] = None
+        self, galaxy: Galaxy, rule_engine: MovementRuleEngine | None = None
     ) -> None:
         """Initialize the movement validator with a galaxy."""
         self._galaxy = galaxy
@@ -285,7 +286,7 @@ class TransportExecutor:
         else:
             to_system.place_unit_on_planet(unit, to_location)
 
-    def can_transport_units(self, carrier: "Unit", units: list["Unit"]) -> bool:
+    def can_transport_units(self, carrier: Unit, units: list[Unit]) -> bool:
         """Check if a carrier can transport the given units."""
 
         # Only infantry and mechs can be transported
@@ -305,7 +306,7 @@ class TransportExecutor:
             used += cost_by_type.get(u.unit_type, 1)
         return used <= carrier.get_capacity()
 
-    def get_transportable_units(self, system: "System", player: str) -> list["Unit"]:
+    def get_transportable_units(self, system: System, player: str) -> list[Unit]:
         """Get all units that can be transported by this player."""
         from .constants import GameConstants
 

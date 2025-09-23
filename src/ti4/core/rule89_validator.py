@@ -1,5 +1,7 @@
 """Rule 89 validator for ground force placement."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -43,7 +45,7 @@ class Rule89Validator:
         """Initialize the tactical action manager."""
         pass
 
-    def _validate_inputs(self, system: "System", player: str) -> None:
+    def _validate_inputs(self, system: System, player: str) -> None:
         """Validate common inputs for tactical action methods.
 
         Args:
@@ -58,7 +60,7 @@ class Rule89Validator:
         if not player or not isinstance(player, str):
             raise ValueError("Player must be a non-empty string")
 
-    def _get_player_units_in_space(self, system: "System", player: str) -> list["Unit"]:
+    def _get_player_units_in_space(self, system: System, player: str) -> list[Unit]:
         """Get all units belonging to a player in the system's space area.
 
         Args:
@@ -70,9 +72,7 @@ class Rule89Validator:
         """
         return [unit for unit in system.space_units if unit.owner == player]
 
-    def _get_player_units_on_planets(
-        self, system: "System", player: str
-    ) -> list["Unit"]:
+    def _get_player_units_on_planets(self, system: System, player: str) -> list[Unit]:
         """Get all units belonging to a player on planets in the system.
 
         Args:
@@ -89,9 +89,7 @@ class Rule89Validator:
                     units.append(unit)
         return units
 
-    def can_activate_system(
-        self, system: "System", player: str, galaxy: "Galaxy"
-    ) -> bool:
+    def can_activate_system(self, system: System, player: str, galaxy: Galaxy) -> bool:
         """Check if a player can activate a system.
 
         Args:
@@ -116,10 +114,10 @@ class Rule89Validator:
 
     def activate_system(
         self,
-        system: "System",
+        system: System,
         player: str,
-        command_sheet: "CommandSheet",
-        galaxy: "Galaxy",
+        command_sheet: CommandSheet,
+        galaxy: Galaxy,
     ) -> ActivationResult:
         """Activate a system by placing a command token.
 
@@ -154,11 +152,11 @@ class Rule89Validator:
 
     def can_move_ship_from_system(
         self,
-        ship: "Unit",
-        source_system: "System",
-        target_system: "System",
+        ship: Unit,
+        source_system: System,
+        target_system: System,
         player: str,
-        galaxy: "Galaxy",
+        galaxy: Galaxy,
     ) -> bool:
         """Check if a ship can move from source to target system.
 
@@ -186,11 +184,11 @@ class Rule89Validator:
 
     def execute_movement_step(
         self,
-        source_system: "System",
-        target_system: "System",
-        ships: list["Unit"],
+        source_system: System,
+        target_system: System,
+        ships: list[Unit],
         player: str,
-        galaxy: "Galaxy",
+        galaxy: Galaxy,
         player_technologies: set[str] | None = None,
     ) -> MovementResult:
         """Execute the movement step of tactical action using the advanced movement system.
@@ -267,7 +265,7 @@ class Rule89Validator:
 
         return MovementResult(success=True)
 
-    def requires_space_combat(self, system: "System") -> bool:
+    def requires_space_combat(self, system: System) -> bool:
         """Check if space combat is required in a system.
 
         Args:
@@ -285,7 +283,7 @@ class Rule89Validator:
 
         return len(players_with_ships) >= 2
 
-    def can_use_bombardment(self, system: "System", player: str) -> bool:
+    def can_use_bombardment(self, system: System, player: str) -> bool:
         """Check if a player can use bombardment abilities.
 
         Args:
@@ -305,7 +303,7 @@ class Rule89Validator:
                     return True
         return False
 
-    def can_commit_ground_forces(self, system: "System", player: str) -> bool:
+    def can_commit_ground_forces(self, system: System, player: str) -> bool:
         """Check if a player can commit ground forces to planets.
 
         Args:
@@ -328,7 +326,7 @@ class Rule89Validator:
             unit.unit_type in GameConstants.GROUND_FORCE_TYPES for unit in player_units
         )
 
-    def can_resolve_production_abilities(self, system: "System", player: str) -> bool:
+    def can_resolve_production_abilities(self, system: System, player: str) -> bool:
         """Check if a player can resolve production abilities in a system.
 
         Args:
@@ -354,7 +352,7 @@ class Rule89Validator:
         space_units = self._get_player_units_in_space(system, player)
         return any(unit.has_production() for unit in space_units)
 
-    def validate_galaxy_integration(self, galaxy: "Galaxy") -> bool:
+    def validate_galaxy_integration(self, galaxy: Galaxy) -> bool:
         """Validate integration with galaxy system.
 
         Args:
@@ -365,7 +363,7 @@ class Rule89Validator:
         """
         return galaxy is not None
 
-    def validate_command_sheet_integration(self, command_sheet: "CommandSheet") -> bool:
+    def validate_command_sheet_integration(self, command_sheet: CommandSheet) -> bool:
         """Validate integration with command sheet system.
 
         Args:
@@ -378,11 +376,11 @@ class Rule89Validator:
 
     def validate_movement_plan(
         self,
-        ships: list["Unit"],
-        source_systems: list["System"],
-        target_system: "System",
+        ships: list[Unit],
+        source_systems: list[System],
+        target_system: System,
         player: str,
-        galaxy: "Galaxy",
+        galaxy: Galaxy,
         player_technologies: set[str] | None = None,
     ) -> tuple[bool, str]:
         """Validate a complete movement plan using the advanced movement system.
@@ -447,11 +445,11 @@ class Rule89Validator:
 
     def create_movement_plan_integration(
         self,
-        ships: list["Unit"],
-        source_systems: list["System"],
-        target_system: "System",
+        ships: list[Unit],
+        source_systems: list[System],
+        target_system: System,
         player: str,
-        galaxy: "Galaxy",
+        galaxy: Galaxy,
         player_technologies: set[str] | None = None,
     ) -> Any:
         """Create a movement plan using the actions system for complex scenarios.

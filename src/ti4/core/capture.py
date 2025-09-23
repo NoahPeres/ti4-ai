@@ -4,6 +4,8 @@ This module implements Rule 17: CAPTURE mechanics according to the TI4 LRR.
 Handles unit capture, faction sheet storage, and return conditions.
 """
 
+from __future__ import annotations
+
 from .constants import UnitType
 from .unit import Unit
 

@@ -1,8 +1,10 @@
 """Core game state management for TI4."""
 
+from __future__ import annotations
+
 import uuid
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
 from .game_phase import GamePhase
 from .player import Player
@@ -36,16 +38,16 @@ class GameState:
 
     game_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     players: list[Player] = field(default_factory=list, hash=False)
-    galaxy: Optional[Galaxy] = None
+    galaxy: Galaxy | None = None
     phase: GamePhase = GamePhase.SETUP
     systems: dict[str, System] = field(default_factory=dict, hash=False)
     # player_resources field removed - incorrect implementation
     # Resources should be tracked on planets per Rules 47 and 75
     player_technologies: dict[str, list[str]] = field(default_factory=dict, hash=False)
     # Player planets (Rule 34)
-    player_planets: dict[str, list["Planet"]] = field(default_factory=dict, hash=False)
+    player_planets: dict[str, list[Planet]] = field(default_factory=dict, hash=False)
     # Player technology cards (Rule 34)
-    player_technology_cards: dict[str, list["TechnologyCard"]] = field(
+    player_technology_cards: dict[str, list[TechnologyCard]] = field(
         default_factory=dict, hash=False
     )
     victory_points: dict[str, int] = field(default_factory=dict, hash=False)
@@ -70,26 +72,26 @@ class GameState:
     # Influence should be tracked on planets per Rules 47 and 75
 
     # Strategy card system (Rule 83)
-    strategy_card_assignments: dict[str, "StrategyCardType"] = field(
+    strategy_card_assignments: dict[str, StrategyCardType] = field(
         default_factory=dict, hash=False
     )  # player_id -> strategy_card
-    exhausted_strategy_cards: set["StrategyCardType"] = field(
+    exhausted_strategy_cards: set[StrategyCardType] = field(
         default_factory=set, hash=False
     )  # Set of exhausted strategy cards
-    strategy_card_coordinator: Optional["StrategyCardCoordinator"] = field(
+    strategy_card_coordinator: StrategyCardCoordinator | None = field(
         default=None, hash=False
     )  # Optional strategy card coordinator
     # Rule 98.2a: Victory points to win (10 for standard, 14 for variant)
     victory_points_to_win: int = VICTORY_POINTS_TO_WIN
 
     # Rule 25: Planet control and card management
-    planet_card_deck: dict[str, "PlanetCard"] = field(default_factory=dict, hash=False)
-    player_planet_cards: dict[str, list["PlanetCard"]] = field(
+    planet_card_deck: dict[str, PlanetCard] = field(default_factory=dict, hash=False)
+    player_planet_cards: dict[str, list[PlanetCard]] = field(
         default_factory=dict, hash=False
     )
     planet_control_tokens: dict[str, set[str]] = field(default_factory=dict, hash=False)
     # Centralized planet control mapping to avoid mutating Planet objects
-    planet_control_mapping: dict[str, Optional[str]] = field(
+    planet_control_mapping: dict[str, str | None] = field(
         default_factory=dict, hash=False
     )
 
@@ -104,7 +106,7 @@ class GameState:
         """Get the victory points for a player."""
         return self.victory_points.get(player_id, 0)
 
-    def award_victory_points(self, player_id: str, points: int) -> "GameState":
+    def award_victory_points(self, player_id: str, points: int) -> GameState:
         """Award victory points to a player, returning a new GameState."""
         # Validate player exists in the game
         if not any(player.id == player_id for player in self.players):
@@ -137,7 +139,7 @@ class GameState:
             for points in self.victory_points.values()
         )
 
-    def get_winner(self) -> Optional[str]:
+    def get_winner(self) -> str | None:
         """Get the player ID of the winner, if any."""
         # Rule 98.7: Initiative order determines winner in case of ties
         winners = []
@@ -254,7 +256,7 @@ class GameState:
         player_objectives = self.completed_objectives.get(player_id, [])
         return objective.id in player_objectives
 
-    def complete_objective(self, player_id: str, objective: Objective) -> "GameState":
+    def complete_objective(self, player_id: str, objective: Objective) -> GameState:
         """Mark an objective as completed for a player, returning a new GameState."""
         new_completed_objectives = {
             pid: objectives.copy()
@@ -269,7 +271,7 @@ class GameState:
 
         return self._create_new_state(completed_objectives=new_completed_objectives)
 
-    def _create_new_state(self, **kwargs: Any) -> "GameState":
+    def _create_new_state(self, **kwargs: Any) -> GameState:
         """Create a new GameState with updated fields."""
         return GameState(
             game_id=self.game_id,
@@ -330,8 +332,8 @@ class GameState:
         return True
 
     def score_objective_during_combat(
-        self, player_id: str, objective: "Objective", combat_id: str
-    ) -> "GameState":
+        self, player_id: str, objective: Objective, combat_id: str
+    ) -> GameState:
         """Score an objective during combat with combat-specific limits."""
         # Rule 61.7: Players can only score one objective during or after each combat
         if (
@@ -358,8 +360,8 @@ class GameState:
         return new_state._create_new_state(combat_scoring=new_combat_scoring)
 
     def execute_status_phase_step_1_score_objectives(
-        self, player_id: str, objectives: list["Objective"]
-    ) -> "GameState":
+        self, player_id: str, objectives: list[Objective]
+    ) -> GameState:
         """Execute status phase step 1: score objectives."""
         # Rule 81.1: Following initiative order, each player may score up to one public and one secret objective
         current_state = self
@@ -371,13 +373,13 @@ class GameState:
 
         return current_state
 
-    def advance_to_next_status_phase(self) -> "GameState":
+    def advance_to_next_status_phase(self) -> GameState:
         """Advance to next status phase, resetting per-phase scoring limits."""
         # Reset status phase scoring limits for new phase
         return self._create_new_state(status_phase_scoring={})
 
     def _validate_status_phase_scoring_limits(
-        self, player_id: str, objective: "Objective"
+        self, player_id: str, objective: Objective
     ) -> None:
         """Validate status phase scoring limits (Rule 61.6)."""
         player_scoring = self.status_phase_scoring.get(
@@ -395,7 +397,7 @@ class GameState:
             )
 
     def _update_status_phase_scoring(
-        self, player_id: str, objective: "Objective", current_phase: GamePhase
+        self, player_id: str, objective: Objective, current_phase: GamePhase
     ) -> dict[str, dict[str, int]]:
         """Update status phase scoring tracking."""
         new_status_phase_scoring = {
@@ -416,8 +418,8 @@ class GameState:
     # Secret Objective System Methods (Rule 61.19-61.20)
 
     def assign_secret_objective(
-        self, player_id: str, objective: "Objective"
-    ) -> "GameState":
+        self, player_id: str, objective: Objective
+    ) -> GameState:
         """Assign a secret objective to a player (Rule 61.19)."""
         # Check if player already has this secret objective
         player_secrets = self.player_secret_objectives.get(player_id, [])
@@ -447,13 +449,13 @@ class GameState:
             player_secret_objectives=new_player_secret_objectives
         )
 
-    def get_player_secret_objectives(self, player_id: str) -> list["Objective"]:
+    def get_player_secret_objectives(self, player_id: str) -> list[Objective]:
         """Get secret objectives owned by a player."""
         return self.player_secret_objectives.get(player_id, [])
 
     def score_objective(
-        self, player_id: str, objective: "Objective", current_phase: GamePhase
-    ) -> "GameState":
+        self, player_id: str, objective: Objective, current_phase: GamePhase
+    ) -> GameState:
         """
         Score an objective for a player with comprehensive validation.
 
@@ -479,7 +481,7 @@ class GameState:
         return self._execute_objective_scoring(player_id, objective, current_phase)
 
     def _validate_objective_scoring(
-        self, player_id: str, objective: "Objective", current_phase: GamePhase
+        self, player_id: str, objective: Objective, current_phase: GamePhase
     ) -> None:
         """Validate all conditions for objective scoring."""
         # Validate player exists in the game
@@ -501,7 +503,7 @@ class GameState:
             self._validate_status_phase_scoring_limits(player_id, objective)
 
     def _validate_secret_objective_ownership(
-        self, player_id: str, objective: "Objective"
+        self, player_id: str, objective: Objective
     ) -> None:
         """Validate that the player owns the secret objective they're trying to score."""
         player_secrets = self.get_player_secret_objectives(player_id)
@@ -511,7 +513,7 @@ class GameState:
             )
 
     def _validate_objective_timing(
-        self, objective: "Objective", current_phase: GamePhase
+        self, objective: Objective, current_phase: GamePhase
     ) -> None:
         """Validate that the objective can be scored in the current phase."""
         if objective.scoring_phase != current_phase:
@@ -520,7 +522,7 @@ class GameState:
             )
 
     def _validate_objective_not_already_scored(
-        self, player_id: str, objective: "Objective"
+        self, player_id: str, objective: Objective
     ) -> None:
         """Validate that the objective hasn't already been scored by this player."""
         if self.is_objective_completed(player_id, objective):
@@ -529,8 +531,8 @@ class GameState:
             )
 
     def _execute_objective_scoring(
-        self, player_id: str, objective: "Objective", current_phase: GamePhase
-    ) -> "GameState":
+        self, player_id: str, objective: Objective, current_phase: GamePhase
+    ) -> GameState:
         """Execute the objective scoring with all state updates."""
         # Update completed objectives tracking
         new_completed_objectives = self._update_completed_objectives(
@@ -558,7 +560,7 @@ class GameState:
         )
 
     def _update_completed_objectives(
-        self, player_id: str, objective: "Objective"
+        self, player_id: str, objective: Objective
     ) -> dict[str, list[str]]:
         """Update the completed objectives tracking."""
         new_completed_objectives = {
@@ -573,7 +575,7 @@ class GameState:
         return new_completed_objectives
 
     def _update_victory_points(
-        self, player_id: str, objective: "Objective"
+        self, player_id: str, objective: Objective
     ) -> dict[str, int]:
         """Update the victory points for the player."""
         new_victory_points = self.victory_points.copy()
@@ -587,8 +589,8 @@ class GameState:
         return new_victory_points
 
     def _update_secret_objectives_after_scoring(
-        self, player_id: str, objective: "Objective"
-    ) -> dict[str, list["Objective"]]:
+        self, player_id: str, objective: Objective
+    ) -> dict[str, list[Objective]]:
         """Remove scored secret objective from player's hand."""
         new_player_secret_objectives = {
             pid: objectives.copy() if isinstance(objectives, list) else objectives
@@ -604,7 +606,7 @@ class GameState:
 
         return new_player_secret_objectives
 
-    def can_player_see_objective(self, player_id: str, objective: "Objective") -> bool:
+    def can_player_see_objective(self, player_id: str, objective: Objective) -> bool:
         """Check if a player can see an objective (public objectives and completed objectives are visible)."""
         if objective.is_public:
             return True
@@ -626,7 +628,7 @@ class GameState:
         """
         return len(self.secret_objective_deck)
 
-    def shuffle_secret_objective_deck(self) -> "GameState":
+    def shuffle_secret_objective_deck(self) -> GameState:
         """Shuffle the secret objective deck.
 
         Returns:
@@ -640,7 +642,7 @@ class GameState:
 
     # Imperial Strategy Card Methods (Rule 45.4)
 
-    def execute_imperial_primary_ability(self, player_id: str) -> "GameState":
+    def execute_imperial_primary_ability(self, player_id: str) -> GameState:
         """Execute Imperial strategy card primary ability - draw a secret objective."""
         if len(self.secret_objective_deck) == 0:
             raise ValueError("Secret objective deck is empty")
@@ -668,7 +670,7 @@ class GameState:
     # According to Rules 47 and 75, influence and resources are planet stats, not player stats
     # Players spend influence/resources by exhausting planet cards, not from player pools
 
-    def add_player(self, player: "Player") -> "GameState":
+    def add_player(self, player: Player) -> GameState:
         """Add a player to the game."""
         new_players = self.players.copy()
         new_players.append(player)
@@ -707,7 +709,7 @@ class GameState:
             # player_influence parameter removed - incorrect implementation
         )
 
-    def eliminate_player(self, player_id: str) -> "GameState":
+    def eliminate_player(self, player_id: str) -> GameState:
         """Eliminate a player from the game, removing their secret objectives."""
         new_player_secret_objectives = {
             pid: objectives
@@ -722,8 +724,8 @@ class GameState:
     # Strategy Card Management Methods (Rule 83)
 
     def assign_strategy_card(
-        self, player_id: str, strategy_card: "StrategyCardType"
-    ) -> "GameState":
+        self, player_id: str, strategy_card: StrategyCardType
+    ) -> GameState:
         """Assign a strategy card to a player.
 
         Args:
@@ -761,7 +763,7 @@ class GameState:
 
         return self._create_new_state(strategy_card_assignments=new_assignments)
 
-    def exhaust_strategy_card(self, strategy_card: "StrategyCardType") -> "GameState":
+    def exhaust_strategy_card(self, strategy_card: StrategyCardType) -> GameState:
         """Exhaust a strategy card (mark as used).
 
         Args:
@@ -785,8 +787,8 @@ class GameState:
 
     # Rule 25: Planet control mechanics
     def gain_planet_control(
-        self, player_id: str, planet: "Planet"
-    ) -> tuple[bool, "GameState"]:
+        self, player_id: str, planet: Planet
+    ) -> tuple[bool, GameState]:
         """Handle gaining control of a planet according to Rule 25.
 
         Args:
@@ -904,7 +906,7 @@ class GameState:
 
         return was_uncontrolled, new_state
 
-    def lose_planet_control(self, player_id: str, planet: "Planet") -> "GameState":
+    def lose_planet_control(self, player_id: str, planet: Planet) -> GameState:
         """Handle losing control of a planet according to Rule 25.
 
         Args:
@@ -990,7 +992,7 @@ class GameState:
             planet_card_deck=new_planet_card_deck,
         )
 
-    def resolve_planet_control_change(self, planet: "Planet") -> "GameState":
+    def resolve_planet_control_change(self, planet: Planet) -> GameState:
         """Resolve planet control changes based on unit presence (Rule 25.5).
 
         Args:
@@ -1062,7 +1064,7 @@ class GameState:
         """
         return len(self.planet_card_deck)
 
-    def has_control_token_on_planet(self, player_id: str, planet: "Planet") -> bool:
+    def has_control_token_on_planet(self, player_id: str, planet: Planet) -> bool:
         """Check if a player has a control token on a planet.
 
         Args:
@@ -1074,7 +1076,7 @@ class GameState:
         """
         return player_id in self.planet_control_tokens.get(planet.name, set())
 
-    def _get_or_create_planet_card(self, planet: "Planet") -> "PlanetCard":
+    def _get_or_create_planet_card(self, planet: Planet) -> PlanetCard:
         """Get or create a planet card for the given planet.
 
         Args:
@@ -1142,7 +1144,7 @@ class GameState:
 
     def _find_player_planet_card(
         self, player_id: str, planet_name: str
-    ) -> Optional[PlanetCard]:
+    ) -> PlanetCard | None:
         """Find a specific planet card in a player's play area.
 
         Args:
@@ -1158,7 +1160,7 @@ class GameState:
                 return card
         return None
 
-    def add_player_planet(self, player_id: str, planet: "Planet") -> "GameState":
+    def add_player_planet(self, player_id: str, planet: Planet) -> GameState:
         """Add a planet to a player's controlled planets.
 
         Args:
@@ -1190,7 +1192,7 @@ class GameState:
         return self.secret_objective_deck.copy()
 
     # Backward compatibility alias
-    def shuffle_secret_objectives(self) -> "GameState":
+    def shuffle_secret_objectives(self) -> GameState:
         """Shuffle the secret objective deck.
 
         Deprecated: Use shuffle_secret_objective_deck instead.
@@ -1200,7 +1202,7 @@ class GameState:
         """
         return self.shuffle_secret_objective_deck()
 
-    def ready_strategy_card(self, card: "StrategyCardType") -> "GameState":
+    def ready_strategy_card(self, card: StrategyCardType) -> GameState:
         """Ready a strategy card (remove from exhausted set).
 
         Args:
@@ -1213,7 +1215,7 @@ class GameState:
         new_exhausted.discard(card)
         return self._create_new_state(exhausted_strategy_cards=new_exhausted)
 
-    def ready_all_strategy_cards(self) -> "GameState":
+    def ready_all_strategy_cards(self) -> GameState:
         """Ready all strategy cards (clear exhausted set).
 
         Returns:
@@ -1221,7 +1223,7 @@ class GameState:
         """
         return self._create_new_state(exhausted_strategy_cards=set())
 
-    def clear_strategy_card_assignments(self) -> "GameState":
+    def clear_strategy_card_assignments(self) -> GameState:
         """Clear all strategy card assignments.
 
         Returns:
@@ -1230,8 +1232,8 @@ class GameState:
         return self._create_new_state(strategy_card_assignments={})
 
     def synchronize_with_coordinator(
-        self, coordinator: "StrategyCardCoordinator"
-    ) -> "GameState":
+        self, coordinator: StrategyCardCoordinator
+    ) -> GameState:
         """Synchronize game state with strategy card coordinator.
 
         Args:
@@ -1252,7 +1254,7 @@ class GameState:
             exhausted_strategy_cards=coordinator_exhausted,
         )
 
-    def get_player_planets(self, player_id: str) -> list["Planet"]:
+    def get_player_planets(self, player_id: str) -> list[Planet]:
         """Get all planets controlled by a player.
 
         Args:
@@ -1264,8 +1266,8 @@ class GameState:
         return self.player_planets.get(player_id, [])
 
     def add_player_technology(
-        self, player_id: str, technology: "TechnologyCard"
-    ) -> "GameState":
+        self, player_id: str, technology: TechnologyCard
+    ) -> GameState:
         """Add a technology card to a player's technology cards.
 
         Args:
@@ -1290,7 +1292,7 @@ class GameState:
             player_technology_cards=new_player_technology_cards
         )
 
-    def get_player_technology_cards(self, player_id: str) -> list["TechnologyCard"]:
+    def get_player_technology_cards(self, player_id: str) -> list[TechnologyCard]:
         """Get all technology cards owned by a player.
 
         Args:
@@ -1301,7 +1303,7 @@ class GameState:
         """
         return self.player_technology_cards.get(player_id, [])
 
-    def add_secret_objective_to_deck(self, objective: "Objective") -> "GameState":
+    def add_secret_objective_to_deck(self, objective: Objective) -> GameState:
         """Add a secret objective to the deck.
 
         Args:

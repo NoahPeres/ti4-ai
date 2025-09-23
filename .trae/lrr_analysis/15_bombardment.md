@@ -54,9 +54,9 @@ Rule 15 defines the bombardment unit ability, which allows ships to destroy grou
 ### 15.1e - Faction-Specific Rules
 **Raw LRR Text**: "The L1Z1X's 'Harrow' ability does not affect the L1Z1X player's own ground forces."
 
-**Implementation Status**: ⚠️ **PARTIAL** (Basic Framework)
+**Implementation Status**: ✅ **COMPLETED**
 **Priority**: Low
-**Details**: Basic L1Z1X Harrow restriction implemented - prevents L1Z1X from bombarding own ground forces.
+**Details**: Self-bombardment prevention implemented - no faction can bombard their own ground forces, consistent with LRR rule targeting "another player's" ground forces.
 
 ### 15.1f - Planetary Shield Interaction
 **Raw LRR Text**: "Planets that contain a unit with the 'Planetary Shield' ability cannot be bombarded."
@@ -115,11 +115,11 @@ Rule 15 defines the bombardment unit ability, which allows ships to destroy grou
 
 ## Test References
 - `test_rule_15_bombardment.py`: Comprehensive bombardment mechanics tests
-- `test_unit.py`: Bombardment ability detection tests (lines 89-103, 146-149, 180-183)
-- `test_unit.py`: Planetary shield ability tests (lines 118-129)
+- `test_unit.py`: Bombardment ability detection tests
+- `test_unit.py`: Planetary shield ability tests
 
 ## Implementation Files
 - `src/ti4/core/bombardment.py`: Complete bombardment system implementation
-- `src/ti4/core/unit.py`: Bombardment ability detection (lines 62-65)
+- `src/ti4/core/unit.py`: Bombardment ability detection
 - `src/ti4/core/unit_stats.py`: Bombardment value and dice handling
 - `UNIT_ABILITIES_IMPLEMENTATION.md`: Bombardment ability documentation

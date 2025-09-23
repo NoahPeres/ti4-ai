@@ -1,5 +1,7 @@
 """Fleet management for TI4 game framework."""
 
+from __future__ import annotations
+
 from .constants import UnitType
 from .unit import Unit
 

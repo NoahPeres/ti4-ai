@@ -1,6 +1,8 @@
 """Planet structure for TI4 systems."""
 
-from typing import TYPE_CHECKING, Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .unit import Unit
@@ -13,7 +15,7 @@ class Planet:
         self.name = name
         self.resources = resources
         self.influence = influence
-        self.controlled_by: Optional[str] = None
+        self.controlled_by: str | None = None
         self.units: list[Unit] = []
         self._exhausted = False  # Rule 34: Track exhausted state
 
@@ -21,11 +23,11 @@ class Planet:
         """Set the controlling player of this planet."""
         self.controlled_by = player_id
 
-    def place_unit(self, unit: "Unit") -> None:
+    def place_unit(self, unit: Unit) -> None:
         """Place a unit on this planet."""
         self.units.append(unit)
 
-    def remove_unit(self, unit: "Unit") -> None:
+    def remove_unit(self, unit: Unit) -> None:
         """Remove a unit from this planet."""
         self.units.remove(unit)
 
