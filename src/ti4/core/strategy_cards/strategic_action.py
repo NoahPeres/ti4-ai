@@ -38,20 +38,24 @@ class StrategyCard:
     card_type: StrategyCardType
     primary_ability: str
     secondary_ability: str
-    exhausted: bool = False
+    _exhausted: bool = False
 
     @property
     def name(self) -> str:
         """Get the string name of the strategy card."""
         return self.card_type.value
 
+    def is_exhausted(self) -> bool:
+        """Check if this strategy card is exhausted."""
+        return self._exhausted
+
     def exhaust(self) -> None:
         """Mark this strategy card as exhausted."""
-        self.exhausted = True
+        self._exhausted = True
 
     def ready(self) -> None:
         """Mark this strategy card as ready (not exhausted)."""
-        self.exhausted = False
+        self._exhausted = False
 
 
 @dataclass
@@ -177,7 +181,7 @@ class StrategicActionManager:
 
         # Rule 82.1b: Cannot activate exhausted cards
         card = self._player_strategy_cards[player_id][card_name_str]
-        return not card.exhausted
+        return not card.is_exhausted()
 
     def activate_strategy_card(
         self, player_id: str, card_name: Union[str, StrategyCardType]
@@ -280,7 +284,7 @@ class StrategicActionManager:
             player_id in self._player_strategy_cards
             and card_name_str in self._player_strategy_cards[player_id]
         ):
-            return self._player_strategy_cards[player_id][card_name_str].exhausted
+            return self._player_strategy_cards[player_id][card_name_str].is_exhausted()
         return True  # Non-existent cards are considered "exhausted"
 
     def resolve_secondary_ability(
@@ -342,7 +346,7 @@ class StrategicActionManager:
             return False
 
         for card in self._player_strategy_cards[player_id].values():
-            if not card.exhausted:
+            if not card.is_exhausted():
                 return True
 
         return False

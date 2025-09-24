@@ -291,7 +291,10 @@ class Galaxy:
                         break
 
                 # Check planet control
-                if hasattr(planet, "controller") and planet.controller == player_id:
+                if (
+                    hasattr(planet, "controlled_by")
+                    and planet.controlled_by == player_id
+                ):
                     player_systems.add(system_id)
                     break
 
