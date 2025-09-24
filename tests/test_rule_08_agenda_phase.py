@@ -456,6 +456,9 @@ class TestRule08VotingValidation:
         )
         assert result1.success
 
+        # Reset voting system for new test
+        voting_system.reset_votes()
+
         # Player1 tries to vote with player2's planet - should fail
         result2 = voting_system.cast_votes(
             player_id="player1", planets=[player2_planet], outcome="For"
@@ -572,18 +575,31 @@ class TestRule08IntegrationWithGameFlow:
         custodians = CustodiansToken()
         custodians.remove_from_mecatol_rex("player1")  # Enable agenda phase
 
-        # Mock game state with proper agenda deck
-        game_state = Mock()
-        game_state.get_players.return_value = ["speaker", "player2", "player3"]
-        game_state.get_speaker_system.return_value = SpeakerSystem()
+        # Create a simple game state class instead of Mock
+        class SimpleGameState:
+            def get_players(self):
+                return ["speaker", "player2", "player3"]
 
-        # Mock agenda deck with draw_top_card method
-        mock_agenda_deck = Mock()
-        mock_agenda = AgendaCard(
-            name="Test Agenda", agenda_type=AgendaType.LAW, outcomes=["For", "Against"]
-        )
-        mock_agenda_deck.draw_top_card.return_value = mock_agenda
-        game_state.get_agenda_deck.return_value = mock_agenda_deck
+            def get_speaker_system(self):
+                speaker_system = SpeakerSystem()
+                speaker_system.set_speaker("speaker")
+                return speaker_system
+
+            def get_players_planets(self):
+                return {}
+
+            def get_agenda_deck(self):
+                class SimpleAgendaDeck:
+                    def draw_top_card(self):
+                        return AgendaCard(
+                            name="Test Agenda",
+                            agenda_type=AgendaType.LAW,
+                            outcomes=["For", "Against"],
+                        )
+
+                return SimpleAgendaDeck()
+
+        game_state = SimpleGameState()
 
         # Execute complete agenda phase
         result = agenda_phase.execute_complete_phase(game_state, custodians)

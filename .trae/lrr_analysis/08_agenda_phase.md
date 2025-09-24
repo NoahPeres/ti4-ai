@@ -93,7 +93,7 @@ The agenda phase is where players cast votes on agenda cards that can change the
 - **Dependencies**: Requires eligibility validation and vote targeting
 - **Notes**: Self-voting allowed for player elections
 
-### 8.12 Vote Declaration 🟢 LOW
+### 8.12 Vote Declaration 🟡 PENDING
 **Raw LRR Text**: "When casting votes, a player must declare aloud the outcome for which their votes are being cast."
 
 **Implementation Status**: ❌ NOT IMPLEMENTED
@@ -193,10 +193,9 @@ The agenda phase is where players cast votes on agenda cards that can change the
 - **Trade Goods**: Explicitly cannot be used for voting
 
 ## Test References
-- **Phase Transitions**: `test_game_state_machine.py` includes AGENDA phase
-- **Planet Influence**: `test_planet.py` tests influence values
-- **Planet Exhaustion**: `test_planet.py` tests exhaustion mechanics
-- **No Agenda-Specific Tests**: No voting, speaker, or custodians tests found
+- tests/test_rule_08_agenda_phase.py covers activation, sequencing, voting, tie‑breaking, and integration
+- test_planet.py covers influence and exhaustion mechanics
+- test_game_state_machine.py includes phase transitions (if present)
 
 ## Implementation Summary
 
@@ -208,7 +207,7 @@ The agenda phase is where players cast votes on agenda cards that can change the
 - **8.6**: Voting mechanism ✅
 - **8.7**: Single outcome voting restriction ✅
 - **8.8**: For/Against voting ✅
-- **8.9**: Abstention (0-vote casting) ✅
+- **8.14**: Abstention (0-vote casting) ✅
 - **8.18-8.19**: Outcome resolution and tie-breaking ✅
 
 ### Partially Implemented (🟡 PARTIAL)
