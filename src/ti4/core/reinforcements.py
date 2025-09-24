@@ -85,8 +85,11 @@ class ReinforcementPool:
             count: Number of units to remove
 
         Raises:
-            ValueError: If not enough units available
+            ValueError: If not enough units available or count is not positive
         """
+        if count <= 0:
+            raise ValueError(f"Removal count must be positive: {count}")
+
         current_count = self.get_unit_count(unit_type)
 
         if count > current_count:
@@ -106,7 +109,12 @@ class ReinforcementPool:
 
         Returns:
             True if enough units are available
+
+        Raises:
+            ValueError: If count is negative
         """
+        if count < 0:
+            raise ValueError(f"Requested count cannot be negative: {count}")
         return self.get_unit_count(unit_type) >= count
 
     def get_all_unit_counts(self) -> dict[UnitType, int]:

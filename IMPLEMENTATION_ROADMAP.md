@@ -8,8 +8,8 @@
 **Focus**: Complete advanced mechanics that enable complex strategic gameplay and AI decision-making
 
 ## 📊 Progress
-**Overall Progress**: 31.7%
-**Completed Rules**: 32/101
+**Overall Progress**: 32.7%
+**Completed Rules**: 33/101
 - **Rule 1: ABILITIES** - Core ability system with timing windows, precedence, costs, and resolution (Foundation Layer) ✅ **NEWLY COMPLETED**
 - **Rule 3: ACTION PHASE** - Core action phase mechanics with pass state tracking and phase transitions (Core Game Layer) ✅ **NEWLY COMPLETED**
 - **Rule 6: ADJACENCY** - Core spatial mechanics for system relationships ✅
@@ -65,6 +65,7 @@
     - **Implementation Approach**: Full integration with existing BombardmentSystem and GroundCombatController, comprehensive step-by-step process with proper sequencing
 14. ✅ **Rule 31: DESTROYED** - Unit destruction mechanics with reinforcement return and destruction vs removal distinction - **COMPLETE** (0% → 100%, 13/13 tests passing)
     - **Implementation Approach**: Complete destruction system with UnitDestructionManager, reinforcement pool integration, Rule 31.2 compliance (destruction vs removal), hit assignment validation, and comprehensive test coverage
+    - **Key Files**: [`src/ti4/core/destruction.py`](src/ti4/core/destruction.py), [`src/ti4/core/reinforcements.py`](src/ti4/core/reinforcements.py), [`tests/test_rule_31_destroyed.py`](tests/test_rule_31_destroyed.py)
 
 ### 📈 Progress Metrics
 - Foundation Layer: 9 rules completed

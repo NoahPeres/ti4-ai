@@ -150,6 +150,8 @@ class TestRule31DestructionVsRemoval:
         """Test that removed (not destroyed) units do not trigger destruction effects."""
         # Setup
         system = System(system_id="test_system")
+        planet = Planet("test_planet", resources=2, influence=1)
+        system.add_planet(planet)
         infantry = Unit(unit_type=UnitType.INFANTRY, owner="player1")
         system.place_unit_on_planet(infantry, "test_planet")
 
@@ -272,8 +274,8 @@ class TestRule31EdgeCases:
         with pytest.raises(ValueError, match="Unit not found in system"):
             destruction_manager.destroy_unit(unit, system)
 
-    def test_invalid_hit_assignment_too_many_hits(self) -> None:
-        """Test validation of hit assignments with too many hits."""
+    def test_invalid_hit_assignment_duplicate_units(self) -> None:
+        """Test validation of hit assignments with duplicate unit assignments."""
         resolver = CombatResolver()
         units = [Unit(unit_type=UnitType.FIGHTER, owner="player1")]
 

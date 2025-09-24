@@ -133,14 +133,20 @@ class UnitDestructionManager:
         LRR Reference: Rule 31.2 - Removed units don't trigger destruction effects
         """
         # Remove unit from system (same as destruction)
+        unit_found = False
         if unit in system.space_units:
             system.remove_unit_from_space(unit)
+            unit_found = True
         else:
             # Find and remove from planet
             for planet in system.planets:
                 if unit in planet.units:
                     system.remove_unit_from_planet(unit, planet.name)
+                    unit_found = True
                     break
+
+        if not unit_found:
+            raise ValueError(f"Unit not found in system {system.system_id}")
 
         # Return to reinforcements if provided
         if reinforcements is not None:
