@@ -143,8 +143,12 @@ class ErrorRecoveryManager:
                     time.sleep(retry_delay)
                 else:
                     self.logger.error(f"Operation failed after {max_retries} retries")
-            except Exception:
-                # Non-transient errors are not retried
+            except Exception as e:
+                # Non-transient errors are not retried - log with type and context
+                self.logger.error(
+                    f"Non-transient error in operation: {type(e).__name__}: {e}",
+                    exc_info=True,
+                )
                 raise
 
         # If we get here, all retries were exhausted
@@ -178,8 +182,12 @@ class ErrorRecoveryManager:
             result = operation()
             circuit_breaker.record_success()
             return result
-        except Exception:
+        except Exception as e:
             circuit_breaker.record_failure()
+            self.logger.error(
+                f"Circuit breaker operation failed: {operation_id}, error: {type(e).__name__}: {e}",
+                exc_info=True,
+            )
             raise
 
     def execute_with_recovery(
