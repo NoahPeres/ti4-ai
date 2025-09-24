@@ -61,7 +61,9 @@
     - **Implementation Approach**: Complete action card framework with timing validation, component action integration, duplicate prevention, and example card implementations (Direct Hit, Leadership Rider, Upgrade)
 
 **Next Up:**
-13. **Rule [TBD]** - Next highest priority rule to be determined 🎯 **NEXT TARGET**
+13. ✅ **Rule 49: INVASION** - Complete invasion process with all five steps (bombardment, commit ground forces, space cannon defense, ground combat, establish control) - **COMPLETE** (0% → 100%, 12/12 tests passing)
+    - **Implementation Approach**: Full integration with existing BombardmentSystem and GroundCombatController, comprehensive step-by-step process with proper sequencing
+14. **Rule 31: DESTROYED** - Unit destruction mechanics with reinforcement return and destruction vs removal distinction 🎯 **NEXT TARGET**
 
 ### 📈 Progress Metrics
 - Foundation Layer: 9 rules completed
