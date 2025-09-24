@@ -6,11 +6,11 @@ Implements LRR Rule 49: INVASION
 
 from typing import Any
 
-from src.ti4.core.game_state import GameState
-from src.ti4.core.planet import Planet
-from src.ti4.core.player import Player
-from src.ti4.core.system import System
-from src.ti4.core.unit import Unit
+from .game_state import GameState
+from .planet import Planet
+from .player import Player
+from .system import System
+from .unit import Unit
 
 
 class InvasionController:
@@ -35,7 +35,35 @@ class InvasionController:
 
     def execute_invasion(self) -> dict[str, Any]:
         """Execute the complete invasion sequence"""
-        raise NotImplementedError("Invasion execution not implemented")
+        results = {}
+
+        # Step 1: Bombardment
+        step1_result = self.bombardment_step()
+        results["bombardment"] = step1_result
+
+        if step1_result == "production":
+            return results
+
+        # Step 2: Commit Ground Forces
+        step2_result = self.commit_ground_forces_step()
+        results["commit_ground_forces"] = step2_result
+
+        if step2_result == "production":
+            return results
+
+        # Step 3: Space Cannon Defense
+        step3_result = self.space_cannon_defense_step()
+        results["space_cannon_defense"] = step3_result
+
+        # Step 4: Ground Combat
+        step4_result = self.ground_combat_step()
+        results["ground_combat"] = step4_result
+
+        # Step 5: Establish Control
+        step5_result = self.establish_control_step()
+        results["establish_control"] = step5_result
+
+        return results
 
     def bombardment_step(self) -> str:
         """Execute bombardment step (49.1)"""
@@ -52,12 +80,18 @@ class InvasionController:
             # Create bombardment system
             bombardment_system = BombardmentSystem()
 
-            # For each planet being invaded, assign bombardment units
-            planet_targets = {}
-            for planet in self.invaded_planets:
-                if planet and bombardment_system.can_bombard_planet(planet):
-                    # Assign all bombardment units to this planet (simplified targeting)
-                    planet_targets[planet.name] = bombardment_units
+            # Build per-planet targets; assign each unit to at most one planet (round‑robin)
+            targets = [
+                p
+                for p in self.invaded_planets
+                if p and bombardment_system.can_bombard_planet(p)
+            ]
+            planet_targets: dict[str, list[Unit]] = {p.name: [] for p in targets}
+            for idx, unit in enumerate(bombardment_units):
+                if not targets:
+                    break
+                planet = targets[idx % len(targets)]
+                planet_targets[planet.name].append(unit)
 
             # Execute bombardment if there are valid targets
             if planet_targets:
@@ -77,13 +111,13 @@ class InvasionController:
     def commit_ground_forces_step(self) -> str:
         """Execute commit ground forces step (49.2)"""
         # Check if active player has ground forces in space
-        from src.ti4.core.constants import UnitType
+        from .constants import UnitType
 
         ground_forces_in_space = [
             unit
             for unit in self.system.space_units
             if unit.owner == self.active_player.id
-            and unit.unit_type == UnitType.INFANTRY
+            and unit.unit_type in {UnitType.INFANTRY, UnitType.MECH}
         ]
 
         if not ground_forces_in_space:
@@ -113,9 +147,7 @@ class InvasionController:
             space_cannon_units = [
                 unit
                 for unit in planet.units
-                if unit.owner != self.active_player.id
-                and hasattr(unit, "has_space_cannon")
-                and unit.has_space_cannon()
+                if unit.owner != self.active_player.id and unit.has_space_cannon()
             ]
 
             if space_cannon_units:
@@ -126,8 +158,9 @@ class InvasionController:
 
     def ground_combat_step(self) -> str:
         """Execute ground combat step (49.4)"""
-        from src.ti4.core.combat import CombatResolver
-        from src.ti4.core.ground_combat import GroundCombatController
+        from .combat import CombatResolver
+        from .constants import UnitType
+        from .ground_combat import GroundCombatController
 
         # Initialize combat resolver and controller
         combat_resolver = CombatResolver()
@@ -140,14 +173,14 @@ class InvasionController:
                 unit
                 for unit in planet.units
                 if unit.owner != self.active_player.id
-                and unit.unit_type.name in ["INFANTRY", "MECH"]
+                and unit.unit_type in {UnitType.INFANTRY, UnitType.MECH}
             ]
 
             attacking_forces = [
                 unit
                 for unit in planet.units
                 if unit.owner == self.active_player.id
-                and unit.unit_type.name in ["INFANTRY", "MECH"]
+                and unit.unit_type in {UnitType.INFANTRY, UnitType.MECH}
             ]
 
             # Only resolve combat if both sides have ground forces
@@ -169,6 +202,8 @@ class InvasionController:
 
     def establish_control_step(self) -> str:
         """Execute establish control step (49.5)"""
+        from .constants import UnitType
+
         # For each invaded planet, check if active player has ground forces remaining
         for planet in self.invaded_planets:
             # Check if active player has ground forces on this planet
@@ -176,12 +211,12 @@ class InvasionController:
                 unit
                 for unit in planet.units
                 if unit.owner == self.active_player.id
-                and unit.unit_type.name in ["INFANTRY", "MECH"]
+                and unit.unit_type in {UnitType.INFANTRY, UnitType.MECH}
             ]
 
             # If active player has ground forces, they gain control
             if active_player_forces:
-                planet.controlled_by = self.active_player.id
+                planet.set_control(self.active_player.id)
 
         return "production"
 
@@ -192,20 +227,36 @@ class InvasionController:
 
     def _get_bombardment_targets(self, system: System) -> dict[str, list[Unit]]:
         """Get bombardment targets for the system"""
-        targets = {}
+        from .bombardment import BombardmentSystem
+        from .constants import UnitType
+
+        targets: dict[str, list[Unit]] = {}
+        bombardment_system = BombardmentSystem()
+
         for planet in system.planets:
-            if planet.controlled_by != self.active_player.id:
-                # Get bombardment units that can target this planet
-                bombardment_units = []
-                for unit in system.space_units:
-                    if (
-                        unit.owner == self.active_player.id
-                        and hasattr(unit, "bombardment")
-                        and unit.bombardment > 0
-                    ):
-                        bombardment_units.append(unit)
-                if bombardment_units:
-                    targets[planet.name] = bombardment_units
+            if planet.controlled_by == self.active_player.id:
+                continue
+
+            # Only consider planets that can be bombarded and have enemy ground forces
+            if not bombardment_system.can_bombard_planet(planet):
+                continue
+
+            has_enemy_ground = any(
+                u.owner != self.active_player.id
+                and u.unit_type in {UnitType.INFANTRY, UnitType.MECH}
+                for u in planet.units
+            )
+            if not has_enemy_ground:
+                continue
+
+            bombardment_units = [
+                u
+                for u in system.space_units
+                if u.owner == self.active_player.id and u.has_bombardment()
+            ]
+            if bombardment_units:
+                targets[planet.name] = bombardment_units
+
         return targets
 
     def _execute_space_cannon_defense(

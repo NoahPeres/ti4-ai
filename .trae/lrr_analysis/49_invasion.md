@@ -4,7 +4,7 @@
 Invasion is the process of landing ground forces on a planet to gain control of it. The invasion process consists of several steps that must be resolved in order.
 
 ## Raw LRR Text
-```
+```text
 49. INVASION
 During an invasion, players resolve the following steps:
 
@@ -45,7 +45,7 @@ During an invasion, players resolve the following steps:
 - **Priority**: High
 - **Notes**: The defending player may use the "Space Cannon" ability of any of their units on the planet.
 - **Test Cases**:
-  - `test_space_cannon_defense_step_uses_space_cannon` - Tests space cannon defense execution
+  - `test_space_cannon_defense_step_uses_space_cannon_abilities` - Tests space cannon defense execution
   - `test_space_cannon_defense_step_returns_ground_combat` - Tests proper step sequencing
 
 ### 49.4 Ground Combat
@@ -76,7 +76,7 @@ During an invasion, players resolve the following steps:
 - **Main Class**: `InvasionController` in `src/ti4/core/invasion.py`
 - **Integration**: Uses existing `BombardmentSystem` and `GroundCombatController`
 - **Test File**: `tests/test_rule_49_invasion.py`
-- **Test Coverage**: 10 test cases covering all 5 invasion steps
+- **Test Coverage**: 12 test cases covering all 5 invasion steps
 
 ## Notes
 - Rule 49 has 5 sub-rules, all implemented
@@ -96,4 +96,4 @@ During an invasion, players resolve the following steps:
 - [x] Create implementation plan
 - [x] Write tests
 - [x] Implement missing functionality
-- [ ] Write integration tests for complete invasion flow
+- [x] Write integration tests for complete invasion flow

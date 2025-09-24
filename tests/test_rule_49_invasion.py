@@ -13,8 +13,6 @@ LRR Reference: Rule 49 - INVASION
 
 from unittest.mock import Mock, patch
 
-import pytest
-
 from src.ti4.core.constants import UnitType
 from src.ti4.core.galaxy import Galaxy
 from src.ti4.core.game_state import GameState
@@ -264,11 +262,18 @@ class TestRule49EstablishControlStep:
         galaxy.register_system(system)
         game_state = game_state._create_new_state(galaxy=galaxy)
 
-        invasion_controller = InvasionController(game_state, system, player)
+        # Prepare a planet with our ground forces
+        planet = Planet(name="test_planet", resources=2, influence=1)
+        system.add_planet(planet)
+        planet.place_unit(Unit(unit_type=UnitType.INFANTRY, owner=player.id))
 
-        # Execute establish control step - should return "production"
+        invasion_controller = InvasionController(game_state, system, player)
+        invasion_controller.invaded_planets = [planet]
+
+        # Execute establish control step
         result = invasion_controller.establish_control_step()
         assert result == "production"
+        assert planet.controlled_by == player.id
 
     def test_complete_invasion_process_integration(self) -> None:
         """Integration test for complete invasion process with all five steps."""
@@ -313,9 +318,8 @@ class TestRule49EstablishControlStep:
         assert hasattr(invasion_controller, "bombardment_results")
 
         # Step 2: Commit Ground Forces
-        with patch.object(invasion_controller, "_execute_space_cannon_defense"):
-            result2 = invasion_controller.commit_ground_forces_step()
-            assert result2 == "space_cannon_defense"
+        result2 = invasion_controller.commit_ground_forces_step()
+        assert result2 == "space_cannon_defense"
 
         # Step 3: Space Cannon Defense
         result3 = invasion_controller.space_cannon_defense_step()
@@ -391,11 +395,13 @@ class TestRule49InvasionProcess:
 
         invasion_controller = InvasionController(game_state, system, player)
 
-        # Execute invasion - should raise NotImplementedError for now
-        with pytest.raises(
-            NotImplementedError, match="Invasion execution not implemented"
-        ):
-            invasion_controller.execute_invasion()
+        # Execute invasion - should now work and return results
+        results = invasion_controller.execute_invasion()
+
+        # Verify the results structure
+        assert isinstance(results, dict)
+        assert "bombardment" in results
+        assert results["bombardment"] == "commit_ground_forces"
 
     def test_invasion_controller_initialization(self) -> None:
         """Test InvasionController proper initialization."""
