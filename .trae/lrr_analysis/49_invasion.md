@@ -25,7 +25,11 @@ During an invasion, players resolve the following steps:
 - **Implementation Status**: [x] Complete
 - **Test Coverage**: [x] Comprehensive
 - **Priority**: High
-- **Notes**: The active player may use the "Bombardment" ability of any of their units in the active system.
+- **Notes**: The active player may use the "Bombardment" ability of any of their units in the active system. Bombardment targets eligible planets in the system that have enemy ground forces and no planetary shield.
+- **Eligibility Criteria**:
+  - Planet must have enemy ground forces (infantry or mechs)
+  - Planet must not have a planetary shield
+  - Planet must not be controlled by the active player
 - **Test Cases**:
   - `test_bombardment_step_uses_bombardment_abilities` - Tests that bombardment abilities are executed when available
   - `test_bombardment_step_returns_commit_ground_forces` - Tests proper step sequencing

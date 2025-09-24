@@ -41,9 +41,6 @@ class InvasionController:
         step1_result = self.bombardment_step()
         results["bombardment"] = step1_result
 
-        if step1_result == "production":
-            return results
-
         # Step 2: Commit Ground Forces
         step2_result = self.commit_ground_forces_step()
         results["commit_ground_forces"] = step2_result
@@ -68,8 +65,12 @@ class InvasionController:
     def bombardment_step(self) -> str:
         """Execute bombardment step (49.1)"""
         from .bombardment import BombardmentSystem
+        from .constants import UnitType
 
-        # Check if active player has bombardment units
+        # Get bombardment system
+        bombardment_system = BombardmentSystem()
+
+        # Find units with bombardment ability in the active system
         bombardment_units = [
             unit
             for unit in self.system.space_units
@@ -77,15 +78,20 @@ class InvasionController:
         ]
 
         if bombardment_units:
-            # Create bombardment system
-            bombardment_system = BombardmentSystem()
-
-            # Build per-planet targets; assign each unit to at most one planet (round‑robin)
-            targets = [
-                p
-                for p in self.invaded_planets
-                if p and bombardment_system.can_bombard_planet(p)
-            ]
+            # Build eligible planet targets in this system (enemy ground forces, no planetary shield)
+            targets = []
+            for p in self.system.planets:
+                if p.controlled_by == self.active_player.id:
+                    continue
+                if not bombardment_system.can_bombard_planet(p):
+                    continue
+                has_enemy_ground = any(
+                    u.owner != self.active_player.id
+                    and u.unit_type in {UnitType.INFANTRY, UnitType.MECH}
+                    for u in p.units
+                )
+                if has_enemy_ground:
+                    targets.append(p)
             planet_targets: dict[str, list[Unit]] = {p.name: [] for p in targets}
             for idx, unit in enumerate(bombardment_units):
                 if not targets:
@@ -194,7 +200,7 @@ class InvasionController:
                 )
 
                 # Store combat result for later reference
-                if not hasattr(self, "combat_results"):
+                if not self.combat_results:
                     self.combat_results = {}
                 self.combat_results[planet.name] = combat_result
 
@@ -219,45 +225,6 @@ class InvasionController:
                 planet.set_control(self.active_player.id)
 
         return "production"
-
-    def _execute_bombardment(self) -> None:
-        """Execute bombardment abilities"""
-        # Placeholder for bombardment execution
-        pass
-
-    def _get_bombardment_targets(self, system: System) -> dict[str, list[Unit]]:
-        """Get bombardment targets for the system"""
-        from .bombardment import BombardmentSystem
-        from .constants import UnitType
-
-        targets: dict[str, list[Unit]] = {}
-        bombardment_system = BombardmentSystem()
-
-        for planet in system.planets:
-            if planet.controlled_by == self.active_player.id:
-                continue
-
-            # Only consider planets that can be bombarded and have enemy ground forces
-            if not bombardment_system.can_bombard_planet(planet):
-                continue
-
-            has_enemy_ground = any(
-                u.owner != self.active_player.id
-                and u.unit_type in {UnitType.INFANTRY, UnitType.MECH}
-                for u in planet.units
-            )
-            if not has_enemy_ground:
-                continue
-
-            bombardment_units = [
-                u
-                for u in system.space_units
-                if u.owner == self.active_player.id and u.has_bombardment()
-            ]
-            if bombardment_units:
-                targets[planet.name] = bombardment_units
-
-        return targets
 
     def _execute_space_cannon_defense(
         self, planet: Planet, space_cannon_units: list[Unit]
