@@ -212,23 +212,28 @@ class InvasionController:
         self, planet: Planet, space_cannon_units: list[Unit]
     ) -> None:
         """Execute space cannon defense against committed ground forces"""
-        # Get committed ground forces on this planet
+        # Target only committed ground forces (infantry/mechs) of the active player
+        from .combat import CombatResolver
+        from .constants import UnitType
+
         committed_forces = [
-            unit for unit in planet.units if unit.owner == self.active_player.id
+            u
+            for u in planet.units
+            if u.owner == self.active_player.id
+            and u.unit_type in {UnitType.INFANTRY, UnitType.MECH}
         ]
+        if not committed_forces:
+            return
 
-        # For each space cannon unit, roll dice
-        for _space_cannon_unit in space_cannon_units:
-            # Mock dice roll - in real implementation would use dice system
-            from random import randint
+        resolver = CombatResolver()
+        total_hits = 0
+        for sc_unit in space_cannon_units:
+            total_hits += resolver.perform_space_cannon(sc_unit, committed_forces)
 
-            roll = randint(1, 10)
-
-            if roll >= 6:  # Hit on 6+
-                # Destroy a committed ground force if available
-                if committed_forces:
-                    target = committed_forces.pop(0)
-                    planet.remove_unit(target)
+        # Destroy up to total_hits committed ground forces (deterministic order)
+        for _ in range(min(total_hits, len(committed_forces))):
+            target = committed_forces.pop(0)
+            planet.remove_unit(target)
 
     def _choose_space_cannon_order(self) -> list[Planet]:
         """Choose order for space cannon defense resolution"""
