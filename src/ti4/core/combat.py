@@ -349,6 +349,10 @@ class CombatResolver:
             if unit_id not in unit_ids:
                 return False
 
+        # Check for duplicate assignments (each unit can only be destroyed once)
+        if len(set(hit_assignments)) != len(hit_assignments):
+            return False
+
         return True
 
     def calculate_hits_with_modifiers(
