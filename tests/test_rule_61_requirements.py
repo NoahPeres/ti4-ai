@@ -1,5 +1,7 @@
 """Tests for Rule 61: OBJECTIVE CARDS - Requirement validation system (Rules 61.9-61.10)."""
 
+import pytest
+
 from src.ti4.core.constants import Faction
 from src.ti4.core.game_state import GameState
 from src.ti4.core.objective_requirements import (
@@ -13,6 +15,12 @@ from src.ti4.core.objective_requirements import (
     WinCombatRequirement,
 )
 from src.ti4.core.player import Player
+
+
+@pytest.fixture
+def game_state_with_player() -> GameState:
+    """Fixture providing a GameState with a single player for testing."""
+    return GameState().add_player(Player("player1", Faction.SOL))
 
 
 class TestObjectiveRequirements:
@@ -53,12 +61,11 @@ class TestObjectiveRequirements:
 
     def test_destroy_units_requirement_creation(self) -> None:
         """Test that unit destruction requirements can be created."""
-        # Rule 61.9: If an objective requires a player to destroy one or more units
         req = DestroyUnitsRequirement(count=3, unit_type="ship")
 
         assert req.count == 3
         assert req.unit_type == "ship"
-        assert req.get_description() == "Destroy 3 ship"
+        assert req.get_description() == "Destroy 3 ships"
 
     def test_win_combat_requirement_creation(self) -> None:
         """Test that combat victory requirements can be created."""
@@ -88,122 +95,96 @@ class TestObjectiveRequirementValidation:
         validator = ObjectiveRequirementValidator()
         assert validator is not None
 
-    def test_validate_empty_requirements_list(self) -> None:
-        """Test that empty requirements list is always valid."""
-        game_state = GameState().add_player(Player("player1", Faction.SOL))
+    def test_validate_empty_requirements_list(
+        self, game_state_with_player: GameState
+    ) -> None:
+        """Test that empty requirements list is considered valid."""
         validator = ObjectiveRequirementValidator()
 
-        result = validator.validate_requirements(game_state, "player1", [])
+        result = validator.validate_requirements(game_state_with_player, "player1", [])
         assert result is True
 
-    def test_validate_single_unfulfilled_requirement(self) -> None:
-        """Test that unfulfilled requirements return False."""
-        game_state = GameState().add_player(Player("player1", Faction.SOL))
+    def test_validate_single_unfulfilled_requirement(
+        self, game_state_with_player: GameState
+    ) -> None:
+        """Test validation with single unfulfilled requirement."""
         validator = ObjectiveRequirementValidator()
-
-        # Resource spending requirement that cannot be fulfilled yet
         req = SpendResourcesRequirement(amount=8)
 
-        result = validator.validate_requirements(game_state, "player1", [req])
+        result = validator.validate_requirements(
+            game_state_with_player, "player1", [req]
+        )
         assert result is False
 
-    def test_validate_multiple_unfulfilled_requirements(self) -> None:
-        """Test that multiple unfulfilled requirements return False."""
-        game_state = GameState().add_player(Player("player1", Faction.SOL))
+    def test_validate_multiple_unfulfilled_requirements(
+        self, game_state_with_player: GameState
+    ) -> None:
+        """Test validation with multiple unfulfilled requirements."""
         validator = ObjectiveRequirementValidator()
-
         requirements = [
             SpendResourcesRequirement(amount=8),
             SpendInfluenceRequirement(amount=6),
             ControlPlanetsRequirement(count=6),
         ]
 
-        result = validator.validate_requirements(game_state, "player1", requirements)
+        result = validator.validate_requirements(
+            game_state_with_player, "player1", requirements
+        )
         assert result is False
 
-    def test_get_unfulfilled_requirements_empty_list(self) -> None:
+    def test_get_unfulfilled_requirements_empty_list(
+        self, game_state_with_player: GameState
+    ) -> None:
         """Test getting unfulfilled requirements from empty list."""
-        game_state = GameState().add_player(Player("player1", Faction.SOL))
         validator = ObjectiveRequirementValidator()
 
-        unfulfilled = validator.get_unfulfilled_requirements(game_state, "player1", [])
+        unfulfilled = validator.get_unfulfilled_requirements(
+            game_state_with_player, "player1", []
+        )
         assert unfulfilled == []
 
-    def test_get_unfulfilled_requirements_all_unfulfilled(self) -> None:
+    def test_get_unfulfilled_requirements_all_unfulfilled(
+        self, game_state_with_player: GameState
+    ) -> None:
         """Test getting unfulfilled requirements when all are unfulfilled."""
-        game_state = GameState().add_player(Player("player1", Faction.SOL))
         validator = ObjectiveRequirementValidator()
-
         requirements = [
             SpendResourcesRequirement(amount=8),
             SpendInfluenceRequirement(amount=6),
+            ControlPlanetsRequirement(count=6),
         ]
 
         unfulfilled = validator.get_unfulfilled_requirements(
-            game_state, "player1", requirements
+            game_state_with_player, "player1", requirements
         )
-        assert len(unfulfilled) == 2
-        assert unfulfilled == requirements
+        assert len(unfulfilled) == 3
+        assert all(req in unfulfilled for req in requirements)
 
 
 class TestRequirementFulfillmentStubs:
-    """Test that requirement fulfillment methods exist and return appropriate stubs."""
+    """Test that all requirements return False by default (stub implementations)."""
 
-    def test_spend_resources_requirement_not_fulfilled_by_default(self) -> None:
-        """Test that resource spending requirements are not fulfilled by default."""
-        game_state = GameState().add_player(Player("player1", Faction.SOL))
-        req = SpendResourcesRequirement(amount=8)
+    @pytest.mark.parametrize(
+        "requirement_class,kwargs",
+        [
+            (SpendResourcesRequirement, {"amount": 8}),
+            (SpendInfluenceRequirement, {"amount": 6}),
+            (SpendTokensRequirement, {"amount": 3, "token_type": "command"}),
+            (ControlPlanetsRequirement, {"count": 6}),
+            (DestroyUnitsRequirement, {"count": 3, "unit_type": "ship"}),
+            (WinCombatRequirement, {"count": 2}),
+            (TechnologyRequirement, {"count": 4}),
+        ],
+    )
+    def test_requirement_not_fulfilled_by_default(
+        self, game_state_with_player: GameState, requirement_class, kwargs
+    ) -> None:
+        """Test that requirement is not fulfilled by default (stub implementation)."""
+        req = requirement_class(**kwargs)
 
-        # Should return False until resource system is implemented
-        assert req.is_fulfilled_by(game_state, "player1") is False
-
-    def test_spend_influence_requirement_not_fulfilled_by_default(self) -> None:
-        """Test that influence spending requirements are not fulfilled by default."""
-        game_state = GameState().add_player(Player("player1", Faction.SOL))
-        req = SpendInfluenceRequirement(amount=6)
-
-        # Should return False until influence system is implemented
-        assert req.is_fulfilled_by(game_state, "player1") is False
-
-    def test_spend_tokens_requirement_not_fulfilled_by_default(self) -> None:
-        """Test that token spending requirements are not fulfilled by default."""
-        game_state = GameState().add_player(Player("player1", Faction.SOL))
-        req = SpendTokensRequirement(amount=3, token_type="command")
-
-        # Should return False until token system is implemented
-        assert req.is_fulfilled_by(game_state, "player1") is False
-
-    def test_control_planets_requirement_not_fulfilled_by_default(self) -> None:
-        """Test that planet control requirements are not fulfilled by default."""
-        game_state = GameState().add_player(Player("player1", Faction.SOL))
-        req = ControlPlanetsRequirement(count=6)
-
-        # Should return False until planet control system is implemented
-        assert req.is_fulfilled_by(game_state, "player1") is False
-
-    def test_destroy_units_requirement_not_fulfilled_by_default(self) -> None:
-        """Test that unit destruction requirements are not fulfilled by default."""
-        game_state = GameState().add_player(Player("player1", Faction.SOL))
-        req = DestroyUnitsRequirement(count=3, unit_type="ship")
-
-        # Should return False until unit destruction tracking is implemented
-        assert req.is_fulfilled_by(game_state, "player1") is False
-
-    def test_win_combat_requirement_not_fulfilled_by_default(self) -> None:
-        """Test that combat victory requirements are not fulfilled by default."""
-        game_state = GameState().add_player(Player("player1", Faction.SOL))
-        req = WinCombatRequirement(count=2, combat_type="space")
-
-        # Should return False until combat tracking is implemented
-        assert req.is_fulfilled_by(game_state, "player1") is False
-
-    def test_technology_requirement_not_fulfilled_by_default(self) -> None:
-        """Test that technology requirements are not fulfilled by default."""
-        game_state = GameState().add_player(Player("player1", Faction.SOL))
-        req = TechnologyRequirement(count=4, tech_type="unit_upgrade")
-
-        # Should return False until technology system is implemented
-        assert req.is_fulfilled_by(game_state, "player1") is False
+        # All requirements should return False until integrated with game systems
+        result = req.is_fulfilled_by(game_state_with_player, "player1")
+        assert result is False
 
 
 class TestRequirementDescriptions:
@@ -236,7 +217,7 @@ class TestRequirementDescriptions:
         req_ships = DestroyUnitsRequirement(count=3, unit_type="ship")
 
         assert req_any.get_description() == "Destroy 2 units"
-        assert req_ships.get_description() == "Destroy 3 ship"
+        assert req_ships.get_description() == "Destroy 3 ships"
 
     def test_win_combat_description_variations(self) -> None:
         """Test combat victory requirement descriptions."""

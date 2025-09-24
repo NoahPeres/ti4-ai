@@ -29,6 +29,11 @@ class SpendResourcesRequirement(ObjectiveRequirement):
 
     amount: int
 
+    def __post_init__(self) -> None:
+        """Validate requirement parameters."""
+        if self.amount <= 0:
+            raise ValueError("Resource amount must be positive")
+
     def is_fulfilled_by(self, game_state: "GameState", player_id: str) -> bool:
         """Check if player can spend the required resources."""
         # For now, return False - we need resource tracking system
@@ -45,6 +50,11 @@ class SpendInfluenceRequirement(ObjectiveRequirement):
     """Requirement to spend a certain amount of influence (Rule 61.10)."""
 
     amount: int
+
+    def __post_init__(self) -> None:
+        """Validate requirement parameters."""
+        if self.amount <= 0:
+            raise ValueError("Influence amount must be positive")
 
     def is_fulfilled_by(self, game_state: "GameState", player_id: str) -> bool:
         """Check if player can spend the required influence."""
@@ -64,6 +74,11 @@ class SpendTokensRequirement(ObjectiveRequirement):
     amount: int
     token_type: str  # "command", "strategy", etc.
 
+    def __post_init__(self) -> None:
+        """Validate requirement parameters."""
+        if self.amount <= 0:
+            raise ValueError("Token amount must be positive")
+
     def is_fulfilled_by(self, game_state: "GameState", player_id: str) -> bool:
         """Check if player can spend the required tokens."""
         # For now, return False - we need token tracking system
@@ -82,6 +97,13 @@ class ControlPlanetsRequirement(ObjectiveRequirement):
     count: int
     planet_type: str = "any"  # "any", "cultural", "industrial", "hazardous", "home"
     exclude_home: bool = False
+
+    def __post_init__(self) -> None:
+        """Validate requirement parameters."""
+        if self.count <= 0:
+            raise ValueError("Planet count must be positive")
+        if self.planet_type == "home" and self.exclude_home:
+            raise ValueError("Cannot require home planets while excluding home system")
 
     def is_fulfilled_by(self, game_state: "GameState", player_id: str) -> bool:
         """Check if player controls the required planets."""
@@ -104,6 +126,11 @@ class DestroyUnitsRequirement(ObjectiveRequirement):
     count: int
     unit_type: str = "any"  # "any", "ship", "ground_force", "fighter", etc.
 
+    def __post_init__(self) -> None:
+        """Validate requirement parameters."""
+        if self.count <= 0:
+            raise ValueError("Unit count must be positive")
+
     def is_fulfilled_by(self, game_state: "GameState", player_id: str) -> bool:
         """Check if player has destroyed the required units."""
         # For now, return False - we need unit destruction tracking system
@@ -112,7 +139,18 @@ class DestroyUnitsRequirement(ObjectiveRequirement):
 
     def get_description(self) -> str:
         """Get description of unit destruction requirement."""
-        unit_desc = self.unit_type if self.unit_type != "any" else "units"
+        if self.unit_type == "any":
+            unit_desc = "unit" if self.count == 1 else "units"
+        else:
+            # Handle pluralization for specific unit types
+            if self.count == 1:
+                unit_desc = self.unit_type
+            else:
+                # Simple pluralization - add 's' for most cases
+                if self.unit_type.endswith("s"):
+                    unit_desc = self.unit_type  # Already plural (e.g., "ground_forces")
+                else:
+                    unit_desc = f"{self.unit_type}s"
         return f"Destroy {self.count} {unit_desc}"
 
 
@@ -123,6 +161,11 @@ class WinCombatRequirement(ObjectiveRequirement):
     count: int
     combat_type: str = "any"  # "any", "space", "ground"
     location_type: str = "any"  # "any", "home_system", "anomaly", etc.
+
+    def __post_init__(self) -> None:
+        """Validate requirement parameters."""
+        if self.count <= 0:
+            raise ValueError("Combat count must be positive")
 
     def is_fulfilled_by(self, game_state: "GameState", player_id: str) -> bool:
         """Check if player has won the required combats."""
@@ -149,6 +192,11 @@ class TechnologyRequirement(ObjectiveRequirement):
     tech_type: str = (
         "any"  # "any", "unit_upgrade", "biotic", "cybernetic", "propulsion", "warfare"
     )
+
+    def __post_init__(self) -> None:
+        """Validate requirement parameters."""
+        if self.count <= 0:
+            raise ValueError("Technology count must be positive")
 
     def is_fulfilled_by(self, game_state: "GameState", player_id: str) -> bool:
         """Check if player has the required technologies."""
@@ -186,13 +234,10 @@ class ObjectiveRequirementValidator:
         Returns:
             True if all requirements are met, False otherwise
         """
-        if not requirements:
-            return True
-
-        for requirement in requirements:
-            if not requirement.is_fulfilled_by(game_state, player_id):
-                return False
-        return True
+        return all(
+            requirement.is_fulfilled_by(game_state, player_id)
+            for requirement in requirements
+        )
 
     def get_unfulfilled_requirements(
         self,
@@ -211,8 +256,8 @@ class ObjectiveRequirementValidator:
         Returns:
             List of unfulfilled requirements
         """
-        unfulfilled = []
-        for requirement in requirements:
-            if not requirement.is_fulfilled_by(game_state, player_id):
-                unfulfilled.append(requirement)
-        return unfulfilled
+        return [
+            requirement
+            for requirement in requirements
+            if not requirement.is_fulfilled_by(game_state, player_id)
+        ]

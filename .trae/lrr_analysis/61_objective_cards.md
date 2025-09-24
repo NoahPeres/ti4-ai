@@ -219,12 +219,12 @@ RELATED TOPICS: Action Phase, Agenda Phase, Control, Status Phase, Victory Point
   - Test cases: `test_rule_61_objectives.py::test_combat_objectives_scoring_restrictions`
 - **Rule 61.8**: One-time scoring enforcement - Players can only score each objective once
   - Test cases: `test_rule_61_scoring_limits.py::test_objective_can_only_be_scored_once`
-- **Rule 61.9-61.10**: Objective requirements validation system - Framework for validating resource spending, unit destruction, etc.
+- **Rule 61.9-61.10**: Objective requirements framework (stubs) — descriptions and validator present; fulfillment integration pending (resources, influence, tokens, control, combat, tech).
   - Test cases: `test_rule_61_requirements.py` (25 comprehensive tests)
   - Implementation: `ObjectiveRequirement` abstract base class and concrete requirement types
   - Implementation: `ObjectiveRequirementValidator` for requirement validation
 - **Rule 61.17-61.21**: Secret objectives - Complete secret objective system
-  - Test cases: `test_rule_61_secret_objectives.py` (13 comprehensive tests)
+  - Test cases: `test_rule_61_secret_objectives.py` (16 comprehensive tests)
   - Implementation: Secret objective ownership, privacy, drawing mechanics, and Imperial strategy card integration
 
 ### Partially Implemented (🔄)
