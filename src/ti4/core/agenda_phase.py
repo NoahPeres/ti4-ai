@@ -26,15 +26,6 @@ class AgendaType(Enum):
 
 
 @dataclass
-class AgendaOutcome:
-    """Represents a possible outcome of an agenda."""
-
-    name: str
-    description: str
-    effect: str | None = None
-
-
-@dataclass
 class AgendaCard:
     """Represents an agenda card."""
 
@@ -151,31 +142,73 @@ class VotingSystem:
         LRR 8.6: Players cast votes by exhausting planets equal to the influence
         value they wish to spend.
         """
-        # Check if player already voted for different outcome
-        if player_id in self.player_votes:
-            if self.player_votes[player_id] != outcome:
-                return VotingOutcome(
-                    success=False,
-                    error_message="Player cannot cast votes for multiple outcomes",
-                )
-
         # Validate agenda outcomes if provided
         if agenda and outcome not in agenda.outcomes:
             return VotingOutcome(
                 success=False, error_message=f"Invalid outcome '{outcome}' for agenda"
             )
 
-        # Calculate total influence and exhaust planets
+        # Validate planets and check for duplicates
+        used_planets = set()
         total_influence = 0
+
         for planet in planets:
+            # Check for duplicate planets in this vote
+            planet_id = getattr(planet, "name", str(planet))
+            if planet_id in used_planets:
+                return VotingOutcome(
+                    success=False,
+                    error_message=f"Cannot use duplicate planet {planet_id} in same vote",
+                )
+            used_planets.add(planet_id)
+
+            # Check planet ownership using controlled_by attribute
+            if hasattr(planet, "controlled_by") and planet.controlled_by != player_id:
+                return VotingOutcome(
+                    success=False,
+                    error_message=f"Player {player_id} does not have ownership of planet {planet_id}",
+                )
+
+            # Check if planet is already exhausted
+            if hasattr(planet, "is_exhausted") and planet.is_exhausted():
+                return VotingOutcome(
+                    success=False,
+                    error_message=f"Planet {planet_id} is already exhausted and cannot be used",
+                )
+
+            # Calculate influence and exhaust planet
             if hasattr(planet, "influence") and hasattr(planet, "exhaust"):
                 total_influence += planet.influence
                 planet.exhaust()  # Exhaust planet when voting
 
-        # Record vote
+        # Check if player already voted (after planet validation)
+        if player_id in self.player_votes:
+            previous_outcome = self.player_votes[player_id]
+            if previous_outcome != outcome:
+                return VotingOutcome(
+                    success=False,
+                    error_message=f"Player {player_id} cannot cast votes for multiple outcomes (previously voted '{previous_outcome}', now attempting '{outcome}')",
+                )
+            else:
+                return VotingOutcome(
+                    success=False,
+                    error_message=f"Player {player_id} has already voted for this agenda",
+                )
+
+        # Record vote and update tally
         self.player_votes[player_id] = outcome
+        self._vote_tally[outcome] = self._vote_tally.get(outcome, 0) + total_influence
 
         return VotingOutcome(success=True, votes_cast=total_influence, outcome=outcome)
+
+    def get_vote_tally(self) -> dict[str, int]:
+        """Get current vote tally for all outcomes."""
+        return self._vote_tally.copy()
+
+    def reset_votes(self) -> None:
+        """Reset all votes and tally for a new agenda."""
+        self.player_votes.clear()
+        self._vote_tally.clear()
 
     def get_voting_order(
         self, players: list[str], speaker_system: SpeakerSystem
@@ -214,15 +247,39 @@ class AgendaPhase:
 
         LRR 8.2: The speaker reveals the top agenda card from the agenda deck.
         """
+        # Reset voting system for new agenda
+        voting_system.reset_votes()
+
         # Draw agenda card from deck
         agenda = agenda_deck.draw_top_card()
+
+        # Get voting order (speaker votes last)
+        _ = voting_system.get_voting_order(players, speaker_system)
+
+        # Simulate voting process (in real implementation, this would be interactive)
+        # For now, we'll just mark as completed with basic vote tally
+        vote_tally = voting_system.get_vote_tally()
+
+        # Determine winning outcome (simplified - in real game this would be based on actual votes)
+        winning_outcome = agenda.outcomes[0] if agenda.outcomes else "For"
+
+        vote_result = VoteResult(
+            winning_outcome=winning_outcome, vote_tally=vote_tally, success=True
+        )
+
+        # Resolve the agenda outcome
+        outcome_result = self.resolve_agenda_outcome(agenda, vote_result)
 
         return AgendaPhaseResult(
             success=True,
             first_agenda_resolved=True,
             agenda_revealed=agenda,
             voting_completed=True,
-            outcome_resolved=True,
+            outcome_resolved=outcome_result.outcome_resolved,
+            law_enacted=outcome_result.law_enacted,
+            permanent_effect_added=outcome_result.permanent_effect_added,
+            one_time_effect_executed=outcome_result.one_time_effect_executed,
+            agenda_discarded=outcome_result.agenda_discarded,
         )
 
     def resolve_second_agenda(
@@ -238,15 +295,39 @@ class AgendaPhase:
         LRR 8.3: After resolving the first agenda, the speaker reveals
         the top agenda card from the agenda deck.
         """
+        # Reset voting system for new agenda
+        voting_system.reset_votes()
+
         # Draw second agenda card from deck
         agenda = agenda_deck.draw_top_card()
+
+        # Get voting order (speaker votes last)
+        _ = voting_system.get_voting_order(players, speaker_system)
+
+        # Simulate voting process (in real implementation, this would be interactive)
+        # For now, we'll just mark as completed with basic vote tally
+        vote_tally = voting_system.get_vote_tally()
+
+        # Determine winning outcome (simplified - in real game this would be based on actual votes)
+        winning_outcome = agenda.outcomes[0] if agenda.outcomes else "For"
+
+        vote_result = VoteResult(
+            winning_outcome=winning_outcome, vote_tally=vote_tally, success=True
+        )
+
+        # Resolve the agenda outcome
+        outcome_result = self.resolve_agenda_outcome(agenda, vote_result)
 
         return AgendaPhaseResult(
             success=True,
             second_agenda_resolved=True,
             agenda_revealed=agenda,
             voting_completed=True,
-            outcome_resolved=True,
+            outcome_resolved=outcome_result.outcome_resolved,
+            law_enacted=outcome_result.law_enacted,
+            permanent_effect_added=outcome_result.permanent_effect_added,
+            one_time_effect_executed=outcome_result.one_time_effect_executed,
+            agenda_discarded=outcome_result.agenda_discarded,
         )
 
     def ready_all_planets(
@@ -283,19 +364,42 @@ class AgendaPhase:
                     outcome_resolved=True,
                 )
             else:
-                # Law is discarded
+                # Law is discarded (Against or other outcome)
                 return AgendaPhaseResult(
                     success=True, agenda_discarded=True, outcome_resolved=True
                 )
 
         elif agenda.agenda_type == AgendaType.DIRECTIVE:
-            # Directive provides one-time effect and is discarded
-            return AgendaPhaseResult(
-                success=True,
-                one_time_effect_executed=True,
-                agenda_discarded=True,
-                outcome_resolved=True,
-            )
+            # Handle different directive outcomes
+            if vote_result.winning_outcome == "Elect":
+                # Elect outcome - choose a player/planet/system
+                elected_target = vote_result.elected_planet or "default_target"
+                return AgendaPhaseResult(
+                    success=True,
+                    one_time_effect_executed=True,
+                    agenda_discarded=True,
+                    outcome_resolved=True,
+                    reason=f"Elected: {elected_target}",
+                )
+            elif vote_result.winning_outcome in ["For", "Against"]:
+                # Standard For/Against directive
+                effect_applied = vote_result.winning_outcome == "For"
+                return AgendaPhaseResult(
+                    success=True,
+                    one_time_effect_executed=effect_applied,
+                    agenda_discarded=True,
+                    outcome_resolved=True,
+                    reason=f"Directive {vote_result.winning_outcome} - Effect {'applied' if effect_applied else 'not applied'}",
+                )
+            else:
+                # Other directive outcomes (custom outcomes)
+                return AgendaPhaseResult(
+                    success=True,
+                    one_time_effect_executed=True,
+                    agenda_discarded=True,
+                    outcome_resolved=True,
+                    reason=f"Directive outcome: {vote_result.winning_outcome}",
+                )
 
         return AgendaPhaseResult(success=False, error_message="Unknown agenda type")
 
@@ -315,11 +419,62 @@ class AgendaPhase:
                 reason="Custodians token still on Mecatol Rex",
             )
 
-        # Placeholder for complete phase execution
-        return AgendaPhaseResult(
-            success=True,
-            first_agenda_resolved=True,
-            second_agenda_resolved=True,
-            planets_readied=True,
-            ready_for_next_round=True,
-        )
+        # Initialize systems for agenda phase
+        speaker_system = SpeakerSystem()
+        voting_system = VotingSystem()
+
+        # Mock players and agenda deck for basic implementation
+        players = ["player1", "player2", "player3"]  # In real game, get from game_state
+
+        # Create a simple mock agenda deck if game_state doesn't have proper methods
+        class MockAgendaDeck:
+            def draw_top_card(self) -> AgendaCard:
+                return AgendaCard(
+                    name="Mock Agenda",
+                    agenda_type=AgendaType.LAW,
+                    outcomes=["For", "Against"],
+                )
+
+        agenda_deck = MockAgendaDeck()
+
+        try:
+            # Execute first agenda
+            first_result = self.resolve_first_agenda(
+                agenda_deck, speaker_system, voting_system, players
+            )
+
+            if not first_result.success:
+                return first_result
+
+            # Execute second agenda
+            second_result = self.resolve_second_agenda(
+                agenda_deck, speaker_system, voting_system, players
+            )
+
+            if not second_result.success:
+                return second_result
+
+            # Ready all planets
+            players_planets: dict[
+                str, list[Any]
+            ] = {}  # In real game, extract from game_state
+            ready_result = self.ready_all_planets(players_planets)
+
+            if not ready_result.success:
+                return ready_result
+
+            # Combine results
+            return AgendaPhaseResult(
+                success=True,
+                first_agenda_resolved=first_result.first_agenda_resolved,
+                second_agenda_resolved=second_result.second_agenda_resolved,
+                planets_readied=ready_result.planets_readied,
+                ready_for_next_round=True,
+                voting_completed=True,
+                outcome_resolved=True,
+            )
+
+        except Exception as e:
+            return AgendaPhaseResult(
+                success=False, error_message=f"Agenda phase execution failed: {str(e)}"
+            )

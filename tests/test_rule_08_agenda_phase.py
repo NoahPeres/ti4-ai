@@ -204,6 +204,10 @@ class TestRule08VotingMechanics:
             Planet("Abyz", resources=3, influence=3),
         ]
 
+        # Set planet control to player1
+        for planet in player_planets:
+            planet.set_control("player1")
+
         # Player chooses to exhaust Mecatol Rex and Jord for "For" outcome
         planets_to_exhaust = [
             player_planets[0],
@@ -239,6 +243,10 @@ class TestRule08VotingMechanics:
             Planet("Jord", resources=4, influence=4),
         ]
 
+        # Set planet control to player1
+        for planet in player_planets:
+            planet.set_control("player1")
+
         # First vote for "For"
         result1 = voting_system.cast_votes(
             player_id="player1", planets=[player_planets[0]], outcome="For"
@@ -273,6 +281,9 @@ class TestRule08VotingMechanics:
         )
 
         player_planets = [Planet("Mecatol Rex", resources=1, influence=6)]
+
+        # Set planet control to player1
+        player_planets[0].set_control("player1")
 
         # Valid vote for "For"
         result = voting_system.cast_votes(
@@ -386,6 +397,162 @@ class TestRule08LawVsDirectiveResolution:
         assert resolution_result.agenda_discarded
 
 
+class TestRule08VotingValidation:
+    """Test enhanced voting validation and double-casting prevention."""
+
+    def test_prevent_double_casting_same_agenda(self):
+        """
+        Test that players cannot cast votes multiple times for the same agenda.
+
+        Enhanced validation should prevent players from voting again after
+        they have already cast their votes for an agenda.
+        """
+        # Setup
+        voting_system = VotingSystem()
+
+        player_planets = [
+            Planet("Mecatol Rex", resources=1, influence=6),
+            Planet("Jord", resources=4, influence=4),
+        ]
+
+        # Set planet control for player1
+        for planet in player_planets:
+            planet.set_control("player1")
+
+        # First vote - should succeed
+        result1 = voting_system.cast_votes(
+            player_id="player1", planets=[player_planets[0]], outcome="For"
+        )
+        assert result1.success
+        assert result1.votes_cast == 6  # Mecatol Rex influence
+
+        # Second vote attempt - should fail
+        result2 = voting_system.cast_votes(
+            player_id="player1", planets=[player_planets[1]], outcome="Against"
+        )
+        assert not result2.success
+        assert "multiple outcomes" in result2.error_message.lower()
+
+    def test_planet_ownership_validation(self):
+        """
+        Test that players can only vote with planets they control.
+
+        Enhanced validation should prevent players from using planets
+        controlled by other players.
+        """
+        # Setup
+        voting_system = VotingSystem()
+
+        player1_planet = Planet("Mecatol Rex", resources=1, influence=6)
+        player2_planet = Planet("Jord", resources=4, influence=4)
+
+        # Set planet control
+        player1_planet.set_control("player1")
+        player2_planet.set_control("player2")
+
+        # Player1 tries to vote with their own planet - should succeed
+        result1 = voting_system.cast_votes(
+            player_id="player1", planets=[player1_planet], outcome="For"
+        )
+        assert result1.success
+
+        # Player1 tries to vote with player2's planet - should fail
+        result2 = voting_system.cast_votes(
+            player_id="player1", planets=[player2_planet], outcome="For"
+        )
+        assert not result2.success
+        assert "ownership" in result2.error_message
+
+    def test_exhausted_planet_validation(self):
+        """
+        Test that exhausted planets cannot be used for voting.
+
+        Enhanced validation should prevent players from using already
+        exhausted planets for voting.
+        """
+        # Setup
+        voting_system = VotingSystem()
+
+        planet = Planet("Mecatol Rex", resources=1, influence=6)
+        planet.set_control("player1")
+
+        # Exhaust the planet first
+        planet.exhaust()
+
+        # Try to vote with exhausted planet - should fail
+        result = voting_system.cast_votes(
+            player_id="player1", planets=[planet], outcome="For"
+        )
+        assert not result.success
+        assert "exhausted" in result.error_message
+
+    def test_duplicate_planet_validation(self):
+        """
+        Test that the same planet cannot be used multiple times in one vote.
+
+        Enhanced validation should prevent players from using the same
+        planet multiple times within a single voting action.
+        """
+        # Setup
+        voting_system = VotingSystem()
+
+        planet = Planet("Mecatol Rex", resources=1, influence=6)
+        planet.set_control("player1")
+
+        # Try to vote with same planet twice in one call - should fail
+        result = voting_system.cast_votes(
+            player_id="player1",
+            planets=[planet, planet],  # Same planet twice
+            outcome="For",
+        )
+        assert not result.success
+        assert "duplicate" in result.error_message
+
+    def test_vote_tally_tracking(self):
+        """
+        Test that vote tallies are correctly tracked and calculated.
+
+        Enhanced voting system should accurately track votes for each
+        outcome and provide correct tallies.
+        """
+        # Setup
+        voting_system = VotingSystem()
+
+        # Create planets for different players
+        player1_planets = [
+            Planet("Mecatol Rex", resources=1, influence=6),
+            Planet("Jord", resources=4, influence=4),
+        ]
+        player2_planets = [
+            Planet("Winnu", resources=3, influence=4),
+        ]
+
+        # Set planet control
+        for planet in player1_planets:
+            planet.set_control("player1")
+        for planet in player2_planets:
+            planet.set_control("player2")
+
+        # Player 1 votes "For" with 10 influence total
+        result1 = voting_system.cast_votes(
+            player_id="player1", planets=player1_planets, outcome="For"
+        )
+        assert result1.success
+        assert result1.votes_cast == 10
+
+        # Player 2 votes "Against" with 4 influence
+        result2 = voting_system.cast_votes(
+            player_id="player2", planets=player2_planets, outcome="Against"
+        )
+        assert result2.success
+        assert result2.votes_cast == 4
+
+        # Check vote tally
+        tally = voting_system.get_vote_tally()
+        assert tally["For"] == 10
+        assert tally["Against"] == 4
+
+
 class TestRule08IntegrationWithGameFlow:
     """Test agenda phase integration with overall game flow."""
 
@@ -405,14 +572,21 @@ class TestRule08IntegrationWithGameFlow:
         custodians = CustodiansToken()
         custodians.remove_from_mecatol_rex("player1")  # Enable agenda phase
 
-        # Mock game state
+        # Mock game state with proper agenda deck
         game_state = Mock()
         game_state.get_players.return_value = ["speaker", "player2", "player3"]
         game_state.get_speaker_system.return_value = SpeakerSystem()
-        game_state.get_agenda_deck.return_value = Mock()
+
+        # Mock agenda deck with draw_top_card method
+        mock_agenda_deck = Mock()
+        mock_agenda = AgendaCard(
+            name="Test Agenda", agenda_type=AgendaType.LAW, outcomes=["For", "Against"]
+        )
+        mock_agenda_deck.draw_top_card.return_value = mock_agenda
+        game_state.get_agenda_deck.return_value = mock_agenda_deck
 
         # Execute complete agenda phase
-        result = agenda_phase.execute_complete_phase(game_state)
+        result = agenda_phase.execute_complete_phase(game_state, custodians)
 
         # Verify full execution
         assert result.success

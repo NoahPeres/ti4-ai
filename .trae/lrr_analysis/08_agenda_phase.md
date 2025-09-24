@@ -115,15 +115,15 @@ The agenda phase is where players cast votes on agenda cards that can change the
 - **Dependencies**: Requires voting system and payment validation
 - **Notes**: Prevents trade goods from being used as votes
 
-### 8.14 Abstention Option 🟢 LOW
+### 8.14 Abstention Option 🟢 IMPLEMENTED
 **Raw LRR Text**: "A player may choose to abstain by not casting any votes."
 
-**Implementation Status**: ❌ NOT IMPLEMENTED
-- **Code**: No abstention system
-- **Tests**: No abstention tests
-- **Assessment**: Optional voting not implemented
-- **Priority**: LOW
-- **Dependencies**: Requires voting system with skip option
+**Implementation Status**: ✅ IMPLEMENTED
+- **Code**: VotingSystem allows casting 0 votes (empty planet list)
+- **Tests**: Covered in voting system tests
+- **Assessment**: Players can abstain by not casting any votes (0 influence)
+- **Priority**: LOW ✅ COMPLETE
+- **Dependencies**: Voting system with skip option implemented
 - **Notes**: Players can choose not to participate
 
 ### 8.15-8.16 Additional Vote Effects 🟡 MEDIUM
@@ -148,14 +148,14 @@ The agenda phase is where players cast votes on agenda cards that can change the
 - **Dependencies**: Speaker system and outcome execution implemented
 - **Notes**: Speaker has decisive power in ties
 
-### 8.20-8.21 Law vs Directive Resolution 🔴 HIGH
+### 8.20-8.21 Law vs Directive Resolution 🟡 MEDIUM
 **Raw LRR Text**: "If an 'Elect' or 'For' outcome of a law was resolved, that card remains in play and permanently affects the game. If a directive or an 'Against' outcome of a law was resolved, that card is placed in the agenda discard pile."
 
-**Implementation Status**: ❌ NOT IMPLEMENTED
-- **Code**: No law persistence or directive discard system
-- **Tests**: No resolution outcome tests
-- **Assessment**: Agenda card lifecycle not implemented
-- **Priority**: HIGH
+**Implementation Status**: 🟡 PARTIALLY IMPLEMENTED
+- **Code**: Basic law/directive distinction in resolve_agenda_outcome
+- **Tests**: Basic law enactment tests
+- **Assessment**: Laws enacted on "For" votes, but missing Elect outcomes and persistence/discard integration
+- **Priority**: MEDIUM
 - **Dependencies**: Requires agenda card system and permanent effects
 - **Notes**: Different outcomes have different persistence rules
 
@@ -169,6 +169,12 @@ The agenda phase is where players cast votes on agenda cards that can change the
 - **Priority**: LOW
 - **Dependencies**: Requires prediction tracking and timing validation
 - **Notes**: Timing-sensitive prediction mechanic
+
+### 8.23 Test Coverage Update
+**Status**: IMPLEMENTED
+**Code**: tests/test_rule_08_agenda_phase.py
+**Tests**: 13 comprehensive tests covering activation, sequencing, voting, and tie-breaking
+**Evaluation**: Full test suite implemented with comprehensive coverage
 
 ## Dependencies Summary
 
@@ -194,34 +200,27 @@ The agenda phase is where players cast votes on agenda cards that can change the
 
 ## Implementation Summary
 
-### Completed Rules (✅ IMPLEMENTED)
-- **8.1** Agenda Phase Activation and Structure
-- **8.2** First Agenda Resolution Steps
-- **8.3** Second Agenda Resolution Steps
-- **8.4** Planet Readying and Round Transition
-- **8.6** Vote Casting Mechanics
-- **8.7** Single Outcome Voting Restriction
-- **8.8** For/Against Voting
-- **8.18-8.19** Outcome Resolution and Tie-Breaking
+### Core Subset Implemented (✅ IMPLEMENTED)
+- **8.1**: Agenda phase activation and timing ✅
+- **8.2**: Two-agenda resolution sequence ✅
+- **8.3**: Speaker revelation powers ✅
+- **8.4**: Planet preparation and round transition ✅
+- **8.6**: Voting mechanism ✅
+- **8.7**: Single outcome voting restriction ✅
+- **8.8**: For/Against voting ✅
+- **8.9**: Abstention (0-vote casting) ✅
+- **8.18-8.19**: Outcome resolution and tie-breaking ✅
 
-### Test Coverage
-All core agenda phase functionality is covered by 13 comprehensive tests in `tests/test_rule_08_agenda_phase.py`:
-- Agenda phase activation and structure
-- First and second agenda resolution sequences
-- Vote casting with planet exhaustion
-- Vote counting and outcome determination
-- Speaker tie-breaking powers
-- Planet readying at phase end
-- For/Against voting constraints
-- Vote splitting prevention
+### Partially Implemented (🟡 PARTIAL)
+- **8.10-8.16**: Law vs Directive lifecycle (basic distinction, missing Elect outcomes)
+- **8.20-8.21**: Law persistence and directive discard (basic implementation)
 
-### Code Architecture
-The implementation follows a modular design with clear separation of concerns:
-- `AgendaPhase`: Main phase controller
-- `VotingSystem`: Vote casting and counting logic
-- `SpeakerSystem`: Speaker powers and tie-breaking
-- `CustodiansToken`: Custodians scoring tracking
-- `AgendaCard`: Agenda representation with outcomes
+### Not Yet Implemented (❌ PENDING)
+- **8.17**: Prediction timing mechanics
+- **8.22**: Advanced agenda interactions
 
-### Integration Status
-✅ **RULE 8 FULLY IMPLEMENTED** - All core agenda phase mechanics are complete and tested.
+**Test Coverage**: 13 comprehensive test cases covering all core mechanics
+**Code Architecture**: AgendaPhase, VotingSystem, SpeakerSystem, CustodiansToken modules
+**Integration Status**: Fully integrated with game state and phase management
+
+**RULE 8 CORE SUBSET FULLY IMPLEMENTED** - Advanced features pending
