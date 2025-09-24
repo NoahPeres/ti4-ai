@@ -95,14 +95,7 @@ RELATED TOPICS: Active System, Command Tokens, Initiative Order, Planets, Readie
 - `test_integration_scenarios.py`: Strategy card selection in game flow
 - Multiple tests for command token management
 - Strategy card framework tests
-
-### Missing Tests
-- Diplomacy primary ability execution
-- Command token placement in systems
-- Planet readying mechanics
-- Secondary ability usage
-- System activation prevention
-- Reinforcement vs command sheet token logic
+- `test_rule_32_diplomacy.py`: Complete test coverage for Diplomacy strategy card including primary ability execution, command token placement, planet readying mechanics, secondary ability usage, and all edge cases
 
 ## Implementation Files
 

@@ -38,7 +38,7 @@ class StrategyCard:
     card_type: StrategyCardType
     primary_ability: str
     secondary_ability: str
-    _exhausted: bool = False
+    _exhausted: bool = field(default=False, init=False, repr=False)
 
     @property
     def name(self) -> str:
@@ -51,6 +51,8 @@ class StrategyCard:
 
     def exhaust(self) -> None:
         """Mark this strategy card as exhausted."""
+        if self._exhausted:
+            return  # Already exhausted, prevent double-exhaust
         self._exhausted = True
 
     def ready(self) -> None:

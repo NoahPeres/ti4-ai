@@ -60,6 +60,7 @@ class DiplomacyStrategyCard(BaseStrategyCard):
             player_id: The active player executing the primary ability
             game_state: Game state for full integration
             **kwargs: Additional parameters - expects 'system_id' for the chosen system
+                     and optionally 'planets_to_ready' list
 
         Returns:
             Result of the primary ability execution
@@ -79,6 +80,14 @@ class DiplomacyStrategyCard(BaseStrategyCard):
                 error_message="System ID must be provided for Diplomacy primary ability",
             )
 
+        # Rule 32.2: Cannot select Mecatol Rex system
+        if system_id == "mecatol_rex":
+            return StrategyCardAbilityResult(
+                success=False,
+                player_id=player_id,
+                error_message="Cannot select Mecatol Rex system for Diplomacy primary ability",
+            )
+
         # Validate the system exists and contains a planet controlled by the active player
         if not game_state.galaxy:
             return StrategyCardAbilityResult(
@@ -96,13 +105,12 @@ class DiplomacyStrategyCard(BaseStrategyCard):
             )
 
         # Check if system contains a planet controlled by the active player
-        player_controlled_planet = False
+        player_controlled_planets = []
         for planet in system.planets:
-            if hasattr(planet, "controlled_by") and planet.controlled_by == player_id:
-                player_controlled_planet = True
-                break
+            if planet.controlled_by == player_id:
+                player_controlled_planets.append(planet)
 
-        if not player_controlled_planet:
+        if not player_controlled_planets:
             return StrategyCardAbilityResult(
                 success=False,
                 player_id=player_id,
@@ -112,10 +120,90 @@ class DiplomacyStrategyCard(BaseStrategyCard):
         # Rule 32.2: Each other player places one command token from their reinforcements in that system
         other_players = [p for p in game_state.players if p.id != player_id]
         for other_player in other_players:
+            # Rule 32.2.b: If player already has a command token in the system, don't place another
+            if system.has_command_token(other_player.id):
+                continue
+
+            # Try to place from reinforcements first
             if other_player.reinforcements > 0:
                 system.place_command_token(other_player.id)
                 # Note: In a real implementation, we'd need to update the player's reinforcements
                 # but since Player is frozen, this would require creating a new game state
+            else:
+                # Rule 32.2.a: If no reinforcements, place from command sheet
+                # Check if player has any command tokens on their command sheet
+                total_command_tokens = (
+                    other_player.command_sheet.tactic_pool
+                    + other_player.command_sheet.fleet_pool
+                    + other_player.command_sheet.strategy_pool
+                )
+                if total_command_tokens > 0:
+                    system.place_command_token(other_player.id)
+                    # Note: In a real implementation, we'd need to remove a token from the command sheet
+                    # but since Player is frozen, this would require creating a new game state
+                # If no tokens available anywhere, the player simply doesn't place a token
+
+        # Ready up to 2 exhausted planets controlled by the player
+        planets_to_ready = kwargs.get("planets_to_ready", [])
+        if len(planets_to_ready) > 2:
+            return StrategyCardAbilityResult(
+                success=False,
+                player_id=player_id,
+                error_message="Cannot ready more than 2 planets with Diplomacy primary ability",
+            )
+
+        # Get all exhausted planets controlled by the player
+        all_exhausted_planets = []
+        if game_state.galaxy:
+            for system_obj in game_state.galaxy.system_objects.values():
+                for planet in system_obj.planets:
+                    if (
+                        planet.controlled_by == player_id
+                        and hasattr(planet, "is_exhausted")
+                        and planet.is_exhausted()
+                    ):
+                        all_exhausted_planets.append(planet)
+
+        # If no specific planets specified, ready up to 2 exhausted planets automatically
+        if not planets_to_ready:
+            planets_to_ready = [p.name for p in all_exhausted_planets[:2]]
+
+        # Validate and ready the specified planets
+        readied_planets = []
+        for planet_name in planets_to_ready:
+            # Find the planet
+            target_planet = None
+            if game_state.galaxy:
+                for system_obj in game_state.galaxy.system_objects.values():
+                    for planet in system_obj.planets:
+                        if (
+                            planet.name == planet_name
+                            and planet.controlled_by == player_id
+                        ):
+                            target_planet = planet
+                            break
+                    if target_planet:
+                        break
+
+            if not target_planet:
+                return StrategyCardAbilityResult(
+                    success=False,
+                    player_id=player_id,
+                    error_message=f"Planet {planet_name} not found or not controlled by player {player_id}",
+                )
+
+            if not (
+                hasattr(target_planet, "is_exhausted") and target_planet.is_exhausted()
+            ):
+                return StrategyCardAbilityResult(
+                    success=False,
+                    player_id=player_id,
+                    error_message=f"Planet {planet_name} is not exhausted",
+                )
+
+            if hasattr(target_planet, "ready"):
+                target_planet.ready()
+                readied_planets.append(planet_name)
 
         return StrategyCardAbilityResult(
             success=True,
@@ -217,6 +305,14 @@ class DiplomacyStrategyCard(BaseStrategyCard):
                     success=False,
                     player_id=player_id,
                     error_message=f"Player {player_id} does not control planet {planet_id}",
+                )
+
+            # Rule 32.3: Can only ready exhausted planets
+            if not found_planet.is_exhausted():
+                return StrategyCardAbilityResult(
+                    success=False,
+                    player_id=player_id,
+                    error_message=f"Planet {planet_id} is not exhausted and cannot be readied",
                 )
 
             planets_to_ready.append(found_planet)

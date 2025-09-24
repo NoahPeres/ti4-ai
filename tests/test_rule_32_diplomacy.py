@@ -32,18 +32,24 @@ class TestRule32DiplomacyPrimaryAbility:
         """Test that Diplomacy primary ability places command tokens correctly.
 
         LRR 32.2: Each other player places one command token from their reinforcements
-        in the chosen system.
+        in the chosen system. Then, ready up to 2 exhausted planets you control.
         """
         # Create players with command tokens in reinforcements
         player1 = Player("player1", Faction.ARBOREC, reinforcements=8)
         player2 = Player("player2", Faction.BARONY, reinforcements=8)
         player3 = Player("player3", Faction.SAAR, reinforcements=8)
 
-        # Create a system with a planet controlled by player1
-        planet = Planet("Test Planet", 2, 1)
-        planet.controlled_by = "player1"
+        # Create a system with planets controlled by player1
+        planet1 = Planet("Test Planet 1", 2, 1)
+        planet1.controlled_by = "player1"
+        planet1.exhaust()  # Exhaust the planet to test readying functionality
+
+        planet2 = Planet("Test Planet 2", 1, 2)
+        planet2.controlled_by = "player1"
+        planet2.exhaust()  # Exhaust the planet to test readying functionality
+
         system = System("system1")
-        system.planets.append(planet)
+        system.planets.extend([planet1, planet2])
 
         galaxy = Galaxy()
         galaxy.register_system(system)
@@ -68,6 +74,10 @@ class TestRule32DiplomacyPrimaryAbility:
         assert system.has_command_token("player3")
         # Active player should not have a command token placed
         assert not system.has_command_token("player1")
+
+        # Verify that exhausted planets controlled by player1 are now readied
+        assert not planet1.is_exhausted()
+        assert not planet2.is_exhausted()
 
     def test_diplomacy_primary_ability_requires_controlled_planet(self):
         """Test that Diplomacy primary ability requires a controlled planet in the system."""
@@ -191,7 +201,7 @@ class TestRule32DiplomacySecondaryAbility:
         assert planet3.is_exhausted()
 
         # Verify command token was spent from strategy pool
-        # Note: This would require updating the player's strategy pool
+        assert player1.command_sheet.strategy_pool == 2
 
     def test_diplomacy_secondary_ability_requires_strategy_token(self):
         """Test that secondary ability requires a command token in strategy pool."""
