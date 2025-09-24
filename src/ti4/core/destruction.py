@@ -53,7 +53,8 @@ class UnitDestructionManager:
         """
         if unit_type not in self._destruction_effects:
             self._destruction_effects[unit_type] = []
-        self._destruction_effects[unit_type].append(effect)
+        if effect not in self._destruction_effects[unit_type]:
+            self._destruction_effects[unit_type].append(effect)
 
     def destroy_unit(
         self,
@@ -102,6 +103,11 @@ class UnitDestructionManager:
 
         # Return to reinforcements if provided
         if reinforcements is not None:
+            if reinforcements.player_id != unit.owner:
+                raise ValueError(
+                    f"Reinforcement pool owner mismatch: unit owned by {unit.owner}, "
+                    f"pool is {reinforcements.player_id}"
+                )
             reinforcements.return_destroyed_unit(unit.unit_type)
 
         # Trigger destruction effects
@@ -150,6 +156,11 @@ class UnitDestructionManager:
 
         # Return to reinforcements if provided
         if reinforcements is not None:
+            if reinforcements.player_id != unit.owner:
+                raise ValueError(
+                    f"Reinforcement pool owner mismatch: unit owned by {unit.owner}, "
+                    f"pool is {reinforcements.player_id}"
+                )
             reinforcements.return_destroyed_unit(unit.unit_type)
 
         # Do NOT trigger destruction effects (Rule 31.2)
@@ -160,6 +171,23 @@ class UnitDestructionManager:
             trigger_effects=False,
             system_id=system.system_id,
         )
+
+    def _is_unit_present(self, unit: Unit, system: System) -> bool:
+        """Helper method to check if a unit is present in the system.
+
+        Args:
+            unit: The unit to check for
+            system: The system to check in
+
+        Returns:
+            True if unit is present, False otherwise
+        """
+        for planet in system.planets:
+            if unit in planet.units:
+                return True
+        if unit in system.space_units:
+            return True
+        return False
 
     def destroy_units(
         self,
@@ -176,7 +204,15 @@ class UnitDestructionManager:
 
         Returns:
             List of DestructionEvents for each unit
+
+        Raises:
+            ValueError: If any unit is not found in system (pre-validation)
         """
+        # Pre-validate all units are present to avoid partial destruction
+        for unit in units:
+            if not self._is_unit_present(unit, system):
+                raise ValueError(f"Unit not found in system {system.system_id}")
+
         events = []
         for unit in units:
             event = self.destroy_unit(unit, system, reinforcements)
