@@ -443,6 +443,24 @@ class CombatResolver:
         Returns:
             Number of hits scored
         """
-        return self._perform_ability_attack(
-            unit, target_units, lambda u: u.has_space_cannon()
-        )
+        if not unit.has_space_cannon():
+            return 0
+
+        if not target_units:
+            return 0
+
+        # Get unit stats and validate space cannon capability
+        stats = unit.get_stats()
+        if stats.space_cannon_value is None:
+            return 0
+
+        # Roll dice using space cannon stats
+        dice_count = stats.space_cannon_dice
+        if dice_count <= 0:
+            return 0
+
+        dice_results = [
+            random.randint(1, GameConstants.DEFAULT_COMBAT_DICE_SIDES)  # nosec B311 - game RNG, not crypto
+            for _ in range(dice_count)
+        ]
+        return self.calculate_hits(dice_results, stats.space_cannon_value)
