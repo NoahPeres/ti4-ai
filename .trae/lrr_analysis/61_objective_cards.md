@@ -201,19 +201,82 @@ RELATED TOPICS: Action Phase, Agenda Phase, Control, Status Phase, Victory Point
 - No home system control validation
 - Limited specific objective implementations
 
+## Implementation Status
+
+**Overall Progress**: ~85%
+
+### Completed (✅)
+- **Rule 61.3**: Phase-based scoring - Objectives can only be scored in their designated phases
+  - Test cases: `test_rule_61_objectives.py::test_objectives_have_scoring_phase_attribute`
+  - Test cases: `test_rule_61_objectives.py::test_objectives_can_only_be_scored_in_correct_phase`
+- **Rule 61.5**: Status phase scoring limits - Maximum one public and one secret objective per status phase
+  - Test cases: `test_rule_61_scoring_limits.py::test_status_phase_public_objective_scoring_limit`
+  - Test cases: `test_rule_61_scoring_limits.py::test_status_phase_secret_objective_scoring_limit`
+- **Rule 61.6**: Action/Agenda phase scoring - No limits on objective scoring during action/agenda phases
+  - Test cases: `test_rule_61_objectives.py::test_action_phase_unlimited_objective_scoring`
+  - Test cases: `test_rule_61_objectives.py::test_agenda_phase_unlimited_objective_scoring`
+- **Rule 61.7**: Combat objective limits - Combat objectives can only be scored during combat
+  - Test cases: `test_rule_61_objectives.py::test_combat_objectives_scoring_restrictions`
+- **Rule 61.8**: One-time scoring enforcement - Players can only score each objective once
+  - Test cases: `test_rule_61_scoring_limits.py::test_objective_can_only_be_scored_once`
+- **Rule 61.9-61.10**: Objective requirements framework (stubs) — descriptions and validator present; fulfillment integration pending (resources, influence, tokens, control, combat, tech).
+  - Test cases: `test_rule_61_requirements.py` (25 comprehensive tests)
+  - Implementation: `ObjectiveRequirement` abstract base class and concrete requirement types
+  - Implementation: `ObjectiveRequirementValidator` for requirement validation
+- **Rule 61.17-61.21**: Secret objectives - Complete secret objective system
+  - Test cases: `test_rule_61_secret_objectives.py` (16 comprehensive tests)
+  - Implementation: Secret objective ownership, privacy, drawing mechanics, and Imperial strategy card integration
+
+### Partially Implemented (🔄)
+- **Rule 61.11-61.16**: Public objectives - Basic framework exists but needs completion
+  - ✅ Basic public objective structure and scoring
+  - ❌ Missing: Stage I/II progression system
+  - ❌ Missing: Specific objective card implementations with concrete requirements
+  - ❌ Missing: Home system control validation (Rule 61.14)
+
+### Not Implemented (❌)
+- **Concrete objective cards** - Specific objectives with implemented requirement validation
+- **Stage I/II public objective progression** - Systematic reveal and replacement of public objectives
+
+## Priority Implementation Tasks
+
+### High Priority
+1. **Public objective setup system** - Implement stage I/II progression and reveal mechanics (Rule 61.11-61.16)
+2. **Home system control validation** - Ensure Rule 61.14 compliance for public objective scoring
+3. **Concrete objective cards** - Implement specific objectives with working requirement validation
+
+### Medium Priority
+1. **Requirement system integration** - Connect objective requirements to actual game systems (resources, influence, combat tracking)
+2. **Enhanced objective completion detection** - Integration with planet control, unit destruction, and resource systems
+
+### Low Priority
+1. **Objective card artwork/UI** - Visual representation of objectives
+2. **AI objective evaluation** - Strategic assessment of objective completion difficulty
+
+## Test Coverage Summary
+
+**Total Tests**: 63 tests across multiple files
+- `test_rule_61_objectives.py`: 12 tests (phase-based scoring mechanics)
+- `test_rule_61_requirements.py`: 25 tests (requirement validation system)
+- `test_rule_61_scoring_limits.py`: 13 tests (scoring limits and restrictions)
+- `test_rule_61_secret_objectives.py`: 13 tests (secret objective system)
+
+**Key Test Demonstrations**:
+- Phase-based scoring validation (Rules 61.3, 61.5-61.7)
+- One-time scoring enforcement (Rule 61.8)
+- Objective requirement framework (Rules 61.9-61.10)
+- Secret objective complete system (Rules 61.17-61.21)
+
 ## Action Items
 
 ### High Priority
-1. **Phase-Based Scoring Validation**: Implement timing rules for different phases
-2. **Objective Requirement System**: Build validation for various objective requirements
-3. **Public Objective Setup**: Implement stage I/II progression and revelation system
-4. **Home System Control Validation**: Prevent public objective scoring without home control
+1. **Public Objective Setup**: Implement stage I/II progression and revelation system
+2. **Home System Control Validation**: Prevent public objective scoring without home control
+3. **Concrete Objective Cards**: Add specific objective implementations with working requirements
 
 ### Medium Priority
-1. **Secret Objective System**: Implement hidden objectives with revelation mechanics
-2. **Scoring Limitations**: Enforce per-phase scoring limits
-3. **Specific Objective Implementations**: Add more concrete objective cards
-4. **Resource/Influence Objectives**: Implement spending-based objectives
+1. **System Integration**: Connect objective requirements to game systems
+2. **Enhanced Detection**: Improve objective completion validation
 
 ### Low Priority
 1. **Objective Analytics**: Track objective completion patterns
@@ -222,7 +285,7 @@ RELATED TOPICS: Action Phase, Agenda Phase, Control, Status Phase, Victory Point
 4. **Objective UI Integration**: Support for objective display and interaction
 
 ## Priority Assessment
-- **Overall Priority**: HIGH
-- **Implementation Status**: ~40% (basic framework exists)
-- **Blocking Dependencies**: Phase system, resource tracking, planet control
-- **Impact**: Core victory system - essential for complete gameplay
+- **Overall Priority**: MEDIUM
+- **Implementation Status**: ~85% (comprehensive framework with most rules implemented)
+- **Blocking Dependencies**: Stage I/II system, home system control validation
+- **Impact**: Core victory system - mostly complete with key mechanics working
