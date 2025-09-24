@@ -89,7 +89,7 @@ class CustodiansToken:
         """Check if custodians token is on Mecatol Rex."""
         return self.on_mecatol_rex
 
-    def remove_from_mecatol_rex(self, player_id: str) -> bool:
+    def remove_from_mecatol_rex(self, player_id: str | None = None) -> bool:
         """Remove custodians token from Mecatol Rex."""
         if self.on_mecatol_rex:
             self.on_mecatol_rex = False
@@ -280,11 +280,10 @@ class AgendaPhase:
 
         # Determine winning outcome from vote tally
         if not vote_tally:
-            # No votes cast - default to first outcome or "For"
-            winning_outcome = agenda.outcomes[0] if agenda.outcomes else "For"
-            vote_result = VoteResult(
-                winning_outcome=winning_outcome, vote_tally=vote_tally, success=True
-            )
+            # No votes cast — treat as a tie of zero and let the speaker decide
+            zero_tally = dict.fromkeys(agenda.outcomes or ["For", "Against"], 0)
+            chosen = agenda.outcomes[0] if agenda.outcomes else "For"
+            vote_result = speaker_system.resolve_tie(zero_tally, chosen)
         else:
             # Find outcome with most votes
             max_votes = max(vote_tally.values())
@@ -346,11 +345,10 @@ class AgendaPhase:
 
         # Determine winning outcome from vote tally
         if not vote_tally:
-            # No votes cast - default to first outcome or "For"
-            winning_outcome = agenda.outcomes[0] if agenda.outcomes else "For"
-            vote_result = VoteResult(
-                winning_outcome=winning_outcome, vote_tally=vote_tally, success=True
-            )
+            # No votes cast — treat as a tie of zero and let the speaker decide
+            zero_tally = dict.fromkeys(agenda.outcomes or ["For", "Against"], 0)
+            chosen = agenda.outcomes[0] if agenda.outcomes else "For"
+            vote_result = speaker_system.resolve_tie(zero_tally, chosen)
         else:
             # Find outcome with most votes
             max_votes = max(vote_tally.values())
@@ -425,7 +423,9 @@ class AgendaPhase:
 
         elif agenda.agenda_type == AgendaType.DIRECTIVE:
             # Handle different directive outcomes
-            if vote_result.winning_outcome == "Elect":
+            if vote_result.winning_outcome == "Elect" or str(
+                vote_result.winning_outcome
+            ).startswith("Elect"):
                 # Elect outcome - choose a player/planet/system
                 elected_target = vote_result.elected_planet or "default_target"
                 return AgendaPhaseResult(

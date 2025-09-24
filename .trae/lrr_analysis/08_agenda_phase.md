@@ -159,7 +159,7 @@ The agenda phase is where players cast votes on agenda cards that can change the
 - **Dependencies**: Requires agenda card system and permanent effects
 - **Notes**: Different outcomes have different persistence rules
 
-### 8.22 Outcome Prediction 🟢 LOW
+### 8.22 Outcome Prediction 🟡 PENDING
 **Raw LRR Text**: "Some game effects instruct a player to predict an outcome. To predict an outcome, a player declares aloud the outcome they think will receive the most votes. That player must make this prediction after the agenda is revealed but before any votes have been cast."
 
 **Implementation Status**: ❌ NOT IMPLEMENTED
@@ -211,12 +211,11 @@ The agenda phase is where players cast votes on agenda cards that can change the
 - **8.18-8.19**: Outcome resolution and tie-breaking ✅
 
 ### Partially Implemented (🟡 PARTIAL)
-- **8.10-8.16**: Law vs Directive lifecycle (basic distinction, missing Elect outcomes)
+- **8.20-8.21**: Law vs Directive lifecycle (basic distinction, missing Elect outcomes)
 - **8.20-8.21**: Law persistence and directive discard (basic implementation)
 
 ### Not Yet Implemented (❌ PENDING)
-- **8.17**: Prediction timing mechanics
-- **8.22**: Advanced agenda interactions
+- **8.22**: Outcome prediction and advanced agenda interactions
 
 **Test Coverage**: 13 comprehensive test cases covering all core mechanics
 **Code Architecture**: AgendaPhase, VotingSystem, SpeakerSystem, CustodiansToken modules
