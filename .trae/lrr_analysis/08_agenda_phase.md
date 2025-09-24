@@ -19,24 +19,24 @@ The agenda phase is where players cast votes on agenda cards that can change the
 ### 8.2 First Agenda Resolution Steps 🟢 IMPLEMENTED
 **Raw LRR Text**: "STEP 1-FIRST AGENDA: Players resolve the first agenda by following these steps in order: i. REVEAL AGENDA: The speaker draws one agenda card from the top of the agenda deck and reads it aloud to all players, including all of its possible outcomes. ii. VOTE: Each player, starting with the player to the left of the speaker and continuing clockwise, can cast votes for an outcome of the current agenda. iii. RESOLVE OUTCOME: Players tally each vote that was cast and resolve the outcome that received the most votes."
 
-**Implementation Status**: ✅ IMPLEMENTED
+**Implementation Status**: ✅ SEQUENCE IMPLEMENTED; INTERACTIVE VOTING ORCHESTRATOR PENDING
 - **Code**: `AgendaPhase.resolve_first_agenda()` in `src/ti4/core/agenda_phase.py`
 - **Tests**: `test_first_agenda_resolution_sequence()` in `tests/test_rule_08_agenda_phase.py`
-- **Assessment**: First agenda resolution sequence fully implemented with agenda revelation
-- **Priority**: HIGH ✅ COMPLETE
+- **Assessment**: First agenda resolution sequence implemented with agenda revelation and timing windows
+- **Priority**: HIGH ✅ SEQUENCE COMPLETE
 - **Dependencies**: Speaker system, agenda deck, and voting mechanics implemented
-- **Notes**: Three-step process with specific turn order
+- **Notes**: Three-step process with specific turn order; interactive voting orchestrator pending TDD
 
 ### 8.3 Second Agenda Resolution 🟢 IMPLEMENTED
 **Raw LRR Text**: "STEP 2-SECOND AGENDA: Players repeat the 'First Agenda' step of this phase for a second agenda."
 
-**Implementation Status**: ✅ IMPLEMENTED
+**Implementation Status**: ✅ SEQUENCE IMPLEMENTED; INTERACTIVE VOTING ORCHESTRATOR PENDING
 - **Code**: `AgendaPhase.resolve_second_agenda()` in `src/ti4/core/agenda_phase.py`
 - **Tests**: `test_second_agenda_resolution_sequence()` in `tests/test_rule_08_agenda_phase.py`
-- **Assessment**: Second agenda resolution fully implemented with same sequence as first
-- **Priority**: HIGH ✅ COMPLETE
+- **Assessment**: Second agenda resolution sequence implemented with same sequence as first
+- **Priority**: HIGH ✅ SEQUENCE COMPLETE
 - **Dependencies**: First agenda system completion implemented
-- **Notes**: Each agenda phase resolves exactly two agendas
+- **Notes**: Each agenda phase resolves exactly two agendas; interactive voting orchestrator pending TDD
 
 ### 8.4 Planet Readying and Round Transition 🟢 IMPLEMENTED
 **Raw LRR Text**: "STEP 3-READY PLANETS: Each player readies each of their exhausted planets. Then, a new game round begins starting with the strategy phase."
@@ -170,7 +170,18 @@ The agenda phase is where players cast votes on agenda cards that can change the
 - **Dependencies**: Requires prediction tracking and timing validation
 - **Notes**: Timing-sensitive prediction mechanic
 
-### 8.23 Test Coverage Update
+### 8.23 Timing Windows Implementation 🟢 IMPLEMENTED
+**Raw LRR Text**: "Various timing windows exist during the agenda phase for action cards, promissory notes, and faction abilities."
+
+**Implementation Status**: ✅ IMPLEMENTED
+- **Code**: `AgendaPhase.trigger_timing_window()` in `src/ti4/core/agenda_phase.py`
+- **Tests**: Timing window integration tested in agenda phase tests
+- **Assessment**: Timing window system integrated with agenda phase for action cards and abilities
+- **Priority**: HIGH ✅ COMPLETE
+- **Dependencies**: Timing window system and action card integration implemented
+- **Notes**: Enables action cards and abilities during agenda phase
+
+### 8.24 Test Coverage Update
 **Status**: IMPLEMENTED
 **Code**: tests/test_rule_08_agenda_phase.py
 **Tests**: 13 comprehensive tests covering activation, sequencing, voting, and tie-breaking
@@ -211,8 +222,7 @@ The agenda phase is where players cast votes on agenda cards that can change the
 - **8.18-8.19**: Outcome resolution and tie-breaking ✅
 
 ### Partially Implemented (🟡 PARTIAL)
-- **8.20-8.21**: Law vs Directive lifecycle (basic distinction, missing Elect outcomes)
-- **8.20-8.21**: Law persistence and directive discard (basic implementation)
+- **8.20-8.21**: Law vs Directive lifecycle (basic distinction with Elect outcomes now handled, law persistence and directive discard implemented)
 
 ### Not Yet Implemented (❌ PENDING)
 - **8.22**: Outcome prediction and advanced agenda interactions

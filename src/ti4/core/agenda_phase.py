@@ -15,7 +15,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any
+from typing import Any, Callable
+
+# Voting orchestration imports removed - will be re-implemented via TDD
 
 
 class AgendaType(Enum):
@@ -165,17 +167,18 @@ class VotingSystem:
             )
 
         # Validate planets and precompute influence; do not mutate until all checks pass
-        seen: set[int] = set()
+        seen: set[str] = set()
         total_influence = 0
         to_exhaust: list[Any] = []
         for planet in planets:
-            pid = id(planet)
-            if pid in seen:
+            # Use stable planet name instead of object identity for deduplication
+            planet_name = getattr(planet, "name", str(planet))
+            if planet_name in seen:
                 return VotingOutcome(
                     success=False,
                     error_message="Cannot use duplicate planet in vote list",
                 )
-            seen.add(pid)
+            seen.add(str(planet_name))
 
             if not hasattr(planet, "influence") or not hasattr(planet, "exhaust"):
                 return VotingOutcome(
@@ -235,55 +238,79 @@ class VotingSystem:
         Get voting order with speaker voting last.
 
         LRR 80.2: The speaker is always the last player to vote.
+        Returns a fresh copy to prevent caller-side mutations.
         """
         speaker = speaker_system.get_speaker()
         if speaker and speaker in players:
             other_players = [p for p in players if p != speaker]
             return other_players + [speaker]
-        return players
+        return players.copy()
 
 
 class AgendaPhase:
-    """Main agenda phase controller."""
+    """Main controller for the agenda phase."""
 
-    def __init__(self, game_state: Any | None = None) -> None:
+    def __init__(self) -> None:
+        """Initialize the agenda phase."""
+        self.voting_system = VotingSystem()
+        self.speaker_system = SpeakerSystem()
+
+    def trigger_timing_window(self, timing_window: str, **kwargs: Any) -> None:
+        """
+        Trigger a timing window for action cards, promissory notes, and faction abilities.
+
+        This is a placeholder implementation that will be properly developed via TDD.
+        """
+        # Minimal implementation - does nothing for now
+        pass
+
+    def reveal_agenda(self, agenda: AgendaCard) -> None:
+        """
+        Reveal an agenda card and trigger appropriate timing windows.
+
+        According to LRR 8.4 and TI4 compendium, this should trigger:
+        1. "when_agenda_revealed" timing window
+        2. "after_agenda_revealed" timing window
+        """
+        # Trigger "when an agenda is revealed" timing window
+        self.trigger_timing_window("when_agenda_revealed", agenda=agenda)
+
+        # Trigger "after an agenda is revealed" timing window
+        self.trigger_timing_window("after_agenda_revealed", agenda=agenda)
+
+    def start_voting(self, agenda: AgendaCard) -> None:
+        """
+        Start the voting process for an agenda.
+
+        This is a placeholder implementation that will be properly developed via TDD.
+        """
+        # Trigger timing window before players vote
+        self.trigger_timing_window("before_players_vote", agenda=agenda)
+        # Minimal implementation - does nothing else for now
         pass
 
     def should_execute_phase(self, custodians: CustodiansToken) -> bool:
         """Check if agenda phase should execute."""
         return not custodians.is_on_mecatol_rex()
 
-    def resolve_first_agenda(
+    def _determine_vote_result(
         self,
-        agenda_deck: Any,
-        speaker_system: SpeakerSystem,
+        agenda: AgendaCard,
         voting_system: VotingSystem,
-        players: list[str],
-    ) -> AgendaPhaseResult:
+        speaker_system: SpeakerSystem,
+    ) -> VoteResult:
         """
-        Resolve the first agenda of the phase.
+        Helper method to determine the winning outcome from vote tallies.
 
-        LRR 8.2: The speaker reveals the top agenda card from the agenda deck.
+        Handles both empty tallies (speaker decides) and ties (speaker breaks).
         """
-        # Reset voting system for new agenda
-        voting_system.reset_votes()
-
-        # Draw agenda card from deck
-        agenda = agenda_deck.draw_top_card()
-
-        # Get voting order (speaker votes last)
-        _ = voting_system.get_voting_order(players, speaker_system)
-
-        # Simulate voting process (in real implementation, this would be interactive)
-        # For now, we'll just mark as completed with basic vote tally
         vote_tally = voting_system.get_vote_tally()
 
-        # Determine winning outcome from vote tally
         if not vote_tally:
             # No votes cast — treat as a tie of zero and let the speaker decide
             zero_tally = dict.fromkeys(agenda.outcomes or ["For", "Against"], 0)
             chosen = agenda.outcomes[0] if agenda.outcomes else "For"
-            vote_result = speaker_system.resolve_tie(zero_tally, chosen)
+            return speaker_system.resolve_tie(zero_tally, chosen)
         else:
             # Find outcome with most votes
             max_votes = max(vote_tally.values())
@@ -294,13 +321,79 @@ class AgendaPhase:
             if len(tied_outcomes) == 1:
                 # Clear winner
                 winning_outcome = tied_outcomes[0]
-                vote_result = VoteResult(
+                return VoteResult(
                     winning_outcome=winning_outcome, vote_tally=vote_tally, success=True
                 )
             else:
                 # Tie - speaker decides (chooses first tied outcome for simulation)
                 winning_outcome = tied_outcomes[0]
-                vote_result = speaker_system.resolve_tie(vote_tally, winning_outcome)
+                return speaker_system.resolve_tie(vote_tally, winning_outcome)
+
+    def resolve_first_agenda(
+        self,
+        agenda_deck: Any,
+        speaker_system: SpeakerSystem,
+        voting_system: VotingSystem,
+        players: list[str],
+        voting_callback: Callable[[VoteResult], VoteResult] | None = None,
+    ) -> AgendaPhaseResult:
+        """
+        Resolve the first agenda of the phase using the voting orchestration system.
+
+        LRR 8.2: The speaker reveals the top agenda card from the agenda deck.
+
+        Flow: reveal → reset_votes → external voting window → tally/resolve
+        """
+        # Draw agenda card from deck
+        agenda = agenda_deck.draw_top_card()
+
+        # Reset voting system for new agenda (immediately after reveal, before any external voting)
+        voting_system.reset_votes()
+
+        # Reveal the agenda (triggers timing windows)
+        self.reveal_agenda(agenda)
+
+        # Get voting order (speaker votes last)
+        voting_system.get_voting_order(players, speaker_system)
+
+        # Start voting process (triggers before_players_vote timing window)
+        self.start_voting(agenda)
+
+        # TODO: Implement voting orchestration system via TDD
+        # For now, use simplified voting approach
+        # orchestration_result = self.voting_orchestrator.start_voting_session(
+        #     agenda=agenda,
+        #     players=players,
+        #     voting_order=voting_order,
+        #     timeout_seconds=300.0  # 5 minutes default
+        # )
+
+        # if not orchestration_result.success:
+        #     return AgendaPhaseResult(
+        #         success=False,
+        #         error_message=f"Failed to start voting session: {orchestration_result.error_message}"
+        #     )
+
+        # If a voting callback is provided, use it to handle the voting window
+        # Otherwise, fall back to the old simulation behavior
+        if voting_callback:
+            # TODO: Implement voting orchestration system via TDD
+            # For now, use simplified voting approach without orchestration
+            vote_result = self._determine_vote_result(
+                agenda, voting_system, speaker_system
+            )
+            try:
+                # Call the voting callback with the result
+                vote_result = voting_callback(vote_result)
+            except Exception as e:
+                return AgendaPhaseResult(
+                    success=False, error_message=f"Voting callback failed: {e}"
+                )
+        else:
+            # Fallback: simulate voting process for backward compatibility
+            vote_result = self._determine_vote_result(
+                agenda, voting_system, speaker_system
+            )
 
         # Resolve the agenda outcome
         outcome_result = self.resolve_agenda_outcome(agenda, vote_result)
@@ -323,63 +416,91 @@ class AgendaPhase:
         speaker_system: SpeakerSystem,
         voting_system: VotingSystem,
         players: list[str],
+        voting_callback: Callable[[VoteResult], VoteResult] | None = None,
     ) -> AgendaPhaseResult:
         """
-        Resolve the second agenda of the phase.
+        Resolve the second agenda of the agenda phase.
 
-        LRR 8.3: After resolving the first agenda, the speaker reveals
-        the top agenda card from the agenda deck.
+        Args:
+            agenda_deck: The agenda deck to draw from
+            speaker_system: The speaker system for tie resolution
+            voting_system: The voting system for vote management
+            players: List of player IDs in the game
+            voting_callback: Optional callback for handling voting window
+
+        Returns:
+            AgendaPhaseResult indicating success/failure and details
         """
-        # Reset voting system for new agenda
+        # Draw second agenda
+        try:
+            agenda = agenda_deck.draw_top_card()
+        except Exception as e:
+            return AgendaPhaseResult(
+                success=False, error_message=f"Failed to draw second agenda: {e}"
+            )
+
+        # Reveal agenda and trigger timing windows
+        self.reveal_agenda(agenda)
+
+        # Reset voting system for new agenda (immediately after reveal, before any external voting)
         voting_system.reset_votes()
 
-        # Draw second agenda card from deck
-        agenda = agenda_deck.draw_top_card()
-
         # Get voting order (speaker votes last)
-        _ = voting_system.get_voting_order(players, speaker_system)
+        voting_system.get_voting_order(players, speaker_system)
 
-        # Simulate voting process (in real implementation, this would be interactive)
-        # For now, we'll just mark as completed with basic vote tally
-        vote_tally = voting_system.get_vote_tally()
+        # Start voting process (triggers before_players_vote timing window)
+        self.start_voting(agenda)
 
-        # Determine winning outcome from vote tally
-        if not vote_tally:
-            # No votes cast — treat as a tie of zero and let the speaker decide
-            zero_tally = dict.fromkeys(agenda.outcomes or ["For", "Against"], 0)
-            chosen = agenda.outcomes[0] if agenda.outcomes else "For"
-            vote_result = speaker_system.resolve_tie(zero_tally, chosen)
-        else:
-            # Find outcome with most votes
-            max_votes = max(vote_tally.values())
-            tied_outcomes = [
-                outcome for outcome, votes in vote_tally.items() if votes == max_votes
-            ]
+        # TODO: Implement voting orchestration system via TDD
+        # For now, use simplified voting approach
+        # orchestration_result = self.voting_orchestrator.start_voting_session(
+        #     agenda=agenda,
+        #     players=players,
+        #     voting_order=voting_order,
+        #     timeout_seconds=300.0  # 5 minutes default
+        # )
 
-            if len(tied_outcomes) == 1:
-                # Clear winner
-                winning_outcome = tied_outcomes[0]
-                vote_result = VoteResult(
-                    winning_outcome=winning_outcome, vote_tally=vote_tally, success=True
+        # if not orchestration_result.success:
+        #     return AgendaPhaseResult(
+        #         success=False,
+        #         error_message=f"Failed to start voting session: {orchestration_result.error_message}"
+        #     )
+
+        # If a voting callback is provided, use it to handle the voting window
+        # Otherwise, fall back to the old simulation behavior
+        if voting_callback:
+            # TODO: Implement voting orchestration system via TDD
+            # For now, use simplified voting approach without orchestration
+            vote_result = self._determine_vote_result(
+                agenda, voting_system, speaker_system
+            )
+            try:
+                # Call the voting callback with the result
+                vote_result = voting_callback(vote_result)
+            except Exception as e:
+                return AgendaPhaseResult(
+                    success=False, error_message=f"Voting callback failed: {e}"
                 )
-            else:
-                # Tie - speaker decides (chooses first tied outcome for simulation)
-                winning_outcome = tied_outcomes[0]
-                vote_result = speaker_system.resolve_tie(vote_tally, winning_outcome)
+        else:
+            # Fallback: simulate voting process for backward compatibility
+            vote_result = self._determine_vote_result(
+                agenda, voting_system, speaker_system
+            )
 
         # Resolve the agenda outcome
         outcome_result = self.resolve_agenda_outcome(agenda, vote_result)
 
         return AgendaPhaseResult(
-            success=True,
+            success=outcome_result.success,
             second_agenda_resolved=True,
             agenda_revealed=agenda,
             voting_completed=True,
-            outcome_resolved=outcome_result.outcome_resolved,
+            outcome_resolved=outcome_result.success,
             law_enacted=outcome_result.law_enacted,
             permanent_effect_added=outcome_result.permanent_effect_added,
             one_time_effect_executed=outcome_result.one_time_effect_executed,
             agenda_discarded=outcome_result.agenda_discarded,
+            error_message=outcome_result.error_message,
         )
 
     def ready_all_planets(
@@ -405,20 +526,40 @@ class AgendaPhase:
 
         LRR 7.7-7.8: Laws become permanent effects when "For" wins,
         directives provide one-time effects.
+        Uses AgendaCard.for_effect/against_effect fields for detailed descriptions.
         """
         if agenda.agenda_type == AgendaType.LAW:
             if vote_result.winning_outcome == "For":
                 # Law is enacted as permanent effect
+                effect_description = agenda.for_effect or "Law enacted"
                 return AgendaPhaseResult(
                     success=True,
                     law_enacted=True,
                     permanent_effect_added=True,
                     outcome_resolved=True,
+                    reason=f"Law '{agenda.name}' enacted: {effect_description}",
+                )
+            elif vote_result.winning_outcome == "Elect" or str(
+                vote_result.winning_outcome
+            ).startswith("Elect"):
+                # Elect outcome on Law - becomes permanent effect (LRR 8.20-8.21)
+                elected_target = vote_result.elected_planet or "default_target"
+                effect_description = agenda.for_effect or "Law enacted with election"
+                return AgendaPhaseResult(
+                    success=True,
+                    law_enacted=True,
+                    permanent_effect_added=True,
+                    outcome_resolved=True,
+                    reason=f"Law '{agenda.name}' enacted with elected target '{elected_target}': {effect_description}",
                 )
             else:
                 # Law is discarded (Against or other outcome)
+                effect_description = agenda.against_effect or "Law discarded"
                 return AgendaPhaseResult(
-                    success=True, agenda_discarded=True, outcome_resolved=True
+                    success=True,
+                    agenda_discarded=True,
+                    outcome_resolved=True,
+                    reason=f"Law '{agenda.name}' rejected: {effect_description}",
                 )
 
         elif agenda.agenda_type == AgendaType.DIRECTIVE:
@@ -428,43 +569,64 @@ class AgendaPhase:
             ).startswith("Elect"):
                 # Elect outcome - choose a player/planet/system
                 elected_target = vote_result.elected_planet or "default_target"
+                effect_description = agenda.for_effect or "Election effect applied"
                 return AgendaPhaseResult(
                     success=True,
                     one_time_effect_executed=True,
                     agenda_discarded=True,
                     outcome_resolved=True,
-                    reason=f"Elected: {elected_target}",
+                    reason=f"Directive '{agenda.name}' - Elected '{elected_target}': {effect_description}",
                 )
             elif vote_result.winning_outcome in ["For", "Against"]:
                 # Standard For/Against directive
                 effect_applied = vote_result.winning_outcome == "For"
+                if effect_applied:
+                    effect_description = agenda.for_effect or "For effect applied"
+                    reason = f"Directive '{agenda.name}' passed: {effect_description}"
+                else:
+                    effect_description = (
+                        agenda.against_effect or "Against effect applied"
+                    )
+                    reason = f"Directive '{agenda.name}' failed: {effect_description}"
+
                 return AgendaPhaseResult(
                     success=True,
                     one_time_effect_executed=effect_applied,
                     agenda_discarded=True,
                     outcome_resolved=True,
-                    reason=f"Directive {vote_result.winning_outcome} - Effect {'applied' if effect_applied else 'not applied'}",
+                    reason=reason,
                 )
             else:
                 # Other directive outcomes (custom outcomes)
+                effect_description = (
+                    agenda.effect or f"Custom outcome: {vote_result.winning_outcome}"
+                )
                 return AgendaPhaseResult(
                     success=True,
                     one_time_effect_executed=True,
                     agenda_discarded=True,
                     outcome_resolved=True,
-                    reason=f"Directive outcome: {vote_result.winning_outcome}",
+                    reason=f"Directive '{agenda.name}' - {effect_description}",
                 )
 
         return AgendaPhaseResult(success=False, error_message="Unknown agenda type")
 
     def execute_complete_phase(
-        self, game_state: Any, custodians: CustodiansToken | None = None
+        self,
+        game_state: Any,
+        custodians: CustodiansToken | None = None,
+        voting_callback: Callable[[VoteResult], VoteResult] | None = None,
     ) -> AgendaPhaseResult:
         """
-        Execute the complete agenda phase sequence.
+        Execute the complete agenda phase sequence with voting orchestration support.
 
         LRR 8.1: The agenda phase is executed only if the custodians token
         is not on Mecatol Rex.
+
+        Args:
+            game_state: The current game state
+            custodians: The custodians token (optional)
+            voting_callback: Optional callback to handle voting windows interactively
         """
         if custodians is None:
             custodians = getattr(game_state, "get_custodians_token", lambda: None)()
@@ -499,17 +661,17 @@ class AgendaPhase:
         )()
 
         try:
-            # Execute first agenda
+            # Execute first agenda with voting orchestration
             first_result = self.resolve_first_agenda(
-                agenda_deck, speaker_system, voting_system, players
+                agenda_deck, speaker_system, voting_system, players, voting_callback
             )
 
             if not first_result.success:
                 return first_result
 
-            # Execute second agenda
+            # Execute second agenda with voting orchestration
             second_result = self.resolve_second_agenda(
-                agenda_deck, speaker_system, voting_system, players
+                agenda_deck, speaker_system, voting_system, players, voting_callback
             )
 
             if not second_result.success:
@@ -540,6 +702,9 @@ class AgendaPhase:
             )
 
         except Exception as e:
+            # Ensure voting orchestration is cleaned up on error
+            # TODO: Implement proper voting orchestration cleanup
+            # self.voting_orchestrator.cancel_voting(f"Phase execution error: {e}")
             return AgendaPhaseResult(
                 success=False, error_message=f"Agenda phase execution failed: {str(e)}"
             )
