@@ -154,17 +154,22 @@ class LeadershipStrategyCard(BaseStrategyCard):
                     error_message=f"token_distribution must allocate exactly {total_tokens_needed} tokens.",
                 )
 
-            # All validation passed - now perform state mutations atomically
-            if planets_to_exhaust and game_state:
-                self._exhaust_planets(planets_to_exhaust, game_state, player_id)
-
+            # All validation passed - now perform state mutations
             if trade_goods_to_spend > 0:
-                if not player.command_sheet.spend_trade_goods(trade_goods_to_spend):
+                if not player.spend_trade_goods(trade_goods_to_spend):
                     return StrategyCardAbilityResult(
                         success=False,
                         player_id=player_id,
                         error_message=f"Failed to spend {trade_goods_to_spend} trade goods",
                     )
+            if planets_to_exhaust:
+                if game_state is None:
+                    return StrategyCardAbilityResult(
+                        success=False,
+                        player_id=player_id,
+                        error_message="game_state is required to exhaust planets",
+                    )
+                self._exhaust_planets(planets_to_exhaust, game_state, player_id)
 
             # Distribute tokens using Player.gain_command_token
             tokens_distributed = 0
@@ -313,17 +318,22 @@ class LeadershipStrategyCard(BaseStrategyCard):
                     error_message=f"token_distribution must allocate exactly {tokens_from_influence} tokens.",
                 )
 
-            # All validation passed - now perform state mutations atomically
-            if planets_to_exhaust and game_state:
-                self._exhaust_planets(planets_to_exhaust, game_state, player_id)
-
+            # All validation passed - now perform state mutations
             if trade_goods_to_spend > 0:
-                if not player.command_sheet.spend_trade_goods(trade_goods_to_spend):
+                if not player.spend_trade_goods(trade_goods_to_spend):
                     return StrategyCardAbilityResult(
                         success=False,
                         player_id=player_id,
                         error_message=f"Failed to spend {trade_goods_to_spend} trade goods",
                     )
+            if planets_to_exhaust:
+                if game_state is None:
+                    return StrategyCardAbilityResult(
+                        success=False,
+                        player_id=player_id,
+                        error_message="game_state is required to exhaust planets",
+                    )
+                self._exhaust_planets(planets_to_exhaust, game_state, player_id)
 
             # Distribute tokens using Player.gain_command_token
             tokens_distributed = 0
