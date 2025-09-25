@@ -461,7 +461,7 @@ class TestRule52LeadershipStrategyCard:
             planets_to_exhaust=[],
         )
         assert result.success is False
-        assert "must allocate at least" in result.error_message
+        assert "must allocate exactly" in result.error_message
 
     def test_primary_ability_invalid_planet_choices(self) -> None:
         """Test primary ability with invalid planet choices for strict validation."""

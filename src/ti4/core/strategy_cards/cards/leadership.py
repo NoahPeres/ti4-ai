@@ -73,11 +73,20 @@ class LeadershipStrategyCard(BaseStrategyCard):
         planets_to_exhaust = kwargs.get("planets_to_exhaust", [])
         trade_goods_to_spend = kwargs.get("trade_goods_to_spend", 0)
 
+        if player is None and game_state is not None:
+            # Derive the player from game_state if not provided
+            player = next((p for p in game_state.players if p.id == player_id), None)
         if player is None:
             return StrategyCardAbilityResult(
                 success=False,
                 player_id=player_id,
                 error_message="Player parameter is required for Leadership primary ability",
+            )
+        if getattr(player, "id", None) != player_id:
+            return StrategyCardAbilityResult(
+                success=False,
+                player_id=player_id,
+                error_message="player.id does not match player_id",
             )
 
         try:
@@ -142,7 +151,7 @@ class LeadershipStrategyCard(BaseStrategyCard):
                 return StrategyCardAbilityResult(
                     success=False,
                     player_id=player_id,
-                    error_message=f"token_distribution must allocate at least {total_tokens_needed} tokens.",
+                    error_message=f"token_distribution must allocate exactly {total_tokens_needed} tokens.",
                 )
 
             # All validation passed - now perform state mutations atomically
@@ -150,7 +159,12 @@ class LeadershipStrategyCard(BaseStrategyCard):
                 self._exhaust_planets(planets_to_exhaust, game_state, player_id)
 
             if trade_goods_to_spend > 0:
-                player.command_sheet.spend_trade_goods(trade_goods_to_spend)
+                if not player.command_sheet.spend_trade_goods(trade_goods_to_spend):
+                    return StrategyCardAbilityResult(
+                        success=False,
+                        player_id=player_id,
+                        error_message=f"Failed to spend {trade_goods_to_spend} trade goods",
+                    )
 
             # Distribute tokens using Player.gain_command_token
             tokens_distributed = 0
@@ -223,11 +237,19 @@ class LeadershipStrategyCard(BaseStrategyCard):
         planets_to_exhaust = kwargs.get("planets_to_exhaust", [])
         trade_goods_to_spend = kwargs.get("trade_goods_to_spend", 0)
 
+        if player is None and game_state is not None:
+            player = next((p for p in game_state.players if p.id == player_id), None)
         if player is None:
             return StrategyCardAbilityResult(
                 success=False,
                 player_id=player_id,
                 error_message="Player parameter is required for Leadership secondary ability",
+            )
+        if getattr(player, "id", None) != player_id:
+            return StrategyCardAbilityResult(
+                success=False,
+                player_id=player_id,
+                error_message="player.id does not match player_id",
             )
 
         try:
@@ -288,7 +310,7 @@ class LeadershipStrategyCard(BaseStrategyCard):
                 return StrategyCardAbilityResult(
                     success=False,
                     player_id=player_id,
-                    error_message=f"token_distribution must allocate at least {tokens_from_influence} tokens.",
+                    error_message=f"token_distribution must allocate exactly {tokens_from_influence} tokens.",
                 )
 
             # All validation passed - now perform state mutations atomically
@@ -296,7 +318,12 @@ class LeadershipStrategyCard(BaseStrategyCard):
                 self._exhaust_planets(planets_to_exhaust, game_state, player_id)
 
             if trade_goods_to_spend > 0:
-                player.command_sheet.spend_trade_goods(trade_goods_to_spend)
+                if not player.command_sheet.spend_trade_goods(trade_goods_to_spend):
+                    return StrategyCardAbilityResult(
+                        success=False,
+                        player_id=player_id,
+                        error_message=f"Failed to spend {trade_goods_to_spend} trade goods",
+                    )
 
             # Distribute tokens using Player.gain_command_token
             tokens_distributed = 0

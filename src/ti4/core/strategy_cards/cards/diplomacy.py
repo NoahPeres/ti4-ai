@@ -37,7 +37,7 @@ class DiplomacyStrategyCard(BaseStrategyCard):
         Returns:
             The initiative value (2)
 
-        LRR Reference: Rule 83 - Diplomacy has initiative value "2"
+        LRR Reference: Rule 32 - Diplomacy has initiative value "2"
         """
         return 2
 
