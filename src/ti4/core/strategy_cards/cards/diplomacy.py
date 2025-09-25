@@ -114,30 +114,8 @@ class DiplomacyStrategyCard(BaseStrategyCard):
                 error_message=f"Player {player_id} does not control any planet in system {system_id}",
             )
 
-        # Rule 32.2: Each other player places one command token from their reinforcements in that system
-        other_players = [p for p in game_state.players if p.id != player_id]
-        for other_player in other_players:
-            # Rule 32.2.b: If player already has a command token in the system, don't place another
-            if system.has_command_token(other_player.id):
-                continue
-
-            # Try to place from reinforcements first
-            if other_player.reinforcements > 0:
-                system.place_command_token(other_player.id)
-                # Consume the token from reinforcements
-                other_player.consume_reinforcement()
-            else:
-                # Rule 32.2.a: If no reinforcements, place from command sheet
-                # Check if player has any command tokens on their command sheet
-                total_command_tokens = other_player.command_sheet.get_total_tokens()
-                if total_command_tokens > 0:
-                    system.place_command_token(other_player.id)
-                    # Remove a token from the command sheet (prefer tactic, then fleet, then strategy)
-                    other_player.command_sheet.consume_any_token()
-                # If no tokens available anywhere, the player simply doesn't place a token
-
         # Ready up to 2 exhausted planets controlled by the player
-        planets_to_ready = kwargs.get("planets_to_ready", [])
+        planets_to_ready = kwargs.get("planets_to_ready", kwargs.get("planet_ids", []))
         if len(planets_to_ready) > 2:
             return StrategyCardAbilityResult(
                 success=False,
@@ -157,8 +135,8 @@ class DiplomacyStrategyCard(BaseStrategyCard):
             all_exhausted_planets.sort(key=lambda p: p.name)
             planets_to_ready = [p.name for p in all_exhausted_planets[:2]]
 
-        # Validate and ready the specified planets
-        readied_planets = []
+        # VALIDATION PHASE: Validate all planets before any mutations
+        planets_to_ready_objs = []
         for planet_name in planets_to_ready:
             # Find the planet using Galaxy helper method
             target_planet = None
@@ -181,8 +159,36 @@ class DiplomacyStrategyCard(BaseStrategyCard):
                     error_message=f"Planet {planet_name} is not exhausted",
                 )
 
+            planets_to_ready_objs.append(target_planet)
+
+        # MUTATION PHASE: All validations passed, now perform mutations
+        # Rule 32.2: Each other player places one command token from their reinforcements in that system
+        other_players = [p for p in game_state.players if p.id != player_id]
+        for other_player in other_players:
+            # Rule 32.2.b: If player already has a command token in the system, don't place another
+            if system.has_command_token(other_player.id):
+                continue
+
+            # Try to place from reinforcements first
+            if other_player.reinforcements > 0:
+                system.place_command_token(other_player.id)
+                # Consume the token from reinforcements
+                other_player.consume_reinforcement()
+            else:
+                # Rule 32.2.a: If no reinforcements, place from command sheet
+                # Check if player has any command tokens on their command sheet
+                total_command_tokens = other_player.command_sheet.get_total_tokens()
+                if total_command_tokens > 0:
+                    system.place_command_token(other_player.id)
+                    # Remove a token from the command sheet (prefer tactic, then fleet, then strategy)
+                    other_player.command_sheet.consume_any_token()
+                # If no tokens available anywhere, the player simply doesn't place a token
+
+        # Ready the validated planets
+        readied_planets = []
+        for target_planet in planets_to_ready_objs:
             target_planet.ready()
-            readied_planets.append(planet_name)
+            readied_planets.append(target_planet.name)
 
         return StrategyCardAbilityResult(
             success=True,
@@ -234,15 +240,7 @@ class DiplomacyStrategyCard(BaseStrategyCard):
                 error_message=f"Player {player_id} not found in game state",
             )
 
-        # Check if player has command tokens in strategy pool
-        if player.command_sheet.strategy_pool <= 0:
-            return StrategyCardAbilityResult(
-                success=False,
-                player_id=player_id,
-                error_message=f"Player {player_id} has no command tokens in strategy pool",
-            )
-
-        planet_ids = kwargs.get("planet_ids", [])
+        planet_ids = kwargs.get("planet_ids", kwargs.get("planets_to_ready", []))
         if not planet_ids:
             return StrategyCardAbilityResult(
                 success=False,
@@ -258,29 +256,16 @@ class DiplomacyStrategyCard(BaseStrategyCard):
                 error_message="Diplomacy secondary ability can ready at most 2 planets",
             )
 
-        # Find and validate planets
+        # Find and validate ALL planets before any state mutation
         planets_to_ready = []
         for planet_id in planet_ids:
             found_planet = None
-            # Search through all systems for the planet
             if game_state.galaxy:
-                for system in game_state.galaxy.system_objects.values():
-                    for planet_obj in system.planets:
-                        if planet_obj.name == planet_id:
-                            found_planet = planet_obj
-                            break
-                    if found_planet:
-                        break
-
-            if not found_planet:
-                return StrategyCardAbilityResult(
-                    success=False,
-                    player_id=player_id,
-                    error_message=f"Planet {planet_id} not found",
+                found_planet = game_state.galaxy.find_planet_by_name(
+                    planet_id, player_id
                 )
 
-            # Check if player controls the planet
-            if found_planet.controlled_by != player_id:
+            if not found_planet:
                 return StrategyCardAbilityResult(
                     success=False,
                     player_id=player_id,
@@ -297,12 +282,13 @@ class DiplomacyStrategyCard(BaseStrategyCard):
 
             planets_to_ready.append(found_planet)
 
-        # Spend command token from strategy pool before mutating state
+        # All validations passed - now perform state mutations
+        # Spend command token from strategy pool
         if not player.command_sheet.spend_strategy_token():
             return StrategyCardAbilityResult(
                 success=False,
                 player_id=player_id,
-                error_message=f"Failed to spend strategy token for player {player_id}",
+                error_message=f"Player {player_id} has no command tokens in strategy pool",
             )
 
         # Ready the planets
@@ -313,4 +299,5 @@ class DiplomacyStrategyCard(BaseStrategyCard):
             success=True,
             player_id=player_id,
             error_message=None,
+            command_tokens_spent=1,
         )

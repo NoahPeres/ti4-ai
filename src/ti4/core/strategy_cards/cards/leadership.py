@@ -86,8 +86,8 @@ class LeadershipStrategyCard(BaseStrategyCard):
             # Validate planet exhaustion choices and calculate influence
             total_influence = 0
             if planets_to_exhaust and game_state:
-                validation_result = self._validate_planet_exhaustion(
-                    player, planets_to_exhaust, game_state
+                validation_result = self._validate_planets_for_exhaustion(
+                    planets_to_exhaust, game_state, player
                 )
                 if not validation_result["valid"]:
                     return StrategyCardAbilityResult(
@@ -123,7 +123,7 @@ class LeadershipStrategyCard(BaseStrategyCard):
 
             # Exhaust planets and spend trade goods (atomicity)
             if planets_to_exhaust and game_state:
-                self._exhaust_planets(planets_to_exhaust, game_state)
+                self._exhaust_planets(planets_to_exhaust, game_state, player_id)
 
             if trade_goods_to_spend > 0:
                 player.command_sheet.spend_trade_goods(trade_goods_to_spend)
@@ -241,8 +241,8 @@ class LeadershipStrategyCard(BaseStrategyCard):
             # Validate planet exhaustion choices and calculate influence
             total_influence = 0
             if planets_to_exhaust and game_state:
-                validation_result = self._validate_planet_exhaustion(
-                    player, planets_to_exhaust, game_state
+                validation_result = self._validate_planets_for_exhaustion(
+                    planets_to_exhaust, game_state, player
                 )
                 if not validation_result["valid"]:
                     return StrategyCardAbilityResult(
@@ -276,7 +276,7 @@ class LeadershipStrategyCard(BaseStrategyCard):
 
             # Exhaust planets and spend trade goods (atomicity)
             if planets_to_exhaust and game_state:
-                self._exhaust_planets(planets_to_exhaust, game_state)
+                self._exhaust_planets(planets_to_exhaust, game_state, player_id)
 
             if trade_goods_to_spend > 0:
                 player.command_sheet.spend_trade_goods(trade_goods_to_spend)
@@ -344,15 +344,15 @@ class LeadershipStrategyCard(BaseStrategyCard):
                 error_message=f"Error executing Leadership secondary ability: {str(e)}",
             )
 
-    def _validate_planet_exhaustion(
-        self, player: Any, planets_to_exhaust: list[str], game_state: "GameState"
+    def _validate_planets_for_exhaustion(
+        self, planets_to_exhaust: list[str], game_state: "GameState", player: Any
     ) -> dict[str, Any]:
         """Validate that the player can exhaust the specified planets for influence.
 
         Args:
-            player: The player attempting to exhaust planets
             planets_to_exhaust: List of planet names to exhaust
             game_state: Game state to get player's planets
+            player: The player attempting to exhaust planets
 
         Returns:
             dict with 'valid' (bool), 'total_influence' (int), and 'error' (str) keys
@@ -361,12 +361,12 @@ class LeadershipStrategyCard(BaseStrategyCard):
             return {"valid": True, "total_influence": 0, "error": ""}
 
         # Get player's controlled planets from game state
-        controlled_planets = {
-            p.name: p for p in game_state.get_player_planets(player.id)
-        }
+        controlled_planets_list = game_state.get_player_planets(player.id)
+        controlled_planets = {p.name: p for p in controlled_planets_list}
 
         total_influence = 0
         for planet_name in planets_to_exhaust:
+            # Check if planet is controlled by player
             if planet_name not in controlled_planets:
                 return {
                     "valid": False,
@@ -382,31 +382,55 @@ class LeadershipStrategyCard(BaseStrategyCard):
                     "error": f"Planet '{planet_name}' is already exhausted",
                 }
 
-            if not hasattr(planet, "influence") or planet.influence <= 0:
+            # Prefer method accessor if available, fallback to attribute for mocks
+            influence_value = None
+            if hasattr(planet, "get_influence"):
+                influence_value = planet.get_influence()
+            elif hasattr(planet, "influence"):
+                influence_value = getattr(planet, "influence", None)
+
+            if influence_value is None:
                 return {
                     "valid": False,
                     "total_influence": 0,
                     "error": f"Planet '{planet_name}' has no influence value",
                 }
 
-            total_influence += int(planet.influence)
+            # Convert to integer
+            try:
+                influence_int = int(influence_value)
+                if influence_int <= 0:
+                    return {
+                        "valid": False,
+                        "total_influence": 0,
+                        "error": f"Planet '{planet_name}' has no influence value",
+                    }
+            except (ValueError, TypeError):
+                return {
+                    "valid": False,
+                    "total_influence": 0,
+                    "error": f"Planet '{planet_name}' has invalid influence value",
+                }
+
+            total_influence += influence_int
 
         return {"valid": True, "total_influence": total_influence, "error": ""}
 
     def _exhaust_planets(
-        self, planets_to_exhaust: list[str], game_state: "GameState"
+        self, planets_to_exhaust: list[str], game_state: "GameState", player_id: str
     ) -> None:
         """Exhaust the specified planets.
 
         Args:
             planets_to_exhaust: List of planet names to exhaust
             game_state: Game state to get planets
+            player_id: Player ID to filter planets by ownership
         """
         if game_state.galaxy is None:
             return
 
         for planet_name in planets_to_exhaust:
-            # Find the planet using Galaxy helper method and exhaust it
-            planet = game_state.galaxy.find_planet_by_name(planet_name)
+            # Find the planet using Galaxy helper method with player filter and exhaust it
+            planet = game_state.galaxy.find_planet_by_name(planet_name, player_id)
             if planet:
                 planet.exhaust()
