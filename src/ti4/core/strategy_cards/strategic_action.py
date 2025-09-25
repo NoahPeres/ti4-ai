@@ -52,7 +52,7 @@ class StrategyCard:
     def exhaust(self) -> None:
         """Mark this strategy card as exhausted."""
         if self._exhausted:
-            return  # Already exhausted, prevent double-exhaust
+            raise ValueError("Strategy card is already exhausted")
         self._exhausted = True
 
     def ready(self) -> None:

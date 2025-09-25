@@ -81,7 +81,7 @@ class DiplomacyStrategyCard(BaseStrategyCard):
             )
 
         # Rule 32.2: Cannot select Mecatol Rex system
-        if system_id == "mecatol_rex":
+        if system_id == "18":
             return StrategyCardAbilityResult(
                 success=False,
                 player_id=player_id,
@@ -157,11 +157,7 @@ class DiplomacyStrategyCard(BaseStrategyCard):
         if game_state.galaxy:
             for system_obj in game_state.galaxy.system_objects.values():
                 for planet in system_obj.planets:
-                    if (
-                        planet.controlled_by == player_id
-                        and hasattr(planet, "is_exhausted")
-                        and planet.is_exhausted()
-                    ):
+                    if planet.controlled_by == player_id and planet.is_exhausted():
                         all_exhausted_planets.append(planet)
 
         # If no specific planets specified, ready up to 2 exhausted planets automatically
@@ -192,18 +188,15 @@ class DiplomacyStrategyCard(BaseStrategyCard):
                     error_message=f"Planet {planet_name} not found or not controlled by player {player_id}",
                 )
 
-            if not (
-                hasattr(target_planet, "is_exhausted") and target_planet.is_exhausted()
-            ):
+            if not target_planet.is_exhausted():
                 return StrategyCardAbilityResult(
                     success=False,
                     player_id=player_id,
                     error_message=f"Planet {planet_name} is not exhausted",
                 )
 
-            if hasattr(target_planet, "ready"):
-                target_planet.ready()
-                readied_planets.append(planet_name)
+            target_planet.ready()
+            readied_planets.append(planet_name)
 
         return StrategyCardAbilityResult(
             success=True,

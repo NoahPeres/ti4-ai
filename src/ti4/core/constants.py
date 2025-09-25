@@ -216,6 +216,13 @@ class CircuitBreakerConstants:
     STATE_HALF_OPEN = CircuitBreakerState.HALF_OPEN.value
 
 
+class SystemConstants:
+    """Constants for game systems."""
+
+    # Special system identifiers
+    MECATOL_REX_ID = "mecatol_rex"
+
+
 class GameStateConstants:
     """Constants for game state management."""
 
