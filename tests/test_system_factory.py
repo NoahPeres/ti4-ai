@@ -85,18 +85,18 @@ class TestSystemFactory:
         # Verify planet properties
         planet_a = system.get_planet_by_name("Planet A")
         assert planet_a is not None
-        assert planet_a.resources == 2
-        assert planet_a.influence == 1
+        assert planet_a.get_resources() == 2
+        assert planet_a.get_influence() == 1
 
         planet_b = system.get_planet_by_name("Planet B")
         assert planet_b is not None
-        assert planet_b.resources == 1
-        assert planet_b.influence == 3
+        assert planet_b.get_resources() == 1
+        assert planet_b.get_influence() == 3
 
         planet_c = system.get_planet_by_name("Planet C")
         assert planet_c is not None
-        assert planet_c.resources == 0
-        assert planet_c.influence == 2
+        assert planet_c.get_resources() == 0
+        assert planet_c.get_influence() == 2
 
     def test_create_system_with_no_planets(self) -> None:
         """Test creation of system with no planets."""

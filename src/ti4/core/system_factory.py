@@ -1,5 +1,6 @@
 """System factory for creating specific game systems."""
 
+from .constants import SystemConstants
 from .planet import Planet
 from .system import System
 
@@ -20,7 +21,7 @@ class SystemFactory:
         Returns:
             System containing the Mecatol Rex planet
         """
-        system = System("18")
+        system = System(SystemConstants.MECATOL_REX_ID)
         mecatol_rex_planet = Planet(name="Mecatol Rex", resources=1, influence=6)
         system.add_planet(mecatol_rex_planet)
         return system

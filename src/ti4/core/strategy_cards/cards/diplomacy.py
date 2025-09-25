@@ -8,6 +8,7 @@ LRR Reference: Rule 32 - DIPLOMACY (Strategy Card)
 
 from typing import TYPE_CHECKING, Any, Optional
 
+from ...constants import SystemConstants
 from ..base_strategy_card import BaseStrategyCard, StrategyCardAbilityResult
 from ..strategic_action import StrategyCardType
 
@@ -81,7 +82,7 @@ class DiplomacyStrategyCard(BaseStrategyCard):
             )
 
         # Rule 32.2: Cannot select Mecatol Rex system
-        if system_id == "18":
+        if system_id == SystemConstants.MECATOL_REX_ID:
             return StrategyCardAbilityResult(
                 success=False,
                 player_id=player_id,
@@ -127,8 +128,10 @@ class DiplomacyStrategyCard(BaseStrategyCard):
             # Try to place from reinforcements first
             if other_player.reinforcements > 0:
                 system.place_command_token(other_player.id)
-                # Note: In a real implementation, we'd need to update the player's reinforcements
-                # but since Player is frozen, this would require creating a new game state
+                # Consume the token from reinforcements
+                object.__setattr__(
+                    other_player, "reinforcements", other_player.reinforcements - 1
+                )
             else:
                 # Rule 32.2.a: If no reinforcements, place from command sheet
                 # Check if player has any command tokens on their command sheet
@@ -139,8 +142,25 @@ class DiplomacyStrategyCard(BaseStrategyCard):
                 )
                 if total_command_tokens > 0:
                     system.place_command_token(other_player.id)
-                    # Note: In a real implementation, we'd need to remove a token from the command sheet
-                    # but since Player is frozen, this would require creating a new game state
+                    # Remove a token from the command sheet (prefer tactic, then fleet, then strategy)
+                    if other_player.command_sheet.tactic_pool > 0:
+                        object.__setattr__(
+                            other_player.command_sheet,
+                            "tactic_pool",
+                            other_player.command_sheet.tactic_pool - 1,
+                        )
+                    elif other_player.command_sheet.fleet_pool > 0:
+                        object.__setattr__(
+                            other_player.command_sheet,
+                            "fleet_pool",
+                            other_player.command_sheet.fleet_pool - 1,
+                        )
+                    elif other_player.command_sheet.strategy_pool > 0:
+                        object.__setattr__(
+                            other_player.command_sheet,
+                            "strategy_pool",
+                            other_player.command_sheet.strategy_pool - 1,
+                        )
                 # If no tokens available anywhere, the player simply doesn't place a token
 
         # Ready up to 2 exhausted planets controlled by the player

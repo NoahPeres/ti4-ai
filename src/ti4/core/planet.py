@@ -58,6 +58,14 @@ class Planet:
         """Check if this planet can spend influence."""
         return not self._exhausted
 
+    def get_resources(self) -> int:
+        """Get the resource value of this planet."""
+        return self.resources
+
+    def get_influence(self) -> int:
+        """Get the influence value of this planet."""
+        return self.influence
+
     def spend_resources(self, amount: int) -> int:
         """Spend resources from this planet, exhausting it."""
         if self._exhausted:

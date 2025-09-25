@@ -220,7 +220,7 @@ class SystemConstants:
     """Constants for game systems."""
 
     # Special system identifiers
-    MECATOL_REX_ID = "mecatol_rex"
+    MECATOL_REX_ID = "18"
 
 
 class GameStateConstants:
