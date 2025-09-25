@@ -117,14 +117,7 @@ class LeadershipStrategyCard(BaseStrategyCard):
             )
             total_tokens_needed = max_base_tokens + additional_tokens
 
-            # Exhaust planets and spend trade goods (atomicity)
-            if planets_to_exhaust and game_state:
-                self._exhaust_planets(planets_to_exhaust, game_state, player_id)
-
-            if trade_goods_to_spend > 0:
-                player.command_sheet.spend_trade_goods(trade_goods_to_spend)
-
-            # Validate token_distribution
+            # Validate token_distribution BEFORE any state mutations
             valid_pools = {"tactic", "fleet", "strategy"}
             if any(
                 (k not in valid_pools) or (int(v) < 0)
@@ -151,6 +144,13 @@ class LeadershipStrategyCard(BaseStrategyCard):
                     player_id=player_id,
                     error_message=f"token_distribution must allocate at least {total_tokens_needed} tokens.",
                 )
+
+            # All validation passed - now perform state mutations atomically
+            if planets_to_exhaust and game_state:
+                self._exhaust_planets(planets_to_exhaust, game_state, player_id)
+
+            if trade_goods_to_spend > 0:
+                player.command_sheet.spend_trade_goods(trade_goods_to_spend)
 
             # Distribute tokens using Player.gain_command_token
             tokens_distributed = 0
@@ -263,14 +263,7 @@ class LeadershipStrategyCard(BaseStrategyCard):
             reinforcements = player.reinforcements
             tokens_from_influence = min(total_influence // 3, reinforcements)
 
-            # Exhaust planets and spend trade goods (atomicity)
-            if planets_to_exhaust and game_state:
-                self._exhaust_planets(planets_to_exhaust, game_state, player_id)
-
-            if trade_goods_to_spend > 0:
-                player.command_sheet.spend_trade_goods(trade_goods_to_spend)
-
-            # Validate token_distribution
+            # Validate token_distribution BEFORE any state mutations
             valid_pools = {"tactic", "fleet", "strategy"}
             if any(
                 (k not in valid_pools) or (int(v) < 0)
@@ -297,6 +290,13 @@ class LeadershipStrategyCard(BaseStrategyCard):
                     player_id=player_id,
                     error_message=f"token_distribution must allocate at least {tokens_from_influence} tokens.",
                 )
+
+            # All validation passed - now perform state mutations atomically
+            if planets_to_exhaust and game_state:
+                self._exhaust_planets(planets_to_exhaust, game_state, player_id)
+
+            if trade_goods_to_spend > 0:
+                player.command_sheet.spend_trade_goods(trade_goods_to_spend)
 
             # Distribute tokens using Player.gain_command_token
             tokens_distributed = 0
@@ -397,11 +397,11 @@ class LeadershipStrategyCard(BaseStrategyCard):
             # Convert to integer
             try:
                 influence_int = int(influence_value)
-                if influence_int <= 0:
+                if influence_int < 0:
                     return {
                         "valid": False,
                         "total_influence": 0,
-                        "error": f"Planet '{planet_name}' must have positive influence",
+                        "error": f"Planet '{planet_name}' cannot have negative influence",
                     }
             except (ValueError, TypeError):
                 return {

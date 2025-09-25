@@ -57,7 +57,7 @@ class DiplomacyStrategyCard(BaseStrategyCard):
             player_id: The active player executing the primary ability
             game_state: Game state for full integration
             **kwargs: Additional parameters - expects 'system_id' for the chosen system;
-                     optionally 'planets_to_ready' (alias: 'planet_ids') with up to two planet names to ready
+                     optionally 'planets_to_ready' (alias: 'planet_ids') with up to two planet names (strings) to ready
 
         Returns:
             Result of the primary ability execution
@@ -116,6 +116,14 @@ class DiplomacyStrategyCard(BaseStrategyCard):
                 success=False,
                 player_id=player_id,
                 error_message="Cannot ready more than 2 planets with Diplomacy primary ability",
+            )
+
+        # Check for duplicate planets
+        if len(planets_to_ready) != len(set(planets_to_ready)):
+            return StrategyCardAbilityResult(
+                success=False,
+                player_id=player_id,
+                error_message="Cannot specify the same planet multiple times",
             )
 
         # Get all exhausted planets controlled by the player
@@ -205,6 +213,7 @@ class DiplomacyStrategyCard(BaseStrategyCard):
             player_id: The player executing the secondary ability
             game_state: Game state for full integration
             **kwargs: Additional parameters - expects 'planet_ids' list (alias: 'planets_to_ready')
+                     containing planet names (strings) of up to 2 exhausted planets to ready
 
         Returns:
             Result of the secondary ability execution
@@ -246,6 +255,14 @@ class DiplomacyStrategyCard(BaseStrategyCard):
                 error_message="Diplomacy secondary ability can ready at most 2 planets",
             )
 
+        # Check for duplicate planets
+        if len(planet_ids) != len(set(planet_ids)):
+            return StrategyCardAbilityResult(
+                success=False,
+                player_id=player_id,
+                error_message="Cannot specify the same planet multiple times",
+            )
+
         # Find and validate ALL planets before any state mutation
         planets_to_ready = []
         for planet_id in planet_ids:
@@ -282,12 +299,15 @@ class DiplomacyStrategyCard(BaseStrategyCard):
             )
 
         # Ready the planets
+        readied_planets = []
         for planet in planets_to_ready:
             planet.ready()
+            readied_planets.append(planet.name)
 
         return StrategyCardAbilityResult(
             success=True,
             player_id=player_id,
             error_message=None,
             command_tokens_spent=1,
+            additional_data={"readied_planets": readied_planets},
         )
