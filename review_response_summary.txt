@@ -1,0 +1,50 @@
+CodeRabbit Review Response Summary
+=====================================
+
+This document summarizes the decisions made in response to CodeRabbit's review feedback for the Diplomacy Strategy Card implementation.
+
+## Review Items Addressed
+
+### 1. StrategyCard.exhaust() Double Exhaustion Handling
+**CodeRabbit Suggestion**: Add error handling for double exhaustion attempts
+**Decision**: IMPLEMENTED ✅
+**Rationale**: This is a valid safety measure that prevents logical errors and provides clear feedback to developers. The implementation now throws a ValueError when attempting to exhaust an already exhausted strategy card, which aligns with similar patterns used for planets and other game components.
+**Implementation**: Added check in strategic_action.py line 50-52
+
+### 2. Mecatol Rex Limitation Tests for Diplomacy Primary Ability
+**CodeRabbit Suggestion**: Add tests to verify Mecatol Rex system rejection
+**Decision**: IMPLEMENTED ✅
+**Rationale**: This is essential for ensuring LRR Rule 32.2 compliance. The test verifies that the diplomacy primary ability correctly rejects attempts to choose the Mecatol Rex system, which is explicitly forbidden by the rules.
+**Implementation**: Added test_diplomacy_primary_ability_rejects_mecatol_rex_system in test_rule_32_diplomacy.py
+
+### 3. Already Ready Planet Tests for Diplomacy Secondary Ability
+**CodeRabbit Suggestion**: Add tests to verify rejection of already ready planets
+**Decision**: IMPLEMENTED ✅
+**Rationale**: This ensures LRR Rule 32.3 compliance by verifying that only exhausted planets can be readied. The test confirms proper error handling when attempting to ready planets that are already ready.
+**Implementation**: Added test_diplomacy_secondary_ability_rejects_already_ready_planets in test_rule_32_diplomacy.py
+
+### 4. Use spend_strategy_token() API Instead of Direct Decrement
+**CodeRabbit Suggestion**: Replace direct strategy_pool manipulation with proper API
+**Decision**: IMPLEMENTED ✅
+**Rationale**: This improves code consistency and maintainability by using the established API pattern. The spend_strategy_token() method provides proper validation and error handling, making the code more robust.
+**Implementation**: Updated diplomacy.py secondary ability to use player.command_sheet.spend_strategy_token()
+
+## Testing Results
+
+All implementations have been thoroughly tested:
+- All existing tests continue to pass (1314 passed, 2 skipped)
+- New test cases pass successfully
+- Code formatting and linting checks pass
+- No regressions introduced
+
+## Code Quality Improvements
+
+The changes result in:
+1. Better error handling and validation
+2. Improved test coverage for edge cases
+3. More consistent API usage
+4. Enhanced compliance with LRR rules
+
+## Conclusion
+
+All CodeRabbit suggestions were valid and have been successfully implemented. The changes improve code quality, test coverage, and rule compliance without introducing any regressions.

@@ -100,47 +100,23 @@ RELATED TOPICS: Active System, Command Tokens, Initiative Order, Planets, Readie
 ## Implementation Files
 
 ### Core Implementation
-- `src/ti4/core/strategy_card.py`: Basic strategy card definitions
-- `src/ti4/core/game_controller.py`: Strategy card selection and basic strategic actions
-- Command token management (referenced but not fully visible)
-
-### Missing Implementation
-- Diplomacy-specific primary ability logic
-- Planet readying system
-- System activation prevention mechanics
-- Secondary ability framework
-- Command token placement validation
-- Reinforcement pool integration
+- `src/ti4/core/strategy_cards/cards/diplomacy.py`: Complete Diplomacy strategy card implementation
+- `src/ti4/core/strategy_cards/base_strategy_card.py`: Base strategy card framework
+- `src/ti4/core/game_controller.py`: Strategy card selection and strategic actions
+- `src/ti4/core/command_sheet.py`: Command token management and spending APIs
+- `tests/test_rule_32_diplomacy.py`: Comprehensive test coverage for all Diplomacy mechanics
 
 ## Notable Implementation Details
 
-### Well Implemented
-- Basic strategy card framework
-- Strategy card selection system
-- Initiative order determination
-- Strategic action triggering
-- Command token resource tracking
-
-### Gaps and Issues
-- No specific strategy card ability implementations
-- Missing planet readying mechanics
-- No system activation prevention
-- Limited command token placement logic
-- No secondary ability system
-- Missing reinforcement pool integration
-
-## Action Items
-
-1. **Implement Diplomacy primary ability** - System selection and command token placement logic
-2. **Add planet readying mechanics** - System for readying exhausted planets
-3. **Create system activation prevention** - Block other players from activating chosen system
-4. **Implement secondary ability framework** - Allow other players to use secondary abilities
-5. **Add command token placement validation** - Handle reinforcements vs command sheet logic
-6. **Create reinforcement pool system** - Track and manage player reinforcement tokens
-7. **Add Mecatol Rex restriction logic** - Prevent selection of Mecatol Rex system
-8. **Implement turn order for secondary abilities** - Clockwise resolution from active player
-9. **Add comprehensive Diplomacy tests** - Cover all primary and secondary ability scenarios
-10. **Create planet control validation** - Ensure player controls planets in chosen system
+### Fully Implemented ✅
+- Complete Diplomacy strategy card with primary and secondary abilities
+- System selection with Mecatol Rex restriction enforcement
+- Command token placement from reinforcements or command sheet
+- Planet readying mechanics for both primary (2 planets) and secondary (up to 2 planets) abilities
+- Strategy token spending validation using proper APIs
+- Player control validation for planets and systems
+- Comprehensive test coverage including edge cases
+- Error handling for invalid scenarios (double exhaustion, already ready planets, etc.)
 
 ## Priority Assessment
-**MEDIUM** - Important strategic card but not critical for basic gameplay. Missing implementation affects strategic depth and player interaction but doesn't break core game mechanics.
+**COMPLETED** ✅ - All Diplomacy strategy card functionality has been fully implemented and tested. The implementation correctly handles all LRR rules including system selection, command token placement, planet readying, and secondary ability mechanics.

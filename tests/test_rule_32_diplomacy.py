@@ -298,6 +298,76 @@ class TestRule32DiplomacySecondaryAbility:
         assert result.success is False
         assert "does not control planet" in result.error_message
 
+    def test_diplomacy_primary_ability_rejects_mecatol_rex_system(self):
+        """Test that Diplomacy primary ability rejects Mecatol Rex system.
+
+        LRR Reference: Rule 32.2 - "chooses a system that contains a planet they control
+        other than the Mecatol Rex system"
+        """
+        from src.ti4.core.system_factory import SystemFactory
+
+        # Create player with command tokens
+        player1 = Player("player1", Faction.ARBOREC, reinforcements=8)
+        player2 = Player("player2", Faction.BARONY, reinforcements=8)
+
+        # Create Mecatol Rex system
+        mecatol_system = SystemFactory.create_mecatol_rex_system()
+        mecatol_planet = mecatol_system.planets[0]
+        mecatol_planet.controlled_by = "player1"  # Player controls Mecatol Rex
+
+        galaxy = Galaxy()
+        galaxy.register_system(mecatol_system)
+
+        game_state = GameState(galaxy=galaxy, players=[player1, player2])
+
+        diplomacy_card = DiplomacyStrategyCard()
+
+        # Try to use primary ability on Mecatol Rex system - should fail
+        result = diplomacy_card.execute_primary_ability(
+            "player1",
+            game_state,
+            system_id="18",  # Mecatol Rex system ID
+        )
+
+        assert result.success is False
+        assert "Cannot select Mecatol Rex system" in result.error_message
+
+    def test_diplomacy_secondary_ability_rejects_already_ready_planets(self):
+        """Test that Diplomacy secondary ability rejects already ready planets.
+
+        LRR Reference: Rule 32.3 - "ready up to two exhausted planets they control"
+        Only exhausted planets can be readied.
+        """
+        # Create players with command tokens
+        from src.ti4.core.command_sheet import CommandSheet
+
+        command_sheet = CommandSheet(strategy_pool=2)
+        player1 = Player("player1", Faction.ARBOREC, command_sheet=command_sheet)
+        player2 = Player("player2", Faction.BARONY)
+
+        # Create a planet that is NOT exhausted (ready)
+        planet = Planet("Ready Planet", 2, 1)
+        planet.controlled_by = "player1"
+        # Planet starts ready by default, don't exhaust it
+
+        system = System("system1")
+        system.planets.append(planet)
+
+        galaxy = Galaxy()
+        galaxy.register_system(system)
+
+        game_state = GameState(galaxy=galaxy, players=[player1, player2])
+
+        diplomacy_card = DiplomacyStrategyCard()
+
+        # Try to ready an already ready planet - should fail
+        result = diplomacy_card.execute_secondary_ability(
+            "player1", game_state, planet_ids=["Ready Planet"]
+        )
+
+        assert result.success is False
+        assert "is not exhausted and cannot be readied" in result.error_message
+
 
 class TestRule32DiplomacyCardProperties:
     """Test cases for Diplomacy strategy card properties."""

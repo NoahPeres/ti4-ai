@@ -3,7 +3,7 @@
 This module implements the Diplomacy strategy card following the
 BaseStrategyCard pattern established for all strategy cards.
 
-LRR Reference: Rule 83 - STRATEGY CARD (Diplomacy)
+LRR Reference: Rule 32 - DIPLOMACY (Strategy Card)
 """
 
 from typing import TYPE_CHECKING, Any, Optional
@@ -314,10 +314,13 @@ class DiplomacyStrategyCard(BaseStrategyCard):
         for planet in planets_to_ready:
             planet.ready()
 
-        # Spend command token from strategy pool
-        # Note: Since Player is frozen, we would need to create a new game state
-        # For now, we'll modify the command sheet directly
-        player.command_sheet.strategy_pool -= 1
+        # Spend command token from strategy pool using proper API
+        if not player.command_sheet.spend_strategy_token():
+            return StrategyCardAbilityResult(
+                success=False,
+                player_id=player_id,
+                error_message=f"Failed to spend strategy token for player {player_id}",
+            )
 
         return StrategyCardAbilityResult(
             success=True,
