@@ -139,3 +139,15 @@ class InvalidSystemError(TI4Error):
     """Raised when an invalid system is referenced."""
 
     pass
+
+
+class DeployError(TI4Error):
+    """Raised when deploy ability usage fails validation."""
+
+    pass
+
+
+class ReinforcementError(TI4Error):
+    """Raised when reinforcement requirements are not met."""
+
+    pass

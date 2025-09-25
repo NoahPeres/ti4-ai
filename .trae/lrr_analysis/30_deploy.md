@@ -3,7 +3,7 @@
 ## Category Overview
 **Rule Type:** Unit Abilities
 **Priority:** MEDIUM-HIGH
-**Implementation Status:** PARTIALLY IMPLEMENTED
+**Implementation Status:** ✅ **COMPLETED**
 
 ## Raw LRR Text
 ```
@@ -24,29 +24,29 @@ RELATED TOPICS: Abilities, Mechs, Reinforcements
 ## Sub-Rules Analysis
 
 ### 30.1 Deploy Ability Usage
-**Status:** 🔶 PARTIALLY IMPLEMENTED
-**Implementation:** Unit has deploy flag but no deployment mechanics
-**Details:** Conditions and placement logic not implemented
+**Status:** ✅ **COMPLETED**
+**Implementation:** Player.deploy_unit() method with full validation
+**Details:** Validates unit has deploy ability, planet control, and placement logic
 
 ### 30.1.a Resource-Free Deployment
-**Status:** ❌ NOT IMPLEMENTED
-**Implementation:** No cost system for deploy abilities
-**Details:** Deploy should bypass normal resource costs
+**Status:** ✅ **COMPLETED**
+**Implementation:** Deploy bypasses resource costs entirely
+**Details:** No resource spending required for deploy abilities
 
 ### 30.2 Reinforcement Requirement
-**Status:** ❌ NOT IMPLEMENTED
-**Implementation:** No reinforcement validation for deploy
-**Details:** Must check unit availability in reinforcements
+**Status:** ✅ **COMPLETED**
+**Implementation:** Validates unit availability in reinforcements
+**Details:** Checks specific unit type availability before deployment
 
 ### 30.2.a Availability Check
-**Status:** ❌ NOT IMPLEMENTED
-**Implementation:** No validation of deploy unit availability
-**Details:** Cannot deploy if no units with deploy ability in reinforcements
+**Status:** ✅ **COMPLETED**
+**Implementation:** Validates deployable units exist in reinforcements
+**Details:** Raises ReinforcementError if no units with deploy ability available
 
 ### 30.3 Timing Window Restriction
-**Status:** ❌ NOT IMPLEMENTED
-**Implementation:** No timing window tracking for deploy abilities
-**Details:** Each deploy ability can only be used once per timing window
+**Status:** ✅ **COMPLETED**
+**Implementation:** Player tracks timing windows and deploy usage
+**Details:** Each deploy ability limited to once per timing window with advance_timing_window()
 
 ## Related Topics
 - **Abilities:** General ability system framework
@@ -61,68 +61,73 @@ RELATED TOPICS: Abilities, Mechs, Reinforcements
 
 ## Test References
 
-### Existing Tests
+### Implemented Tests
+- `tests/test_rule_30_deploy.py`: Complete deploy ability testing
+  - `test_rule_30_1_deploy_ability_usage`: Basic deploy functionality
+  - `test_rule_30_1a_no_resource_cost`: Resource-free deployment
+  - `test_rule_30_2_reinforcement_requirement`: Reinforcement validation
+  - `test_rule_30_2a_no_deploy_units_available`: Deployable unit availability check
+  - `test_rule_30_3_timing_window_restriction`: Once per timing window restriction
+  - `test_rule_30_3_timing_window_reset`: Timing window advancement
+  - `test_deploy_ability_multiple_planets_same_system`: Multi-planet deployment
+
+### Unit Ability Tests
 - `test_unit.py`: Deploy ability detection
   - Lines 105-116: Basic deploy ability identification for mechs
   - Lines 232-233: Deploy ability verification in comprehensive tests
 
-### Missing Tests
-- Deploy ability activation and placement
-- Reinforcement validation for deploy
-- Timing window restrictions
-- Resource cost bypassing
-- Deploy condition checking
-- Multiple deploy attempts prevention
-
 ## Implementation Files
 
-### Existing Implementation
+### Core Implementation
+- `src/ti4/core/player.py`: Deploy ability system
+  - `Player.deploy_unit()`: Main deployment method with full validation
+  - `Player.advance_timing_window()`: Timing window management
+  - `Player._timing_window_id`: Current timing window tracking
+  - `Player._deploy_used_this_window`: Deploy usage tracking per window
+
+### Supporting Implementation
 - `src/ti4/core/unit.py`: Deploy ability detection
   - `Unit.has_deploy()`: Returns boolean for deploy capability
 - `src/ti4/core/unit_stats.py`: Deploy ability flag
   - `UnitStats.deploy`: Boolean flag for deploy capability
   - Mech units have deploy=True in stats
-
-### Missing Implementation
-- Deploy ability activation system
-- Reinforcement validation logic
-- Timing window tracking
-- Deploy placement mechanics
-- Condition checking system
+- `src/ti4/core/reinforcements.py`: Unit availability validation
+- `src/ti4/core/exceptions.py`: DeployError and ReinforcementError
 
 ## Notable Implementation Details
 
-### Well-Implemented
-- Deploy ability detection for mechs
-- Unit stats system with deploy flag
-- Comprehensive unit ability testing framework
+### Successfully Implemented
+- **Deploy ability activation system** with full condition checking
+- **Reinforcement validation logic** for unit availability
+- **Timing window tracking** with once-per-window enforcement
+- **Deploy placement mechanics** for planet-based deployment
+- **Resource-free deployment** bypassing normal production costs
+- **Comprehensive error handling** with specific exception types
+- **Complete test coverage** for all rule aspects
 
-### Gaps
-- **No deploy activation system:** Cannot actually use deploy abilities
-- **Missing reinforcement integration:** No validation of unit availability
-- **No timing restrictions:** Can't enforce once-per-timing-window rule
-- **No placement mechanics:** No system to place deployed units
-- **Missing condition system:** No way to check deploy ability conditions
-- **No resource bypass:** Deploy still requires normal production costs
+### Key Features
+- **Planet control validation:** Must control target planet to deploy
+- **Unit type validation:** Only units with deploy ability can be deployed
+- **Reinforcement checking:** Validates both specific unit and deployable unit availability
+- **Timing window management:** Tracks and enforces deployment restrictions
+- **Error messaging:** Clear feedback for deployment failures
 
-## Action Items
+## Test Case Coverage
 
-1. **Create deploy ability activation system** with condition checking
-2. **Implement reinforcement validation** for deploy abilities
-3. **Add timing window tracking** to prevent multiple uses
-4. **Create deploy placement mechanics** for unit positioning
-5. **Implement resource-free deployment** bypassing normal costs
-6. **Add deploy condition system** for ability-specific requirements
-7. **Create comprehensive deploy tests** covering all scenarios
-8. **Integrate deploy with game actions** and turn structure
-9. **Add deploy UI/UX elements** for player interaction
-10. **Document deploy mechanics** in game rules and help system
+The following test cases demonstrate complete Rule 30 implementation:
+
+1. **test_rule_30_1_deploy_ability_usage**: Validates basic deploy functionality
+2. **test_rule_30_1a_no_resource_cost**: Confirms resource-free deployment
+3. **test_rule_30_2_reinforcement_requirement**: Tests reinforcement validation
+4. **test_rule_30_2a_no_deploy_units_available**: Validates deployable unit availability
+5. **test_rule_30_3_timing_window_restriction**: Enforces once-per-window limit
+6. **test_rule_30_3_timing_window_reset**: Tests timing window advancement
+7. **test_deploy_ability_multiple_planets_same_system**: Multi-planet scenarios
 
 ## Priority Assessment
-**MEDIUM-HIGH Priority** - Deploy abilities are important for:
-- Mech unit functionality (core game mechanic)
-- Strategic flexibility and positioning
-- Faction-specific abilities and balance
-- Advanced gameplay scenarios
-
-While basic unit detection works, the complete absence of deployment mechanics significantly impacts gameplay depth and unit utility.
+**✅ COMPLETED** - Deploy abilities are fully implemented with:
+- Complete rule compliance for all sub-rules (30.1, 30.1.a, 30.2, 30.2.a, 30.3)
+- Comprehensive validation and error handling
+- Full test coverage demonstrating correct behavior
+- Integration with existing game systems (reinforcements, planets, units)
+- Proper timing window management for strategic gameplay

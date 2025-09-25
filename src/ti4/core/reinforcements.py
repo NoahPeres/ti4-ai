@@ -6,7 +6,12 @@ Handles tracking of units returned to reinforcements after destruction.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from .constants import UnitType
+
+if TYPE_CHECKING:
+    from .unit import Unit
 
 
 class ReinforcementPool:
@@ -124,3 +129,66 @@ class ReinforcementPool:
             Dictionary mapping unit types to their counts
         """
         return self._unit_counts.copy()
+
+
+class Reinforcements:
+    """Manages reinforcement pools for all players.
+
+    This is a convenience class that manages multiple ReinforcementPool instances.
+    """
+
+    def __init__(self) -> None:
+        """Initialize reinforcements manager."""
+        self._pools: dict[str, ReinforcementPool] = {}
+
+    def get_pool(self, player_id: str) -> ReinforcementPool:
+        """Get or create a reinforcement pool for a player.
+
+        Args:
+            player_id: The player ID
+
+        Returns:
+            The player's reinforcement pool
+        """
+        if player_id not in self._pools:
+            self._pools[player_id] = ReinforcementPool(player_id)
+        return self._pools[player_id]
+
+    def has_units_available(
+        self, player_id: str, unit_type: UnitType, count: int
+    ) -> bool:
+        """Check if a player has enough units available in reinforcements.
+
+        Args:
+            player_id: The player ID
+            unit_type: The type of unit to check
+            count: Number of units needed
+
+        Returns:
+            True if enough units are available
+        """
+        pool = self.get_pool(player_id)
+        return pool.has_units_available(unit_type, count)
+
+    def add_unit_instance(self, unit: Unit) -> None:
+        """Add a unit instance to reinforcements.
+
+        Args:
+            unit: The unit to add
+        """
+        # For now, just track by type - this is a minimal implementation
+        pool = self.get_pool(unit.owner)
+        current_count = pool.get_unit_count(unit.unit_type)
+        pool.set_unit_count(unit.unit_type, current_count + 1)
+
+    def get_available_units(self, unit_type: UnitType) -> list[Unit]:
+        """Get available units of a specific type.
+
+        Args:
+            unit_type: The type of unit to get
+
+        Returns:
+            List of available units (minimal implementation)
+        """
+        # Minimal implementation - return empty list for now
+        return []

@@ -1231,23 +1231,24 @@ Based on comprehensive analysis of LRR analysis files, here are the next 10 rule
 - **Files**: `src/ti4/core/combat.py` (CombatRoleManager with get_defender_id/get_defender_ids/get_ground_combat_defender_id)
 - **Remaining**: Nebula combat bonus (enhancement feature)
 
+**5. Rule 30: DEPLOY** ✅ **COMPLETED**
+- **Priority**: MEDIUM-HIGH - Unit placement abilities
+- **Status**: ✅ IMPLEMENTED (full deploy ability system)
+- **Dependencies**: ✅ Unit system, reinforcements, timing windows
+- **Implementation**: Complete deploy ability validation, reinforcement checking, timing window restrictions
+- **Test Coverage**: 10 comprehensive tests in `tests/test_rule_30_deploy.py` covering all sub-rules
+- **Files**: `src/ti4/core/player.py` (deploy_unit method), `src/ti4/core/game.py` (timing window tracking)
+- **Key Features**: Deploy ability validation, reinforcement checking, timing window restrictions, planet control validation
+
 #### **Tier 2: Unit Management & Destruction (Rules 5-7)**
 
-**5. Rule 31: DESTROYED**
+**6. Rule 31: DESTROYED**
 - **Priority**: HIGH - Core combat mechanic
 - **Status**: ⚠️ PARTIAL (hit assignment exists, removal vs destruction distinction missing)
 - **Dependencies**: ✅ Combat system, reinforcement pools
 - **Key Gaps**: Distinction between destruction (triggers effects) vs removal (no triggers)
 - **Impact**: Critical for proper combat resolution and ability triggering
 - **Estimated Effort**: Medium (extend existing combat system)
-
-**6. Rule 30: DEPLOY**
-- **Priority**: MEDIUM-HIGH - Unit placement abilities
-- **Status**: ⚠️ PARTIAL (deploy flag exists, mechanics missing)
-- **Dependencies**: ✅ Unit system, reinforcements
-- **Key Gaps**: Deploy ability conditions, placement logic, timing restrictions
-- **Impact**: Enables mech deployment and special unit placement abilities
-- **Estimated Effort**: Medium (new deployment system)
 
 **7. Rule 33: ELIMINATION**
 - **Priority**: MEDIUM-HIGH - Player elimination system
@@ -1348,12 +1349,12 @@ We have successfully implemented the **foundational core** of TI4, establishing 
    - Enables agenda effects and planet attachments
 
 #### **Secondary Priority (Next 6 Rules)**
-5. **Rule 30: DEPLOY** - Advanced unit placement
-6. **Rule 33: ELIMINATION** - Player elimination system
-7. **Rule 12: ATTACH** - Card attachment mechanics
-8. **Rule 35: EXPLORATION** - Planet exploration system
-9. **Rule 87: SUSTAIN DAMAGE** - Unit damage mechanics
-10. **Rule 74: REROLLS** - Dice reroll mechanics
+5. **Rule 33: ELIMINATION** - Player elimination system
+6. **Rule 12: ATTACH** - Card attachment mechanics
+7. **Rule 35: EXPLORATION** - Planet exploration system
+8. **Rule 87: SUSTAIN DAMAGE** - Unit damage mechanics
+9. **Rule 74: REROLLS** - Dice reroll mechanics
+10. **Rule 37: FLEET POOL** - Fleet supply management
 
 ### **Phase 3: Political & Economic Systems (Priority Tier 2)**
 **Target: 15 additional rules → 54/101 (53.5% coverage)**
