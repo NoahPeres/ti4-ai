@@ -19,13 +19,9 @@ if TYPE_CHECKING:
 class DiplomacyStrategyCard(BaseStrategyCard):
     """Implementation of the Diplomacy strategy card.
 
-    LRR Reference: Rule 83 - The "Diplomacy" strategy card.
+    LRR Reference: Rule 32 - The "Diplomacy" strategy card.
     This card's initiative value is "2."
     """
-
-    def __init__(self) -> None:
-        """Initialize the Diplomacy strategy card."""
-        pass
 
     def get_card_type(self) -> StrategyCardType:
         """Get the strategy card type.
@@ -129,38 +125,15 @@ class DiplomacyStrategyCard(BaseStrategyCard):
             if other_player.reinforcements > 0:
                 system.place_command_token(other_player.id)
                 # Consume the token from reinforcements
-                object.__setattr__(
-                    other_player, "reinforcements", other_player.reinforcements - 1
-                )
+                other_player.consume_reinforcement()
             else:
                 # Rule 32.2.a: If no reinforcements, place from command sheet
                 # Check if player has any command tokens on their command sheet
-                total_command_tokens = (
-                    other_player.command_sheet.tactic_pool
-                    + other_player.command_sheet.fleet_pool
-                    + other_player.command_sheet.strategy_pool
-                )
+                total_command_tokens = other_player.command_sheet.get_total_tokens()
                 if total_command_tokens > 0:
                     system.place_command_token(other_player.id)
                     # Remove a token from the command sheet (prefer tactic, then fleet, then strategy)
-                    if other_player.command_sheet.tactic_pool > 0:
-                        object.__setattr__(
-                            other_player.command_sheet,
-                            "tactic_pool",
-                            other_player.command_sheet.tactic_pool - 1,
-                        )
-                    elif other_player.command_sheet.fleet_pool > 0:
-                        object.__setattr__(
-                            other_player.command_sheet,
-                            "fleet_pool",
-                            other_player.command_sheet.fleet_pool - 1,
-                        )
-                    elif other_player.command_sheet.strategy_pool > 0:
-                        object.__setattr__(
-                            other_player.command_sheet,
-                            "strategy_pool",
-                            other_player.command_sheet.strategy_pool - 1,
-                        )
+                    other_player.command_sheet.consume_any_token()
                 # If no tokens available anywhere, the player simply doesn't place a token
 
         # Ready up to 2 exhausted planets controlled by the player
@@ -175,31 +148,24 @@ class DiplomacyStrategyCard(BaseStrategyCard):
         # Get all exhausted planets controlled by the player
         all_exhausted_planets = []
         if game_state.galaxy:
-            for system_obj in game_state.galaxy.system_objects.values():
-                for planet in system_obj.planets:
-                    if planet.controlled_by == player_id and planet.is_exhausted():
-                        all_exhausted_planets.append(planet)
+            all_exhausted_planets = (
+                game_state.galaxy.find_exhausted_planets_controlled_by_player(player_id)
+            )
 
         # If no specific planets specified, ready up to 2 exhausted planets automatically
         if not planets_to_ready:
+            all_exhausted_planets.sort(key=lambda p: p.name)
             planets_to_ready = [p.name for p in all_exhausted_planets[:2]]
 
         # Validate and ready the specified planets
         readied_planets = []
         for planet_name in planets_to_ready:
-            # Find the planet
+            # Find the planet using Galaxy helper method
             target_planet = None
             if game_state.galaxy:
-                for system_obj in game_state.galaxy.system_objects.values():
-                    for planet in system_obj.planets:
-                        if (
-                            planet.name == planet_name
-                            and planet.controlled_by == player_id
-                        ):
-                            target_planet = planet
-                            break
-                    if target_planet:
-                        break
+                target_planet = game_state.galaxy.find_planet_by_name(
+                    planet_name, player_id
+                )
 
             if not target_planet:
                 return StrategyCardAbilityResult(
@@ -222,6 +188,7 @@ class DiplomacyStrategyCard(BaseStrategyCard):
             success=True,
             player_id=player_id,
             error_message=None,
+            additional_data={"readied_planets": readied_planets},
         )
 
     def execute_secondary_ability(
@@ -330,17 +297,17 @@ class DiplomacyStrategyCard(BaseStrategyCard):
 
             planets_to_ready.append(found_planet)
 
-        # Ready the planets
-        for planet in planets_to_ready:
-            planet.ready()
-
-        # Spend command token from strategy pool using proper API
+        # Spend command token from strategy pool before mutating state
         if not player.command_sheet.spend_strategy_token():
             return StrategyCardAbilityResult(
                 success=False,
                 player_id=player_id,
                 error_message=f"Failed to spend strategy token for player {player_id}",
             )
+
+        # Ready the planets
+        for planet in planets_to_ready:
+            planet.ready()
 
         return StrategyCardAbilityResult(
             success=True,

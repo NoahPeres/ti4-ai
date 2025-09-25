@@ -13,8 +13,8 @@ class Planet:
 
     def __init__(self, name: str, resources: int, influence: int) -> None:
         self.name = name
-        self.resources = resources
-        self.influence = influence
+        self._resources = resources
+        self._influence = influence
         self.controlled_by: str | None = None
         self.units: list[Unit] = []
         self._exhausted = False  # Rule 34: Track exhausted state
@@ -58,21 +58,31 @@ class Planet:
         """Check if this planet can spend influence."""
         return not self._exhausted
 
+    @property
+    def resources(self) -> int:
+        """Get the resource value of this planet."""
+        return self._resources
+
+    @property
+    def influence(self) -> int:
+        """Get the influence value of this planet."""
+        return self._influence
+
     def get_resources(self) -> int:
         """Get the resource value of this planet."""
-        return self.resources
+        return self._resources
 
     def get_influence(self) -> int:
         """Get the influence value of this planet."""
-        return self.influence
+        return self._influence
 
     def spend_resources(self, amount: int) -> int:
         """Spend resources from this planet, exhausting it."""
         if self._exhausted:
             raise ValueError("Cannot spend from exhausted planet")
-        if amount > self.resources:
+        if amount > self._resources:
             raise ValueError(
-                f"Cannot spend {amount} resources, planet only has {self.resources}"
+                f"Cannot spend {amount} resources, planet only has {self._resources}"
             )
 
         self.exhaust()
@@ -82,9 +92,9 @@ class Planet:
         """Spend influence from this planet, exhausting it."""
         if self._exhausted:
             raise ValueError("Cannot spend from exhausted planet")
-        if amount > self.influence:
+        if amount > self._influence:
             raise ValueError(
-                f"Cannot spend {amount} influence, planet only has {self.influence}"
+                f"Cannot spend {amount} influence, planet only has {self._influence}"
             )
 
         self.exhaust()

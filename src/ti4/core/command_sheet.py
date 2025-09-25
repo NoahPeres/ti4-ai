@@ -64,6 +64,34 @@ class CommandSheet:
             return True
         return False
 
+    def spend_fleet_token(self) -> bool:
+        """Spend a fleet token (Rule 37.4).
+
+        Returns:
+            True if token was spent, False if no tokens available
+        """
+        if self.fleet_pool > 0:
+            self.fleet_pool -= 1
+            return True
+        return False
+
+    def consume_any_token(self) -> PoolType | None:
+        """Consume any available token from command sheet, preferring tactic > fleet > strategy.
+
+        Returns:
+            The pool type that was consumed, or None if no tokens available
+        """
+        if self.tactic_pool > 0:
+            self.tactic_pool -= 1
+            return "tactic"
+        elif self.fleet_pool > 0:
+            self.fleet_pool -= 1
+            return "fleet"
+        elif self.strategy_pool > 0:
+            self.strategy_pool -= 1
+            return "strategy"
+        return None
+
     def has_tactic_tokens(self) -> bool:
         """Check if player has tactic tokens available."""
         return self.tactic_pool > 0

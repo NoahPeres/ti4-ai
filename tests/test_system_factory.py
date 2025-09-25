@@ -2,6 +2,7 @@
 
 import pytest
 
+from src.ti4.core.constants import SystemConstants
 from src.ti4.core.system_factory import SystemFactory
 
 
@@ -13,7 +14,7 @@ class TestSystemFactory:
         system = SystemFactory.create_mecatol_rex_system()
 
         # Verify system ID
-        assert system.system_id == "18"
+        assert system.system_id == SystemConstants.MECATOL_REX_ID
 
         # Verify it has exactly one planet
         assert len(system.planets) == 1
@@ -21,8 +22,8 @@ class TestSystemFactory:
         # Verify planet properties
         mecatol_rex = system.planets[0]
         assert mecatol_rex.name == "Mecatol Rex"
-        assert mecatol_rex.resources == 1
-        assert mecatol_rex.influence == 6
+        assert mecatol_rex.get_resources() == 1
+        assert mecatol_rex.get_influence() == 6
 
         # Verify planet is initially uncontrolled
         assert mecatol_rex.controlled_by is None

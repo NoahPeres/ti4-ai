@@ -63,6 +63,17 @@ class TestRule52LeadershipStrategyCard:
         mock_system.planets = planets
         self.mock_game_state.galaxy.system_objects.values.return_value = [mock_system]
 
+        # Mock the galaxy's find_planet_by_name method to return the correct mock planets
+        def mock_find_planet_by_name(planet_name, player_id=None):
+            for planet in planets:
+                if planet.name == planet_name:
+                    return planet
+            return None
+
+        self.mock_game_state.galaxy.find_planet_by_name.side_effect = (
+            mock_find_planet_by_name
+        )
+
     def test_leadership_card_basic_properties(self) -> None:
         """Test basic Leadership card properties.
 

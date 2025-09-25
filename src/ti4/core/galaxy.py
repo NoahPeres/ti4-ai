@@ -344,3 +344,56 @@ class Galaxy:
                         visited.add(system_id)
 
         return []  # No path found
+
+    def find_planets_controlled_by_player(self, player_id: str) -> list[Planet]:
+        """Find all planets controlled by a specific player.
+
+        Args:
+            player_id: The player ID to search for
+
+        Returns:
+            List of planets controlled by the player
+        """
+        controlled_planets = []
+        for system in self.system_objects.values():
+            for planet in system.planets:
+                if planet.controlled_by == player_id:
+                    controlled_planets.append(planet)
+        return controlled_planets
+
+    def find_exhausted_planets_controlled_by_player(
+        self, player_id: str
+    ) -> list[Planet]:
+        """Find all exhausted planets controlled by a specific player.
+
+        Args:
+            player_id: The player ID to search for
+
+        Returns:
+            List of exhausted planets controlled by the player
+        """
+        exhausted_planets = []
+        for system in self.system_objects.values():
+            for planet in system.planets:
+                if planet.controlled_by == player_id and planet.is_exhausted():
+                    exhausted_planets.append(planet)
+        return exhausted_planets
+
+    def find_planet_by_name(
+        self, planet_name: str, player_id: str | None = None
+    ) -> Planet | None:
+        """Find a planet by name, optionally filtered by controlling player.
+
+        Args:
+            planet_name: The name of the planet to find
+            player_id: Optional player ID to filter by controlling player
+
+        Returns:
+            The planet if found, None otherwise
+        """
+        for system in self.system_objects.values():
+            for planet in system.planets:
+                if planet.name == planet_name:
+                    if player_id is None or planet.controlled_by == player_id:
+                        return planet
+        return None

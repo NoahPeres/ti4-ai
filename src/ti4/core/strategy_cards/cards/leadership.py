@@ -406,9 +406,7 @@ class LeadershipStrategyCard(BaseStrategyCard):
             return
 
         for planet_name in planets_to_exhaust:
-            # Find the planet in the game state and exhaust it
-            for system in game_state.galaxy.system_objects.values():
-                for planet in system.planets:
-                    if planet.name == planet_name:
-                        planet.exhaust()
-                        break
+            # Find the planet using Galaxy helper method and exhaust it
+            planet = game_state.galaxy.find_planet_by_name(planet_name)
+            if planet:
+                planet.exhaust()
