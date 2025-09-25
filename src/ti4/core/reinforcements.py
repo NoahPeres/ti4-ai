@@ -78,7 +78,7 @@ class ReinforcementPool:
         max_capacity = self._max_capacities.get(unit_type)
 
         if max_capacity is not None and current_count >= max_capacity:
-            raise ValueError(f"Reinforcement pool at capacity for {unit_type}")
+            raise ValueError(f"Reinforcement pool at capacity for {unit_type.value}")
 
         self._unit_counts[unit_type] = current_count + 1
 
@@ -99,7 +99,7 @@ class ReinforcementPool:
 
         if count > current_count:
             raise ValueError(
-                f"Not enough {unit_type} in reinforcements. "
+                f"Not enough {unit_type.value} in reinforcements. "
                 f"Requested: {count}, Available: {current_count}"
             )
 
@@ -176,19 +176,18 @@ class Reinforcements:
         Args:
             unit: The unit to add
         """
-        # For now, just track by type - this is a minimal implementation
+        # Reuse capacity-aware API when incrementing counts
         pool = self.get_pool(unit.owner)
-        current_count = pool.get_unit_count(unit.unit_type)
-        pool.set_unit_count(unit.unit_type, current_count + 1)
+        pool.return_destroyed_unit(unit.unit_type)
 
-    def get_available_units(self, unit_type: UnitType) -> list[Unit]:
+    def get_available_units(self, unit_type: UnitType) -> tuple[Unit, ...]:
         """Get available units of a specific type.
 
         Args:
             unit_type: The type of unit to get
 
         Returns:
-            List of available units (minimal implementation)
+            Immutable tuple of available units (minimal implementation)
         """
-        # Minimal implementation - return empty list for now
-        return []
+        # Minimal implementation - return empty tuple for now
+        return ()

@@ -12,7 +12,6 @@ import pytest
 
 from src.ti4.core.constants import UnitType
 from src.ti4.core.exceptions import DeployError, ReinforcementError
-from src.ti4.core.game_state import GameState
 from src.ti4.core.planet import Planet
 from src.ti4.core.player import Player
 from src.ti4.core.reinforcements import Reinforcements
@@ -25,14 +24,10 @@ class TestRule30DeployAbilities:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
-        self.game_state = GameState()
         self.player = Player(id="player1", faction=None)
         self.system = System(system_id="test_system")
         self.planet = Planet(name="test_planet", resources=2, influence=1)
         self.system.add_planet(self.planet)
-
-        # Add player to game state
-        self.game_state.add_player(self.player)
 
         # Set up reinforcements with mechs available
         self.reinforcements = Reinforcements()
@@ -70,8 +65,9 @@ class TestRule30DeployAbilities:
         assert deployed_unit.owner == "player1"
 
         # Check that reinforcements were decremented
-        available_mechs = self.reinforcements.get_available_units(UnitType.MECH)
-        assert len(available_mechs) == 0  # Should be empty after deployment
+        pool = self.reinforcements.get_pool("player1")
+        # Started at 4 in setup; added 1 then deployed 1 -> 4 remain
+        assert pool.get_unit_count(UnitType.MECH) == 4
 
     def test_rule_30_1_deploy_ability_conditions_not_met(self) -> None:
         """Test Rule 30.1: Deploy ability fails when conditions not met.
@@ -124,7 +120,7 @@ class TestRule30DeployAbilities:
         self.planet.set_control("player1")
 
         # Record initial planet state (deploy should not exhaust planets)
-        initial_exhausted = self.planet._exhausted
+        initial_exhausted = self.planet.is_exhausted()
 
         # Deploy mech
         self.player.deploy_unit(
@@ -135,7 +131,7 @@ class TestRule30DeployAbilities:
         )
 
         # Planet should remain in same state (deploy is free - no resource spending)
-        assert self.planet._exhausted == initial_exhausted
+        assert self.planet.is_exhausted() == initial_exhausted
 
     def test_rule_30_2_reinforcement_requirement(self) -> None:
         """Test Rule 30.2: Deploy requires unit in reinforcements.
@@ -254,6 +250,10 @@ class TestRule30DeployAbilities:
         self.reinforcements.add_unit_instance(mech)
         self.planet.set_control("player1")
 
+        # Track reinforcement count before deployment
+        pool = self.reinforcements.get_pool("player1")
+        before_count = pool.get_unit_count(UnitType.MECH)
+
         # Deploy mech
         self.player.deploy_unit(
             unit_type=UnitType.MECH,
@@ -268,9 +268,9 @@ class TestRule30DeployAbilities:
         assert planet_units[0].unit_type == UnitType.MECH
         assert planet_units[0].owner == "player1"
 
-        # Verify reinforcements are updated
-        available_mechs = self.reinforcements.get_available_units(UnitType.MECH)
-        assert mech not in available_mechs
+        # Verify reinforcements are updated (decremented by one)
+        after_count = pool.get_unit_count(UnitType.MECH)
+        assert after_count == before_count - 1
 
     def test_deploy_ability_multiple_planets_same_system(self) -> None:
         """Test deploy ability works with multiple planets in same system."""

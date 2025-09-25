@@ -238,7 +238,7 @@ class Player:
         # Rule 30.1: Check if unit type has deploy ability
         temp_unit = Unit(unit_type=unit_type, owner=self.id)
         if not temp_unit.has_deploy():
-            raise DeployError(f"Unit {unit_type} does not have deploy ability")
+            raise DeployError(f"Unit {unit_type.value} does not have deploy ability")
 
         # Rule 30.3: Check timing window restriction
         deploy_key = f"{unit_type.value}_deploy"
@@ -294,12 +294,17 @@ class Player:
                 f"Cannot deploy to {target_planet}: planet not controlled by player"
             )
 
-        # Create and place the unit
-        unit_to_deploy = Unit(unit_type=unit_type, owner=self.id)
-        target_planet_obj.place_unit(unit_to_deploy)
-
-        # Remove from reinforcements
+        # Remove from reinforcements first to maintain atomicity
         pool.remove_units(unit_type, 1)
+
+        # Create and place the unit
+        try:
+            unit_to_deploy = Unit(unit_type=unit_type, owner=self.id)
+            target_planet_obj.place_unit(unit_to_deploy)
+        except Exception:
+            # If placement fails, restore the unit to reinforcements using proper API
+            pool.return_destroyed_unit(unit_type)
+            raise
 
         # Mark deploy ability as used in this timing window
         new_used_set = self._deploy_used_this_window.copy()
