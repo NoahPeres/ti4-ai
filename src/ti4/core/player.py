@@ -45,6 +45,17 @@ class Player:
 
         return success
 
+    def consume_reinforcement(self) -> bool:
+        """Consume a command token from reinforcements (Rule 20.3).
+
+        Returns:
+            True if token was consumed, False if no reinforcements available
+        """
+        if self.reinforcements > 0:
+            object.__setattr__(self, "reinforcements", self.reinforcements - 1)
+            return True
+        return False
+
     def get_commodity_value(self) -> int:
         """Get the commodity value for this player's faction.
 

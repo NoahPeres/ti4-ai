@@ -27,11 +27,13 @@ class TestRule52LeadershipStrategyCard:
         self.mock_planet1 = Mock()
         self.mock_planet1.name = "planet1"
         self.mock_planet1.influence = 3
+        self.mock_planet1.get_influence.return_value = 3
         self.mock_planet1.is_exhausted.return_value = False
 
         self.mock_planet2 = Mock()
         self.mock_planet2.name = "planet2"
         self.mock_planet2.influence = 2
+        self.mock_planet2.get_influence.return_value = 2
         self.mock_planet2.is_exhausted.return_value = False
 
     def _create_test_player(self, player_id: str = "test_player") -> Player:
@@ -62,6 +64,17 @@ class TestRule52LeadershipStrategyCard:
         mock_system = Mock()
         mock_system.planets = planets
         self.mock_game_state.galaxy.system_objects.values.return_value = [mock_system]
+
+        # Mock the galaxy's find_planet_by_name method to return the correct mock planets
+        def mock_find_planet_by_name(planet_name, player_id=None):
+            for planet in planets:
+                if planet.name == planet_name:
+                    return planet
+            return None
+
+        self.mock_game_state.galaxy.find_planet_by_name.side_effect = (
+            mock_find_planet_by_name
+        )
 
     def test_leadership_card_basic_properties(self) -> None:
         """Test basic Leadership card properties.
@@ -357,6 +370,7 @@ class TestRule52LeadershipStrategyCard:
                 planet_name = f"planet{len(planets)}"
                 planet.name = planet_name
                 planet.influence = min(remaining_influence, 5)  # Max 5 per planet
+                planet.get_influence.return_value = min(remaining_influence, 5)
                 planet.is_exhausted.return_value = False
                 planets.append(planet)
                 planet_names.append(planet_name)
@@ -447,7 +461,7 @@ class TestRule52LeadershipStrategyCard:
             planets_to_exhaust=[],
         )
         assert result.success is False
-        assert "must allocate at least" in result.error_message
+        assert "must allocate exactly" in result.error_message
 
     def test_primary_ability_invalid_planet_choices(self) -> None:
         """Test primary ability with invalid planet choices for strict validation."""

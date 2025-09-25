@@ -186,7 +186,7 @@ class VotingSystem:
                 )
 
             # Validate ownership
-            if hasattr(planet, "controlled_by") and planet.controlled_by != player_id:
+            if planet.controlled_by != player_id:
                 return VotingOutcome(
                     success=False,
                     error_message=f"Player {player_id} does not have ownership of planet {getattr(planet, 'name', '<unknown>')}",
@@ -513,8 +513,7 @@ class AgendaPhase:
         """
         for player_planets in players_planets.values():
             for planet in player_planets:
-                if hasattr(planet, "ready"):
-                    planet.ready()
+                planet.ready()
 
         return AgendaPhaseResult(success=True, planets_readied=True)
 

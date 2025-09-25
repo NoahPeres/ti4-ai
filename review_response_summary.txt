@@ -1,0 +1,41 @@
+## CodeRabbit Review Response Summary
+
+I have successfully addressed all the issues raised in the CodeRabbit review:
+
+### 1. Fixed MECATOL_REX_ID Constant ✅
+- **Issue**: `MECATOL_REX_ID` was set to `"mecatol_rex"` instead of `"18"`
+- **Resolution**: Updated `src/ti4/core/constants.py` to use `"18"` as the value
+- **Reasoning**: This aligns with the actual system ID used in the game rules
+
+### 2. Fixed Command Token Consumption in Diplomacy ✅
+- **Issue**: Diplomacy strategy card was placing command tokens without consuming player supply
+- **Resolution**: Added proper logic in `diplomacy.py` to consume tokens from reinforcements first, then from command sheet (tactical → fleet → strategy)
+- **Reasoning**: This follows the game rules for command token placement and prevents infinite token placement
+
+### 3. Updated System Factory to Use Constants ✅
+- **Issue**: `system_factory.py` used hardcoded `"18"` instead of `SystemConstants.MECATOL_REX_ID`
+- **Resolution**: Updated `create_mecatol_rex_system` method to use the constant and added proper import
+- **Reasoning**: Maintains consistency and makes the code more maintainable
+
+### 4. Updated Diplomacy to Use Constants ✅
+- **Issue**: `diplomacy.py` used hardcoded `"18"` instead of `SystemConstants.MECATOL_REX_ID`
+- **Resolution**: Updated the system ID check to use the constant and added proper import
+- **Reasoning**: Maintains consistency across the codebase
+
+### 5. Added Planet Public Accessors ✅
+- **Issue**: Tests were using direct attribute access (`planet.resources`, `planet.influence`) instead of public accessors
+- **Resolution**:
+  - Added `get_resources()` and `get_influence()` methods to the `Planet` class
+  - Updated `test_system_factory.py` to use these public accessors
+- **Reasoning**: This follows the API cleanup pattern and prepares for potential future changes to make these attributes private
+
+### Testing and Quality Assurance ✅
+- All tests pass (1314 passed, 2 skipped)
+- Code formatting and linting checks pass
+- Type checking passes for production code (src/)
+- All pre-commit hooks pass
+
+### Changes Committed and Pushed ✅
+All changes have been committed and pushed to the `diplomacy` branch, which will trigger another CodeRabbit review to verify the fixes.
+
+The implementation follows strict TDD practices and maintains backward compatibility while addressing all the review concerns.

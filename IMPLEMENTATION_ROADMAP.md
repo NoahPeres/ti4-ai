@@ -8,38 +8,41 @@
 **Focus**: Complete advanced mechanics that enable complex strategic gameplay and AI decision-making
 
 ## 📊 Progress
-**Overall Progress**: 32.7%
-**Completed Rules**: 33/101
-- **Rule 1: ABILITIES** - Core ability system with timing windows, precedence, costs, and resolution (Foundation Layer) ✅ **NEWLY COMPLETED**
-- **Rule 3: ACTION PHASE** - Core action phase mechanics with pass state tracking and phase transitions (Core Game Layer) ✅ **NEWLY COMPLETED**
+**Overall Progress**: 33.7%
+**Completed Rules**: 34/101
+- **Rule 1: ABILITIES** - Core ability system with timing windows, precedence, costs, and resolution (Foundation Layer) ✅ **COMPLETED**
+- **Rule 3: ACTION PHASE** - Core action phase mechanics with pass state tracking and phase transitions (Core Game Layer) ✅ **COMPLETED**
 - **Rule 6: ADJACENCY** - Core spatial mechanics for system relationships ✅
-- **Rule 2: ACTION CARDS** - Action card system with timing windows, component actions, and comprehensive card management (Core Game Layer) ✅ **NEWLY COMPLETED**
-- **Rule 8: AGENDA PHASE** - Voting and law system with speaker powers and outcome resolution (Core Game Layer) ✅ **NEWLY COMPLETED**
-- **Rule 13: ATTACKER** - Combat role definition with attacker/defender assignment (Foundation Layer) ✅ **NEWLY COMPLETED**
+- **Rule 2: ACTION CARDS** - Action card system with timing windows, component actions, and comprehensive card management (Core Game Layer) ✅ **COMPLETED**
+- **Rule 8: AGENDA PHASE** - Voting and law system with speaker powers and outcome resolution (Core Game Layer) ✅ **COMPLETED**
+- **Rule 13: ATTACKER** - Combat role definition with attacker/defender assignment (Foundation Layer) ✅ **COMPLETED**
 - **Rule 14: BLOCKADED** - Blockade mechanics for space docks and production restrictions (Foundation Layer) ✅ **COMPLETED**
-- **Rule 15: BOMBARDMENT** - Bombardment unit ability with roll mechanics, planetary shield interaction, and ground force destruction (Core Game Layer) ✅ **NEWLY COMPLETED**
+- **Rule 15: BOMBARDMENT** - Bombardment unit ability with roll mechanics, planetary shield interaction, and ground force destruction (Core Game Layer) ✅ **COMPLETED**
 - **Rule 17: CAPTURE** - Unit capture mechanics and faction sheet management (Foundation Layer) ✅ **COMPLETED**
-- **Rule 18: COMBAT** - General combat mechanics with burst icon support (Core Game Layer) ✅ **NEWLY COMPLETED**
+- **Rule 18: COMBAT** - General combat mechanics with burst icon support (Core Game Layer) ✅ **COMPLETED**
 - **Rule 20: COMMAND TOKENS** - Resource management and reinforcement system (Foundation Layer) ✅
-- **Rule 21: COMMODITIES** - Commodity trading and conversion system (Economic Layer) ✅ **NEWLY COMPLETED**
+- **Rule 21: COMMODITIES** - Commodity trading and conversion system (Economic Layer) ✅ **COMPLETED**
 - **Rule 25: CONTROL** - Planet control mechanics with planet card management and control tokens (Core Game Layer) ✅ **COMPLETED**
-- **Rule 29: DEFENDER** - Combat role definition with defender identification for space and ground combat (Foundation Layer) ✅ **NEWLY COMPLETED**
-- **Rule 34: EXHAUSTED** - Card exhaustion mechanics for planets, technology, and strategy cards (Foundation Layer) ✅ **NEWLY COMPLETED**
-- **Rule 40: GROUND COMBAT** - Ground combat resolution with multi-round mechanics, dice rolling, hit assignment, and combat ending conditions. Core mechanics completed; sustain damage player choice integration pending (Core Game Layer) ✅ **NEWLY COMPLETED**
-- **Rule 52: LEADERSHIP (STRATEGY CARD)** - Leadership strategy card with primary/secondary abilities and command token management (Core Game Layer) ✅ **NEWLY COMPLETED**
+- **Rule 29: DEFENDER** - Combat role definition with defender identification for space and ground combat (Foundation Layer) ✅ **COMPLETED**
+- **Rule 31: DESTROYED** - Unit destruction mechanics with reinforcement return and destruction vs removal distinction (Foundation Layer) ✅ **COMPLETED**
+- **Rule 32: DIPLOMACY** - Diplomacy strategy card with primary/secondary abilities and command token mechanics (Core Game Layer) ✅ **COMPLETED**
+- **Rule 34: EXHAUSTED** - Card exhaustion mechanics for planets, technology, and strategy cards (Foundation Layer) ✅ **COMPLETED**
+- **Rule 40: GROUND COMBAT** - Ground combat resolution with multi-round mechanics, dice rolling, hit assignment, and combat ending conditions. Core mechanics completed; sustain damage player choice integration pending (Core Game Layer) ✅ **COMPLETED**
+- **Rule 49: INVASION** - Complete invasion process with all five steps (bombardment, commit ground forces, space cannon defense, ground combat, establish control) (Core Game Layer) ✅ **COMPLETED**
+- **Rule 52: LEADERSHIP (STRATEGY CARD)** - Leadership strategy card with primary/secondary abilities and command token management (Core Game Layer) ✅ **COMPLETED**
 - **Rule 58: MOVEMENT** - Unit movement and fleet mechanics (Core Game Layer) ✅ **COMPLETED**
 - **Rule 60: NEIGHBORS** - Player neighbor determination for transactions ✅
 - **Rule 61: OBJECTIVE CARDS** - Victory condition framework (Core Game Layer) ✅
 - **Rule 67: PRODUCING UNITS** - Unit production system with blockade integration (Core Game Layer) ✅ **COMPLETED**
 - **Rule 69: PROMISSORY NOTES** - Promissory note mechanics and diplomatic system (Core Game Layer) ✅ **COMPLETED**
 - **Rule 76: SHIPS** - Ship unit mechanics, fleet pool limits, and ship attributes (Foundation Layer) ✅ **COMPLETED**
-- **Rule 78: SPACE COMBAT** - Space combat resolution with anti-fighter barrage, retreats, and multi-round mechanics (Core Game Layer) ✅ **NEWLY COMPLETED**
+- **Rule 78: SPACE COMBAT** - Space combat resolution with anti-fighter barrage, retreats, and multi-round mechanics (Core Game Layer) ✅ **COMPLETED**
 - **Rule 82: STRATEGIC ACTION** - Strategy card activation framework (Core Game Layer) ✅ **COMPLETED**
-- **Rule 83: STRATEGY CARD** - Strategy card system with initiative, selection, and state management (Core Game Layer) ✅ **NEWLY COMPLETED**
+- **Rule 83: STRATEGY CARD** - Strategy card system with initiative, selection, and state management (Core Game Layer) ✅ **COMPLETED**
 - **Rule 90: TECHNOLOGY** - Technology research, prerequisites, and game state integration (Core Game Layer) ✅ **COMPLETED**
 - **Rule 91: TECHNOLOGY (Strategy Card)** - Technology strategy card with primary/secondary abilities (Core Game Layer) ✅ **COMPLETED**
 - **Rule 94: TRANSACTIONS** - Player trading and exchange system (Core Game Layer) ✅ **COMPLETED**
-- **Rule 98: VICTORY POINTS** - Victory point tracking and win conditions (Victory & Objectives Layer) ✅ **NEWLY COMPLETED**
+- **Rule 98: VICTORY POINTS** - Victory point tracking and win conditions (Victory & Objectives Layer) ✅ **COMPLETED**
 - **Rule 99: WARFARE STRATEGY CARD** - Command token management and redistribution (Core Game Layer) ✅ **COMPLETED**
 - **Rule 101: WORMHOLES** - Wormhole adjacency mechanics (Foundation Layer) ✅
 
@@ -1429,7 +1432,7 @@ We have successfully implemented the **foundational core** of TI4, establishing 
 - **Rule 5: ACTIVE PLAYER** - Active player mechanics
 - **Rule 10: ANTI-FIGHTER BARRAGE** - Anti-fighter combat
 - **Rule 19: COMMAND SHEET** - Command sheet mechanics
-- **Rule 32: DIPLOMACY** - Diplomacy strategy card
+- ✅ **Rule 32: DIPLOMACY** - Diplomacy strategy card (Core Game Layer) - **COMPLETE** (0% → 100%, 11/11 tests passing)
 - **Rule 36: FACTION SHEET** - Faction sheet management
 - **Rule 38: GAME ROUND** - Game round structure
 - **Rule 39: GAME BOARD** - Game board setup
