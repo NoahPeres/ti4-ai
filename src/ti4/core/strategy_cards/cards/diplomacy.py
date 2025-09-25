@@ -56,8 +56,8 @@ class DiplomacyStrategyCard(BaseStrategyCard):
         Args:
             player_id: The active player executing the primary ability
             game_state: Game state for full integration
-            **kwargs: Additional parameters - expects 'system_id' for the chosen system
-                     and optionally 'planets_to_ready' list
+            **kwargs: Additional parameters - expects 'system_id' for the chosen system;
+                     optionally 'planets_to_ready' (alias: 'planet_ids') with up to two planet names to ready
 
         Returns:
             Result of the primary ability execution
@@ -102,12 +102,7 @@ class DiplomacyStrategyCard(BaseStrategyCard):
             )
 
         # Check if system contains a planet controlled by the active player
-        player_controlled_planets = []
-        for planet in system.planets:
-            if planet.controlled_by == player_id:
-                player_controlled_planets.append(planet)
-
-        if not player_controlled_planets:
+        if not any(p.controlled_by == player_id for p in system.planets):
             return StrategyCardAbilityResult(
                 success=False,
                 player_id=player_id,
@@ -169,19 +164,14 @@ class DiplomacyStrategyCard(BaseStrategyCard):
             if system.has_command_token(other_player.id):
                 continue
 
-            # Try to place from reinforcements first
-            if other_player.reinforcements > 0:
+            # Try to consume from reinforcements first; place only after successful spend
+            if other_player.consume_reinforcement():
                 system.place_command_token(other_player.id)
-                # Consume the token from reinforcements
-                other_player.consume_reinforcement()
             else:
-                # Rule 32.2.a: If no reinforcements, place from command sheet
-                # Check if player has any command tokens on their command sheet
-                total_command_tokens = other_player.command_sheet.get_total_tokens()
-                if total_command_tokens > 0:
+                # Rule 32.2.a: If no reinforcements, take from command sheet (prefer tactic > fleet > strategy)
+                consumed_pool = other_player.command_sheet.consume_any_token()
+                if consumed_pool is not None:
                     system.place_command_token(other_player.id)
-                    # Remove a token from the command sheet (prefer tactic, then fleet, then strategy)
-                    other_player.command_sheet.consume_any_token()
                 # If no tokens available anywhere, the player simply doesn't place a token
 
         # Ready the validated planets
@@ -214,7 +204,7 @@ class DiplomacyStrategyCard(BaseStrategyCard):
         Args:
             player_id: The player executing the secondary ability
             game_state: Game state for full integration
-            **kwargs: Additional parameters - expects 'planet_ids' list
+            **kwargs: Additional parameters - expects 'planet_ids' list (alias: 'planets_to_ready')
 
         Returns:
             Result of the secondary ability execution
