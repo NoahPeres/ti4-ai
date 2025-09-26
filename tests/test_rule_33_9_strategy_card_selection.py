@@ -7,6 +7,9 @@ LRR Reference: Rule 33.9 - If the game drops from five or more players to four o
 players due to elimination, players still only select one strategy card during the strategy phase.
 """
 
+import pytest
+
+from src.ti4.core.validation import ValidationError
 from ti4.core.constants import Faction
 from ti4.core.game_controller import GameController
 from ti4.core.player import Player
@@ -218,3 +221,52 @@ class TestRule339StrategyCardSelection:
         # Rule 33.9 does NOT apply: Still have 5 players (above 4)
         # Normal distribution should apply
         assert controller_after_elimination._get_cards_per_player() == 1
+
+    def test_rule_33_9_validation_error_when_selecting_second_card(self) -> None:
+        """Test Rule 33.9: Selecting a second strategy card raises ValidationError when rule applies."""
+        # Setup 5-player game
+        players = [
+            Player("player1", Faction.SOL),
+            Player("player2", Faction.HACAN),
+            Player("player3", Faction.XXCHA),
+            Player("player4", Faction.YSSARIL),
+            Player("player5", Faction.NAALU),
+        ]
+        controller = GameController(players)
+
+        # Start strategy phase
+        controller.start_strategy_phase()
+
+        # Simulate player elimination by creating a new controller with 4 players
+        remaining_players = players[:-1]  # Remove last player
+        controller_after_elimination = GameController.with_remaining_players(
+            controller, remaining_players
+        )
+        controller_after_elimination.start_strategy_phase()
+
+        # Rule 33.9 applies: Started with 5 (>= 5), now have 4 (<= 4)
+        # Each player should only get 1 card, not 2
+
+        # Player 1 selects their first card
+        available_cards = controller_after_elimination.get_available_strategy_cards()
+        first_card = available_cards[0]
+        controller_after_elimination.select_strategy_card("player1", first_card.id)
+
+        # Verify player has exactly 1 card
+        player_cards = controller_after_elimination.get_player_strategy_cards("player1")
+        assert len(player_cards) == 1
+
+        # Attempting to select a second card should raise ValidationError
+        # since Rule 33.9 limits players to 1 card each
+        second_card = available_cards[1]
+        with pytest.raises(
+            ValidationError,
+            match="Player player1 cannot select more than 1 strategy cards",
+        ):
+            controller_after_elimination.select_strategy_card("player1", second_card.id)
+
+        # Verify player still has only 1 card after failed attempt
+        player_cards_after = controller_after_elimination.get_player_strategy_cards(
+            "player1"
+        )
+        assert len(player_cards_after) == 1
