@@ -303,7 +303,7 @@ class GameState:
 
     def _create_new_state(self, **kwargs: Any) -> GameState:
         """Create a new GameState with updated fields."""
-        return GameState(
+        new_state = GameState(
             game_id=self.game_id,
             players=kwargs.get("players", self.players),
             galaxy=self.galaxy,
@@ -355,6 +355,9 @@ class GameState:
             planet_control_mapping=kwargs.get(
                 "planet_control_mapping", self.planet_control_mapping
             ),
+            planet_attachment_tokens=kwargs.get(
+                "planet_attachment_tokens", self.planet_attachment_tokens
+            ),
             # Agenda card system
             player_agenda_cards=kwargs.get(
                 "player_agenda_cards", self.player_agenda_cards
@@ -376,6 +379,15 @@ class GameState:
             # Speaker token system
             speaker_id=kwargs.get("speaker_id", self.speaker_id),
         )
+
+        # Ensure every planet card now points at this cloned state for token bookkeeping.
+        for card in new_state.planet_card_deck.values():
+            card._game_state = new_state
+        for cards in new_state.player_planet_cards.values():
+            for card in cards:
+                card._game_state = new_state
+
+        return new_state
 
     def is_valid(self) -> bool:
         """Validate the consistency of the game state."""

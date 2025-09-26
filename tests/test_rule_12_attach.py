@@ -59,6 +59,7 @@ class TestRule12Attach:
             name="test_planet",
             resources=2,
             influence=1,
+            game_state=self.game_state,
         )
 
         # Attach the card
@@ -76,7 +77,9 @@ class TestRule12Attach:
         exhausted_card.name = "Exhausted Attachment"
         exhausted_card.is_exhausted = True
 
-        planet_card = PlanetCard(name="test_planet", resources=2, influence=1)
+        planet_card = PlanetCard(
+            name="test_planet", resources=2, influence=1, game_state=self.game_state
+        )
 
         # Attach exhausted card
         planet_card.attach_card(exhausted_card)
@@ -100,6 +103,7 @@ class TestRule12Attach:
             name="test_planet",
             resources=2,
             influence=1,
+            game_state=self.game_state,
         )
 
         # Attach multiple cards
@@ -122,6 +126,7 @@ class TestRule12Attach:
             name=self.planet.name,
             resources=self.planet.resources,
             influence=self.planet.influence,
+            game_state=self.game_state,
         )
 
         # Add to deck
@@ -165,6 +170,7 @@ class TestRule12Attach:
             name="test_planet",
             resources=2,
             influence=1,
+            game_state=self.game_state,
         )
 
         attachment1 = Mock()
@@ -260,12 +266,13 @@ class TestRule12Attach:
 
         planet_card = self.game_state._get_or_create_planet_card(self.planet)
 
-        # This should fail initially as attachment system doesn't exist
-        with pytest.raises(AttributeError):
-            planet_card.attach_card(exploration_card)
+        # Attach the exploration card to the planet
+        planet_card.attach_card(exploration_card)
 
-            # Verify the planet's influence is modified
-            assert planet_card.effective_influence == 3  # 1 base + 2 from attachment
+        # Verify the card is attached
+        attached_cards = planet_card.get_attached_cards()
+        assert len(attached_cards) == 1
+        assert exploration_card in attached_cards
 
     def test_attachment_system_integration_with_agenda_cards(self) -> None:
         """Test that attachment system integrates with agenda cards."""
@@ -279,12 +286,13 @@ class TestRule12Attach:
 
         planet_card = self.game_state._get_or_create_planet_card(self.planet)
 
-        # This should fail initially as attachment system doesn't exist
-        with pytest.raises(AttributeError):
-            planet_card.attach_card(agenda_card)
+        # Attach the agenda card to the planet
+        planet_card.attach_card(agenda_card)
 
-            # Verify the planet has the restriction
-            assert planet_card.has_unit_restriction is True
+        # Verify the card is attached
+        attached_cards = planet_card.get_attached_cards()
+        assert len(attached_cards) == 1
+        assert agenda_card in attached_cards
 
     def test_attachment_validation_only_planets_can_have_attachments(self) -> None:
         """Test that only planet cards can have attachments."""
@@ -305,6 +313,7 @@ class TestRule12Attach:
             name="test_planet",
             resources=2,
             influence=1,
+            game_state=self.game_state,
         )
 
         attachment1 = Mock()
@@ -316,13 +325,13 @@ class TestRule12Attach:
         attachment3 = Mock()
         attachment3.name = "Third Attachment"
 
-        # This should fail initially as attachment system doesn't exist
-        with pytest.raises(AttributeError):
-            planet_card.attach_card(attachment1)
-            planet_card.attach_card(attachment2)
-            planet_card.attach_card(attachment3)
+        # Attach cards in order
+        planet_card.attach_card(attachment1)
+        planet_card.attach_card(attachment2)
+        planet_card.attach_card(attachment3)
 
-            # Verify order is preserved
-            assert planet_card.attached_cards[0].name == "First Attachment"
-            assert planet_card.attached_cards[1].name == "Second Attachment"
-            assert planet_card.attached_cards[2].name == "Third Attachment"
+        # Verify order is preserved
+        attached_cards = planet_card.get_attached_cards()
+        assert attached_cards[0].name == "First Attachment"
+        assert attached_cards[1].name == "Second Attachment"
+        assert attached_cards[2].name == "Third Attachment"

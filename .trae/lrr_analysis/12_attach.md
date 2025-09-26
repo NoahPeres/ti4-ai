@@ -145,7 +145,7 @@ Rule 12 defines the mechanics for attaching cards to planet cards, including phy
    - Proper error handling for invalid operations
 
 ## Raw LRR Text
-```
+```text
 12. ATTACH
 To attach a card to a planet card, a player places the card with the attach effect partially underneath the planet card.
 
