@@ -13,15 +13,15 @@ LRR Reference: Rule 49 - INVASION
 
 from unittest.mock import Mock, patch
 
-from src.ti4.core.constants import UnitType
-from src.ti4.core.galaxy import Galaxy
-from src.ti4.core.game_state import GameState
-from src.ti4.core.hex_coordinate import HexCoordinate
-from src.ti4.core.invasion import InvasionController
-from src.ti4.core.planet import Planet
-from src.ti4.core.player import Player
-from src.ti4.core.system import System
-from src.ti4.core.unit import Unit
+from ti4.core.constants import UnitType
+from ti4.core.galaxy import Galaxy
+from ti4.core.game_state import GameState
+from ti4.core.hex_coordinate import HexCoordinate
+from ti4.core.invasion import InvasionController
+from ti4.core.planet import Planet
+from ti4.core.player import Player
+from ti4.core.system import System
+from ti4.core.unit import Unit
 
 
 class TestRule49BombardmentStep:

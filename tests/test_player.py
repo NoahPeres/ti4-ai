@@ -1,7 +1,7 @@
 """Tests for Player class."""
 
-from src.ti4.core.constants import Faction
-from src.ti4.core.player import Player
+from ti4.core.constants import Faction
+from ti4.core.player import Player
 
 
 def test_player_has_unique_identification() -> None:

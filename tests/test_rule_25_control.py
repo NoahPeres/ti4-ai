@@ -2,11 +2,11 @@
 
 import pytest
 
-from src.ti4.core.constants import Faction, UnitType
-from src.ti4.core.game_state import GameState
-from src.ti4.core.planet import Planet
-from src.ti4.core.player import Player
-from src.ti4.core.unit import Unit
+from ti4.core.constants import Faction, UnitType
+from ti4.core.game_state import GameState
+from ti4.core.planet import Planet
+from ti4.core.player import Player
+from ti4.core.unit import Unit
 
 
 class TestRule25Control:

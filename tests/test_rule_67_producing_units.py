@@ -12,14 +12,14 @@ Rule 67 Sub-rules tested:
 - 67.6: Ship production restriction - cannot produce ships with enemy ships
 """
 
-from src.ti4.core.blockade import BlockadeManager
-from src.ti4.core.constants import UnitType
-from src.ti4.core.galaxy import Galaxy
-from src.ti4.core.hex_coordinate import HexCoordinate
-from src.ti4.core.planet import Planet
-from src.ti4.core.production import ProductionManager
-from src.ti4.core.system import System
-from src.ti4.core.unit import Unit
+from ti4.core.blockade import BlockadeManager
+from ti4.core.constants import UnitType
+from ti4.core.galaxy import Galaxy
+from ti4.core.hex_coordinate import HexCoordinate
+from ti4.core.planet import Planet
+from ti4.core.production import ProductionManager
+from ti4.core.system import System
+from ti4.core.unit import Unit
 
 
 class TestRule67ProductionBasics:
@@ -368,7 +368,7 @@ class TestRule67TacticalActionIntegration:
 
         LRR Reference: Rule 67.3 - Production during tactical action
         """
-        from src.ti4.actions.production_step import ProductionStep
+        from ti4.actions.production_step import ProductionStep
 
         # Should be able to create a production step
         step = ProductionStep()
@@ -379,11 +379,11 @@ class TestRule67TacticalActionIntegration:
 
         LRR Reference: Rule 67.3 - Production follows tactical action rules
         """
-        from src.ti4.actions.production_step import ProductionStep
-        from src.ti4.core.galaxy import Galaxy
-        from src.ti4.core.hex_coordinate import HexCoordinate
-        from src.ti4.core.planet import Planet
-        from src.ti4.core.system import System
+        from ti4.actions.production_step import ProductionStep
+        from ti4.core.galaxy import Galaxy
+        from ti4.core.hex_coordinate import HexCoordinate
+        from ti4.core.planet import Planet
+        from ti4.core.system import System
 
         step = ProductionStep()
 

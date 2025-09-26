@@ -9,7 +9,7 @@ LRR References:
 - Rule 22: Component Action
 """
 
-from src.ti4.core.action_cards import (
+from ti4.core.action_cards import (
     ActionCardContext,
     ActionCardManager,
     ActionCardResult,
@@ -18,7 +18,7 @@ from src.ti4.core.action_cards import (
     LeadershipRiderActionCard,
     UpgradeActionCard,
 )
-from src.ti4.core.component_action import (
+from ti4.core.component_action import (
     ComponentActionContext,
     ComponentActionManager,
     ComponentActionType,

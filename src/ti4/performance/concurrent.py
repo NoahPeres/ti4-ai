@@ -7,8 +7,8 @@ from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass, field
 from typing import Any, Callable, Optional
 
-from src.ti4.core.game_state import GameState
-from src.ti4.performance.monitoring import ResourceMonitor
+from ti4.core.game_state import GameState
+from ti4.performance.monitoring import ResourceMonitor
 
 
 @dataclass
@@ -195,7 +195,7 @@ class ThreadSafeGameStateCache:
             from ..core.constants import PerformanceConstants
 
             max_size = PerformanceConstants.DEFAULT_CACHE_SIZE
-        from src.ti4.performance.cache import GameStateCache
+        from ti4.performance.cache import GameStateCache
 
         self._cache = GameStateCache(max_size)
         self._lock = threading.RLock()

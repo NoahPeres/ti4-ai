@@ -5,10 +5,10 @@ from unittest.mock import Mock
 
 import pytest
 
-from src.ti4.commands.base import GameCommand
-from src.ti4.commands.manager import CommandManager
-from src.ti4.commands.movement import MovementCommand
-from src.ti4.core.game_state import GameState
+from ti4.commands.base import GameCommand
+from ti4.commands.manager import CommandManager
+from ti4.commands.movement import MovementCommand
+from ti4.core.game_state import GameState
 
 
 def test_game_command_interface_exists() -> None:
@@ -23,7 +23,7 @@ def test_game_command_interface_exists() -> None:
 
 def test_command_manager_exists() -> None:
     """Test that CommandManager class can be imported and instantiated."""
-    from src.ti4.commands.manager import CommandManager
+    from ti4.commands.manager import CommandManager
 
     manager = CommandManager()
     assert manager is not None
@@ -34,7 +34,7 @@ def test_command_manager_exists() -> None:
 
 def test_command_manager_execute_command() -> None:
     """Test that CommandManager can execute a command."""
-    from src.ti4.commands.manager import CommandManager
+    from ti4.commands.manager import CommandManager
 
     # Create a mock command
     class MockCommand(GameCommand):
@@ -75,7 +75,7 @@ def test_command_manager_execute_command() -> None:
 
 def test_command_manager_undo_command() -> None:
     """Test that CommandManager can undo a command."""
-    from src.ti4.commands.manager import CommandManager
+    from ti4.commands.manager import CommandManager
 
     # Create a mock command
     class MockCommand(GameCommand):
@@ -121,7 +121,7 @@ def test_command_manager_undo_command() -> None:
 
 def test_command_manager_rejects_invalid_command() -> None:
     """Test that CommandManager rejects commands that cannot be executed."""
-    from src.ti4.commands.manager import CommandManager
+    from ti4.commands.manager import CommandManager
 
     # Create a command that cannot be executed
     class InvalidCommand(GameCommand):
@@ -154,7 +154,7 @@ def test_command_manager_rejects_invalid_command() -> None:
 
 def test_command_manager_undo_empty_history() -> None:
     """Test that CommandManager raises error when undoing with empty history."""
-    from src.ti4.commands.manager import CommandManager
+    from ti4.commands.manager import CommandManager
 
     manager = CommandManager()
     initial_state = GameState()
@@ -204,7 +204,7 @@ def test_command_validation_interface() -> None:
 
 def test_command_manager_replay_from_initial_state() -> None:
     """Test that CommandManager can replay commands from initial state."""
-    from src.ti4.commands.manager import CommandManager
+    from ti4.commands.manager import CommandManager
 
     # Create mock commands
     class MockCommand(GameCommand):
@@ -253,7 +253,7 @@ def test_command_manager_replay_from_initial_state() -> None:
 
 def test_command_serialization() -> None:
     """Test that commands can be serialized for persistence."""
-    from src.ti4.core.constants import UnitType
+    from ti4.core.constants import UnitType
 
     # Create a mock unit
     unit = Mock()

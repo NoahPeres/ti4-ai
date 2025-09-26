@@ -13,14 +13,14 @@ Rule 37 Sub-rules tested:
 - 37.4: Spending restrictions - fleet pool tokens cannot be spent unless allowed
 """
 
-from src.ti4.core.constants import UnitType
-from src.ti4.core.fleet_pool import FleetPoolManager
-from src.ti4.core.galaxy import Galaxy
-from src.ti4.core.hex_coordinate import HexCoordinate
-from src.ti4.core.planet import Planet
-from src.ti4.core.system import System
-from src.ti4.core.unit import Unit
 from tests.test_constants import MockPlanet, MockPlayer, MockSystem
+from ti4.core.constants import UnitType
+from ti4.core.fleet_pool import FleetPoolManager
+from ti4.core.galaxy import Galaxy
+from ti4.core.hex_coordinate import HexCoordinate
+from ti4.core.planet import Planet
+from ti4.core.system import System
+from ti4.core.unit import Unit
 
 
 class TestRule37FleetPoolBasics:
@@ -489,7 +489,7 @@ class TestRule37FleetPoolIntegration:
 
         This ensures fleet pool works with existing fleet mechanics.
         """
-        from src.ti4.core.fleet import Fleet, FleetCapacityValidator
+        from ti4.core.fleet import Fleet, FleetCapacityValidator
 
         fleet_validator = FleetCapacityValidator()
 

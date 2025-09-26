@@ -1,10 +1,10 @@
 """Integration tests for Mecatol Rex system with game mechanics."""
 
-from src.ti4.core.galaxy import Galaxy
-from src.ti4.core.game_state import GameState
-from src.ti4.core.hex_coordinate import HexCoordinate
-from src.ti4.core.strategy_cards.cards.diplomacy import DiplomacyStrategyCard
-from src.ti4.core.system_factory import SystemFactory
+from ti4.core.galaxy import Galaxy
+from ti4.core.game_state import GameState
+from ti4.core.hex_coordinate import HexCoordinate
+from ti4.core.strategy_cards.cards.diplomacy import DiplomacyStrategyCard
+from ti4.core.system_factory import SystemFactory
 
 
 class TestMecatolRexIntegration:

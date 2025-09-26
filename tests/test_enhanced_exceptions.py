@@ -2,7 +2,7 @@
 
 import time
 
-from src.ti4.core.exceptions import TI4GameError
+from ti4.core.exceptions import TI4GameError
 
 
 class TestEnhancedExceptionHierarchy:

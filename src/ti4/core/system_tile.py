@@ -10,7 +10,7 @@ from enum import Enum
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ti4.core.planet import Planet  # type: ignore[import-untyped]
+    from ti4.core.planet import Planet
 
 
 class TileColor(Enum):

@@ -3,10 +3,10 @@
 import hashlib
 from typing import Optional
 
-from src.ti4.actions.action import PlayerDecision
-from src.ti4.actions.legal_moves import LegalMoveGenerator
-from src.ti4.core.galaxy import Galaxy
-from src.ti4.core.game_state import GameState
+from ti4.actions.action import PlayerDecision
+from ti4.actions.legal_moves import LegalMoveGenerator
+from ti4.core.galaxy import Galaxy
+from ti4.core.game_state import GameState
 
 
 class GameStateCache:

@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from src.ti4.commands.base import GameCommand
-from src.ti4.core.game_state import GameState
+from ti4.commands.base import GameCommand
+from ti4.core.game_state import GameState
 
 
 class MockCommand(GameCommand):
@@ -34,7 +34,7 @@ class TestCommandExecutionError:
     def test_command_execution_error_creation(self) -> None:
         """Test CommandExecutionError creation with command context."""
         # RED: This will fail because CommandExecutionError doesn't exist yet
-        from src.ti4.core.exceptions import CommandExecutionError
+        from ti4.core.exceptions import CommandExecutionError
 
         command = MockCommand()
         reason = "Invalid game state"
@@ -50,7 +50,7 @@ class TestCommandExecutionError:
     def test_command_execution_error_without_context(self) -> None:
         """Test CommandExecutionError creation without additional context."""
         # RED: This will fail because CommandExecutionError doesn't exist yet
-        from src.ti4.core.exceptions import CommandExecutionError
+        from ti4.core.exceptions import CommandExecutionError
 
         command = MockCommand()
         reason = "Command validation failed"

@@ -2,11 +2,11 @@
 
 import pytest
 
-from src.ti4.core.constants import Faction
-from src.ti4.core.exceptions import InvalidPlayerError
-from src.ti4.core.game_controller import GameController
-from src.ti4.core.game_phase import GamePhase
-from src.ti4.core.player import Player
+from ti4.core.constants import Faction
+from ti4.core.exceptions import InvalidPlayerError
+from ti4.core.game_controller import GameController
+from ti4.core.game_phase import GamePhase
+from ti4.core.player import Player
 
 
 def create_test_players(count=3) -> list[Player]:

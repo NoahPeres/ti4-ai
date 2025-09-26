@@ -2,8 +2,8 @@
 
 import pytest
 
-from src.ti4.core.constants import SystemConstants
-from src.ti4.core.system_factory import SystemFactory
+from ti4.core.constants import SystemConstants
+from ti4.core.system_factory import SystemFactory
 
 
 class TestSystemFactory:

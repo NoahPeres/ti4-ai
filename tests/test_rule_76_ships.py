@@ -10,15 +10,15 @@ Rule 76 Sub-rules tested:
 - 76.3: Ship attributes - cost, combat, move, and capacity attributes
 """
 
-from src.ti4.core.constants import UnitType
-from src.ti4.core.fleet import Fleet
-from src.ti4.core.galaxy import Galaxy
-from src.ti4.core.hex_coordinate import HexCoordinate
-from src.ti4.core.planet import Planet
-from src.ti4.core.ships import ShipManager
-from src.ti4.core.system import System
-from src.ti4.core.unit import Unit
 from tests.test_constants import MockPlanet, MockPlayer, MockSystem
+from ti4.core.constants import UnitType
+from ti4.core.fleet import Fleet
+from ti4.core.galaxy import Galaxy
+from ti4.core.hex_coordinate import HexCoordinate
+from ti4.core.planet import Planet
+from ti4.core.ships import ShipManager
+from ti4.core.system import System
+from ti4.core.unit import Unit
 
 
 class TestRule76ShipBasics:

@@ -2,9 +2,9 @@
 
 import pytest
 
-from src.ti4.core.constants import UnitType
-from src.ti4.core.fleet import Fleet
-from src.ti4.core.unit import Unit
+from ti4.core.constants import UnitType
+from ti4.core.fleet import Fleet
+from ti4.core.unit import Unit
 
 
 class TestCapacityExcessRemoval:
@@ -38,7 +38,7 @@ class TestCapacityExcessRemoval:
         chosen_units_to_remove = [fighters[2], fighters[4]]
 
         # This should work - remove player's chosen excess units
-        from src.ti4.core.fleet import FleetCapacityEnforcer
+        from ti4.core.fleet import FleetCapacityEnforcer
 
         enforcer = FleetCapacityEnforcer()
 
@@ -103,7 +103,7 @@ class TestCapacityExcessRemoval:
         # Player chooses to remove 1 fighter and 1 infantry
         chosen_units_to_remove = [fighters[1], infantry_units[2]]
 
-        from src.ti4.core.fleet import FleetCapacityEnforcer
+        from ti4.core.fleet import FleetCapacityEnforcer
 
         enforcer = FleetCapacityEnforcer()
 
@@ -140,8 +140,8 @@ class TestCapacityExcessRemoval:
         # Player only chooses to remove 1 unit (need to remove 2)
         chosen_units_to_remove = [fighters[0]]
 
-        from src.ti4.core.exceptions import FleetCapacityError
-        from src.ti4.core.fleet import FleetCapacityEnforcer
+        from ti4.core.exceptions import FleetCapacityError
+        from ti4.core.fleet import FleetCapacityEnforcer
 
         enforcer = FleetCapacityEnforcer()
 
@@ -172,8 +172,8 @@ class TestCapacityExcessRemoval:
         # Player tries to remove cruiser instead of fighters
         chosen_units_to_remove = [cruiser, fighters[0]]
 
-        from src.ti4.core.exceptions import FleetCapacityError
-        from src.ti4.core.fleet import FleetCapacityEnforcer
+        from ti4.core.exceptions import FleetCapacityError
+        from ti4.core.fleet import FleetCapacityEnforcer
 
         enforcer = FleetCapacityEnforcer()
 
@@ -201,7 +201,7 @@ class TestCapacityExcessRemoval:
             fighters.append(fighter)
             fleet.add_unit(fighter)
 
-        from src.ti4.core.fleet import FleetCapacityEnforcer
+        from ti4.core.fleet import FleetCapacityEnforcer
 
         enforcer = FleetCapacityEnforcer()
 
@@ -233,8 +233,8 @@ class TestCapacityExcessRemoval:
         # Create a fighter NOT in the fleet
         external_fighter = Unit(unit_type=UnitType.FIGHTER, owner="player1")
 
-        from src.ti4.core.exceptions import FleetCapacityError
-        from src.ti4.core.fleet import FleetCapacityEnforcer
+        from ti4.core.exceptions import FleetCapacityError
+        from ti4.core.fleet import FleetCapacityEnforcer
 
         enforcer = FleetCapacityEnforcer()
 
@@ -262,8 +262,8 @@ class TestCapacityExcessRemoval:
             fighters.append(fighter)
             fleet.add_unit(fighter)
 
-        from src.ti4.core.exceptions import FleetCapacityError
-        from src.ti4.core.fleet import FleetCapacityEnforcer
+        from ti4.core.exceptions import FleetCapacityError
+        from ti4.core.fleet import FleetCapacityEnforcer
 
         enforcer = FleetCapacityEnforcer()
 
@@ -293,7 +293,7 @@ class TestCapacityExcessRemoval:
             fighters.append(fighter)
             fleet.add_unit(fighter)
 
-        from src.ti4.core.fleet import FleetCapacityEnforcer
+        from ti4.core.fleet import FleetCapacityEnforcer
 
         enforcer = FleetCapacityEnforcer()
 

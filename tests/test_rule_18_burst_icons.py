@@ -1,9 +1,9 @@
 """Tests for Rule 18.2: Burst Icon Mechanics."""
 
-from src.ti4.core.combat import CombatResolver
-from src.ti4.core.constants import UnitType
-from src.ti4.core.unit import Unit
-from src.ti4.core.unit_stats import UnitStats, UnitStatsProvider
+from ti4.core.combat import CombatResolver
+from ti4.core.constants import UnitType
+from ti4.core.unit import Unit
+from ti4.core.unit_stats import UnitStats, UnitStatsProvider
 
 
 class TestRule18BurstIconMechanics:

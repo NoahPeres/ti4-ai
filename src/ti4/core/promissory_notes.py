@@ -117,7 +117,7 @@ class PromissoryNoteManager:
         # Handle notes in the eliminated player's hand
         if eliminated_player in self._player_hands:
             eliminated_player_hand = self._player_hands[eliminated_player].copy()
-            
+
             # Iterate through each note in the eliminated player's hand
             for note in eliminated_player_hand:
                 # If the note belongs to another player, return it to their available pool
@@ -127,12 +127,12 @@ class PromissoryNoteManager:
                     # Remove from eliminated player's hand
                     if note in self._player_hands[eliminated_player]:
                         self._player_hands[eliminated_player].remove(note)
-            
+
             # Remove the eliminated player's hand entry
             del self._player_hands[eliminated_player]
 
         # Remove all notes issued by the eliminated player from other players' hands
-        for player_id, hand in self._player_hands.items():
+        for _player_id, hand in self._player_hands.items():
             # Create a copy of the hand to iterate over while modifying
             hand_copy = hand.copy()
             for note in hand_copy:

@@ -5,13 +5,13 @@ from typing import Any
 
 import pytest
 
-from src.ti4.actions.action import Action
-from src.ti4.core.game_state import GameState
+from ti4.actions.action import Action
+from ti4.core.game_state import GameState
 
 
 def test_player_interface_exists():
     """Test that PlayerInterface abstract base class exists."""
-    from src.ti4.core.player_interface import PlayerInterface
+    from ti4.core.player_interface import PlayerInterface
 
     # Should be an abstract base class
     assert issubclass(PlayerInterface, ABC)
@@ -19,7 +19,7 @@ def test_player_interface_exists():
 
 def test_player_interface_has_choose_action_method():
     """Test that PlayerInterface has choose_action method."""
-    from src.ti4.core.player_interface import PlayerInterface
+    from ti4.core.player_interface import PlayerInterface
 
     # Should have choose_action method
     assert hasattr(PlayerInterface, "choose_action")
@@ -30,7 +30,7 @@ def test_player_interface_has_choose_action_method():
 
 def test_player_interface_has_make_choice_method():
     """Test that PlayerInterface has make_choice method."""
-    from src.ti4.core.player_interface import PlayerInterface
+    from ti4.core.player_interface import PlayerInterface
 
     # Should have make_choice method
     assert hasattr(PlayerInterface, "make_choice")
@@ -41,7 +41,7 @@ def test_player_interface_has_make_choice_method():
 
 def test_basic_ai_player_exists():
     """Test that BasicAIPlayer exists and implements PlayerInterface."""
-    from src.ti4.core.player_interface import BasicAIPlayer, PlayerInterface
+    from ti4.core.player_interface import BasicAIPlayer, PlayerInterface
 
     # Should be a subclass of PlayerInterface
     assert issubclass(BasicAIPlayer, PlayerInterface)
@@ -49,7 +49,7 @@ def test_basic_ai_player_exists():
 
 def test_basic_ai_player_can_be_instantiated():
     """Test that BasicAIPlayer can be instantiated."""
-    from src.ti4.core.player_interface import BasicAIPlayer
+    from ti4.core.player_interface import BasicAIPlayer
 
     ai_player = BasicAIPlayer(player_id="ai1")
     assert ai_player.player_id == "ai1"
@@ -57,7 +57,7 @@ def test_basic_ai_player_can_be_instantiated():
 
 def test_basic_ai_player_implements_choose_action():
     """Test that BasicAIPlayer implements choose_action method."""
-    from src.ti4.core.player_interface import BasicAIPlayer
+    from ti4.core.player_interface import BasicAIPlayer
 
     # Create a mock action for testing
     class MockAction(Action):
@@ -80,7 +80,7 @@ def test_basic_ai_player_implements_choose_action():
 
 def test_basic_ai_player_implements_make_choice():
     """Test that BasicAIPlayer implements make_choice method."""
-    from src.ti4.core.player_interface import BasicAIPlayer
+    from ti4.core.player_interface import BasicAIPlayer
 
     ai_player = BasicAIPlayer(player_id="ai1")
     game_state = GameState()
@@ -93,7 +93,7 @@ def test_basic_ai_player_implements_make_choice():
 
 def test_basic_ai_player_handles_no_legal_actions():
     """Test that BasicAIPlayer raises error when no legal actions available."""
-    from src.ti4.core.player_interface import BasicAIPlayer
+    from ti4.core.player_interface import BasicAIPlayer
 
     ai_player = BasicAIPlayer(player_id="ai1")
     game_state = GameState()
@@ -105,7 +105,7 @@ def test_basic_ai_player_handles_no_legal_actions():
 
 def test_player_state_view_exists():
     """Test that PlayerStateView class exists."""
-    from src.ti4.core.player_interface import PlayerStateView
+    from ti4.core.player_interface import PlayerStateView
 
     # Should be a class that can be instantiated
     assert PlayerStateView is not None
@@ -113,8 +113,8 @@ def test_player_state_view_exists():
 
 def test_player_state_view_can_be_created():
     """Test that PlayerStateView can be created from game state."""
-    from src.ti4.core.player import Player
-    from src.ti4.core.player_interface import PlayerStateView
+    from ti4.core.player import Player
+    from ti4.core.player_interface import PlayerStateView
 
     game_state = GameState(players=[Player(id="player1", faction="sol")])
     player_view = PlayerStateView.create_for_player(game_state, "player1")
@@ -124,8 +124,8 @@ def test_player_state_view_can_be_created():
 
 def test_player_state_view_has_get_legal_actions_method():
     """Test that PlayerStateView has get_legal_actions method."""
-    from src.ti4.core.player import Player
-    from src.ti4.core.player_interface import PlayerStateView
+    from ti4.core.player import Player
+    from ti4.core.player_interface import PlayerStateView
 
     game_state = GameState(players=[Player(id="player1", faction="sol")])
     player_view = PlayerStateView.create_for_player(game_state, "player1")
@@ -137,8 +137,8 @@ def test_player_state_view_has_get_legal_actions_method():
 
 def test_player_state_view_get_legal_actions_returns_list():
     """Test that get_legal_actions returns a list of actions."""
-    from src.ti4.core.player import Player
-    from src.ti4.core.player_interface import PlayerStateView
+    from ti4.core.player import Player
+    from ti4.core.player_interface import PlayerStateView
 
     game_state = GameState(players=[Player(id="player1", faction="sol")])
     player_view = PlayerStateView.create_for_player(game_state, "player1")
@@ -149,8 +149,8 @@ def test_player_state_view_get_legal_actions_returns_list():
 
 def test_player_state_view_has_get_visible_information_method():
     """Test that PlayerStateView has get_visible_information method."""
-    from src.ti4.core.player import Player
-    from src.ti4.core.player_interface import PlayerStateView
+    from ti4.core.player import Player
+    from ti4.core.player_interface import PlayerStateView
 
     game_state = GameState(players=[Player(id="player1", faction="sol")])
     player_view = PlayerStateView.create_for_player(game_state, "player1")
@@ -162,8 +162,8 @@ def test_player_state_view_has_get_visible_information_method():
 
 def test_player_state_view_get_visible_information_returns_dict():
     """Test that get_visible_information returns a dictionary."""
-    from src.ti4.core.player import Player
-    from src.ti4.core.player_interface import PlayerStateView
+    from ti4.core.player import Player
+    from ti4.core.player_interface import PlayerStateView
 
     game_state = GameState(players=[Player(id="player1", faction="sol")])
     player_view = PlayerStateView.create_for_player(game_state, "player1")
@@ -174,9 +174,9 @@ def test_player_state_view_get_visible_information_returns_dict():
 
 def test_player_state_view_information_visibility():
     """Test that PlayerStateView provides appropriate information visibility."""
-    from src.ti4.core.game_phase import GamePhase
-    from src.ti4.core.player import Player
-    from src.ti4.core.player_interface import PlayerStateView
+    from ti4.core.game_phase import GamePhase
+    from ti4.core.player import Player
+    from ti4.core.player_interface import PlayerStateView
 
     players = [
         Player(id="player1", faction="sol"),

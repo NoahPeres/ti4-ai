@@ -1,8 +1,8 @@
 """Tests for planet structure."""
 
-from src.ti4.core.constants import UnitType
-from src.ti4.core.planet import Planet
-from src.ti4.core.unit import Unit
+from ti4.core.constants import UnitType
+from ti4.core.planet import Planet
+from ti4.core.unit import Unit
 
 
 class TestPlanet:

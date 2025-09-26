@@ -7,11 +7,11 @@ if two players have ships in the active system, those players must resolve a spa
 
 import pytest
 
-from src.ti4.core.combat import CombatDetector
-from src.ti4.core.constants import UnitType
-from src.ti4.core.space_combat import CombatStep
-from src.ti4.core.system import System
-from src.ti4.core.unit import Unit
+from ti4.core.combat import CombatDetector
+from ti4.core.constants import UnitType
+from ti4.core.space_combat import CombatStep
+from ti4.core.system import System
+from ti4.core.unit import Unit
 
 
 class TestSpaceCombatDetection:
@@ -59,7 +59,7 @@ class TestSpaceCombatResolution:
 
     def test_space_combat_class_exists(self) -> None:
         """Test that SpaceCombat class exists for combat resolution."""
-        from src.ti4.core.space_combat import SpaceCombat
+        from ti4.core.space_combat import SpaceCombat
 
         system = System("test_system")
         combat = SpaceCombat(system, "player1", "player2")
@@ -67,7 +67,7 @@ class TestSpaceCombatResolution:
 
     def test_anti_fighter_barrage_step(self) -> None:
         """Test anti-fighter barrage step (Rule 78.2)."""
-        from src.ti4.core.space_combat import SpaceCombat
+        from ti4.core.space_combat import SpaceCombat
 
         system = System("test_system")
         # Add destroyer with anti-fighter barrage vs fighter
@@ -83,7 +83,7 @@ class TestSpaceCombatResolution:
 
     def test_announce_retreats_step(self) -> None:
         """Test announce retreats step (Rule 78.4)."""
-        from src.ti4.core.space_combat import SpaceCombat
+        from ti4.core.space_combat import SpaceCombat
 
         system = System("test_system")
         cruiser = Unit(UnitType.CRUISER, "player1")
@@ -105,7 +105,7 @@ class TestSpaceCombatResolution:
 
     def test_roll_dice_step(self) -> None:
         """Test roll dice step (Rule 78.4)."""
-        from src.ti4.core.space_combat import SpaceCombat
+        from ti4.core.space_combat import SpaceCombat
 
         system = System("test_system")
         cruiser = Unit(UnitType.CRUISER, "player1")
@@ -125,7 +125,7 @@ class TestSpaceCombatResolution:
 
     def test_assign_hits_step(self) -> None:
         """Test assign hits step (Rule 78.5)."""
-        from src.ti4.core.space_combat import SpaceCombat
+        from ti4.core.space_combat import SpaceCombat
 
         system = System("test_system")
         cruiser = Unit(UnitType.CRUISER, "player1")
@@ -144,7 +144,7 @@ class TestSpaceCombatResolution:
 
     def test_retreat_step(self) -> None:
         """Test retreat step (Rule 78.6)."""
-        from src.ti4.core.space_combat import SpaceCombat
+        from ti4.core.space_combat import SpaceCombat
 
         system = System("test_system")
         cruiser = Unit(UnitType.CRUISER, "player1")
@@ -160,7 +160,7 @@ class TestSpaceCombatResolution:
 
     def test_multiple_rounds(self) -> None:
         """Test multiple rounds of combat (Rule 78.7)."""
-        from src.ti4.core.space_combat import SpaceCombat
+        from ti4.core.space_combat import SpaceCombat
 
         system = System("test_system")
         cruiser1 = Unit(UnitType.CRUISER, "player1")
@@ -186,7 +186,7 @@ class TestSpaceCombatSpecialCases:
 
     def test_combat_with_fighters_only(self) -> None:
         """Test combat with only fighters."""
-        from src.ti4.core.space_combat import SpaceCombat
+        from ti4.core.space_combat import SpaceCombat
 
         system = System("test_system")
         fighter1 = Unit(UnitType.FIGHTER, "player1")
@@ -202,7 +202,7 @@ class TestSpaceCombatSpecialCases:
 
     def test_combat_with_sustain_damage_units(self) -> None:
         """Test combat with units that have sustain damage."""
-        from src.ti4.core.space_combat import SpaceCombat
+        from ti4.core.space_combat import SpaceCombat
 
         system = System("test_system")
         dreadnought = Unit(UnitType.DREADNOUGHT, "player1")
@@ -218,7 +218,7 @@ class TestSpaceCombatSpecialCases:
 
     def test_combat_with_flagship(self) -> None:
         """Test combat involving flagship units."""
-        from src.ti4.core.space_combat import SpaceCombat
+        from ti4.core.space_combat import SpaceCombat
 
         system = System("test_system")
         flagship = Unit(UnitType.FLAGSHIP, "player1")
@@ -234,7 +234,7 @@ class TestSpaceCombatSpecialCases:
 
     def test_combat_result_tracking(self) -> None:
         """Test that combat results are properly tracked."""
-        from src.ti4.core.space_combat import SpaceCombat
+        from ti4.core.space_combat import SpaceCombat
 
         system = System("test_system")
         cruiser = Unit(UnitType.CRUISER, "player1")
@@ -257,7 +257,7 @@ class TestSpaceCombatIntegration:
         """Test that tactical action properly triggers space combat when needed."""
         # This should fail initially - tactical action integration not implemented
         with pytest.raises(ImportError):
-            from src.ti4.actions.tactical_action import (
+            from ti4.actions.tactical_action import (
                 TacticalAction,  # This import should fail
             )
 
@@ -265,7 +265,7 @@ class TestSpaceCombatIntegration:
 
     def test_space_combat_affects_game_state(self) -> None:
         """Test that space combat results properly update game state."""
-        from src.ti4.core.space_combat import SpaceCombat
+        from ti4.core.space_combat import SpaceCombat
 
         system = System("test_system")
         cruiser = Unit(UnitType.CRUISER, "player1")
@@ -281,7 +281,7 @@ class TestSpaceCombatIntegration:
 
     def test_space_combat_events_fired(self) -> None:
         """Test that appropriate events are fired during space combat."""
-        from src.ti4.core.space_combat import SpaceCombat
+        from ti4.core.space_combat import SpaceCombat
 
         system = System("test_system")
         cruiser = Unit(UnitType.CRUISER, "player1")
@@ -302,7 +302,7 @@ class TestSpaceCombatAdvancedMechanics:
 
     def test_rule_78_7_retreat_execution(self) -> None:
         """Test Rule 78.7: STEP 5-RETREAT - Player must retreat if announced and eligible system exists."""
-        from src.ti4.core.space_combat import SpaceCombat
+        from ti4.core.space_combat import SpaceCombat
 
         # Create systems for retreat test
         active_system = System("active_system")
@@ -331,7 +331,7 @@ class TestSpaceCombatAdvancedMechanics:
 
     def test_rule_78_8_combat_continuation_after_retreat(self) -> None:
         """Test Rule 78.8: Combat continues if both players still have ships after retreat."""
-        from src.ti4.core.space_combat import SpaceCombat
+        from ti4.core.space_combat import SpaceCombat
 
         system = System("test_system")
         # Multiple ships for each player
@@ -359,7 +359,7 @@ class TestSpaceCombatAdvancedMechanics:
 
     def test_rule_78_9_combat_ends_when_only_one_player_has_ships(self) -> None:
         """Test Rule 78.9: Combat ends when only one player has ships in system."""
-        from src.ti4.core.space_combat import SpaceCombat
+        from ti4.core.space_combat import SpaceCombat
 
         system = System("test_system")
         cruiser = Unit(UnitType.CRUISER, "player1")
@@ -382,7 +382,7 @@ class TestSpaceCombatAdvancedMechanics:
 
     def test_rule_78_9_combat_ends_when_no_players_have_ships(self) -> None:
         """Test Rule 78.9: Combat ends when neither player has ships in system."""
-        from src.ti4.core.space_combat import SpaceCombat
+        from ti4.core.space_combat import SpaceCombat
 
         system = System("test_system")
         cruiser = Unit(UnitType.CRUISER, "player1")
@@ -400,7 +400,7 @@ class TestSpaceCombatAdvancedMechanics:
 
     def test_rule_78_10_winner_determination_attacker_wins(self) -> None:
         """Test Rule 78.10: Winner determination when attacker has ships remaining."""
-        from src.ti4.core.space_combat import SpaceCombat
+        from ti4.core.space_combat import SpaceCombat
 
         system = System("test_system")
         cruiser = Unit(UnitType.CRUISER, "player1")
@@ -424,7 +424,7 @@ class TestSpaceCombatAdvancedMechanics:
 
     def test_rule_78_10_winner_determination_defender_wins(self) -> None:
         """Test Rule 78.10: Winner determination when defender has ships remaining."""
-        from src.ti4.core.space_combat import SpaceCombat
+        from ti4.core.space_combat import SpaceCombat
 
         system = System("test_system")
         cruiser = Unit(UnitType.CRUISER, "player1")
@@ -448,7 +448,7 @@ class TestSpaceCombatAdvancedMechanics:
 
     def test_rule_78_10_combat_draw_no_ships_remaining(self) -> None:
         """Test Rule 78.10: Combat ends in draw when neither player has ships remaining."""
-        from src.ti4.core.space_combat import SpaceCombat
+        from ti4.core.space_combat import SpaceCombat
 
         system = System("test_system")
         cruiser = Unit(UnitType.CRUISER, "player1")

@@ -13,8 +13,8 @@ Rule 69 Sub-rules tested:
 - 69.7: Elimination effects - return matching notes when player eliminated
 """
 
-from src.ti4.core.promissory_notes import PromissoryNoteManager
-from src.ti4.core.transactions import PromissoryNote, PromissoryNoteType
+from ti4.core.promissory_notes import PromissoryNoteManager
+from ti4.core.transactions import PromissoryNote, PromissoryNoteType
 
 
 class TestRule69PromissoryNoteBasics:

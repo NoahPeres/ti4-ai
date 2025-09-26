@@ -6,8 +6,8 @@ All tests follow strict TDD methodology with RED-GREEN-REFACTOR cycles.
 LRR Reference: Rule 91 - TECHNOLOGY (STRATEGY CARD)
 """
 
-from src.ti4.core.constants import Technology
 from tests.test_constants import MockPlayer
+from ti4.core.constants import Technology
 
 
 class TestRule91TechnologyStrategyCardBasics:
@@ -21,7 +21,7 @@ class TestRule91TechnologyStrategyCardBasics:
         LRR Reference: Rule 91.0 - The "Technology" strategy card allows players to research new technology
         """
         # RED: This will fail until we create TechnologyStrategyCard
-        from src.ti4.core.technology_strategy_card import TechnologyStrategyCard
+        from ti4.core.technology_strategy_card import TechnologyStrategyCard
 
         card = TechnologyStrategyCard()
         assert card is not None
@@ -31,7 +31,7 @@ class TestRule91TechnologyStrategyCardBasics:
 
         LRR Reference: Rule 91.0 - This card's initiative value is "7"
         """
-        from src.ti4.core.technology_strategy_card import TechnologyStrategyCard
+        from ti4.core.technology_strategy_card import TechnologyStrategyCard
 
         card = TechnologyStrategyCard()
         assert card.get_initiative_value() == 7
@@ -45,7 +45,7 @@ class TestRule91PrimaryAbility:
 
         LRR Reference: Rule 91.2 - The active player can research one technology of their choice
         """
-        from src.ti4.core.technology_strategy_card import TechnologyStrategyCard
+        from ti4.core.technology_strategy_card import TechnologyStrategyCard
 
         card = TechnologyStrategyCard()
 
@@ -65,7 +65,7 @@ class TestRule91PrimaryAbility:
 
         LRR Reference: Rule 91.2 - Then may research one additional technology by spending six resources
         """
-        from src.ti4.core.technology_strategy_card import TechnologyStrategyCard
+        from ti4.core.technology_strategy_card import TechnologyStrategyCard
 
         card = TechnologyStrategyCard()
 
@@ -82,7 +82,7 @@ class TestRule91PrimaryAbility:
 
         LRR Reference: Rule 91.2 - May research additional technology by spending six resources
         """
-        from src.ti4.core.technology_strategy_card import TechnologyStrategyCard
+        from ti4.core.technology_strategy_card import TechnologyStrategyCard
 
         card = TechnologyStrategyCard()
 
@@ -103,7 +103,7 @@ class TestRule91SecondaryAbility:
         LRR Reference: Rule 91.3 - Each other player may research one technology by spending
         one command token from their strategy pool and four resources
         """
-        from src.ti4.core.technology_strategy_card import TechnologyStrategyCard
+        from ti4.core.technology_strategy_card import TechnologyStrategyCard
 
         card = TechnologyStrategyCard()
 
@@ -127,7 +127,7 @@ class TestRule91SecondaryAbility:
 
         LRR Reference: Rule 91.3 - Must spend one command token from strategy pool
         """
-        from src.ti4.core.technology_strategy_card import TechnologyStrategyCard
+        from ti4.core.technology_strategy_card import TechnologyStrategyCard
 
         card = TechnologyStrategyCard()
 
@@ -146,7 +146,7 @@ class TestRule91SecondaryAbility:
 
         LRR Reference: Rule 91.3 - Must spend four resources
         """
-        from src.ti4.core.technology_strategy_card import TechnologyStrategyCard
+        from ti4.core.technology_strategy_card import TechnologyStrategyCard
 
         card = TechnologyStrategyCard()
 
@@ -169,7 +169,7 @@ class TestRule91StrategyCardIntegration:
 
         LRR Reference: Rule 91.1 - During action phase, active player can perform strategic action
         """
-        from src.ti4.core.strategic_action import (
+        from ti4.core.strategic_action import (
             StrategicActionManager,
             StrategyCard,
             StrategyCardType,
@@ -200,8 +200,8 @@ class TestRule91StrategyCardIntegration:
 
         LRR Reference: Rule 91.2/91.3 - Card allows researching technologies
         """
-        from src.ti4.core.technology import TechnologyManager
-        from src.ti4.core.technology_strategy_card import TechnologyStrategyCard
+        from ti4.core.technology import TechnologyManager
+        from ti4.core.technology_strategy_card import TechnologyStrategyCard
 
         card = TechnologyStrategyCard()
         tech_manager = TechnologyManager()
@@ -218,8 +218,8 @@ class TestRule91StrategyCardIntegration:
 
         This tests the complete integration with GameTechnologyManager and game state.
         """
-        from src.ti4.core.game_technology_manager import GameTechnologyManager
-        from src.ti4.core.technology_strategy_card import TechnologyStrategyCard
+        from ti4.core.game_technology_manager import GameTechnologyManager
+        from ti4.core.technology_strategy_card import TechnologyStrategyCard
 
         # Use the mock game state from technology integration tests
         class MockGameState:
@@ -283,8 +283,8 @@ class TestRule91StrategyCardIntegration:
 
     def test_prerequisite_validation_with_integration(self) -> None:
         """Test that prerequisite validation works with full integration."""
-        from src.ti4.core.game_technology_manager import GameTechnologyManager
-        from src.ti4.core.technology_strategy_card import TechnologyStrategyCard
+        from ti4.core.game_technology_manager import GameTechnologyManager
+        from ti4.core.technology_strategy_card import TechnologyStrategyCard
 
         # Use the same mock as above
         class MockGameState:
@@ -338,8 +338,8 @@ class TestRule91StrategyCardIntegration:
 
     def test_secondary_ability_integration(self) -> None:
         """Test that secondary ability works with full integration."""
-        from src.ti4.core.game_technology_manager import GameTechnologyManager
-        from src.ti4.core.technology_strategy_card import TechnologyStrategyCard
+        from ti4.core.game_technology_manager import GameTechnologyManager
+        from ti4.core.technology_strategy_card import TechnologyStrategyCard
 
         # Use the same mock as above
         class MockGameState:

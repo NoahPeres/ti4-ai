@@ -12,14 +12,14 @@ Rule 14 Sub-rules tested:
 
 import pytest
 
-from src.ti4.core.blockade import BlockadeManager
-from src.ti4.core.capture import CaptureManager
-from src.ti4.core.constants import UnitType
-from src.ti4.core.galaxy import Galaxy
-from src.ti4.core.hex_coordinate import HexCoordinate
-from src.ti4.core.planet import Planet
-from src.ti4.core.system import System
-from src.ti4.core.unit import Unit
+from ti4.core.blockade import BlockadeManager
+from ti4.core.capture import CaptureManager
+from ti4.core.constants import UnitType
+from ti4.core.galaxy import Galaxy
+from ti4.core.hex_coordinate import HexCoordinate
+from ti4.core.planet import Planet
+from ti4.core.system import System
+from ti4.core.unit import Unit
 
 
 def create_test_system_with_planet(system_id: str, planet_name: str):

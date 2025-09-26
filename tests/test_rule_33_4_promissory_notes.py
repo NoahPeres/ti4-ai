@@ -1,9 +1,9 @@
 """Test Rule 33.4: Promissory note handling on player elimination."""
 
+from ti4.core.constants import Faction
 from ti4.core.game_state import GameState
 from ti4.core.player import Player
 from ti4.core.transactions import PromissoryNote, PromissoryNoteType
-from ti4.core.constants import Faction
 
 
 class TestRule334PromissoryNoteElimination:

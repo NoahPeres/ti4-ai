@@ -3,10 +3,10 @@
 from typing import Any
 from unittest.mock import Mock, patch
 
-from src.ti4.core.constants import Faction
-from src.ti4.core.events import CombatStartedEvent, PhaseChangedEvent, UnitMovedEvent
-from src.ti4.core.observers import AITrainingDataCollector, LoggingObserver
-from src.ti4.testing.scenario_builder import GameScenarioBuilder
+from ti4.core.constants import Faction
+from ti4.core.events import CombatStartedEvent, PhaseChangedEvent, UnitMovedEvent
+from ti4.core.observers import AITrainingDataCollector, LoggingObserver
+from ti4.testing.scenario_builder import GameScenarioBuilder
 
 
 class TestObserverMethodBreakdown:
@@ -100,7 +100,7 @@ class TestObserverMethodBreakdown:
         assert phase_record["to_phase"] == "strategy"
         assert phase_record["round_number"] == 1
 
-    @patch("src.ti4.core.observers.logger")
+    @patch("ti4.core.observers.logger")
     def test_logging_observer_broken_down_methods_work(self, mock_logger) -> None:
         """Test that the broken down logging observer methods work correctly."""
 
@@ -125,7 +125,7 @@ class TestObserverMethodBreakdown:
         assert "sys2" in log_message
         assert "player1" in log_message
 
-    @patch("src.ti4.core.observers.logger")
+    @patch("ti4.core.observers.logger")
     def test_logging_observer_event_specific_methods(self, mock_logger) -> None:
         """Test that event-specific logging methods work correctly."""
 

@@ -2,14 +2,14 @@
 
 from unittest.mock import Mock
 
-from src.ti4.core.constants import LocationType, UnitType
-from src.ti4.core.game_state import GameState
+from ti4.core.constants import LocationType, UnitType
+from ti4.core.game_state import GameState
 
 
 def test_movement_command_exists() -> None:
     """Test that MovementCommand can be imported and implements GameCommand."""
-    from src.ti4.commands.base import GameCommand
-    from src.ti4.commands.movement import MovementCommand
+    from ti4.commands.base import GameCommand
+    from ti4.commands.movement import MovementCommand
 
     # Check that it's a subclass of GameCommand
     assert issubclass(MovementCommand, GameCommand)
@@ -23,7 +23,7 @@ def test_movement_command_exists() -> None:
 
 def test_movement_command_creation() -> None:
     """Test that MovementCommand can be created with required parameters."""
-    from src.ti4.commands.movement import MovementCommand
+    from ti4.commands.movement import MovementCommand
 
     # Create a mock unit
     unit = Mock()
@@ -49,7 +49,7 @@ def test_movement_command_creation() -> None:
 
 def test_movement_command_execute_and_undo_data() -> None:
     """Test that MovementCommand collects undo data during execution."""
-    from src.ti4.commands.movement import MovementCommand
+    from ti4.commands.movement import MovementCommand
 
     # Create a mock unit
     unit = Mock()
@@ -83,8 +83,8 @@ def test_movement_command_execute_and_undo_data() -> None:
 
 def test_movement_command_execute_undo_cycle() -> None:
     """Test that MovementCommand can execute and then undo properly."""
-    from src.ti4.commands.manager import CommandManager
-    from src.ti4.commands.movement import MovementCommand
+    from ti4.commands.manager import CommandManager
+    from ti4.commands.movement import MovementCommand
 
     # Create a mock unit
     unit = Mock()

@@ -21,7 +21,7 @@ class TestRule83GameStateExtensions:
 
         Requirements: 1.3, 4.5 - Strategy card tracking in game state
         """
-        from src.ti4.core.game_state import GameState
+        from ti4.core.game_state import GameState
 
         # RED: This will fail until we add the field
         state = GameState()
@@ -33,7 +33,7 @@ class TestRule83GameStateExtensions:
 
         Requirements: 4.5 - State persistence for card exhaustion
         """
-        from src.ti4.core.game_state import GameState
+        from ti4.core.game_state import GameState
 
         # RED: This will fail until we add the field
         state = GameState()
@@ -45,10 +45,10 @@ class TestRule83GameStateExtensions:
 
         Requirements: 1.3, 6.2 - Strategy card tracking and state synchronization
         """
-        from src.ti4.core.constants import Faction
-        from src.ti4.core.game_state import GameState
-        from src.ti4.core.player import Player
-        from src.ti4.core.strategic_action import StrategyCardType
+        from ti4.core.constants import Faction
+        from ti4.core.game_state import GameState
+        from ti4.core.player import Player
+        from ti4.core.strategic_action import StrategyCardType
 
         # RED: This will fail until we implement the functionality
         state = GameState()
@@ -69,10 +69,10 @@ class TestRule83GameStateExtensions:
 
         Requirements: 4.5 - State persistence for card exhaustion
         """
-        from src.ti4.core.constants import Faction
-        from src.ti4.core.game_state import GameState
-        from src.ti4.core.player import Player
-        from src.ti4.core.strategic_action import StrategyCardType
+        from ti4.core.constants import Faction
+        from ti4.core.game_state import GameState
+        from ti4.core.player import Player
+        from ti4.core.strategic_action import StrategyCardType
 
         # RED: This will fail until we implement the functionality
         state = GameState()
@@ -90,8 +90,8 @@ class TestRule83GameStateExtensions:
 
         Requirements: 4.5, 10.2 - State persistence and round management
         """
-        from src.ti4.core.game_state import GameState
-        from src.ti4.core.strategic_action import StrategyCardType
+        from ti4.core.game_state import GameState
+        from ti4.core.strategic_action import StrategyCardType
 
         # RED: This will fail until we implement the functionality
         state = GameState()
@@ -109,8 +109,8 @@ class TestRule83GameStateExtensions:
 
         Requirements: 10.2 - Round management state tracking
         """
-        from src.ti4.core.game_state import GameState
-        from src.ti4.core.strategic_action import StrategyCardType
+        from ti4.core.game_state import GameState
+        from ti4.core.strategic_action import StrategyCardType
 
         # RED: This will fail until we implement the functionality
         state = GameState()
@@ -129,10 +129,10 @@ class TestRule83GameStateExtensions:
 
         Requirements: 10.2 - Round management and state reset
         """
-        from src.ti4.core.constants import Faction
-        from src.ti4.core.game_state import GameState
-        from src.ti4.core.player import Player
-        from src.ti4.core.strategic_action import StrategyCardType
+        from ti4.core.constants import Faction
+        from ti4.core.game_state import GameState
+        from ti4.core.player import Player
+        from ti4.core.strategic_action import StrategyCardType
 
         # RED: This will fail until we implement the functionality
         state = GameState()
@@ -156,12 +156,12 @@ class TestRule83GameStateExtensions:
 
         Requirements: 6.2 - State synchronization with StrategyCardCoordinator
         """
-        from src.ti4.core.game_state import GameState
-        from src.ti4.core.strategic_action import (
+        from ti4.core.game_state import GameState
+        from ti4.core.strategic_action import (
             StrategicActionManager,
             StrategyCardType,
         )
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         # RED: This will fail until we implement the functionality
         state = GameState()
@@ -185,7 +185,7 @@ class TestRule83GameStateExtensions:
 
         Requirements: Ensure backward compatibility with existing game state management
         """
-        from src.ti4.core.game_state import GameState
+        from ti4.core.game_state import GameState
 
         # Should be able to create GameState without strategy card fields
         state = GameState()
@@ -209,8 +209,8 @@ class TestRule83GameStateValidation:
 
         Requirements: Input validation for robustness
         """
-        from src.ti4.core.game_state import GameState
-        from src.ti4.core.strategic_action import StrategyCardType
+        from ti4.core.game_state import GameState
+        from ti4.core.strategic_action import StrategyCardType
 
         state = GameState()
 
@@ -231,7 +231,7 @@ class TestRule83GameStateValidation:
 
         Requirements: Input validation for robustness
         """
-        from src.ti4.core.game_state import GameState
+        from ti4.core.game_state import GameState
 
         state = GameState()
 
@@ -244,10 +244,10 @@ class TestRule83GameStateValidation:
 
         Requirements: 1.3 - Strategy card tracking validation
         """
-        from src.ti4.core.constants import Faction
-        from src.ti4.core.game_state import GameState
-        from src.ti4.core.player import Player
-        from src.ti4.core.strategic_action import StrategyCardType
+        from ti4.core.constants import Faction
+        from ti4.core.game_state import GameState
+        from ti4.core.player import Player
+        from ti4.core.strategic_action import StrategyCardType
 
         state = GameState()
 

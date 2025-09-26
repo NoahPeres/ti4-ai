@@ -4,9 +4,9 @@ import logging
 from typing import Any
 from unittest.mock import patch
 
-from src.ti4.commands.base import GameCommand
-from src.ti4.core.events import GameEvent
-from src.ti4.core.game_state import GameState
+from ti4.commands.base import GameCommand
+from ti4.core.events import GameEvent
+from ti4.core.game_state import GameState
 
 
 class MockCommand(GameCommand):
@@ -37,7 +37,7 @@ class TestGameLogger:
     def test_game_logger_creation(self) -> None:
         """Test GameLogger creation with game ID."""
         # RED: This will fail because GameLogger doesn't exist yet
-        from src.ti4.core.logging import GameLogger
+        from ti4.core.logging import GameLogger
 
         game_id = "test_game_123"
         logger = GameLogger(game_id)
@@ -48,7 +48,7 @@ class TestGameLogger:
     def test_command_logging_with_context(self) -> None:
         """Test logging command execution with structured context."""
         # RED: This will fail because GameLogger doesn't exist yet
-        from src.ti4.core.logging import GameLogger
+        from ti4.core.logging import GameLogger
 
         game_id = "test_game_123"
         logger = GameLogger(game_id)
@@ -74,7 +74,7 @@ class TestGameLogger:
     def test_event_logging(self) -> None:
         """Test logging game events with structured data."""
         # RED: This will fail because GameLogger doesn't exist yet
-        from src.ti4.core.logging import GameLogger
+        from ti4.core.logging import GameLogger
 
         game_id = "test_game_123"
         logger = GameLogger(game_id)
@@ -103,8 +103,8 @@ class TestGameLogger:
     def test_error_logging_with_context(self) -> None:
         """Test logging errors with full context information."""
         # RED: This will fail because GameLogger doesn't exist yet
-        from src.ti4.core.exceptions import TI4GameError
-        from src.ti4.core.logging import GameLogger
+        from ti4.core.exceptions import TI4GameError
+        from ti4.core.logging import GameLogger
 
         game_id = "test_game_123"
         logger = GameLogger(game_id)
@@ -132,7 +132,7 @@ class TestGameLogger:
     def test_logger_configuration(self) -> None:
         """Test that logger is properly configured for structured output."""
         # RED: This will fail because GameLogger doesn't exist yet
-        from src.ti4.core.logging import GameLogger
+        from ti4.core.logging import GameLogger
 
         game_id = "test_game_123"
         logger = GameLogger(game_id)

@@ -2,14 +2,14 @@
 
 from typing import Any, Optional
 
-from src.ti4.core.constants import Faction, FactionConstants, UnitType
-from src.ti4.core.fleet import Fleet
-from src.ti4.core.galaxy import Galaxy
-from src.ti4.core.hex_coordinate import HexCoordinate
-from src.ti4.core.player import Player
-from src.ti4.core.system import System
-from src.ti4.core.unit import Unit
-from src.ti4.core.unit_stats import UnitStatsProvider
+from ti4.core.constants import Faction, FactionConstants, UnitType
+from ti4.core.fleet import Fleet
+from ti4.core.galaxy import Galaxy
+from ti4.core.hex_coordinate import HexCoordinate
+from ti4.core.player import Player
+from ti4.core.system import System
+from ti4.core.unit import Unit
+from ti4.core.unit_stats import UnitStatsProvider
 
 
 class TestDataFactory:

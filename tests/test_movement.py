@@ -1,11 +1,11 @@
 """Tests for movement validation and execution."""
 
-from src.ti4.core.constants import Technology, UnitType
-from src.ti4.core.galaxy import Galaxy
-from src.ti4.core.hex_coordinate import HexCoordinate
-from src.ti4.core.movement import MovementExecutor, MovementOperation, MovementValidator
-from src.ti4.core.system import System
-from src.ti4.core.unit import Unit
+from ti4.core.constants import Technology, UnitType
+from ti4.core.galaxy import Galaxy
+from ti4.core.hex_coordinate import HexCoordinate
+from ti4.core.movement import MovementExecutor, MovementOperation, MovementValidator
+from ti4.core.system import System
+from ti4.core.unit import Unit
 
 
 class TestMovementValidator:
@@ -118,7 +118,7 @@ class TestMovementValidator:
         galaxy.register_system(system_c)
 
         # Create unit with Gravity Drive (movement 2)
-        from src.ti4.core.constants import Technology
+        from ti4.core.constants import Technology
 
         unit = Unit(unit_type=UnitType.CARRIER, owner="player1")  # Movement 1
         unit.add_technology(Technology.GRAVITY_DRIVE)  # Increases movement to 2
@@ -232,7 +232,7 @@ class TestMovementExecution:
         system_a = System("system_a")
         system_b = System("system_b")
 
-        from src.ti4.core.planet import Planet
+        from ti4.core.planet import Planet
 
         planet_a = Planet(name="Planet A", resources=2, influence=1)
         planet_b = Planet(name="Planet B", resources=1, influence=2)
@@ -323,7 +323,7 @@ class TestMovementExecution:
         system_a.place_unit_in_space(destroyer)
 
         # Try to load infantry onto destroyer (no capacity)
-        from src.ti4.core.exceptions import FleetCapacityError
+        from ti4.core.exceptions import FleetCapacityError
 
         try:
             destroyer.load_transport_unit(infantry)
@@ -341,7 +341,7 @@ class TestMovementExecution:
         system_a = System("system_a")
         system_b = System("system_b")
 
-        from src.ti4.core.planet import Planet
+        from ti4.core.planet import Planet
 
         planet_a = Planet(name="Planet A", resources=2, influence=1)
         planet_b = Planet(name="Planet B", resources=1, influence=2)
@@ -385,7 +385,7 @@ class TestMovementExecution:
         system_a = System("system_a")
         system_b = System("system_b")
 
-        from src.ti4.core.planet import Planet
+        from ti4.core.planet import Planet
 
         planet_a = Planet(name="Planet A", resources=2, influence=1)
         system_a.add_planet(planet_a)

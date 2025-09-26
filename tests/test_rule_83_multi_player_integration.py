@@ -11,8 +11,8 @@ Requirements tested:
 - 7.5: Each player has independent card selection
 """
 
-from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
-from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+from ti4.core.strategic_action import StrategicActionManager, StrategyCardType
+from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
 
 class TestRule83MultiPlayerIntegration:

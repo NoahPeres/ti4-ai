@@ -11,16 +11,16 @@ This test file verifies that all sub-rules of Rule 58 are properly implemented:
 - 58.9: Ability Movement Rules
 """
 
-from src.ti4.actions.movement_engine import MovementPlan, TacticalAction
-from src.ti4.actions.movement_engine import (
+from ti4.actions.movement_engine import MovementPlan, TacticalAction
+from ti4.actions.movement_engine import (
     MovementValidator as TacticalMovementValidator,
 )
-from src.ti4.core.constants import UnitType
-from src.ti4.core.galaxy import Galaxy
-from src.ti4.core.hex_coordinate import HexCoordinate
-from src.ti4.core.movement import MovementOperation, MovementValidator
-from src.ti4.core.system import System
-from src.ti4.core.unit import Unit
+from ti4.core.constants import UnitType
+from ti4.core.galaxy import Galaxy
+from ti4.core.hex_coordinate import HexCoordinate
+from ti4.core.movement import MovementOperation, MovementValidator
+from ti4.core.system import System
+from ti4.core.unit import Unit
 
 
 class TestRule58TacticalActionMovement:

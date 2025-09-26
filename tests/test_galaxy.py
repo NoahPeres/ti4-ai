@@ -1,7 +1,7 @@
 """Tests for galaxy structure."""
 
-from src.ti4.core.galaxy import Galaxy
-from src.ti4.core.hex_coordinate import HexCoordinate
+from ti4.core.galaxy import Galaxy
+from ti4.core.hex_coordinate import HexCoordinate
 
 
 class TestGalaxy:

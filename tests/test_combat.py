@@ -1,10 +1,10 @@
 """Tests for combat system."""
 
-from src.ti4.core.combat import CombatDetector, CombatInitiator, CombatResolver
-from src.ti4.core.constants import UnitType
-from src.ti4.core.fleet import Fleet
-from src.ti4.core.system import System
-from src.ti4.core.unit import Unit
+from ti4.core.combat import CombatDetector, CombatInitiator, CombatResolver
+from ti4.core.constants import UnitType
+from ti4.core.fleet import Fleet
+from ti4.core.system import System
+from ti4.core.unit import Unit
 
 
 class TestCombatDetector:

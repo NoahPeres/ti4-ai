@@ -23,8 +23,8 @@ class TestRule83StrategicActionIntegration:
 
         Requirements: 6.1 - Integration with existing StrategicActionManager
         """
-        from src.ti4.core.strategic_action import StrategicActionManager
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategic_action import StrategicActionManager
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         # Create strategic action manager
         strategic_action_manager = StrategicActionManager()
@@ -46,11 +46,11 @@ class TestRule83StrategicActionIntegration:
 
         Requirements: 6.2 - Strategy card validation in strategic action workflow
         """
-        from src.ti4.core.strategic_action import (
+        from ti4.core.strategic_action import (
             StrategicActionManager,
             StrategyCardType,
         )
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         # Create and integrate systems
         strategic_action_manager = StrategicActionManager()
@@ -81,11 +81,11 @@ class TestRule83StrategicActionIntegration:
 
         Requirements: 6.3 - Card exhaustion during strategic action resolution
         """
-        from src.ti4.core.strategic_action import (
+        from ti4.core.strategic_action import (
             StrategicActionManager,
             StrategyCardType,
         )
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         # Create and integrate systems
         strategic_action_manager = StrategicActionManager()
@@ -122,7 +122,7 @@ class TestRule83StrategicActionIntegration:
 
         Requirements: 6.4 - Backward compatibility with existing Rule 82 implementations
         """
-        from src.ti4.core.strategic_action import (
+        from ti4.core.strategic_action import (
             StrategicActionManager,
             StrategyCard,
             StrategyCardType,
@@ -159,11 +159,11 @@ class TestRule83StrategicActionIntegration:
 
         Requirements: 6.5 - Strategic actions work with strategy card coordinator
         """
-        from src.ti4.core.strategic_action import (
+        from ti4.core.strategic_action import (
             StrategicActionManager,
             StrategyCardType,
         )
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         # Create and integrate systems
         strategic_action_manager = StrategicActionManager()
@@ -199,11 +199,11 @@ class TestRule83CoordinatorValidation:
 
         Requirements: 6.2 - Strategy card validation in strategic action workflow
         """
-        from src.ti4.core.strategic_action import (
+        from ti4.core.strategic_action import (
             StrategicActionManager,
             StrategyCardType,
         )
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         # Create and integrate systems
         strategic_action_manager = StrategicActionManager()
@@ -225,7 +225,7 @@ class TestRule83CoordinatorValidation:
 
         Requirements: 6.4 - Backward compatibility with existing implementations
         """
-        from src.ti4.core.strategic_action import (
+        from ti4.core.strategic_action import (
             StrategicActionManager,
             StrategyCardType,
         )
@@ -243,7 +243,7 @@ class TestRule83CoordinatorValidation:
 
         This test ensures the refactored helper method works correctly.
         """
-        from src.ti4.core.strategic_action import (
+        from ti4.core.strategic_action import (
             StrategicActionManager,
             StrategyCardType,
         )

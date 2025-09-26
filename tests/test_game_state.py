@@ -1,6 +1,6 @@
 """Tests for GameState class."""
 
-from src.ti4.core.game_state import GameState
+from ti4.core.game_state import GameState
 
 
 def test_game_state_creation() -> None:

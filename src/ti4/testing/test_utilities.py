@@ -2,16 +2,16 @@
 
 from typing import TYPE_CHECKING, Optional
 
-from src.ti4.core.constants import Faction, UnitType
-from src.ti4.core.game_state import GameState
-from src.ti4.core.system import System
-from src.ti4.core.unit import Unit
+from ti4.core.constants import Faction, UnitType
+from ti4.core.game_state import GameState
+from ti4.core.system import System
+from ti4.core.unit import Unit
 
 from .scenario_builder import GameScenarioBuilder
 
 if TYPE_CHECKING:
-    from src.ti4.core.strategic_action import StrategicActionManager
-    from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+    from ti4.core.strategic_action import StrategicActionManager
+    from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
 
 class TestUtilities:
@@ -136,7 +136,7 @@ class TestUtilities:
         Returns:
             StrategicActionManager instance for testing
         """
-        from src.ti4.core.strategic_action import StrategicActionManager
+        from ti4.core.strategic_action import StrategicActionManager
 
         return StrategicActionManager()
 
@@ -152,7 +152,7 @@ class TestUtilities:
         Returns:
             StrategyCardCoordinator instance for testing
         """
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         if strategic_action_manager is None:
             strategic_action_manager = TestUtilities.create_strategic_action_manager()

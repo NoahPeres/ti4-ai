@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import pytest
 
-from src.ti4.core.exceptions import TI4GameError
+from ti4.core.exceptions import TI4GameError
 
 
 class TestErrorRecoveryMechanisms:
@@ -14,7 +14,7 @@ class TestErrorRecoveryMechanisms:
     def test_graceful_degradation_for_non_critical_failures(self) -> None:
         """Test graceful degradation when non-critical operations fail."""
         # RED: This will fail because ErrorRecoveryManager doesn't exist yet
-        from src.ti4.core.error_recovery import ErrorRecoveryManager
+        from ti4.core.error_recovery import ErrorRecoveryManager
 
         recovery_manager = ErrorRecoveryManager()
 
@@ -35,7 +35,7 @@ class TestErrorRecoveryMechanisms:
     def test_automatic_retry_for_transient_errors(self) -> None:
         """Test automatic retry mechanism for transient errors."""
         # RED: This will fail because ErrorRecoveryManager doesn't exist yet
-        from src.ti4.core.error_recovery import ErrorRecoveryManager, TransientError
+        from ti4.core.error_recovery import ErrorRecoveryManager, TransientError
 
         recovery_manager = ErrorRecoveryManager()
 
@@ -59,7 +59,7 @@ class TestErrorRecoveryMechanisms:
     def test_retry_exhaustion_raises_original_error(self) -> None:
         """Test that retry exhaustion raises the original error."""
         # RED: This will fail because ErrorRecoveryManager doesn't exist yet
-        from src.ti4.core.error_recovery import ErrorRecoveryManager, TransientError
+        from ti4.core.error_recovery import ErrorRecoveryManager, TransientError
 
         recovery_manager = ErrorRecoveryManager()
 
@@ -74,7 +74,7 @@ class TestErrorRecoveryMechanisms:
     def test_circuit_breaker_for_repeated_failures(self) -> None:
         """Test circuit breaker pattern for repeated failures."""
         # RED: This will fail because ErrorRecoveryManager doesn't exist yet
-        from src.ti4.core.error_recovery import (
+        from ti4.core.error_recovery import (
             CircuitBreakerOpenError,
             ErrorRecoveryManager,
         )
@@ -102,7 +102,7 @@ class TestErrorRecoveryMechanisms:
     def test_error_recovery_strategy_selection(self) -> None:
         """Test that appropriate recovery strategy is selected based on error type."""
         # RED: This will fail because ErrorRecoveryManager doesn't exist yet
-        from src.ti4.core.error_recovery import ErrorRecoveryManager
+        from ti4.core.error_recovery import ErrorRecoveryManager
 
         recovery_manager = ErrorRecoveryManager()
 
@@ -125,7 +125,7 @@ class TestErrorRecoveryMechanisms:
     def test_recovery_context_preservation(self) -> None:
         """Test that recovery mechanisms preserve error context."""
         # RED: This will fail because ErrorRecoveryManager doesn't exist yet
-        from src.ti4.core.error_recovery import ErrorRecoveryManager
+        from ti4.core.error_recovery import ErrorRecoveryManager
 
         recovery_manager = ErrorRecoveryManager()
 

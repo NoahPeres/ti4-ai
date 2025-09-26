@@ -16,9 +16,9 @@ LRR Reference: Rule 21 - COMMODITIES
 
 import pytest
 
-from src.ti4.core.constants import Faction
-from src.ti4.core.faction_data import FactionData
-from src.ti4.core.player import Player
+from ti4.core.constants import Faction
+from ti4.core.faction_data import FactionData
+from ti4.core.player import Player
 
 
 class TestRule21CommodityBasics:

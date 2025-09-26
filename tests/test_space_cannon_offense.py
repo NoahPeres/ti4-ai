@@ -6,12 +6,12 @@ in a tactical action, as defined in Rules 58.7 and 77.2-77.5.
 
 from unittest.mock import Mock, patch
 
-from src.ti4.actions.movement_engine import SpaceCannonOffenseStep, TacticalAction
-from src.ti4.core.constants import UnitType
-from src.ti4.core.galaxy import Galaxy, HexCoordinate
-from src.ti4.core.planet import Planet
-from src.ti4.core.system import System
-from src.ti4.core.unit import Unit
+from ti4.actions.movement_engine import SpaceCannonOffenseStep, TacticalAction
+from ti4.core.constants import UnitType
+from ti4.core.galaxy import Galaxy, HexCoordinate
+from ti4.core.planet import Planet
+from ti4.core.system import System
+from ti4.core.unit import Unit
 
 
 class TestRule58SpaceCannonOffenseStep:
@@ -110,7 +110,7 @@ class TestRule77SpaceCannonOffenseMechanics:
         system = System("active_system")
 
         # Add planets to the system
-        from src.ti4.core.planet import Planet
+        from ti4.core.planet import Planet
 
         planet1 = Planet("planet1", resources=2, influence=1)
         planet2 = Planet("planet2", resources=1, influence=2)
@@ -172,7 +172,7 @@ class TestRule77SpaceCannonOffenseMechanics:
 
         step = SpaceCannonOffenseStep()
 
-        with patch("src.ti4.core.dice.roll_dice") as mock_roll:
+        with patch("ti4.core.dice.roll_dice") as mock_roll:
             mock_roll.return_value = [6, 4, 3]  # One hit (6 >= 6)
 
             hits = step._roll_space_cannon_dice(pds, game_state, context)
@@ -312,7 +312,7 @@ class TestRule77SpaceCannonOffenseMechanics:
         )
         assert pds_ii in space_cannon_units
 
-    @patch("src.ti4.core.dice.roll_dice")
+    @patch("ti4.core.dice.roll_dice")
     def test_complete_space_cannon_offense_execution(self, mock_roll) -> None:
         """Test complete Space Cannon Offense step execution."""
         mock_roll.return_value = [6]  # One hit

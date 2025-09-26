@@ -4,8 +4,8 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from src.ti4.core.game_phase import GamePhase
-from src.ti4.core.game_state_machine import GameStateMachine
+from ti4.core.game_phase import GamePhase
+from ti4.core.game_state_machine import GameStateMachine
 
 if TYPE_CHECKING:
     pass

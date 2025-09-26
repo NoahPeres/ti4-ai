@@ -4,7 +4,7 @@ from typing import Any, Optional, Union
 
 import pytest
 
-from src.ti4.core.runtime_type_checking import (
+from ti4.core.runtime_type_checking import (
     BEARTYPE_AVAILABLE,
     TYPEGUARD_AVAILABLE,
     basic_type_validation,

@@ -6,8 +6,8 @@ and proper cleanup and state reset between rounds.
 Requirements: 10.1, 10.2, 10.3, 10.4, 10.5
 """
 
-from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
-from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+from ti4.core.strategic_action import StrategicActionManager, StrategyCardType
+from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
 
 class TestRoundManagement:

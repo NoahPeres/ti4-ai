@@ -1,8 +1,8 @@
 """Tests for fleet composition and capacity management."""
 
-from src.ti4.core.constants import Faction, Technology, UnitType
-from src.ti4.core.fleet import Fleet, FleetCapacityValidator
-from src.ti4.core.unit import Unit
+from ti4.core.constants import Faction, Technology, UnitType
+from ti4.core.fleet import Fleet, FleetCapacityValidator
+from ti4.core.unit import Unit
 
 
 class TestFleet:
@@ -134,7 +134,7 @@ class TestFleetCapacityValidator:
 
     def test_faction_specific_unit_stats(self) -> None:
         """Test that faction-specific modifications work."""
-        from src.ti4.core.unit_stats import UnitStats, UnitStatsProvider
+        from ti4.core.unit_stats import UnitStats, UnitStatsProvider
 
         # Create custom stats provider with faction modifier
         stats_provider = UnitStatsProvider()
@@ -163,7 +163,7 @@ class TestFleetCapacityValidator:
 
     def test_technology_unit_upgrades(self) -> None:
         """Test that technology upgrades affect unit stats."""
-        from src.ti4.core.unit_stats import UnitStats, UnitStatsProvider
+        from ti4.core.unit_stats import UnitStats, UnitStatsProvider
 
         # Create stats provider with technology modifier
         stats_provider = UnitStatsProvider()
@@ -187,7 +187,7 @@ class TestFleetCapacityValidator:
 
     def test_fighter_ii_requires_fleet_supply(self) -> None:
         """Test that Fighter II (with independent movement) requires fleet supply."""
-        from src.ti4.core.unit_stats import UnitStats, UnitStatsProvider
+        from ti4.core.unit_stats import UnitStats, UnitStatsProvider
 
         validator = FleetCapacityValidator()
 

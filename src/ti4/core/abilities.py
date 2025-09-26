@@ -24,7 +24,7 @@ from enum import Enum, IntEnum
 from typing import TYPE_CHECKING, Any, Callable, Optional, Protocol
 
 if TYPE_CHECKING:
-    from ti4.core.game_state import GameState  # type: ignore[import-untyped]
+    from ti4.core.game_state import GameState
 
 logger = logging.getLogger(__name__)
 

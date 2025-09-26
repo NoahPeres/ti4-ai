@@ -5,10 +5,10 @@ from hypothesis import given
 from hypothesis import strategies as st
 from hypothesis.strategies import composite
 
-from src.ti4.core.game_phase import GamePhase
-from src.ti4.core.game_state import GameState
-from src.ti4.core.hex_coordinate import HexCoordinate
-from src.ti4.core.player import Player
+from ti4.core.game_phase import GamePhase
+from ti4.core.game_state import GameState
+from ti4.core.hex_coordinate import HexCoordinate
+from ti4.core.player import Player
 
 
 # GREEN Phase: Basic property-based test to verify hypothesis is working
@@ -23,7 +23,7 @@ def test_property_based_testing_setup(text_value) -> None:
 @composite
 def valid_player_strategy(draw) -> None:
     """Generate a valid Player instance using hypothesis."""
-    from src.ti4.core.constants import Faction
+    from ti4.core.constants import Faction
 
     player_id = draw(st.text(min_size=1, max_size=50).filter(lambda x: x.strip()))
     faction = draw(st.sampled_from(list(Faction)))
@@ -33,7 +33,7 @@ def valid_player_strategy(draw) -> None:
 @given(valid_player_strategy())
 def test_player_generator_creates_valid_players(player) -> None:
     """Test that we can generate valid Player instances."""
-    from src.ti4.core.constants import Faction
+    from ti4.core.constants import Faction
 
     assert isinstance(player, Player)
     assert player.is_valid()
@@ -62,7 +62,7 @@ def test_hex_coordinate_generator_creates_valid_coordinates(coord) -> None:
 @composite
 def valid_game_state_strategy(draw) -> None:
     """Generate a valid GameState instance using hypothesis."""
-    from src.ti4.core.constants import Faction
+    from ti4.core.constants import Faction
 
     num_players = draw(st.integers(min_value=2, max_value=6))
 

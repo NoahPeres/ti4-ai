@@ -9,7 +9,7 @@ Requirements: 8.4 - Integrate with existing AI decision-making frameworks
 from dataclasses import dataclass
 from typing import Any
 
-from src.ti4.actions.action import ActionResult, PlayerDecision
+from ti4.actions.action import ActionResult, PlayerDecision
 
 from ..strategic_action import StrategyCardType
 

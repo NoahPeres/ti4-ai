@@ -1,10 +1,10 @@
 """Integration tests using the GameScenarioBuilder."""
 
-from src.ti4.core.combat import CombatDetector, CombatInitiator
-from src.ti4.core.constants import Faction
-from src.ti4.core.fleet import Fleet, FleetCapacityValidator
-from src.ti4.core.game_phase import GamePhase
-from src.ti4.testing.scenario_builder import GameScenarioBuilder
+from ti4.core.combat import CombatDetector, CombatInitiator
+from ti4.core.constants import Faction
+from ti4.core.fleet import Fleet, FleetCapacityValidator
+from ti4.core.game_phase import GamePhase
+from ti4.testing.scenario_builder import GameScenarioBuilder
 
 
 class TestTI4IntegrationWithBuilder:

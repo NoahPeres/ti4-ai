@@ -3,9 +3,9 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from ti4.core.combat import CombatResolver  # type: ignore
-from ti4.core.system import System  # type: ignore
-from ti4.core.unit import Unit  # type: ignore
+from ti4.core.combat import CombatResolver
+from ti4.core.system import System
+from ti4.core.unit import Unit
 
 
 @dataclass
@@ -94,7 +94,7 @@ class GroundCombatController:
                 # Sort fallback units for deterministic assignment
                 fallback = sorted(
                     [u for u in units if u not in chosen],
-                    key=lambda unit: (unit.unit_type, unit.unit_id),
+                    key=lambda unit: (unit.unit_type, unit.id),
                 )[:remaining]
                 chosen.extend(fallback)
 

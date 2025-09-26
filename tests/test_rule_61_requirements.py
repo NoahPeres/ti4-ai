@@ -2,9 +2,9 @@
 
 import pytest
 
-from src.ti4.core.constants import Faction
-from src.ti4.core.game_state import GameState
-from src.ti4.core.objective_requirements import (
+from ti4.core.constants import Faction
+from ti4.core.game_state import GameState
+from ti4.core.objective_requirements import (
     ControlPlanetsRequirement,
     DestroyUnitsRequirement,
     ObjectiveRequirementValidator,
@@ -14,7 +14,7 @@ from src.ti4.core.objective_requirements import (
     TechnologyRequirement,
     WinCombatRequirement,
 )
-from src.ti4.core.player import Player
+from ti4.core.player import Player
 
 
 @pytest.fixture

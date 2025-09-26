@@ -23,7 +23,7 @@ class TestRule82StrategicActionBasics:
         LRR Reference: Rule 82.0 - Core strategic action concept
         """
         # This will fail initially - RED phase
-        from src.ti4.core.strategic_action import StrategicActionManager
+        from ti4.core.strategic_action import StrategicActionManager
 
         strategic_action_manager = StrategicActionManager()
         assert strategic_action_manager is not None
@@ -39,7 +39,7 @@ class TestRule82StrategyCardActivation:
         strategy card that is not exhausted, they may perform a strategic action
         to activate that strategy card."
         """
-        from src.ti4.core.strategic_action import (
+        from ti4.core.strategic_action import (
             StrategicActionManager,
             StrategyCard,
             StrategyCardType,
@@ -70,7 +70,7 @@ class TestRule82StrategyCardActivation:
         LRR Reference: Rule 82.1b - "A player cannot activate a strategy card
         that is already exhausted."
         """
-        from src.ti4.core.strategic_action import (
+        from ti4.core.strategic_action import (
             StrategicActionManager,
             StrategyCard,
             StrategyCardType,
@@ -104,7 +104,7 @@ class TestRule82StrategyCardActivation:
         LRR Reference: Rule 82.1a - "After a player activates a strategy card,
         they exhaust it."
         """
-        from src.ti4.core.strategic_action import (
+        from ti4.core.strategic_action import (
             StrategicActionManager,
             StrategyCard,
             StrategyCardType,
@@ -145,7 +145,7 @@ class TestRule82AbilityResolution:
         LRR Reference: Rule 82.2 - "When a player activates a strategy card,
         they resolve its primary ability."
         """
-        from src.ti4.core.strategic_action import (
+        from ti4.core.strategic_action import (
             StrategicActionManager,
             StrategyCard,
             StrategyCardType,
@@ -180,7 +180,7 @@ class TestRule82AbilityResolution:
         player to the left of the active player and proceeding clockwise, may
         resolve the secondary ability of that strategy card."
         """
-        from src.ti4.core.strategic_action import (
+        from ti4.core.strategic_action import (
             StrategicActionManager,
             StrategyCard,
             StrategyCardType,
@@ -222,7 +222,7 @@ class TestRule82AbilityResolution:
 
         LRR Reference: Rule 82.2a - Players "may" resolve secondary ability
         """
-        from src.ti4.core.strategic_action import (
+        from ti4.core.strategic_action import (
             StrategicActionManager,
             StrategyCard,
             StrategyCardType,
@@ -268,7 +268,7 @@ class TestRule82TurnContinuation:
         LRR Reference: Rule 82.3a - "If the active player has other strategy cards
         that are not exhausted, they may perform another strategic action."
         """
-        from src.ti4.core.strategic_action import (
+        from ti4.core.strategic_action import (
             StrategicActionManager,
             StrategyCard,
             StrategyCardType,
@@ -310,7 +310,7 @@ class TestRule82TurnContinuation:
         LRR Reference: Rule 82.3b - "If the active player has no strategy cards,
         or if all of their strategy cards are exhausted, they must pass."
         """
-        from src.ti4.core.strategic_action import (
+        from ti4.core.strategic_action import (
             StrategicActionManager,
             StrategyCard,
             StrategyCardType,
@@ -343,7 +343,7 @@ class TestRule82TurnContinuation:
         LRR Reference: Rule 82.3b - "If the active player has no strategy cards...
         they must pass."
         """
-        from src.ti4.core.strategic_action import StrategicActionManager
+        from ti4.core.strategic_action import StrategicActionManager
 
         # Create strategic action manager
         strategic_action_manager = StrategicActionManager()
@@ -365,7 +365,7 @@ class TestRule82ComponentActionIntegration:
         the strategy card was activated by a component action instead of a
         strategic action."
         """
-        from src.ti4.core.strategic_action import (
+        from ti4.core.strategic_action import (
             StrategicActionManager,
             StrategyCard,
             StrategyCardType,
@@ -401,7 +401,7 @@ class TestRule82InputValidation:
 
     def test_empty_player_id_validation(self) -> None:
         """Test that empty player IDs are properly validated."""
-        from src.ti4.core.strategic_action import (
+        from ti4.core.strategic_action import (
             StrategicActionManager,
             StrategyCard,
             StrategyCardType,
@@ -429,7 +429,7 @@ class TestRule82InputValidation:
 
     def test_empty_player_order_validation(self) -> None:
         """Test that empty player order is properly validated."""
-        from src.ti4.core.strategic_action import StrategicActionManager
+        from ti4.core.strategic_action import StrategicActionManager
 
         strategic_action_manager = StrategicActionManager()
 
@@ -443,7 +443,7 @@ class TestRule82StrategyCardEnum:
 
     def test_strategy_card_enum_values(self) -> None:
         """Test that strategy card enum has correct values."""
-        from src.ti4.core.strategic_action import StrategyCardType
+        from ti4.core.strategic_action import StrategyCardType
 
         # Test all strategy card types exist
         assert StrategyCardType.LEADERSHIP.value == "leadership"
@@ -457,7 +457,7 @@ class TestRule82StrategyCardEnum:
 
     def test_strategy_card_accepts_enum_and_string(self) -> None:
         """Test that methods accept both enum and string card names."""
-        from src.ti4.core.strategic_action import (
+        from ti4.core.strategic_action import (
             StrategicActionManager,
             StrategyCard,
             StrategyCardType,

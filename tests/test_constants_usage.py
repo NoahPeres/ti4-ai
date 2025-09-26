@@ -2,16 +2,16 @@
 
 import pytest
 
-from src.ti4.core.constants import (
+from ti4.core.constants import (
     CircuitBreakerConstants,
     EventConstants,
     GameStateConstants,
     PerformanceConstants,
 )
-from src.ti4.core.error_recovery import CircuitBreaker, ErrorRecoveryManager
-from src.ti4.core.events import CombatStartedEvent, PhaseChangedEvent, UnitMovedEvent
-from src.ti4.performance.cache import GameStateCache
-from src.ti4.performance.concurrent import ConcurrentGameManager
+from ti4.core.error_recovery import CircuitBreaker, ErrorRecoveryManager
+from ti4.core.events import CombatStartedEvent, PhaseChangedEvent, UnitMovedEvent
+from ti4.performance.cache import GameStateCache
+from ti4.performance.concurrent import ConcurrentGameManager
 
 
 class TestEventConstants:
@@ -76,7 +76,7 @@ class TestPerformanceConstants:
 
     def test_error_recovery_manager_uses_default_constants(self) -> None:
         """Test that ErrorRecoveryManager uses default constants."""
-        from src.ti4.core.error_recovery import TransientError
+        from ti4.core.error_recovery import TransientError
 
         manager = ErrorRecoveryManager()
 
@@ -140,7 +140,7 @@ class TestConstantConsistency:
 
     def test_token_constants_match_game_constants(self) -> None:
         """Test that token constants match the original game constants."""
-        from src.ti4.core.constants import GameConstants
+        from ti4.core.constants import GameConstants
 
         # These should match the values in GameConstants
         assert (

@@ -3,18 +3,18 @@
 # Import for type hints
 from typing import TYPE_CHECKING, Any, Optional, Union
 
-from src.ti4.commands.base import GameCommand
-from src.ti4.commands.manager import CommandManager
-from src.ti4.core.events import create_phase_changed_event
-from src.ti4.core.exceptions import InvalidPlayerError
-from src.ti4.core.game_phase import GamePhase
-from src.ti4.core.game_state_machine import GameStateMachine
-from src.ti4.core.player import Player
-from src.ti4.core.strategy_card import STANDARD_STRATEGY_CARDS, StrategyCard
+from ti4.commands.base import GameCommand
+from ti4.commands.manager import CommandManager
+from ti4.core.events import create_phase_changed_event
+from ti4.core.exceptions import InvalidPlayerError
+from ti4.core.game_phase import GamePhase
+from ti4.core.game_state_machine import GameStateMachine
+from ti4.core.player import Player
+from ti4.core.strategy_card import STANDARD_STRATEGY_CARDS, StrategyCard
 from ti4.core.validation import ValidationError
 
 if TYPE_CHECKING:
-    from src.ti4.core.strategy_cards.strategic_action import StrategyCardType
+    from ti4.core.strategy_cards.strategic_action import StrategyCardType
 
 
 class GameController:

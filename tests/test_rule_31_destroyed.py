@@ -12,13 +12,13 @@ from unittest.mock import Mock
 
 import pytest
 
-from src.ti4.core.combat import CombatResolver
-from src.ti4.core.constants import UnitType
-from src.ti4.core.destruction import UnitDestructionManager
-from src.ti4.core.planet import Planet
-from src.ti4.core.reinforcements import ReinforcementPool
-from src.ti4.core.system import System
-from src.ti4.core.unit import Unit
+from ti4.core.combat import CombatResolver
+from ti4.core.constants import UnitType
+from ti4.core.destruction import UnitDestructionManager
+from ti4.core.planet import Planet
+from ti4.core.reinforcements import ReinforcementPool
+from ti4.core.system import System
+from ti4.core.unit import Unit
 
 
 class TestRule31UnitDestruction:

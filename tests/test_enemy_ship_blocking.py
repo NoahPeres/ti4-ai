@@ -1,11 +1,11 @@
 """Test enemy ship blocking movement through systems (Rule 58.4b)."""
 
-from src.ti4.core.constants import UnitType
-from src.ti4.core.galaxy import Galaxy
-from src.ti4.core.hex_coordinate import HexCoordinate
-from src.ti4.core.movement import MovementOperation, MovementValidator
-from src.ti4.core.system import System
-from src.ti4.core.unit import Unit
+from ti4.core.constants import UnitType
+from ti4.core.galaxy import Galaxy
+from ti4.core.hex_coordinate import HexCoordinate
+from ti4.core.movement import MovementOperation, MovementValidator
+from ti4.core.system import System
+from ti4.core.unit import Unit
 
 
 class TestEnemyShipBlockingMovement:

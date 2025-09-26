@@ -2,13 +2,13 @@
 
 from unittest.mock import patch
 
-from src.ti4.core.events import (
+from ti4.core.events import (
     GameEventBus,
     create_combat_started_event,
     create_phase_changed_event,
     create_unit_moved_event,
 )
-from src.ti4.core.observers import (
+from ti4.core.observers import (
     AITrainingDataCollector,
     LoggingObserver,
     StatisticsCollector,
@@ -35,7 +35,7 @@ class TestLoggingObserver:
             player_id="player_1",
         )
 
-        with patch("src.ti4.core.observers.logger") as mock_logger:
+        with patch("ti4.core.observers.logger") as mock_logger:
             observer.handle_event(event)
 
             # Verify logging was called
@@ -53,7 +53,7 @@ class TestLoggingObserver:
             game_id="game_123", from_phase="action", to_phase="status", round_number=3
         )
 
-        with patch("src.ti4.core.observers.logger") as mock_logger:
+        with patch("ti4.core.observers.logger") as mock_logger:
             observer.handle_event(event)
 
             # Verify logging was called
@@ -80,7 +80,7 @@ class TestLoggingObserver:
             player_id="player_1",
         )
 
-        with patch("src.ti4.core.observers.logger") as mock_logger:
+        with patch("ti4.core.observers.logger") as mock_logger:
             event_bus.publish(event)
             mock_logger.info.assert_called_once()
 
@@ -177,7 +177,7 @@ class TestAITrainingDataCollector:
 
     def test_ai_training_data_collector_collects_unit_movements(self) -> None:
         """Test that AITrainingDataCollector collects unit movement data."""
-        from src.ti4.core.constants import EventType
+        from ti4.core.constants import EventType
 
         collector = AITrainingDataCollector()
 
@@ -291,7 +291,7 @@ class TestObserverIntegration:
             player_id="player_1",
         )
 
-        with patch("src.ti4.core.observers.logger"):
+        with patch("ti4.core.observers.logger"):
             event_bus.publish(event)
 
         # Verify all observers processed the event

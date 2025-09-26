@@ -6,8 +6,8 @@ evaluation, and strategic planning support.
 Requirements: 8.1, 8.2, 8.3, 8.4, 8.5
 """
 
-from src.ti4.core.strategic_action import StrategyCardType
-from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+from ti4.core.strategic_action import StrategyCardType
+from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
 
 class TestStrategyCardAIInformationAccess:
@@ -15,7 +15,7 @@ class TestStrategyCardAIInformationAccess:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
-        from src.ti4.core.strategic_action import StrategicActionManager
+        from ti4.core.strategic_action import StrategicActionManager
 
         self.strategic_action_manager = StrategicActionManager()
         self.coordinator = StrategyCardCoordinator(self.strategic_action_manager)
@@ -210,8 +210,8 @@ class TestStrategyCardAIInformationAccess:
 
         Requirements: 8.4 - Integrate with existing AI decision-making frameworks
         """
-        from src.ti4.actions.legal_moves import LegalMoveGenerator
-        from src.ti4.actions.strategy_card_actions import StrategyCardSelectionDecision
+        from ti4.actions.legal_moves import LegalMoveGenerator
+        from ti4.actions.strategy_card_actions import StrategyCardSelectionDecision
 
         # Create a mock game state with strategy card coordinator
         class MockGameState:

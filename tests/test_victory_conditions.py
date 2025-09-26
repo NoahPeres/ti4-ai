@@ -1,7 +1,7 @@
 """Tests for victory point tracking and objective system."""
 
-from src.ti4.core.game_state import GameState
-from src.ti4.core.player import Player
+from ti4.core.game_state import GameState
+from ti4.core.player import Player
 
 
 class TestVictoryPointTracking:
@@ -42,8 +42,8 @@ class TestObjectiveSystem:
 
     def test_create_objective_card(self) -> None:
         """Test that objective cards can be created with proper structure."""
-        from src.ti4.core.game_phase import GamePhase
-        from src.ti4.core.objective import Objective
+        from ti4.core.game_phase import GamePhase
+        from ti4.core.objective import Objective
 
         # This should fail initially - we need to implement Objective class
         objective = Objective(
@@ -60,8 +60,8 @@ class TestObjectiveSystem:
 
     def test_objective_completion_detection(self) -> None:
         """Test that objective completion can be detected."""
-        from src.ti4.core.game_phase import GamePhase
-        from src.ti4.core.objective import Objective
+        from ti4.core.game_phase import GamePhase
+        from ti4.core.objective import Objective
 
         player = Player(id="player1", faction="sol")
         game_state = GameState(players=[player])
@@ -85,8 +85,8 @@ class TestObjectiveSystem:
 
     def test_completing_objective_awards_victory_points(self) -> None:
         """Test that completing an objective awards the correct victory points."""
-        from src.ti4.core.game_phase import GamePhase
-        from src.ti4.core.objective import Objective
+        from ti4.core.game_phase import GamePhase
+        from ti4.core.objective import Objective
 
         player = Player(id="player1", faction="sol")
         game_state = GameState(players=[player])
@@ -119,7 +119,7 @@ class TestPublicObjectives:
 
     def test_control_planets_objective_completion(self) -> None:
         """Test that control planets objective can be completed."""
-        from src.ti4.core.public_objectives import ControlPlanetsObjective
+        from ti4.core.public_objectives import ControlPlanetsObjective
 
         player = Player(id="player1", faction="sol")
         game_state = GameState(players=[player])
@@ -129,7 +129,7 @@ class TestPublicObjectives:
 
     def test_spend_resources_objective_completion(self) -> None:
         """Test that spend resources objective can be completed."""
-        from src.ti4.core.public_objectives import SpendResourcesObjective
+        from ti4.core.public_objectives import SpendResourcesObjective
 
         player = Player(id="player1", faction="sol")
         game_state = GameState(players=[player])
@@ -139,7 +139,7 @@ class TestPublicObjectives:
 
     def test_objective_scoring_and_validation(self) -> None:
         """Test that objectives can be scored and validated for timing."""
-        from src.ti4.core.public_objectives import ControlPlanetsObjective
+        from ti4.core.public_objectives import ControlPlanetsObjective
 
         player = Player(id="player1", faction="sol")
         game_state = GameState(players=[player])

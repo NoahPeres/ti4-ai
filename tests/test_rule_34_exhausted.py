@@ -15,8 +15,8 @@ Rule 34 Sub-rules tested:
 
 import pytest
 
-from src.ti4.core.planet import Planet
 from tests.test_constants import MockPlayer
+from ti4.core.planet import Planet
 
 
 class TestRule34GeneralExhaustedMechanics:
@@ -66,7 +66,7 @@ class TestRule34GeneralExhaustedMechanics:
         LRR Reference: Rule 34.0 - "A player cannot resolve abilities...of an exhausted card"
         """
         # RED: This will fail until we implement technology card exhausted state
-        from src.ti4.core.technology import TechnologyCard
+        from ti4.core.technology import TechnologyCard
 
         tech_card = TechnologyCard("Test Tech", "Test ability that requires exhaustion")
 
@@ -135,8 +135,8 @@ class TestRule34StatusPhaseReadyCards:
         each player readies all of their exhausted cards"
         """
         # RED: This will fail until we implement status phase card readying
-        from src.ti4.core.game_state import GameState
-        from src.ti4.core.status_phase import StatusPhaseManager
+        from ti4.core.game_state import GameState
+        from ti4.core.status_phase import StatusPhaseManager
 
         # Create game state with exhausted cards
         game_state = GameState()
@@ -172,10 +172,10 @@ class TestRule34StatusPhaseReadyCards:
         LRR Reference: Rule 34.2 - "each player readies all of their exhausted cards"
         """
         # RED: This will fail until we implement comprehensive card readying
-        from src.ti4.core.game_state import GameState
-        from src.ti4.core.status_phase import StatusPhaseManager
-        from src.ti4.core.strategic_action import StrategyCardType
-        from src.ti4.core.technology import TechnologyCard
+        from ti4.core.game_state import GameState
+        from ti4.core.status_phase import StatusPhaseManager
+        from ti4.core.strategic_action import StrategyCardType
+        from ti4.core.technology import TechnologyCard
 
         # Create game state with various exhausted cards
         game_state = GameState()
@@ -282,7 +282,7 @@ class TestRule34TechnologyCardExhaustion:
         LRR Reference: Rule 34.4 - "Abilities...may instruct a player to exhaust a card to resolve those abilities"
         """
         # RED: This will fail until we implement technology card exhaustion
-        from src.ti4.core.technology import TechnologyCard
+        from ti4.core.technology import TechnologyCard
 
         tech_card = TechnologyCard(
             "Test Tech", "Exhaust this card: Gain 1 command token"
@@ -303,7 +303,7 @@ class TestRule34TechnologyCardExhaustion:
         LRR Reference: Rule 34.4 - "If a card is already exhausted, it cannot be exhausted again"
         """
         # RED: This will fail until we implement exhaustion validation
-        from src.ti4.core.technology import TechnologyCard
+        from ti4.core.technology import TechnologyCard
 
         tech_card = TechnologyCard(
             "Test Tech", "Exhaust this card: Gain 1 command token"
@@ -323,7 +323,7 @@ class TestRule34TechnologyCardExhaustion:
         LRR Reference: Rule 34.4a - "Passive abilities on an exhausted card are still in effect while that card is exhausted"
         """
         # RED: This will fail until we implement passive ability mechanics
-        from src.ti4.core.technology import TechnologyCard
+        from ti4.core.technology import TechnologyCard
 
         tech_card = TechnologyCard("Test Tech", "Passive: +1 to all combat rolls")
         tech_card.add_passive_ability("combat_bonus", 1)
@@ -347,8 +347,8 @@ class TestRule34IntegrationWithExistingSystems:
         LRR Reference: Rule 34.5 - "After a player performs a strategic action, they exhaust the strategy card"
         """
         # This should pass - strategy card exhaustion is already implemented
-        from src.ti4.core.game_state import GameState
-        from src.ti4.core.strategic_action import StrategyCardType
+        from ti4.core.game_state import GameState
+        from ti4.core.strategic_action import StrategyCardType
 
         game_state = GameState()
 
@@ -367,10 +367,10 @@ class TestRule34IntegrationWithExistingSystems:
         LRR Reference: Rule 34.2 - "each player readies all of their exhausted cards"
         """
         # RED: This will fail until we implement comprehensive status phase readying
-        from src.ti4.core.game_state import GameState
-        from src.ti4.core.status_phase import StatusPhaseManager
-        from src.ti4.core.strategic_action import StrategyCardType
-        from src.ti4.core.technology import TechnologyCard
+        from ti4.core.game_state import GameState
+        from ti4.core.status_phase import StatusPhaseManager
+        from ti4.core.strategic_action import StrategyCardType
+        from ti4.core.technology import TechnologyCard
 
         # Create game state with all types of exhausted cards
         game_state = GameState()

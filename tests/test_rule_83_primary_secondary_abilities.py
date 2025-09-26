@@ -11,8 +11,8 @@ Requirements tested:
 - 5.5: System tracks which players have participated in ability resolution
 """
 
-from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
-from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+from ti4.core.strategic_action import StrategicActionManager, StrategyCardType
+from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
 
 class TestRule83PrimaryAbilityFramework:

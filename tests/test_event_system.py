@@ -5,7 +5,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from src.ti4.core.events import (
+from ti4.core.events import (
     CombatStartedEvent,
     GameEvent,
     GameEventBus,

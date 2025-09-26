@@ -9,8 +9,8 @@ Requirements tested:
 - 9.1, 9.2: Comprehensive error handling and validation
 """
 
-from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
-from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+from ti4.core.strategic_action import StrategicActionManager, StrategyCardType
+from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
 
 class TestRule83PlayerCountValidation:
