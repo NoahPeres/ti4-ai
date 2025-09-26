@@ -144,13 +144,5 @@ class PromissoryNoteManager:
         )
 
     def __hash__(self) -> int:
-        """Return hash of the PromissoryNoteManager."""
-        # Convert mutable structures to immutable for hashing
-        player_hands_tuple = tuple(
-            (player_id, tuple(notes))
-            for player_id, notes in sorted(self._player_hands.items())
-        )
-        available_notes_tuple = tuple(
-            sorted(self._available_notes, key=lambda x: str(x))
-        )
-        return hash((player_hands_tuple, available_notes_tuple))
+        """PromissoryNoteManager is not hashable due to mutable state."""
+        raise TypeError("PromissoryNoteManager is mutable and cannot be hashed")

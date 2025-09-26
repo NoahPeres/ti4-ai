@@ -27,10 +27,7 @@ else:
     StrategyCardCoordinator = "StrategyCardCoordinator"
     TechnologyCard = "TechnologyCard"
 
-# Import System and Planet at runtime for eliminate_player method
-from .planet import Planet
-from .planet_card import PlanetCard
-from .system import System
+
 
 # Victory condition constants
 VICTORY_POINTS_TO_WIN = 10
@@ -809,6 +806,9 @@ class GameState:
 
         LRR Reference: Rule 33.2 - Component return to game box
         """
+        # Local import to avoid circular dependencies
+        from .system import System
+        
         # Validate player exists
         if not any(player.id == player_id for player in self.players):
             raise ValueError(f"Player {player_id} does not exist")
@@ -1233,6 +1233,9 @@ class GameState:
 
     def _get_or_create_planet_card(self, planet: Planet) -> PlanetCard:
         """Get or create a planet card for the given planet."""
+        # Local import to avoid circular dependencies
+        from .planet_card import PlanetCard
+        
         # First check if it's already in the deck
         if planet.name in self.planet_card_deck:
             return self.planet_card_deck[planet.name]

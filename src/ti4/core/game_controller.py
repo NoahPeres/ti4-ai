@@ -48,6 +48,30 @@ class GameController:
             c.name.lower(): c.id for c in STANDARD_STRATEGY_CARDS
         }
 
+    @classmethod
+    def with_remaining_players(
+        cls, original_controller: "GameController", remaining_players: list[Player]
+    ) -> "GameController":
+        """Create a new GameController with remaining players while preserving original player count.
+        
+        This method is used for Rule 33.9 testing where we need to simulate player elimination
+        while preserving the original player count for strategy card distribution rules.
+        
+        Args:
+            original_controller: The original GameController instance
+            remaining_players: List of players that remain after elimination
+            
+        Returns:
+            New GameController instance with preserved initial player count
+        """
+        # Create new controller with remaining players
+        new_controller = cls(remaining_players)
+        
+        # Preserve the original initial player count for Rule 33.9
+        new_controller._initial_player_count = original_controller._initial_player_count
+        
+        return new_controller
+
     def get_turn_order(self) -> list[Player]:
         """Get the current turn order."""
         return list(self._players)
@@ -357,11 +381,10 @@ class GameController:
         total_strategy_cards = len(STANDARD_STRATEGY_CARDS)  # 8 cards
         player_count = len(self._players)
 
-        # Rule 33.9: If we started with 5+ players but now have 4 or fewer,
+        # Rule 33.9: If we started with 5+ players and now have 4 or fewer,
         # each player still only gets 1 strategy card
-        if hasattr(self, "_initial_player_count"):
-            if self._initial_player_count >= 5 and player_count <= 4:
-                return 1
+        if self._initial_player_count >= 5 and player_count <= 4:
+            return 1
 
         # Standard distribution: divide cards evenly among players
         return total_strategy_cards // player_count

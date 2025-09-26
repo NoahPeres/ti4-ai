@@ -69,12 +69,8 @@ class TestRule33Elimination:
 
         # Create system with production unit in space
         system = System("system1")
-        # Use a carrier instead of war sun - carriers can be in space and have capacity
-        # But for production, we need a space dock. Let's put it on a planet
-        planet = Planet("Mecatol Rex", 1, 6)
         space_dock = Unit(UnitType.SPACE_DOCK, "player1")  # Space docks have production
-        planet.place_unit(space_dock)
-        system.add_planet(planet)
+        system.place_unit_in_space(space_dock)
 
         # Add system to game state
         game_state.systems["test_system"] = system
@@ -236,13 +232,14 @@ class TestRule33Elimination:
         player2 = Player("player2", Faction.HACAN)
         game_state = GameState().add_player(player1).add_player(player2)
 
-        # Assign strategy cards to both players
-        game_state = game_state.assign_strategy_card("player1", 1)  # Leadership
-        game_state = game_state.assign_strategy_card("player2", 2)  # Diplomacy
+        # Assign strategy cards to both players using StrategyCardType enum
+        from src.ti4.core.strategic_action import StrategyCardType
+        game_state = game_state.assign_strategy_card("player1", StrategyCardType.LEADERSHIP)
+        game_state = game_state.assign_strategy_card("player2", StrategyCardType.DIPLOMACY)
 
         # Verify initial assignments
-        assert game_state.strategy_card_assignments["player1"] == 1
-        assert game_state.strategy_card_assignments["player2"] == 2
+        assert game_state.strategy_card_assignments["player1"] == StrategyCardType.LEADERSHIP
+        assert game_state.strategy_card_assignments["player2"] == StrategyCardType.DIPLOMACY
 
         # Eliminate player1
         new_game_state = game_state.eliminate_player("player1")
@@ -250,7 +247,7 @@ class TestRule33Elimination:
         # Verify player1's strategy card is no longer assigned
         assert "player1" not in new_game_state.strategy_card_assignments
         # Verify player2's strategy card remains
-        assert new_game_state.strategy_card_assignments["player2"] == 2
+        assert new_game_state.strategy_card_assignments["player2"] == StrategyCardType.DIPLOMACY
 
     def test_rule_33_8_speaker_token_transfer_on_elimination(self) -> None:
         """Test Rule 33.8: Speaker token passes to next player when speaker is eliminated."""

@@ -32,13 +32,14 @@ class TestRule339StrategyCardSelection:
         assert len(controller._players) == 5
         assert controller._get_cards_per_player() == 1
 
-        # Simulate player elimination by removing a player
-        controller._players = controller._players[:-1]  # Remove last player
-        assert len(controller._players) == 4
+        # Simulate player elimination by creating a new controller with 4 players
+        # This represents the game state after elimination
+        remaining_players = players[:-1]  # Remove last player
+        controller_after_elimination = GameController.with_remaining_players(controller, remaining_players)
 
         # Rule 33.9: Even with 4 players, each should still get only 1 card
         # (not 2 cards as would be normal for a 4-player game)
-        assert controller._get_cards_per_player() == 1
+        assert controller_after_elimination._get_cards_per_player() == 1
 
     def test_rule_33_9_six_to_four_players_single_card_selection(self) -> None:
         """Test Rule 33.9: When game drops from 6 to 4 players, each player still selects only 1 card."""
@@ -58,12 +59,12 @@ class TestRule339StrategyCardSelection:
         assert len(controller._players) == 6
         assert controller._get_cards_per_player() == 1
 
-        # Simulate elimination of 2 players
-        controller._players = controller._players[:-2]  # Remove last 2 players
-        assert len(controller._players) == 4
+        # Simulate elimination of 2 players by creating a new controller with 4 players
+        remaining_players = players[:-2]  # Remove last 2 players
+        controller_after_elimination = GameController.with_remaining_players(controller, remaining_players)
 
         # Rule 33.9: Even with 4 players, each should still get only 1 card
-        assert controller._get_cards_per_player() == 1
+        assert controller_after_elimination._get_cards_per_player() == 1
 
     def test_rule_33_9_eight_to_three_players_single_card_selection(self) -> None:
         """Test Rule 33.9: When game drops from 8 to 3 players, each player still selects only 1 card."""
@@ -85,13 +86,13 @@ class TestRule339StrategyCardSelection:
         assert len(controller._players) == 8
         assert controller._get_cards_per_player() == 1
 
-        # Simulate elimination of 5 players
-        controller._players = controller._players[:3]  # Keep only first 3 players
-        assert len(controller._players) == 3
+        # Simulate elimination of 5 players by creating a new controller with 3 players
+        remaining_players = players[:3]  # Keep only first 3 players
+        controller_after_elimination = GameController.with_remaining_players(controller, remaining_players)
 
         # Rule 33.9: Even with 3 players, each should still get only 1 card
         # (not 2 cards as would be normal for a 3-player game)
-        assert controller._get_cards_per_player() == 1
+        assert controller_after_elimination._get_cards_per_player() == 1
 
     def test_rule_33_9_does_not_apply_to_games_starting_with_four_or_fewer(
         self,
@@ -111,13 +112,13 @@ class TestRule339StrategyCardSelection:
         assert len(controller._players) == 4
         assert controller._get_cards_per_player() == 2
 
-        # Simulate elimination of 1 player
-        controller._players = controller._players[:-1]  # Remove last player
-        assert len(controller._players) == 3
+        # Simulate elimination of 1 player by creating a new controller with 3 players
+        remaining_players = players[:-1]  # Remove last player
+        controller_after_elimination = GameController.with_remaining_players(controller, remaining_players)
 
         # Rule 33.9 does NOT apply: Game started with 4 players, so normal distribution applies
         # 3 players should get 2 cards each (8 cards / 3 players = 2 cards each, with 2 remaining)
-        assert controller._get_cards_per_player() == 2
+        assert controller_after_elimination._get_cards_per_player() == 2
 
     def test_rule_33_9_does_not_apply_to_games_starting_with_three_players(
         self,
@@ -156,12 +157,12 @@ class TestRule339StrategyCardSelection:
         assert controller._initial_player_count == 5
         assert controller._get_cards_per_player() == 1
 
-        # Drop to exactly 4 players
-        controller._players = controller._players[:-1]
-        assert len(controller._players) == 4
+        # Drop to exactly 4 players by creating a new controller with 4 players
+        remaining_players = players[:-1]
+        controller_after_elimination = GameController.with_remaining_players(controller, remaining_players)
 
         # Rule 33.9 applies: Started with 5 (>= 5), now have 4 (<= 4)
-        assert controller._get_cards_per_player() == 1
+        assert controller_after_elimination._get_cards_per_player() == 1
 
     def test_rule_33_9_boundary_condition_drop_to_exactly_four_players(self) -> None:
         """Test Rule 33.9: Boundary condition dropping to exactly 4 players."""
@@ -176,12 +177,12 @@ class TestRule339StrategyCardSelection:
         ]
         controller = GameController(players)
 
-        # Drop to exactly 4 players (boundary condition)
-        controller._players = controller._players[:4]
-        assert len(controller._players) == 4
+        # Drop to exactly 4 players by creating a new controller with 4 players
+        remaining_players = players[:4]
+        controller_after_elimination = GameController.with_remaining_players(controller, remaining_players)
 
         # Rule 33.9 applies: Started with 6 (>= 5), now have 4 (<= 4)
-        assert controller._get_cards_per_player() == 1
+        assert controller_after_elimination._get_cards_per_player() == 1
 
     def test_rule_33_9_does_not_apply_when_staying_above_four_players(self) -> None:
         """Test Rule 33.9: Rule does not apply when player count stays above 4."""
@@ -196,10 +197,10 @@ class TestRule339StrategyCardSelection:
         ]
         controller = GameController(players)
 
-        # Drop to 5 players (still above 4)
-        controller._players = controller._players[:-1]
-        assert len(controller._players) == 5
+        # Drop to 5 players by creating a new controller with 5 players
+        remaining_players = players[:-1]
+        controller_after_elimination = GameController.with_remaining_players(controller, remaining_players)
 
-        # Rule 33.9 does NOT apply: Still have more than 4 players
-        # Normal distribution: 8 cards / 5 players = 1 card each
-        assert controller._get_cards_per_player() == 1
+        # Rule 33.9 does NOT apply: Still have 5 players (above 4)
+        # Normal distribution should apply
+        assert controller_after_elimination._get_cards_per_player() == 1
