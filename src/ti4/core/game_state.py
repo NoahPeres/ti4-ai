@@ -94,8 +94,12 @@ class GameState:
     planet_control_mapping: dict[str, str | None] = field(
         default_factory=dict, hash=False
     )
+    # Planet attachment tokens for visual board representation (Rule 12.3)
+    planet_attachment_tokens: dict[str, set[str]] = field(
+        default_factory=dict, hash=False
+    )  # planet_name -> {token_ids}
 
-    # Agenda card system (Rule 7)
+    # Agenda cards (Rule 22)7)
     player_agenda_cards: dict[str, list[Any]] = field(
         default_factory=dict, hash=False
     )  # player_id -> [agenda_cards]
@@ -1223,6 +1227,17 @@ class GameState:
         else:
             # Transfer from previous controller to new controller
             if current_controller in new_player_planet_cards:
+                # Find the existing planet card to preserve attachments
+                existing_card = None
+                for card in new_player_planet_cards[current_controller]:
+                    if card.name == planet_card.name:
+                        existing_card = card
+                        break
+
+                # Use existing card if found, otherwise use the one we got/created
+                if existing_card:
+                    planet_card = existing_card
+
                 new_player_planet_cards[current_controller] = [
                     card
                     for card in new_player_planet_cards[current_controller]
@@ -1321,6 +1336,7 @@ class GameState:
             name=planet.name,
             resources=planet.resources,
             influence=planet.influence,
+            game_state=self,
         )
 
     def get_player_planet_cards(self, player_id: str) -> list[PlanetCard]:

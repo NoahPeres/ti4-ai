@@ -1,13 +1,21 @@
 """Planet card structure for TI4 game."""
 
-from typing import Optional
+from typing import TYPE_CHECKING, Any, Optional
+
+if TYPE_CHECKING:
+    from .game_state import GameState
 
 
 class PlanetCard:
     """Represents a planet card in a player's play area."""
 
     def __init__(
-        self, name: str, resources: int, influence: int, trait: Optional[str] = None
+        self,
+        name: str,
+        resources: int,
+        influence: int,
+        trait: Optional[str] = None,
+        game_state: Optional["GameState"] = None,
     ) -> None:
         if not name or not isinstance(name, str):
             raise ValueError("Planet name must be a non-empty string")
@@ -21,6 +29,8 @@ class PlanetCard:
         self.influence = influence
         self.trait = trait
         self._exhausted = False
+        self._attached_cards: list[Any] = []  # Cards attached to this planet card
+        self._game_state = game_state  # Reference to game state for token management
 
     def is_exhausted(self) -> bool:
         """Check if this planet card is exhausted."""
@@ -89,4 +99,62 @@ class PlanetCard:
     def __repr__(self) -> str:
         """String representation of planet card."""
         status = "exhausted" if self._exhausted else "readied"
-        return f"PlanetCard({self.name}, {self.resources}R/{self.influence}I, {status})"
+        attachments = (
+            f", {len(self._attached_cards)} attachments" if self._attached_cards else ""
+        )
+        return f"PlanetCard({self.name}, {self.resources}R/{self.influence}I, {status}{attachments})"
+
+    # Rule 12: ATTACH - Attachment System
+    def attach_card(self, card: Any) -> None:
+        """Attach a card to this planet card (Rule 12.1)."""
+        if card is None:
+            raise ValueError("Cannot attach None card")
+        if card in self._attached_cards:
+            raise ValueError(f"Card {card} is already attached to this planet")
+
+        self._attached_cards.append(card)
+
+        # Add attachment token to game board (Rule 12.3)
+        if self._game_state is not None and hasattr(card, "token_id"):
+            if self.name not in self._game_state.planet_attachment_tokens:
+                self._game_state.planet_attachment_tokens[self.name] = set()
+            self._game_state.planet_attachment_tokens[self.name].add(card.token_id)
+
+    def detach_card(self, card: Any) -> None:
+        """Detach a card from this planet card."""
+        if card not in self._attached_cards:
+            raise ValueError(f"Card {card} is not attached to this planet")
+
+        self._attached_cards.remove(card)
+
+        # Remove attachment token from game board (Rule 12.3)
+        if self._game_state is not None and hasattr(card, "token_id"):
+            if self.name in self._game_state.planet_attachment_tokens:
+                self._game_state.planet_attachment_tokens[self.name].discard(
+                    card.token_id
+                )
+                # Clean up empty sets
+                if not self._game_state.planet_attachment_tokens[self.name]:
+                    del self._game_state.planet_attachment_tokens[self.name]
+
+    def get_attached_cards(self) -> list[Any]:
+        """Get all cards attached to this planet card."""
+        return self._attached_cards.copy()
+
+    def has_attached_cards(self) -> bool:
+        """Check if this planet card has any attached cards."""
+        return len(self._attached_cards) > 0
+
+    def purge_attachments(self) -> list[Any]:
+        """Remove and return all attached cards (for control transfer)."""
+        purged_cards = self._attached_cards.copy()
+
+        # Remove all attachment tokens from game board (Rule 12.3)
+        if (
+            self._game_state is not None
+            and self.name in self._game_state.planet_attachment_tokens
+        ):
+            del self._game_state.planet_attachment_tokens[self.name]
+
+        self._attached_cards.clear()
+        return purged_cards
