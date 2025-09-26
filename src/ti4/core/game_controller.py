@@ -53,23 +53,23 @@ class GameController:
         cls, original_controller: "GameController", remaining_players: list[Player]
     ) -> "GameController":
         """Create a new GameController with remaining players while preserving original player count.
-        
+
         This method is used for Rule 33.9 testing where we need to simulate player elimination
         while preserving the original player count for strategy card distribution rules.
-        
+
         Args:
             original_controller: The original GameController instance
             remaining_players: List of players that remain after elimination
-            
+
         Returns:
             New GameController instance with preserved initial player count
         """
         # Create new controller with remaining players
         new_controller = cls(remaining_players)
-        
+
         # Preserve the original initial player count for Rule 33.9
         new_controller._initial_player_count = original_controller._initial_player_count
-        
+
         return new_controller
 
     def get_turn_order(self) -> list[Player]:

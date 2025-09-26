@@ -35,7 +35,9 @@ class TestRule339StrategyCardSelection:
         # Simulate player elimination by creating a new controller with 4 players
         # This represents the game state after elimination
         remaining_players = players[:-1]  # Remove last player
-        controller_after_elimination = GameController.with_remaining_players(controller, remaining_players)
+        controller_after_elimination = GameController.with_remaining_players(
+            controller, remaining_players
+        )
 
         # Rule 33.9: Even with 4 players, each should still get only 1 card
         # (not 2 cards as would be normal for a 4-player game)
@@ -61,7 +63,9 @@ class TestRule339StrategyCardSelection:
 
         # Simulate elimination of 2 players by creating a new controller with 4 players
         remaining_players = players[:-2]  # Remove last 2 players
-        controller_after_elimination = GameController.with_remaining_players(controller, remaining_players)
+        controller_after_elimination = GameController.with_remaining_players(
+            controller, remaining_players
+        )
 
         # Rule 33.9: Even with 4 players, each should still get only 1 card
         assert controller_after_elimination._get_cards_per_player() == 1
@@ -88,7 +92,9 @@ class TestRule339StrategyCardSelection:
 
         # Simulate elimination of 5 players by creating a new controller with 3 players
         remaining_players = players[:3]  # Keep only first 3 players
-        controller_after_elimination = GameController.with_remaining_players(controller, remaining_players)
+        controller_after_elimination = GameController.with_remaining_players(
+            controller, remaining_players
+        )
 
         # Rule 33.9: Even with 3 players, each should still get only 1 card
         # (not 2 cards as would be normal for a 3-player game)
@@ -114,7 +120,9 @@ class TestRule339StrategyCardSelection:
 
         # Simulate elimination of 1 player by creating a new controller with 3 players
         remaining_players = players[:-1]  # Remove last player
-        controller_after_elimination = GameController.with_remaining_players(controller, remaining_players)
+        controller_after_elimination = GameController.with_remaining_players(
+            controller, remaining_players
+        )
 
         # Rule 33.9 does NOT apply: Game started with 4 players, so normal distribution applies
         # 3 players should get 2 cards each (8 cards / 3 players = 2 cards each, with 2 remaining)
@@ -159,7 +167,9 @@ class TestRule339StrategyCardSelection:
 
         # Drop to exactly 4 players by creating a new controller with 4 players
         remaining_players = players[:-1]
-        controller_after_elimination = GameController.with_remaining_players(controller, remaining_players)
+        controller_after_elimination = GameController.with_remaining_players(
+            controller, remaining_players
+        )
 
         # Rule 33.9 applies: Started with 5 (>= 5), now have 4 (<= 4)
         assert controller_after_elimination._get_cards_per_player() == 1
@@ -179,7 +189,9 @@ class TestRule339StrategyCardSelection:
 
         # Drop to exactly 4 players by creating a new controller with 4 players
         remaining_players = players[:4]
-        controller_after_elimination = GameController.with_remaining_players(controller, remaining_players)
+        controller_after_elimination = GameController.with_remaining_players(
+            controller, remaining_players
+        )
 
         # Rule 33.9 applies: Started with 6 (>= 5), now have 4 (<= 4)
         assert controller_after_elimination._get_cards_per_player() == 1
@@ -199,7 +211,9 @@ class TestRule339StrategyCardSelection:
 
         # Drop to 5 players by creating a new controller with 5 players
         remaining_players = players[:-1]
-        controller_after_elimination = GameController.with_remaining_players(controller, remaining_players)
+        controller_after_elimination = GameController.with_remaining_players(
+            controller, remaining_players
+        )
 
         # Rule 33.9 does NOT apply: Still have 5 players (above 4)
         # Normal distribution should apply

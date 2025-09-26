@@ -28,7 +28,6 @@ else:
     TechnologyCard = "TechnologyCard"
 
 
-
 # Victory condition constants
 VICTORY_POINTS_TO_WIN = 10
 
@@ -808,7 +807,7 @@ class GameState:
         """
         # Local import to avoid circular dependencies
         from .system import System
-        
+
         # Validate player exists
         if not any(player.id == player_id for player in self.players):
             raise ValueError(f"Player {player_id} does not exist")
@@ -843,11 +842,11 @@ class GameState:
         new_players = [player for player in self.players if player.id != player_id]
 
         # Remove player from planet control mapping
-        new_planet_control_mapping = {
-            planet_name: controller
-            for planet_name, controller in self.planet_control_mapping.items()
-            if controller != player_id
-        }
+        # Set eliminated player's controlled planets to None instead of filtering them out
+        new_planet_control_mapping = self.planet_control_mapping.copy()
+        for planet_name, controller in list(new_planet_control_mapping.items()):
+            if controller == player_id:
+                new_planet_control_mapping[planet_name] = None
 
         # Remove player from planet-related data structures
         new_player_planets = {
@@ -1235,7 +1234,7 @@ class GameState:
         """Get or create a planet card for the given planet."""
         # Local import to avoid circular dependencies
         from .planet_card import PlanetCard
-        
+
         # First check if it's already in the deck
         if planet.name in self.planet_card_deck:
             return self.planet_card_deck[planet.name]

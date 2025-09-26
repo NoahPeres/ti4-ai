@@ -234,12 +234,23 @@ class TestRule33Elimination:
 
         # Assign strategy cards to both players using StrategyCardType enum
         from src.ti4.core.strategic_action import StrategyCardType
-        game_state = game_state.assign_strategy_card("player1", StrategyCardType.LEADERSHIP)
-        game_state = game_state.assign_strategy_card("player2", StrategyCardType.DIPLOMACY)
+
+        game_state = game_state.assign_strategy_card(
+            "player1", StrategyCardType.LEADERSHIP
+        )
+        game_state = game_state.assign_strategy_card(
+            "player2", StrategyCardType.DIPLOMACY
+        )
 
         # Verify initial assignments
-        assert game_state.strategy_card_assignments["player1"] == StrategyCardType.LEADERSHIP
-        assert game_state.strategy_card_assignments["player2"] == StrategyCardType.DIPLOMACY
+        assert (
+            game_state.strategy_card_assignments["player1"]
+            == StrategyCardType.LEADERSHIP
+        )
+        assert (
+            game_state.strategy_card_assignments["player2"]
+            == StrategyCardType.DIPLOMACY
+        )
 
         # Eliminate player1
         new_game_state = game_state.eliminate_player("player1")
@@ -247,7 +258,10 @@ class TestRule33Elimination:
         # Verify player1's strategy card is no longer assigned
         assert "player1" not in new_game_state.strategy_card_assignments
         # Verify player2's strategy card remains
-        assert new_game_state.strategy_card_assignments["player2"] == StrategyCardType.DIPLOMACY
+        assert (
+            new_game_state.strategy_card_assignments["player2"]
+            == StrategyCardType.DIPLOMACY
+        )
 
     def test_rule_33_8_speaker_token_transfer_on_elimination(self) -> None:
         """Test Rule 33.8: Speaker token passes to next player when speaker is eliminated."""
