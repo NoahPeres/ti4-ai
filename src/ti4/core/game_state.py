@@ -99,7 +99,7 @@ class GameState:
         default_factory=dict, hash=False
     )  # planet_name -> {token_ids}
 
-    # Agenda cards (Rule 22)7)
+    # Agenda cards (Rule 22)
     player_agenda_cards: dict[str, list[Any]] = field(
         default_factory=dict, hash=False
     )  # player_id -> [agenda_cards]
@@ -303,6 +303,14 @@ class GameState:
 
     def _create_new_state(self, **kwargs: Any) -> GameState:
         """Create a new GameState with updated fields."""
+        # Prepare a copy to avoid cross-state aliasing
+        _tokens_in = kwargs.get(
+            "planet_attachment_tokens", self.planet_attachment_tokens
+        )
+        _tokens_copy = {
+            planet_name: tokens.copy() for planet_name, tokens in _tokens_in.items()
+        }
+
         new_state = GameState(
             game_id=self.game_id,
             players=kwargs.get("players", self.players),
@@ -355,9 +363,7 @@ class GameState:
             planet_control_mapping=kwargs.get(
                 "planet_control_mapping", self.planet_control_mapping
             ),
-            planet_attachment_tokens=kwargs.get(
-                "planet_attachment_tokens", self.planet_attachment_tokens
-            ),
+            planet_attachment_tokens=_tokens_copy,
             # Agenda card system
             player_agenda_cards=kwargs.get(
                 "player_agenda_cards", self.player_agenda_cards
@@ -381,11 +387,23 @@ class GameState:
         )
 
         # Ensure every planet card now points at this cloned state for token bookkeeping.
-        for card in new_state.planet_card_deck.values():
-            card._game_state = new_state
-        for cards in new_state.player_planet_cards.values():
+        # Clone PlanetCard instances to avoid mutating the original state's cards
+        cloned_planet_card_deck = {}
+        for planet_name, card in new_state.planet_card_deck.items():
+            cloned_card = card.clone_for_state(new_state)
+            cloned_planet_card_deck[planet_name] = cloned_card
+        # Use object.__setattr__ to bypass frozen dataclass restriction
+        object.__setattr__(new_state, "planet_card_deck", cloned_planet_card_deck)
+
+        cloned_player_planet_cards = {}
+        for player_id, cards in new_state.player_planet_cards.items():
+            cloned_cards = []
             for card in cards:
-                card._game_state = new_state
+                cloned_card = card.clone_for_state(new_state)
+                cloned_cards.append(cloned_card)
+            cloned_player_planet_cards[player_id] = cloned_cards
+        # Use object.__setattr__ to bypass frozen dataclass restriction
+        object.__setattr__(new_state, "player_planet_cards", cloned_player_planet_cards)
 
         return new_state
 

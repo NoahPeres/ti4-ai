@@ -146,7 +146,7 @@ class PlanetCard:
         return len(self._attached_cards) > 0
 
     def purge_attachments(self) -> list[Any]:
-        """Remove and return all attached cards (for control transfer)."""
+        """Remove and return all attached cards (for card purge/removal scenarios)."""
         purged_cards = self._attached_cards.copy()
 
         # Remove all attachment tokens from game board (Rule 12.3)
@@ -158,3 +158,16 @@ class PlanetCard:
 
         self._attached_cards.clear()
         return purged_cards
+
+    def clone_for_state(self, new_game_state: "GameState") -> "PlanetCard":
+        """Create a clone of this PlanetCard bound to a new GameState."""
+        cloned_card = PlanetCard(
+            name=self.name,
+            resources=self.resources,
+            influence=self.influence,
+            trait=self.trait,
+            game_state=new_game_state,
+        )
+        cloned_card._exhausted = self._exhausted
+        cloned_card._attached_cards = self._attached_cards.copy()
+        return cloned_card

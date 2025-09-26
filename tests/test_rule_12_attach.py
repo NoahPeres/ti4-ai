@@ -120,8 +120,6 @@ class TestRule12Attach:
     def test_attached_cards_stay_with_planet_on_control_change(self) -> None:
         """Test that attached cards stay with planet when control changes (Rule 12.2)."""
         # Create a planet card and add it to the deck first
-        from ti4.core.planet_card import PlanetCard
-
         planet_card = PlanetCard(
             name=self.planet.name,
             resources=self.planet.resources,
@@ -140,8 +138,9 @@ class TestRule12Attach:
         attachment_card.name = "Test Attachment"
         attachment_card.is_exhausted = False
 
-        # Attach card to planet
-        planet_card.attach_card(attachment_card)
+        # Attach card to the planet card in the deck
+        deck_planet_card = game_state_with_deck.planet_card_deck[self.planet.name]
+        deck_planet_card.attach_card(attachment_card)
 
         # Give control to player1
         _, new_state = game_state_with_deck.gain_planet_control("player1", self.planet)
@@ -149,6 +148,11 @@ class TestRule12Attach:
         # Verify attachment is still there after first control change
         player1_planet_cards = new_state.get_player_planet_cards("player1")
         assert len(player1_planet_cards) == 1
+        first_planet_card = player1_planet_cards[0]
+        assert first_planet_card.has_attached_cards()
+        first_attached_cards = first_planet_card.get_attached_cards()
+        assert len(first_attached_cards) == 1
+        assert first_attached_cards[0].name == "Test Attachment"
 
         # Transfer control to player2 (using same planet object)
         _, final_state = new_state.gain_planet_control("player2", self.planet)
@@ -210,6 +214,15 @@ class TestRule12Attach:
         assert "test_attachment_token" in self.game_state.planet_attachment_tokens.get(
             "test_planet", set()
         )
+
+        # Optional: Also check token presence via card's state reference
+        if planet_card._game_state is not None:
+            assert (
+                "test_attachment_token"
+                in planet_card._game_state.planet_attachment_tokens.get(
+                    "test_planet", set()
+                )
+            )
 
     def test_attachment_token_removed_when_card_detached(self) -> None:
         """Test that attachment tokens are removed when cards are detached."""
@@ -335,3 +348,60 @@ class TestRule12Attach:
         assert attached_cards[0].name == "First Attachment"
         assert attached_cards[1].name == "Second Attachment"
         assert attached_cards[2].name == "Third Attachment"
+
+    def test_attachment_tokens_persist_across_control_transfers(self) -> None:
+        """Test that attachment tokens persist when planet control changes multiple times."""
+        # Create a planet card and add it to the deck first
+        planet_card = PlanetCard(
+            name=self.planet.name,
+            resources=self.planet.resources,
+            influence=self.planet.influence,
+            game_state=self.game_state,
+        )
+
+        # Add to deck
+        new_deck = self.game_state.planet_card_deck.copy()
+        new_deck[planet_card.name] = planet_card
+        game_state_with_deck = self.game_state._create_new_state(
+            planet_card_deck=new_deck
+        )
+
+        attachment_card = Mock()
+        attachment_card.name = "Test Attachment"
+        attachment_card.is_exhausted = False
+
+        # Attach card to the planet card in the deck
+        deck_planet_card = game_state_with_deck.planet_card_deck[self.planet.name]
+        deck_planet_card.attach_card(attachment_card)
+
+        # Add attachment token to game state
+        new_tokens = game_state_with_deck.planet_attachment_tokens.copy()
+        new_tokens[self.planet.name] = {"test_attachment_token"}
+        state_with_tokens = game_state_with_deck._create_new_state(
+            planet_attachment_tokens=new_tokens
+        )
+
+        # Transfer control to player1
+        _, state1 = state_with_tokens.gain_planet_control("player1", self.planet)
+
+        # Verify attachment token persists
+        assert (
+            "test_attachment_token" in state1.planet_attachment_tokens[self.planet.name]
+        )
+
+        # Transfer control to player2
+        _, state2 = state1.gain_planet_control("player2", self.planet)
+
+        # Verify attachment token still persists
+        assert (
+            "test_attachment_token" in state2.planet_attachment_tokens[self.planet.name]
+        )
+
+        # Verify the attachment card is still attached
+        player2_planet_cards = state2.get_player_planet_cards("player2")
+        assert len(player2_planet_cards) == 1
+        final_planet_card = player2_planet_cards[0]
+        assert final_planet_card.has_attached_cards()
+        attached_cards = final_planet_card.get_attached_cards()
+        assert len(attached_cards) == 1
+        assert attached_cards[0].name == "Test Attachment"
