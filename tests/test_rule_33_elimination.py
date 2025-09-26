@@ -228,3 +228,92 @@ class TestRule33Elimination:
 
         with pytest.raises(ValueError, match="Player nonexistent does not exist"):
             game_state.should_eliminate_player("nonexistent")
+
+    def test_rule_33_6_strategy_cards_returned_on_elimination(self) -> None:
+        """Test Rule 33.6: Strategy cards are returned to common play area when player is eliminated."""
+        # Setup game state with two players
+        player1 = Player("player1", Faction.SOL)
+        player2 = Player("player2", Faction.HACAN)
+        game_state = GameState().add_player(player1).add_player(player2)
+
+        # Assign strategy cards to both players
+        game_state = game_state.assign_strategy_card("player1", 1)  # Leadership
+        game_state = game_state.assign_strategy_card("player2", 2)  # Diplomacy
+
+        # Verify initial assignments
+        assert game_state.strategy_card_assignments["player1"] == 1
+        assert game_state.strategy_card_assignments["player2"] == 2
+
+        # Eliminate player1
+        new_game_state = game_state.eliminate_player("player1")
+
+        # Verify player1's strategy card is no longer assigned
+        assert "player1" not in new_game_state.strategy_card_assignments
+        # Verify player2's strategy card remains
+        assert new_game_state.strategy_card_assignments["player2"] == 2
+
+    def test_rule_33_8_speaker_token_transfer_on_elimination(self) -> None:
+        """Test Rule 33.8: Speaker token passes to next player when speaker is eliminated."""
+        # Setup game state with three players
+        player1 = Player("player1", Faction.SOL)
+        player2 = Player("player2", Faction.HACAN)
+        player3 = Player("player3", Faction.XXCHA)
+        game_state = (
+            GameState().add_player(player1).add_player(player2).add_player(player3)
+        )
+
+        # Set player1 as speaker
+        game_state = game_state._create_new_state(speaker_id="player1")
+        assert game_state.speaker_id == "player1"
+
+        # Eliminate the speaker (player1)
+        new_game_state = game_state.eliminate_player("player1")
+
+        # Verify speaker token passed to next player (player2)
+        assert new_game_state.speaker_id == "player2"
+        # Verify player1 is no longer in the game
+        assert "player1" not in [player.id for player in new_game_state.players]
+
+    def test_rule_33_8_speaker_token_unchanged_when_non_speaker_eliminated(
+        self,
+    ) -> None:
+        """Test Rule 33.8: Speaker token unchanged when non-speaker is eliminated."""
+        # Setup game state with three players
+        player1 = Player("player1", Faction.SOL)
+        player2 = Player("player2", Faction.HACAN)
+        player3 = Player("player3", Faction.XXCHA)
+        game_state = (
+            GameState().add_player(player1).add_player(player2).add_player(player3)
+        )
+
+        # Set player2 as speaker
+        game_state = game_state._create_new_state(speaker_id="player2")
+        assert game_state.speaker_id == "player2"
+
+        # Eliminate non-speaker (player1)
+        new_game_state = game_state.eliminate_player("player1")
+
+        # Verify speaker token remains with player2
+        assert new_game_state.speaker_id == "player2"
+        # Verify player1 is no longer in the game
+        assert "player1" not in [player.id for player in new_game_state.players]
+
+    def test_rule_33_8_speaker_token_edge_case_single_player_remaining(self) -> None:
+        """Test Rule 33.8: Edge case when only one player remains after elimination."""
+        # Setup game state with two players
+        player1 = Player("player1", Faction.SOL)
+        player2 = Player("player2", Faction.HACAN)
+        game_state = GameState().add_player(player1).add_player(player2)
+
+        # Set player1 as speaker
+        game_state = game_state._create_new_state(speaker_id="player1")
+        assert game_state.speaker_id == "player1"
+
+        # Eliminate the speaker (player1), leaving only player2
+        new_game_state = game_state.eliminate_player("player1")
+
+        # Verify speaker token goes to the remaining player
+        assert new_game_state.speaker_id == "player2"
+        # Verify only player2 remains
+        assert len(new_game_state.players) == 1
+        assert "player2" in [player.id for player in new_game_state.players]

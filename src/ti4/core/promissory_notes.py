@@ -133,3 +133,24 @@ class PromissoryNoteManager:
         # Clear the eliminated player's hand (they no longer exist)
         if eliminated_player in self._player_hands:
             del self._player_hands[eliminated_player]
+
+    def __eq__(self, other: object) -> bool:
+        """Check equality with another PromissoryNoteManager."""
+        if not isinstance(other, PromissoryNoteManager):
+            return False
+        return (
+            self._player_hands == other._player_hands
+            and self._available_notes == other._available_notes
+        )
+
+    def __hash__(self) -> int:
+        """Return hash of the PromissoryNoteManager."""
+        # Convert mutable structures to immutable for hashing
+        player_hands_tuple = tuple(
+            (player_id, tuple(notes))
+            for player_id, notes in sorted(self._player_hands.items())
+        )
+        available_notes_tuple = tuple(
+            sorted(self._available_notes, key=lambda x: str(x))
+        )
+        return hash((player_hands_tuple, available_notes_tuple))

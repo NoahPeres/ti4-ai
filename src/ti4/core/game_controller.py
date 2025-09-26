@@ -27,6 +27,7 @@ class GameController:
         if len(players) < 3:
             raise InvalidPlayerError("At least 3 players are required for TI4")
         self._players = players
+        self._initial_player_count = len(players)  # Track initial count for Rule 33.9
         self._current_player_index = 0
         self._state_machine = GameStateMachine()
         self._available_strategy_cards = list(STANDARD_STRATEGY_CARDS)
@@ -348,9 +349,22 @@ class GameController:
         return [player for player, _ in player_initiatives]
 
     def _get_cards_per_player(self) -> int:
-        """Calculate how many strategy cards each player should have."""
+        """Calculate how many strategy cards each player should have.
+
+        Rule 33.9: If the game drops from 5+ players to 4 or fewer due to elimination,
+        players still only select one strategy card during the strategy phase.
+        """
         total_strategy_cards = len(STANDARD_STRATEGY_CARDS)  # 8 cards
-        return total_strategy_cards // len(self._players)
+        player_count = len(self._players)
+
+        # Rule 33.9: If we started with 5+ players but now have 4 or fewer,
+        # each player still only gets 1 strategy card
+        if hasattr(self, "_initial_player_count"):
+            if self._initial_player_count >= 5 and player_count <= 4:
+                return 1
+
+        # Standard distribution: divide cards evenly among players
+        return total_strategy_cards // player_count
 
     def is_strategy_phase_complete(self) -> bool:
         """Check if all players have selected their required number of strategy cards."""
