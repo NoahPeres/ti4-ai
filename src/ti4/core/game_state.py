@@ -29,6 +29,7 @@ else:
 
 # Import System and Planet at runtime for eliminate_player method
 from .planet import Planet
+from .planet_card import PlanetCard
 from .system import System
 
 # Victory condition constants
@@ -783,9 +784,6 @@ class GameState:
                     planet.name,
                     planet.resources,
                     planet.influence,
-                    planet.planet_type,
-                    planet.tech_specialty,
-                    planet.legendary
                 )
                 # Only keep units not owned by eliminated player
                 for unit in planet.units:
@@ -812,12 +810,14 @@ class GameState:
 
         # Remove player from planet-related data structures
         new_player_planets = {
-            pid: planets for pid, planets in self.player_planets.items()
+            pid: planets
+            for pid, planets in self.player_planets.items()
             if pid != player_id
         }
 
         new_player_planet_cards = {
-            pid: cards for pid, cards in self.player_planet_cards.items()
+            pid: cards
+            for pid, cards in self.player_planet_cards.items()
             if pid != player_id
         }
 
@@ -833,7 +833,8 @@ class GameState:
             new_agenda_discard_pile.extend(self.player_agenda_cards[player_id])
 
         new_player_agenda_cards = {
-            pid: cards for pid, cards in self.player_agenda_cards.items()
+            pid: cards
+            for pid, cards in self.player_agenda_cards.items()
             if pid != player_id
         }
 
@@ -843,13 +844,15 @@ class GameState:
             new_action_card_discard_pile.extend(self.player_action_cards[player_id])
 
         new_player_action_cards = {
-            pid: cards for pid, cards in self.player_action_cards.items()
+            pid: cards
+            for pid, cards in self.player_action_cards.items()
             if pid != player_id
         }
 
         # Rule 33.7: Remove eliminated player's secret objectives
         new_player_secret_objectives = {
-            pid: objectives for pid, objectives in self.player_secret_objectives.items()
+            pid: objectives
+            for pid, objectives in self.player_secret_objectives.items()
             if pid != player_id
         }
 
@@ -857,9 +860,12 @@ class GameState:
         new_promissory_note_manager = PromissoryNoteManager()
         # Copy existing state
         new_promissory_note_manager._player_hands = {
-            pid: hand.copy() for pid, hand in self.promissory_note_manager._player_hands.items()
+            pid: hand.copy()
+            for pid, hand in self.promissory_note_manager._player_hands.items()
         }
-        new_promissory_note_manager._available_notes = self.promissory_note_manager._available_notes.copy()
+        new_promissory_note_manager._available_notes = (
+            self.promissory_note_manager._available_notes.copy()
+        )
         # Handle elimination
         new_promissory_note_manager.handle_player_elimination(player_id)
 
@@ -896,7 +902,8 @@ class GameState:
 
         # Remove player from agenda cards mapping
         new_player_agenda_cards = {
-            pid: cards for pid, cards in self.player_agenda_cards.items()
+            pid: cards
+            for pid, cards in self.player_agenda_cards.items()
             if pid != player_id
         }
 
@@ -937,7 +944,10 @@ class GameState:
             # Check planets for ground forces
             for planet in system.planets:
                 for unit in planet.units:
-                    if unit.owner == player_id and unit.unit_type in GameConstants.GROUND_FORCE_TYPES:
+                    if (
+                        unit.owner == player_id
+                        and unit.unit_type in GameConstants.GROUND_FORCE_TYPES
+                    ):
                         has_ground_forces = True
                         break
                 if has_ground_forces:
@@ -975,7 +985,9 @@ class GameState:
 
         # Rule 33.1: Player is eliminated if ALL three conditions are true:
         # - No ground forces AND no production units AND controls no planets
-        return not has_ground_forces and not has_production_units and not controls_planets
+        return (
+            not has_ground_forces and not has_production_units and not controls_planets
+        )
 
     def resolve_planet_control_change(self, planet: Planet) -> GameState:
         """Resolve planet control changes based on unit presence (Rule 25.5).
@@ -1019,7 +1031,9 @@ class GameState:
 
         return self
 
-    def gain_planet_control(self, player_id: str, planet: Planet) -> tuple[bool, GameState]:
+    def gain_planet_control(
+        self, player_id: str, planet: Planet
+    ) -> tuple[bool, GameState]:
         """Handle gaining control of a planet according to Rule 25.
 
         Args:
@@ -1070,7 +1084,8 @@ class GameState:
             # Transfer from previous controller to new controller
             if current_controller in new_player_planet_cards:
                 new_player_planet_cards[current_controller] = [
-                    card for card in new_player_planet_cards[current_controller]
+                    card
+                    for card in new_player_planet_cards[current_controller]
                     if card.name != planet_card.name
                 ]
             if player_id not in new_player_planet_cards:
@@ -1121,7 +1136,8 @@ class GameState:
                     new_planet_card_deck[card.name] = card
                     break
             new_player_planet_cards[player_id] = [
-                card for card in new_player_planet_cards[player_id]
+                card
+                for card in new_player_planet_cards[player_id]
                 if card.name != planet.name
             ]
 
@@ -1149,10 +1165,6 @@ class GameState:
             name=planet.name,
             resources=planet.resources,
             influence=planet.influence,
-            planet_type=planet.planet_type,
-            tech_specialty=planet.tech_specialty,
-            legendary=planet.legendary,
-            exhausted=False
         )
 
     def get_player_planet_cards(self, player_id: str) -> list[PlanetCard]:
@@ -1196,31 +1208,6 @@ class GameState:
             True if player has control token on planet
         """
         return player_id in self.planet_control_tokens.get(planet.name, set())
-
-    def _get_or_create_planet_card(self, planet: Planet) -> PlanetCard:
-        """Get or create a planet card for the given planet.
-
-        Args:
-            planet: The planet
-
-        Returns:
-            The corresponding planet card
-        """
-        # Check if card exists in deck
-        if planet.name in self.planet_card_deck:
-            return self.planet_card_deck[planet.name]
-
-        # Check if card exists in any player's play area
-        for player_cards in self.player_planet_cards.values():
-            for card in player_cards:
-                if card.name == planet.name:
-                    return card
-
-        # Create new card if it doesn't exist
-        from .planet_card import PlanetCard as PlanetCardClass
-
-        planet_card = PlanetCardClass(planet.name, planet.resources, planet.influence)
-        return planet_card
 
     def _transfer_planet_card_from_deck(
         self, player_id: str, planet_card: PlanetCard

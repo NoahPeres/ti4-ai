@@ -52,7 +52,7 @@ RELATED TOPICS: Agenda Card, Control, Ground Forces, Production, Promissory Note
 - **Status:** IMPLEMENTED
 - **Description:** Three-condition check for elimination (no ground forces, no production units, no planets)
 - **Implementation:** `should_eliminate_player` method in GameState checks all three conditions
-- **Test Cases:** 
+- **Test Cases:**
   - `test_player_not_eliminated_with_ground_forces` - verifies ground forces prevent elimination
   - `test_player_not_eliminated_with_production_units` - verifies production units prevent elimination
   - `test_player_not_eliminated_with_controlled_planet` - verifies planet control prevents elimination
@@ -75,7 +75,7 @@ RELATED TOPICS: Agenda Card, Control, Ground Forces, Production, Promissory Note
 - **Status:** IMPLEMENTED
 - **Description:** Return other players' promissory notes to their owners
 - **Implementation:** Integrated `PromissoryNoteManager.handle_player_elimination` into `GameState.eliminate_player` method
-- **Test Cases:** 
+- **Test Cases:**
   - `test_promissory_notes_returned_on_elimination` - verifies promissory notes are properly handled on elimination
   - `test_promissory_notes_removed_from_available_pool` - verifies eliminated player's notes removed from available pool
   - `test_elimination_with_no_promissory_notes` - verifies elimination works when no promissory notes involved
@@ -84,7 +84,7 @@ RELATED TOPICS: Agenda Card, Control, Ground Forces, Production, Promissory Note
 - **Status:** IMPLEMENTED
 - **Description:** Discard all action cards in hand
 - **Implementation:** `eliminate_player` method in GameState adds eliminated player's action cards to discard pile and removes them from player's hand
-- **Test Cases:** 
+- **Test Cases:**
   - `test_action_cards_discarded_on_elimination` - verifies action cards are discarded when player eliminated
   - `test_elimination_with_no_action_cards` - verifies elimination works when player has no action cards
   - `test_elimination_does_not_affect_other_players_action_cards` - verifies other players' action cards unaffected
