@@ -236,7 +236,7 @@ class Player:
         from .unit import Unit
 
         # Rule 30.1: Check if unit type has deploy ability
-        temp_unit = Unit(unit_type=unit_type, owner=self.id)
+        temp_unit = Unit(unit_type=unit_type, owner=self.id, faction=self.faction)
         if not temp_unit.has_deploy():
             raise DeployError(f"Unit {unit_type.value} does not have deploy ability")
 
@@ -256,10 +256,19 @@ class Player:
         has_deployable_units = False
         for unit_type_in_pool in pool.get_all_unit_counts():
             if pool.get_unit_count(unit_type_in_pool) > 0:
-                temp_check_unit = Unit(unit_type=unit_type_in_pool, owner=self.id)
-                if temp_check_unit.has_deploy():
-                    has_deployable_units = True
-                    break
+                # Reuse the temp_unit for capability check instead of creating new instances
+                if unit_type_in_pool == unit_type:
+                    # We already have the temp_unit for this type
+                    if temp_unit.has_deploy():
+                        has_deployable_units = True
+                        break
+                else:
+                    temp_check_unit = Unit(
+                        unit_type=unit_type_in_pool, owner=self.id, faction=self.faction
+                    )
+                    if temp_check_unit.has_deploy():
+                        has_deployable_units = True
+                        break
 
         if not has_deployable_units:
             raise ReinforcementError(
@@ -299,7 +308,9 @@ class Player:
 
         # Create and place the unit
         try:
-            unit_to_deploy = Unit(unit_type=unit_type, owner=self.id)
+            unit_to_deploy = Unit(
+                unit_type=unit_type, owner=self.id, faction=self.faction
+            )
             target_planet_obj.place_unit(unit_to_deploy)
         except Exception:
             # If placement fails, restore the unit to reinforcements using proper API

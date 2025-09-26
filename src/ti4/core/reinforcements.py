@@ -187,7 +187,15 @@ class Reinforcements:
             unit_type: The type of unit to get
 
         Returns:
-            Immutable tuple of available units (minimal implementation)
+            Immutable tuple of available units
+
+        Note:
+            This is currently a stub implementation that returns an empty tuple.
+            In a full implementation, this would return actual Unit instances
+            from the reinforcement pools. The current design uses count-based
+            tracking rather than maintaining actual Unit objects in pools.
         """
-        # Minimal implementation - return empty tuple for now
+        # TODO: Implement proper unit retrieval from reinforcement pools
+        # Current architecture uses count-based tracking, so this method
+        # would need to instantiate Unit objects based on pool counts
         return ()

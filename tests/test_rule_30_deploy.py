@@ -10,7 +10,7 @@ Deploy abilities allow units to be placed on the game board without producing th
 
 import pytest
 
-from src.ti4.core.constants import UnitType
+from src.ti4.core.constants import Faction, UnitType
 from src.ti4.core.exceptions import DeployError, ReinforcementError
 from src.ti4.core.planet import Planet
 from src.ti4.core.player import Player
@@ -24,7 +24,7 @@ class TestRule30DeployAbilities:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
-        self.player = Player(id="player1", faction=None)
+        self.player = Player(id="player1", faction=Faction.SOL)
         self.system = System(system_id="test_system")
         self.planet = Planet(name="test_planet", resources=2, influence=1)
         self.system.add_planet(self.planet)
