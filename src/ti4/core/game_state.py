@@ -1208,10 +1208,10 @@ class GameState:
         # Determine if this triggers exploration (Rule 25.1c)
         was_uncontrolled = current_controller is None
 
-        # Get or create planet card
-        planet_card = self._get_or_create_planet_card(planet)
-
-        # Rule 25.1: Planet card is exhausted when gained
+        # Get or create source card (do not mutate current state)
+        source_card = self._get_or_create_planet_card(planet)
+        # Rule 25.1: Planet card is exhausted when gained (operate on a clone)
+        planet_card = source_card.clone_for_state(self)
         if not planet_card.is_exhausted():
             planet_card.exhaust()
 

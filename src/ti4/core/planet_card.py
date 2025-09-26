@@ -116,9 +116,9 @@ class PlanetCard:
 
         # Add attachment token to game board (Rule 12.3)
         if self._game_state is not None and hasattr(card, "token_id"):
-            if self.name not in self._game_state.planet_attachment_tokens:
-                self._game_state.planet_attachment_tokens[self.name] = set()
-            self._game_state.planet_attachment_tokens[self.name].add(card.token_id)
+            self._game_state.planet_attachment_tokens.setdefault(self.name, set()).add(
+                card.token_id
+            )
 
     def detach_card(self, card: Any) -> None:
         """Detach a card from this planet card."""
@@ -129,12 +129,10 @@ class PlanetCard:
 
         # Remove attachment token from game board (Rule 12.3)
         if self._game_state is not None and hasattr(card, "token_id"):
-            if self.name in self._game_state.planet_attachment_tokens:
-                self._game_state.planet_attachment_tokens[self.name].discard(
-                    card.token_id
-                )
-                # Clean up empty sets
-                if not self._game_state.planet_attachment_tokens[self.name]:
+            tokens = self._game_state.planet_attachment_tokens.get(self.name)
+            if tokens is not None:
+                tokens.discard(card.token_id)
+                if not tokens:
                     del self._game_state.planet_attachment_tokens[self.name]
 
     def get_attached_cards(self) -> list[Any]:

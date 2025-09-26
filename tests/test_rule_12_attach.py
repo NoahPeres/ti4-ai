@@ -405,3 +405,36 @@ class TestRule12Attach:
         attached_cards = final_planet_card.get_attached_cards()
         assert len(attached_cards) == 1
         assert attached_cards[0].name == "Test Attachment"
+
+    def test_attach_card_rejects_duplicates(self) -> None:
+        """Test that attaching the same card twice raises ValueError."""
+        planet_card = PlanetCard(
+            name="test_planet",
+            resources=2,
+            influence=1,
+            game_state=self.game_state,
+        )
+        attachment = Mock()
+        attachment.name = "Test Attachment"
+
+        # First attachment should succeed
+        planet_card.attach_card(attachment)
+
+        # Second attachment of same card should raise ValueError
+        with pytest.raises(ValueError):
+            planet_card.attach_card(attachment)
+
+    def test_detach_card_requires_existing_attachment(self) -> None:
+        """Test that detaching a non-attached card raises ValueError."""
+        planet_card = PlanetCard(
+            name="test_planet",
+            resources=2,
+            influence=1,
+            game_state=self.game_state,
+        )
+        attachment = Mock()
+        attachment.name = "Test Attachment"
+
+        # Detaching a card that was never attached should raise ValueError
+        with pytest.raises(ValueError):
+            planet_card.detach_card(attachment)
