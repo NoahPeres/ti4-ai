@@ -232,7 +232,6 @@ class Player:
             DeployError: If deployment conditions are not met
             ReinforcementError: If no units available in reinforcements
         """
-        from .reinforcements import Reinforcements
         from .unit import Unit
 
         # Rule 30.1: Check if unit type has deploy ability
@@ -249,7 +248,7 @@ class Player:
 
         # Rule 30.2: Check reinforcements for available units
         if reinforcements is None:
-            reinforcements = Reinforcements()
+            raise ReinforcementError("Reinforcements pool is required for deployment")
         pool = reinforcements.get_pool(self.id)
 
         # Rule 30.2.a: Check if there are any units with deploy ability in reinforcements

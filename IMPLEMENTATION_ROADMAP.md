@@ -58,9 +58,9 @@ Core Game Mechanics
 
 ## 📊 Implementation Status Summary
 
-### ✅ Completed Rules (32/101)
+### ✅ Completed Rules (37/101)
 
-**Foundation Layer (14/101)**
+#### Foundation Layer (14/101)
 - Rule 6: ADJACENCY - Spatial relationships and system connections
 - Rule 13: ATTACKER - Combat role definition and assignment
 - Rule 14: BLOCKADED - Production restrictions and space dock blockades
@@ -76,7 +76,7 @@ Core Game Mechanics
 - Rule 87: SUSTAIN DAMAGE - Unit damage mechanics ✅ VERIFIED
 - Rule 101: WORMHOLES - Special adjacency mechanics for wormhole systems ✅ VERIFIED
 
-#### Core Game Layer (17/101)
+#### Core Game Layer (19/101)
 - Rule 1: ABILITIES - Core ability system with timing windows and precedence
 - Rule 2: ACTION CARDS - Action card system with timing and component actions
 - Rule 3: ACTION PHASE - Action phase mechanics with pass state tracking
@@ -341,4 +341,4 @@ The following rules require implementation to achieve full TI4 compliance:
 
 ---
 
-This roadmap provides a clear, strategic path from our current 33.7% coverage to full 101 rule implementation, prioritizing combat completion, political systems, and advanced mechanics in logical dependency order.
+This roadmap provides a clear, strategic path from our current 36.6% coverage to full 101 rule implementation, prioritizing combat completion, political systems, and advanced mechanics in logical dependency order.

@@ -189,13 +189,11 @@ class Reinforcements:
         Returns:
             Immutable tuple of available units
 
-        Note:
-            This is currently a stub implementation that returns an empty tuple.
-            In a full implementation, this would return actual Unit instances
-            from the reinforcement pools. The current design uses count-based
-            tracking rather than maintaining actual Unit objects in pools.
+        Raises:
+            NotImplementedError: This method is not yet implemented
         """
-        # TODO: Implement proper unit retrieval from reinforcement pools
-        # Current architecture uses count-based tracking, so this method
-        # would need to instantiate Unit objects based on pool counts
-        return ()
+        raise NotImplementedError(
+            "get_available_units is not yet implemented. "
+            "Current architecture uses count-based tracking via get_unit_count() "
+            "rather than maintaining actual Unit objects in pools."
+        )
