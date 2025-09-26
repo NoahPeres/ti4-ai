@@ -4,7 +4,7 @@ This module tests the base strategy card implementation that follows the
 TechnologyStrategyCard pattern for all 8 strategy cards.
 """
 
-from src.ti4.core.strategic_action import StrategyCardType
+from ti4.core.strategic_action import StrategyCardType
 
 
 class TestBaseStrategyCardPattern:
@@ -16,7 +16,7 @@ class TestBaseStrategyCardPattern:
         Requirements: 5.1 - Primary and secondary ability framework
         """
         # RED: This will fail until we create BaseStrategyCard
-        from src.ti4.core.base_strategy_card import BaseStrategyCard
+        from ti4.core.base_strategy_card import BaseStrategyCard
 
         # Create a concrete implementation for testing
         class TestStrategyCard(BaseStrategyCard):
@@ -32,14 +32,14 @@ class TestBaseStrategyCardPattern:
             def execute_primary_ability(
                 self, player_id: str, game_state=None, **kwargs
             ):
-                from src.ti4.core.base_strategy_card import StrategyCardAbilityResult
+                from ti4.core.base_strategy_card import StrategyCardAbilityResult
 
                 return StrategyCardAbilityResult(success=True, player_id=player_id)
 
             def execute_secondary_ability(
                 self, player_id: str, game_state=None, **kwargs
             ):
-                from src.ti4.core.base_strategy_card import StrategyCardAbilityResult
+                from ti4.core.base_strategy_card import StrategyCardAbilityResult
 
                 return StrategyCardAbilityResult(success=True, player_id=player_id)
 
@@ -51,7 +51,7 @@ class TestBaseStrategyCardPattern:
 
         Requirements: 5.1, 6.1 - Framework compatibility with strategic action resolution
         """
-        from src.ti4.core.base_strategy_card import BaseStrategyCard
+        from ti4.core.base_strategy_card import BaseStrategyCard
 
         # Should have abstract methods that concrete cards must implement
         assert hasattr(BaseStrategyCard, "get_card_type")
@@ -64,7 +64,7 @@ class TestBaseStrategyCardPattern:
 
         Requirements: 6.3 - Compatibility with existing strategic action resolution
         """
-        from src.ti4.core.base_strategy_card import BaseStrategyCard
+        from ti4.core.base_strategy_card import BaseStrategyCard
 
         # Create a concrete implementation
         class TestStrategyCard(BaseStrategyCard):
@@ -80,14 +80,14 @@ class TestBaseStrategyCardPattern:
             def execute_primary_ability(
                 self, player_id: str, game_state=None, **kwargs
             ):
-                from src.ti4.core.base_strategy_card import StrategyCardAbilityResult
+                from ti4.core.base_strategy_card import StrategyCardAbilityResult
 
                 return StrategyCardAbilityResult(success=True, player_id=player_id)
 
             def execute_secondary_ability(
                 self, player_id: str, game_state=None, **kwargs
             ):
-                from src.ti4.core.base_strategy_card import StrategyCardAbilityResult
+                from ti4.core.base_strategy_card import StrategyCardAbilityResult
 
                 return StrategyCardAbilityResult(success=True, player_id=player_id)
 
@@ -111,7 +111,7 @@ class TestStrategyCardRegistry:
         Requirements: 5.7 - Strategy card registry system for all 8 cards
         """
         # RED: This will fail until we create the registry
-        from src.ti4.core.strategy_card_registry import StrategyCardRegistry
+        from ti4.core.strategy_card_registry import StrategyCardRegistry
 
         registry = StrategyCardRegistry()
         assert registry is not None
@@ -121,7 +121,7 @@ class TestStrategyCardRegistry:
 
         Requirements: 5.7 - Registry system for all 8 cards
         """
-        from src.ti4.core.strategy_card_registry import StrategyCardRegistry
+        from ti4.core.strategy_card_registry import StrategyCardRegistry
 
         registry = StrategyCardRegistry()
 
@@ -139,7 +139,7 @@ class TestStrategyCardRegistry:
 
         Requirements: 5.7 - Registry system for card access
         """
-        from src.ti4.core.strategy_card_registry import StrategyCardRegistry
+        from ti4.core.strategy_card_registry import StrategyCardRegistry
 
         registry = StrategyCardRegistry()
 
@@ -164,7 +164,7 @@ class TestIndividualStrategyCards:
         Requirements: 5.1 - Individual strategy card implementations
         """
         # RED: This will fail until we create LeadershipStrategyCard
-        from src.ti4.core.leadership_strategy_card import LeadershipStrategyCard
+        from ti4.core.leadership_strategy_card import LeadershipStrategyCard
 
         card = LeadershipStrategyCard()
         assert card is not None
@@ -177,7 +177,7 @@ class TestIndividualStrategyCards:
         Requirements: 5.1 - Individual strategy card implementations
         """
         # RED: This will fail until we create DiplomacyStrategyCard
-        from src.ti4.core.diplomacy_strategy_card import DiplomacyStrategyCard
+        from ti4.core.diplomacy_strategy_card import DiplomacyStrategyCard
 
         card = DiplomacyStrategyCard()
         assert card is not None
@@ -189,7 +189,7 @@ class TestIndividualStrategyCards:
 
         Requirements: 5.1 - Correct initiative values for all cards
         """
-        from src.ti4.core.strategy_card_registry import StrategyCardRegistry
+        from ti4.core.strategy_card_registry import StrategyCardRegistry
 
         registry = StrategyCardRegistry()
 

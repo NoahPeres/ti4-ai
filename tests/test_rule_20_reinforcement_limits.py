@@ -1,7 +1,7 @@
 """Test Rule 20.3: Reinforcement limits for command tokens."""
 
-from src.ti4.core.constants import Faction
-from src.ti4.core.player import Player
+from ti4.core.constants import Faction
+from ti4.core.player import Player
 
 
 class TestRule20ReinforcementLimits:

@@ -14,13 +14,13 @@ clockwise, may spend one command token from their strategy pool to ready up to t
 planets they control.
 """
 
-from src.ti4.core.constants import Faction
-from src.ti4.core.galaxy import Galaxy
-from src.ti4.core.game_state import GameState
-from src.ti4.core.planet import Planet
-from src.ti4.core.player import Player
-from src.ti4.core.strategy_cards.cards.diplomacy import DiplomacyStrategyCard
-from src.ti4.core.system import System
+from ti4.core.constants import Faction
+from ti4.core.galaxy import Galaxy
+from ti4.core.game_state import GameState
+from ti4.core.planet import Planet
+from ti4.core.player import Player
+from ti4.core.strategy_cards.cards.diplomacy import DiplomacyStrategyCard
+from ti4.core.system import System
 
 
 class TestRule32DiplomacyPrimaryAbility:
@@ -157,7 +157,7 @@ class TestRule32DiplomacySecondaryAbility:
         pool to ready up to two exhausted planets they control.
         """
         # Create player with exhausted planets and strategy pool tokens
-        from src.ti4.core.command_sheet import CommandSheet
+        from ti4.core.command_sheet import CommandSheet
 
         command_sheet = CommandSheet(strategy_pool=3)
         player1 = Player("player1", Faction.ARBOREC, command_sheet=command_sheet)
@@ -206,7 +206,7 @@ class TestRule32DiplomacySecondaryAbility:
     def test_diplomacy_secondary_ability_requires_strategy_token(self):
         """Test that secondary ability requires a command token in strategy pool."""
         # Create player with no strategy pool tokens
-        from src.ti4.core.command_sheet import CommandSheet
+        from ti4.core.command_sheet import CommandSheet
 
         command_sheet = CommandSheet(strategy_pool=0)
         player1 = Player("player1", Faction.ARBOREC, command_sheet=command_sheet)
@@ -235,7 +235,7 @@ class TestRule32DiplomacySecondaryAbility:
 
     def test_diplomacy_secondary_ability_max_two_planets(self):
         """Test that secondary ability can ready at most two planets."""
-        from src.ti4.core.command_sheet import CommandSheet
+        from ti4.core.command_sheet import CommandSheet
 
         command_sheet = CommandSheet(strategy_pool=3)
         player1 = Player("player1", Faction.ARBOREC, command_sheet=command_sheet)
@@ -268,7 +268,7 @@ class TestRule32DiplomacySecondaryAbility:
 
     def test_diplomacy_secondary_ability_only_controlled_planets(self):
         """Test that secondary ability only readies planets controlled by the player."""
-        from src.ti4.core.command_sheet import CommandSheet
+        from ti4.core.command_sheet import CommandSheet
 
         command_sheet1 = CommandSheet(strategy_pool=3)
         command_sheet2 = CommandSheet(strategy_pool=3)
@@ -304,7 +304,7 @@ class TestRule32DiplomacySecondaryAbility:
         LRR Reference: Rule 32.2 - "chooses a system that contains a planet they control
         other than the Mecatol Rex system"
         """
-        from src.ti4.core.system_factory import SystemFactory
+        from ti4.core.system_factory import SystemFactory
 
         # Create player with command tokens
         player1 = Player("player1", Faction.ARBOREC, reinforcements=8)
@@ -339,7 +339,7 @@ class TestRule32DiplomacySecondaryAbility:
         Only exhausted planets can be readied.
         """
         # Create players with command tokens
-        from src.ti4.core.command_sheet import CommandSheet
+        from ti4.core.command_sheet import CommandSheet
 
         command_sheet = CommandSheet(strategy_pool=2)
         player1 = Player("player1", Faction.ARBOREC, command_sheet=command_sheet)
@@ -376,7 +376,7 @@ class TestRule32DiplomacyCardProperties:
         """Test that Diplomacy card returns correct type."""
         diplomacy_card = DiplomacyStrategyCard()
 
-        from src.ti4.core.strategy_cards.strategic_action import StrategyCardType
+        from ti4.core.strategy_cards.strategic_action import StrategyCardType
 
         assert diplomacy_card.get_card_type() == StrategyCardType.DIPLOMACY
 

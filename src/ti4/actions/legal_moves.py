@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from src.ti4.actions.action import PlayerDecision
-from src.ti4.actions.strategy_card_actions import (
+from ti4.actions.action import PlayerDecision
+from ti4.actions.strategy_card_actions import (
     SecondaryAbilityDecision,
     StrategyCardActivationDecision,
     StrategyCardSelectionDecision,

@@ -6,9 +6,9 @@ Requirements: 9.1, 9.2, 9.3, 9.4, 9.5
 
 import pytest
 
-from src.ti4.core.exceptions import StrategyCardStateError
-from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
-from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+from ti4.core.exceptions import StrategyCardStateError
+from ti4.core.strategic_action import StrategicActionManager, StrategyCardType
+from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
 
 class TestRule83ErrorHandlingValidation:

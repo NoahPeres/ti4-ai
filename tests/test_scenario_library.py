@@ -1,8 +1,8 @@
 """Tests for comprehensive scenario library."""
 
-from src.ti4.core.constants import Faction, UnitType
-from src.ti4.core.game_phase import GamePhase
-from src.ti4.testing.scenario_builder import GameScenarioBuilder
+from ti4.core.constants import Faction, UnitType
+from ti4.core.game_phase import GamePhase
+from ti4.testing.scenario_builder import GameScenarioBuilder
 
 
 class TestScenarioLibrary:

@@ -4,8 +4,8 @@ from typing import Any
 
 import pytest
 
-from src.ti4.actions.action import Action
-from src.ti4.actions.validation import (
+from ti4.actions.action import Action
+from ti4.actions.validation import (
     PreconditionValidationError,
     RuleValidationError,
     SyntaxValidationError,

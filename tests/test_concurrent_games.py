@@ -6,8 +6,8 @@ from concurrent.futures import as_completed
 
 import pytest
 
-from src.ti4.core.game_state import GameState
-from src.ti4.performance.concurrent import (
+from ti4.core.game_state import GameState
+from ti4.performance.concurrent import (
     ConcurrentGameManager,
     ThreadSafeGameStateCache,
     get_game_manager,

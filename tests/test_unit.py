@@ -2,8 +2,8 @@
 
 import pytest
 
-from src.ti4.core.constants import UnitType
-from src.ti4.core.unit import Unit
+from ti4.core.constants import UnitType
+from ti4.core.unit import Unit
 
 
 class TestUnit:

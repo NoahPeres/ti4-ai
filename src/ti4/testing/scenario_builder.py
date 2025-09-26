@@ -2,13 +2,13 @@
 
 from typing import Any, Optional
 
-from src.ti4.core.constants import Faction, LocationType, UnitType
-from src.ti4.core.galaxy import Galaxy
-from src.ti4.core.game_phase import GamePhase
-from src.ti4.core.game_state import GameState
-from src.ti4.core.player import Player
-from src.ti4.core.system import System
-from src.ti4.core.unit import Unit
+from ti4.core.constants import Faction, LocationType, UnitType
+from ti4.core.galaxy import Galaxy
+from ti4.core.game_phase import GamePhase
+from ti4.core.game_state import GameState
+from ti4.core.player import Player
+from ti4.core.system import System
+from ti4.core.unit import Unit
 
 
 def _is_space_location(location: str) -> bool:

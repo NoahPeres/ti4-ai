@@ -5,9 +5,9 @@ This module tests the integration between Rule 90 TechnologyManager and the game
 
 import pytest
 
-from src.ti4.actions.research_technology import ResearchTechnologyAction
-from src.ti4.core.constants import Faction, Technology
-from src.ti4.core.game_technology_manager import GameTechnologyManager
+from ti4.actions.research_technology import ResearchTechnologyAction
+from ti4.core.constants import Faction, Technology
+from ti4.core.game_technology_manager import GameTechnologyManager
 
 
 class MockPlayerState:

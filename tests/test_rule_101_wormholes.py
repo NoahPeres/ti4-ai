@@ -2,9 +2,9 @@
 
 import pytest
 
-from src.ti4.core.galaxy import Galaxy
-from src.ti4.core.hex_coordinate import HexCoordinate
-from src.ti4.core.system import System
+from ti4.core.galaxy import Galaxy
+from ti4.core.hex_coordinate import HexCoordinate
+from ti4.core.system import System
 
 
 class TestRule101Wormholes:

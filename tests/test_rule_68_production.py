@@ -15,14 +15,14 @@ Rule 68 Sub-rules tested:
 - 68.4: Space area production - special placement rules for space-based production
 """
 
-from src.ti4.core.constants import Faction, UnitType
-from src.ti4.core.galaxy import Galaxy
-from src.ti4.core.hex_coordinate import HexCoordinate
-from src.ti4.core.planet import Planet
-from src.ti4.core.production_ability import ProductionAbilityManager
-from src.ti4.core.system import System
-from src.ti4.core.unit import Unit
 from tests.test_constants import MockPlanet, MockPlayer, MockSystem
+from ti4.core.constants import Faction, UnitType
+from ti4.core.galaxy import Galaxy
+from ti4.core.hex_coordinate import HexCoordinate
+from ti4.core.planet import Planet
+from ti4.core.production_ability import ProductionAbilityManager
+from ti4.core.system import System
+from ti4.core.unit import Unit
 
 
 class TestRule68ProductionAbilityBasics:
@@ -697,7 +697,7 @@ class TestRule68ProductionIntegration:
 
         This ensures production is affected by blockades (Rule 14).
         """
-        from src.ti4.core.blockade import BlockadeManager
+        from ti4.core.blockade import BlockadeManager
 
         production_manager = ProductionAbilityManager()
 

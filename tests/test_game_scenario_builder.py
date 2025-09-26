@@ -2,9 +2,9 @@
 
 import pytest
 
-from src.ti4.core.constants import Faction, Technology, UnitType
-from src.ti4.core.game_phase import GamePhase
-from src.ti4.testing.scenario_builder import GameScenarioBuilder
+from ti4.core.constants import Faction, Technology, UnitType
+from ti4.core.game_phase import GamePhase
+from ti4.testing.scenario_builder import GameScenarioBuilder
 
 
 def test_game_scenario_builder_creation() -> None:

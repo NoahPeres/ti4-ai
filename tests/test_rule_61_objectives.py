@@ -2,12 +2,12 @@
 
 import pytest
 
-from src.ti4.core.constants import Faction
-from src.ti4.core.game_phase import GamePhase
-from src.ti4.core.game_state import GameState
-from src.ti4.core.game_state_machine import GameStateMachine
-from src.ti4.core.objective import Objective
-from src.ti4.core.player import Player
+from ti4.core.constants import Faction
+from ti4.core.game_phase import GamePhase
+from ti4.core.game_state import GameState
+from ti4.core.game_state_machine import GameStateMachine
+from ti4.core.objective import Objective
+from ti4.core.player import Player
 
 from .test_rule_61_test_helpers import (
     ObjectiveTestHelpers,
@@ -220,8 +220,8 @@ class TestObjectiveScoringMechanics:
 
     def test_score_objective_awards_victory_points(self) -> None:
         """Test that scoring an objective awards the correct victory points."""
-        from src.ti4.core.constants import Faction
-        from src.ti4.core.player import Player
+        from ti4.core.constants import Faction
+        from ti4.core.player import Player
 
         game_state = GameState().add_player(Player("player1", Faction.SOL))
 
@@ -240,8 +240,8 @@ class TestObjectiveScoringMechanics:
 
     def test_multiple_players_can_score_same_public_objective(self) -> None:
         """Test that multiple players can score the same public objective."""
-        from src.ti4.core.constants import Faction
-        from src.ti4.core.player import Player
+        from ti4.core.constants import Faction
+        from ti4.core.player import Player
 
         game_state = (
             GameState()

@@ -12,8 +12,8 @@ Rule 17 Sub-rules tested:
 - 17.6: Blockade capture restriction
 """
 
-from src.ti4.core.constants import UnitType
-from src.ti4.core.unit import Unit
+from ti4.core.constants import UnitType
+from ti4.core.unit import Unit
 
 
 class TestRule17CaptureBasics:
@@ -27,7 +27,7 @@ class TestRule17CaptureBasics:
         LRR Reference: Rule 17.0 - Core capture concept
         """
         # This will fail initially - RED phase
-        from src.ti4.core.capture import CaptureManager
+        from ti4.core.capture import CaptureManager
 
         capture_manager = CaptureManager()
         assert capture_manager is not None
@@ -42,7 +42,7 @@ class TestRule17NonFighterCapture:
         LRR Reference: Rule 17.1 - "If a player captures a non-fighter ship or mech,
         they place it on their faction sheet."
         """
-        from src.ti4.core.capture import CaptureManager
+        from ti4.core.capture import CaptureManager
 
         # Create a cruiser owned by player1
         cruiser = Unit(unit_type=UnitType.CRUISER, owner="player1")
@@ -65,7 +65,7 @@ class TestRule17NonFighterCapture:
 
         LRR Reference: Rule 17.1 - Non-fighter ships and mechs go to faction sheet
         """
-        from src.ti4.core.capture import CaptureManager
+        from ti4.core.capture import CaptureManager
 
         # Create a mech owned by player1
         mech = Unit(unit_type=UnitType.MECH, owner="player1")
@@ -92,7 +92,7 @@ class TestRule17FighterInfantryCapture:
         faction sheet; the capturing player places a fighter or infantry token
         from the supply on their faction sheet instead."
         """
-        from src.ti4.core.capture import CaptureManager
+        from ti4.core.capture import CaptureManager
 
         # Create a fighter owned by player1
         fighter = Unit(unit_type=UnitType.FIGHTER, owner="player1")
@@ -118,7 +118,7 @@ class TestRule17FighterInfantryCapture:
 
         LRR Reference: Rule 17.3 - Infantry capture creates tokens like fighters
         """
-        from src.ti4.core.capture import CaptureManager
+        from ti4.core.capture import CaptureManager
 
         # Create infantry owned by player1
         infantry = Unit(unit_type=UnitType.INFANTRY, owner="player1")
@@ -149,7 +149,7 @@ class TestRule17UnitReturn:
         LRR Reference: Rule 17.1 - "When such a unit is returned, it is placed
         into the reinforcements of the original owner."
         """
-        from src.ti4.core.capture import CaptureManager
+        from ti4.core.capture import CaptureManager
 
         # Create and capture a cruiser
         cruiser = Unit(unit_type=UnitType.CRUISER, owner="player1")
@@ -176,7 +176,7 @@ class TestRule17ProductionRestriction:
         LRR Reference: Rule 17.5 - "While a unit is captured, it cannot be
         produced or placed by its original owner until it is returned."
         """
-        from src.ti4.core.capture import CaptureManager
+        from ti4.core.capture import CaptureManager
 
         # Create and capture a cruiser
         cruiser = Unit(unit_type=UnitType.CRUISER, owner="player1")
@@ -195,7 +195,7 @@ class TestRule17ProductionRestriction:
 
         LRR Reference: Rule 17.5 - Units can be produced again after return
         """
-        from src.ti4.core.capture import CaptureManager
+        from ti4.core.capture import CaptureManager
 
         # Create, capture, and return a cruiser
         cruiser = Unit(unit_type=UnitType.CRUISER, owner="player1")
@@ -217,7 +217,7 @@ class TestRule17BlockadeRestriction:
         is being blockaded, that player cannot capture units from the
         blockading players."
         """
-        from src.ti4.core.capture import CaptureManager
+        from ti4.core.capture import CaptureManager
 
         # Create capture manager with blockade state
         capture_manager = CaptureManager()
@@ -241,7 +241,7 @@ class TestRule17BlockadeRestriction:
 
         LRR Reference: Rule 17.6 - Restriction only applies to blockaded players
         """
-        from src.ti4.core.capture import CaptureManager
+        from ti4.core.capture import CaptureManager
 
         # Create capture manager
         capture_manager = CaptureManager()
@@ -267,7 +267,7 @@ class TestRule17TokenReturn:
         LRR Reference: Rule 17.4c - "When a captured fighter or infantry is
         returned, it is placed in the supply."
         """
-        from src.ti4.core.capture import CaptureManager
+        from ti4.core.capture import CaptureManager
 
         # Create and capture a fighter
         fighter = Unit(unit_type=UnitType.FIGHTER, owner="player1")
@@ -295,7 +295,7 @@ class TestRule17TokenReturn:
 
         LRR Reference: Rule 17.4c - Infantry tokens returned to supply like fighters
         """
-        from src.ti4.core.capture import CaptureManager
+        from ti4.core.capture import CaptureManager
 
         # Create and capture infantry
         infantry = Unit(unit_type=UnitType.INFANTRY, owner="player1")

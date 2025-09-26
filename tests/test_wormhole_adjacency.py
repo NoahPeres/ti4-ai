@@ -1,8 +1,8 @@
 """Tests for wormhole adjacency mechanics based on LRR Rule 6.1."""
 
-from src.ti4.core.galaxy import Galaxy
-from src.ti4.core.hex_coordinate import HexCoordinate
-from src.ti4.core.system import System
+from ti4.core.galaxy import Galaxy
+from ti4.core.hex_coordinate import HexCoordinate
+from ti4.core.system import System
 
 
 class TestWormholeAdjacency:

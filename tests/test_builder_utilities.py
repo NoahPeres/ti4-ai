@@ -1,9 +1,9 @@
 """Tests for builder utilities and test patterns."""
 
-from src.ti4.core.constants import UnitType
-from src.ti4.core.game_phase import GamePhase
-from src.ti4.testing.scenario_builder import GameScenarioBuilder
-from src.ti4.testing.test_utilities import TestUtilities
+from ti4.core.constants import UnitType
+from ti4.core.game_phase import GamePhase
+from ti4.testing.scenario_builder import GameScenarioBuilder
+from ti4.testing.test_utilities import TestUtilities
 
 
 def test_early_game_scenario() -> None:

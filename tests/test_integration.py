@@ -2,16 +2,16 @@
 
 from typing import Any, Optional
 
-from src.ti4.core.combat import CombatDetector
-from src.ti4.core.constants import Faction, Technology, UnitType
-from src.ti4.core.fleet import Fleet, FleetCapacityValidator
-from src.ti4.core.galaxy import Galaxy
-from src.ti4.core.hex_coordinate import HexCoordinate
-from src.ti4.core.movement import MovementOperation, MovementValidator
-from src.ti4.core.player import Player
-from src.ti4.core.system import System
-from src.ti4.core.unit import Unit
-from src.ti4.core.unit_stats import UnitStatsProvider
+from ti4.core.combat import CombatDetector
+from ti4.core.constants import Faction, Technology, UnitType
+from ti4.core.fleet import Fleet, FleetCapacityValidator
+from ti4.core.galaxy import Galaxy
+from ti4.core.hex_coordinate import HexCoordinate
+from ti4.core.movement import MovementOperation, MovementValidator
+from ti4.core.player import Player
+from ti4.core.system import System
+from ti4.core.unit import Unit
+from ti4.core.unit_stats import UnitStatsProvider
 
 
 class TestTI4Integration:

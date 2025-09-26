@@ -2,17 +2,17 @@
 
 from unittest.mock import Mock, patch
 
-from src.ti4.commands.base import GameCommand
-from src.ti4.core.diagnostics import CommandHistoryAnalyzer
-from src.ti4.core.error_recovery import ErrorRecoveryManager
-from src.ti4.core.events import UnitMovedEvent
-from src.ti4.core.observers import (
+from ti4.commands.base import GameCommand
+from ti4.core.diagnostics import CommandHistoryAnalyzer
+from ti4.core.error_recovery import ErrorRecoveryManager
+from ti4.core.events import UnitMovedEvent
+from ti4.core.observers import (
     AITrainingDataCollector,
     LoggingObserver,
     StatisticsCollector,
 )
-from src.ti4.performance.cache import GameStateCache
-from src.ti4.performance.monitoring import GameStateResourceManager
+from ti4.performance.cache import GameStateCache
+from ti4.performance.monitoring import GameStateResourceManager
 
 
 class TestObserverNamingImprovements:
@@ -45,7 +45,7 @@ class TestObserverNamingImprovements:
         event_type = logger._extract_event_type_identifier(mock_event)
         assert event_type == "TestEvent"
 
-    @patch("src.ti4.core.observers.logger")
+    @patch("ti4.core.observers.logger")
     def test_event_logging_with_improved_method(self, mock_logger) -> None:
         """Test that event logging works with the improved method name."""
 
@@ -153,7 +153,7 @@ class TestDiagnosticsNamingImprovements:
 class TestErrorRecoveryNamingImprovements:
     """Test that error recovery method naming improvements work correctly."""
 
-    @patch("src.ti4.core.error_recovery.logging.getLogger")
+    @patch("ti4.core.error_recovery.logging.getLogger")
     def test_error_recovery_logging_with_improved_method(self, mock_get_logger) -> None:
         """Test that error recovery logging works with the improved method name."""
         mock_logger = Mock()

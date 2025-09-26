@@ -2,9 +2,9 @@
 
 from unittest.mock import Mock, patch
 
-from src.ti4.actions.action import PlayerDecision
-from src.ti4.core.game_state import GameState
-from src.ti4.performance.cache import GameStateCache
+from ti4.actions.action import PlayerDecision
+from ti4.core.game_state import GameState
+from ti4.performance.cache import GameStateCache
 
 
 class TestGameStateCache:
@@ -25,7 +25,7 @@ class TestGameStateCache:
         mock_moves = [Mock(spec=PlayerDecision)]
 
         with patch(
-            "src.ti4.actions.legal_moves.LegalMoveGenerator.generate_legal_actions",
+            "ti4.actions.legal_moves.LegalMoveGenerator.generate_legal_actions",
             return_value=mock_moves,
         ) as mock_generator:
             # First call should miss cache and call generator
@@ -47,7 +47,7 @@ class TestGameStateCache:
         mock_moves = [Mock(spec=PlayerDecision)]
 
         with patch(
-            "src.ti4.actions.legal_moves.LegalMoveGenerator.generate_legal_actions",
+            "ti4.actions.legal_moves.LegalMoveGenerator.generate_legal_actions",
             return_value=mock_moves,
         ) as mock_generator:
             # Fill cache
@@ -67,7 +67,7 @@ class TestGameStateCache:
 
         # Mock the galaxy adjacency check
         with patch(
-            "src.ti4.core.galaxy.Galaxy.are_systems_adjacent", return_value=True
+            "ti4.core.galaxy.Galaxy.are_systems_adjacent", return_value=True
         ) as mock_adjacency:
             # First call should miss cache and call adjacency check
             result1 = cache.are_systems_adjacent("system1", "system2")
@@ -113,7 +113,7 @@ class TestGameStateCache:
             return [Mock(spec=PlayerDecision)]
 
         with patch(
-            "src.ti4.actions.legal_moves.LegalMoveGenerator.generate_legal_actions",
+            "ti4.actions.legal_moves.LegalMoveGenerator.generate_legal_actions",
             side_effect=slow_legal_moves,
         ):
             # First call - should be slow

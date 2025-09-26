@@ -17,12 +17,12 @@ from unittest.mock import patch
 
 import pytest
 
-from src.ti4.core.constants import Faction
-from src.ti4.core.game_controller import GameController
-from src.ti4.core.game_phase import GamePhase
-from src.ti4.core.player import Player
-from src.ti4.core.strategic_action import StrategyCardType
-from src.ti4.core.validation import ValidationError
+from ti4.core.constants import Faction
+from ti4.core.game_controller import GameController
+from ti4.core.game_phase import GamePhase
+from ti4.core.player import Player
+from ti4.core.strategic_action import StrategyCardType
+from ti4.core.validation import ValidationError
 
 
 class TestRule03ActionPhase:

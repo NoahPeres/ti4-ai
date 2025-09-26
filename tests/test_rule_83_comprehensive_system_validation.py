@@ -14,24 +14,24 @@ import time
 
 import pytest
 
-from src.ti4.actions.legal_moves import LegalMoveGenerator
-from src.ti4.core.constants import Faction
-from src.ti4.core.construction_strategy_card import ConstructionStrategyCard
-from src.ti4.core.diplomacy_strategy_card import DiplomacyStrategyCard
-from src.ti4.core.game_state import GameState
-from src.ti4.core.imperial_strategy_card import ImperialStrategyCard
-from src.ti4.core.leadership_strategy_card import LeadershipStrategyCard
-from src.ti4.core.player import Player
-from src.ti4.core.politics_strategy_card import PoliticsStrategyCard
-from src.ti4.core.strategic_action import (
+from ti4.actions.legal_moves import LegalMoveGenerator
+from ti4.core.constants import Faction
+from ti4.core.construction_strategy_card import ConstructionStrategyCard
+from ti4.core.diplomacy_strategy_card import DiplomacyStrategyCard
+from ti4.core.game_state import GameState
+from ti4.core.imperial_strategy_card import ImperialStrategyCard
+from ti4.core.leadership_strategy_card import LeadershipStrategyCard
+from ti4.core.player import Player
+from ti4.core.politics_strategy_card import PoliticsStrategyCard
+from ti4.core.strategic_action import (
     StrategicActionManager,
     StrategicActionResult,
 )
-from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
-from src.ti4.core.strategy_card_registry import StrategyCardRegistry
-from src.ti4.core.technology_strategy_card import TechnologyStrategyCard
-from src.ti4.core.trade_strategy_card import TradeStrategyCard
-from src.ti4.core.warfare_strategy_card import WarfareStrategyCard
+from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+from ti4.core.strategy_card_registry import StrategyCardRegistry
+from ti4.core.technology_strategy_card import TechnologyStrategyCard
+from ti4.core.trade_strategy_card import TradeStrategyCard
+from ti4.core.warfare_strategy_card import WarfareStrategyCard
 
 
 class TestRule83SystemRegressionValidation:
@@ -100,8 +100,8 @@ class TestRule83SystemRegressionValidation:
         """Test that new strategy card system doesn't create circular imports."""
         # If we can import all these modules without error, no circular dependencies
         try:
-            from src.ti4.core.strategic_action import StrategicActionManager
-            from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+            from ti4.core.strategic_action import StrategicActionManager
+            from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
             # Should be able to create instances with proper parameters
             manager = StrategicActionManager()

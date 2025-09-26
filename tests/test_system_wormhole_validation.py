@@ -2,7 +2,7 @@
 
 import pytest
 
-from src.ti4.core.system import System
+from ti4.core.system import System
 
 
 class TestSystemWormholeValidation:

@@ -2,11 +2,11 @@
 
 from typing import Any
 
-from src.ti4.actions.action import PlayerDecision
-from src.ti4.actions.legal_moves import LegalMoveGenerator
-from src.ti4.core.constants import Faction
-from src.ti4.core.game_state import GameState
-from src.ti4.core.player import Player
+from ti4.actions.action import PlayerDecision
+from ti4.actions.legal_moves import LegalMoveGenerator
+from ti4.core.constants import Faction
+from ti4.core.game_state import GameState
+from ti4.core.player import Player
 
 
 def test_legal_move_generator_creation() -> None:
@@ -27,7 +27,7 @@ def test_generate_legal_actions_returns_list() -> None:
 
 def test_generate_legal_actions_filters_by_game_phase() -> None:
     """Test that legal actions are filtered by current game phase."""
-    from src.ti4.core.game_phase import GamePhase
+    from ti4.core.game_phase import GamePhase
 
     generator = LegalMoveGenerator()
     state = GameState()

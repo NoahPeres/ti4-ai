@@ -2,13 +2,13 @@
 
 import time
 
-from src.ti4.core.constants import UnitType
-from src.ti4.core.galaxy import Galaxy
-from src.ti4.core.game_state import GameState
-from src.ti4.core.movement import MovementValidator
-from src.ti4.core.player import Player
-from src.ti4.core.unit import Unit
-from src.ti4.core.unit_stats import UnitStatsProvider
+from ti4.core.constants import UnitType
+from ti4.core.galaxy import Galaxy
+from ti4.core.game_state import GameState
+from ti4.core.movement import MovementValidator
+from ti4.core.player import Player
+from ti4.core.unit import Unit
+from ti4.core.unit_stats import UnitStatsProvider
 
 
 class TestPerformanceBenchmarks:
@@ -56,8 +56,8 @@ class TestPerformanceBenchmarks:
         validator = MovementValidator(galaxy)
 
         # Create a large galaxy with many systems
-        from src.ti4.core.hex_coordinate import HexCoordinate
-        from src.ti4.core.system import System
+        from ti4.core.hex_coordinate import HexCoordinate
+        from ti4.core.system import System
 
         systems = []
         for x in range(-5, 6):
@@ -81,7 +81,7 @@ class TestPerformanceBenchmarks:
         # Benchmark movement validation
         start_time = time.time()
 
-        from src.ti4.core.movement import MovementOperation
+        from ti4.core.movement import MovementOperation
 
         for unit, from_system in units:
             # Try to validate movement to adjacent systems
@@ -149,7 +149,7 @@ class TestPerformanceBenchmarks:
         start_time = time.time()
 
         # Create systems and place units
-        from src.ti4.core.system import System
+        from ti4.core.system import System
 
         for player_id in range(4):
             system_id = f"system_{player_id}"

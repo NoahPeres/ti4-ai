@@ -1,8 +1,8 @@
 """Tests for Rule 20: COMMAND TOKENS."""
 
-from src.ti4.core.command_sheet import CommandSheet
-from src.ti4.core.constants import Faction
-from src.ti4.core.player import Player
+from ti4.core.command_sheet import CommandSheet
+from ti4.core.constants import Faction
+from ti4.core.player import Player
 
 
 class TestRule20StartingTokens:

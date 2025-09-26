@@ -1,6 +1,6 @@
 """Tests for PhaseTransitionError."""
 
-from src.ti4.core.game_phase import GamePhase
+from ti4.core.game_phase import GamePhase
 
 
 class TestPhaseTransitionError:
@@ -9,7 +9,7 @@ class TestPhaseTransitionError:
     def test_phase_transition_error_creation(self) -> None:
         """Test PhaseTransitionError creation with phase information."""
         # RED: This will fail because PhaseTransitionError doesn't exist yet
-        from src.ti4.core.exceptions import PhaseTransitionError
+        from ti4.core.exceptions import PhaseTransitionError
 
         from_phase = GamePhase.STRATEGY
         to_phase = GamePhase.AGENDA
@@ -25,7 +25,7 @@ class TestPhaseTransitionError:
     def test_phase_transition_error_with_context(self) -> None:
         """Test PhaseTransitionError creation with additional context."""
         # RED: This will fail because PhaseTransitionError doesn't exist yet
-        from src.ti4.core.exceptions import PhaseTransitionError
+        from ti4.core.exceptions import PhaseTransitionError
 
         from_phase = GamePhase.ACTION
         to_phase = GamePhase.SETUP

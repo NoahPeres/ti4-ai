@@ -8,9 +8,9 @@ LRR Reference: Rule 90 - TECHNOLOGY
 
 import pytest
 
-from src.ti4.core.constants import Technology, UnitType
-from src.ti4.core.technology import TechnologyColor, TechnologyManager
 from tests.test_constants import MockPlayer
+from ti4.core.constants import Technology, UnitType
+from ti4.core.technology import TechnologyColor, TechnologyManager
 
 
 class TestRule90TechnologyBasics:
@@ -203,7 +203,7 @@ class TestRule90FactionTechnologyRestriction:
 
         LRR Reference: Rule 90.11 - A player cannot research a faction technology that does not match their faction
         """
-        from src.ti4.core.constants import Faction
+        from ti4.core.constants import Faction
 
         manager = TechnologyManager()
 
@@ -223,7 +223,7 @@ class TestRule90FactionTechnologyRestriction:
 
         LRR Reference: Rule 90.11 - A player cannot research a faction technology that does not match their faction
         """
-        from src.ti4.core.constants import Faction
+        from ti4.core.constants import Faction
 
         manager = TechnologyManager()
 
@@ -248,7 +248,7 @@ class TestRule90FactionTechnologyRestriction:
 
         LRR Reference: Rule 90.11 - Players can research faction technologies that match their faction
         """
-        from src.ti4.core.constants import Faction
+        from ti4.core.constants import Faction
 
         manager = TechnologyManager()
 
@@ -273,7 +273,7 @@ class TestRule90FactionTechnologyRestriction:
 
         LRR Reference: Rule 90.11 - Faction restriction only applies to faction technologies
         """
-        from src.ti4.core.constants import Faction
+        from ti4.core.constants import Faction
 
         manager = TechnologyManager()
 

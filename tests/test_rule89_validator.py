@@ -11,12 +11,12 @@ Rule 89 defines the 5-step tactical action sequence:
 - 89.5: Production - Resolve production abilities if applicable
 """
 
-from src.ti4.core.constants import UnitType
-from src.ti4.core.galaxy import Galaxy
-from src.ti4.core.hex_coordinate import HexCoordinate
-from src.ti4.core.system import System
-from src.ti4.core.unit import Unit
 from tests.test_constants import MockPlayer, MockSystem
+from ti4.core.constants import UnitType
+from ti4.core.galaxy import Galaxy
+from ti4.core.hex_coordinate import HexCoordinate
+from ti4.core.system import System
+from ti4.core.unit import Unit
 
 
 class TestRule89TacticalActionBasics:
@@ -30,7 +30,7 @@ class TestRule89TacticalActionBasics:
         LRR Reference: Rule 89.0 - Core tactical action concept
         """
         # This will fail initially - RED phase
-        from src.ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.rule89_validator import Rule89Validator
 
         manager = Rule89Validator()
         assert manager is not None
@@ -44,7 +44,7 @@ class TestRule89Step1Activation:
 
         LRR Reference: Rule 89.1 - "activate a system that does not contain one of their command tokens"
         """
-        from src.ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.rule89_validator import Rule89Validator
 
         manager = Rule89Validator()
 
@@ -67,7 +67,7 @@ class TestRule89Step1Activation:
 
         LRR Reference: Rule 89.1 - Cannot activate system with own command token
         """
-        from src.ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.rule89_validator import Rule89Validator
 
         manager = Rule89Validator()
 
@@ -93,8 +93,8 @@ class TestRule89Step1Activation:
 
         LRR Reference: Rule 89.1 - "placing a command token from their tactic pool"
         """
-        from src.ti4.core.command_sheet import CommandSheet
-        from src.ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.command_sheet import CommandSheet
+        from ti4.core.rule89_validator import Rule89Validator
 
         manager = Rule89Validator()
 
@@ -128,7 +128,7 @@ class TestRule89Step2Movement:
 
         LRR Reference: Rule 89.2 - "move any number of ships... from systems without their command tokens"
         """
-        from src.ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.rule89_validator import Rule89Validator
 
         manager = Rule89Validator()
 
@@ -160,7 +160,7 @@ class TestRule89Step2Movement:
 
         LRR Reference: Rule 89.2 - Ships cannot move from systems with command tokens
         """
-        from src.ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.rule89_validator import Rule89Validator
 
         manager = Rule89Validator()
 
@@ -195,7 +195,7 @@ class TestRule89Step2Movement:
 
         LRR Reference: Rule 89.2 - Ships move "into the active system"
         """
-        from src.ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.rule89_validator import Rule89Validator
 
         manager = Rule89Validator()
 
@@ -235,7 +235,7 @@ class TestRule89Step3SpaceCombat:
 
         LRR Reference: Rule 89.3 - "If two players have ships in the active system, those players must resolve a space combat"
         """
-        from src.ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.rule89_validator import Rule89Validator
 
         manager = Rule89Validator()
 
@@ -267,7 +267,7 @@ class TestRule89Step3SpaceCombat:
 
         LRR Reference: Rule 89.3 - Combat only when two players have ships
         """
-        from src.ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.rule89_validator import Rule89Validator
 
         manager = Rule89Validator()
 
@@ -303,7 +303,7 @@ class TestRule89Step4Invasion:
 
         LRR Reference: Rule 89.4 - "The active player may use 'Bombardment' abilities"
         """
-        from src.ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.rule89_validator import Rule89Validator
 
         manager = Rule89Validator()
 
@@ -316,7 +316,7 @@ class TestRule89Step4Invasion:
         galaxy.register_system(active_system)
 
         # Add planet to system
-        from src.ti4.core.planet import Planet
+        from ti4.core.planet import Planet
 
         planet = Planet("Test Planet", resources=2, influence=1)
         active_system.add_planet(planet)
@@ -338,7 +338,7 @@ class TestRule89Step4Invasion:
 
         LRR Reference: Rule 89.4 - "commit units to land on planets"
         """
-        from src.ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.rule89_validator import Rule89Validator
 
         manager = Rule89Validator()
 
@@ -351,7 +351,7 @@ class TestRule89Step4Invasion:
         galaxy.register_system(active_system)
 
         # Add planet to system
-        from src.ti4.core.planet import Planet
+        from ti4.core.planet import Planet
 
         planet = Planet("Test Planet", resources=2, influence=1)
         active_system.add_planet(planet)
@@ -375,7 +375,7 @@ class TestRule89Step5Production:
 
         LRR Reference: Rule 89.5 - "The active player may resolve each of their unit's 'Production' abilities in the active system"
         """
-        from src.ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.rule89_validator import Rule89Validator
 
         manager = Rule89Validator()
 
@@ -388,7 +388,7 @@ class TestRule89Step5Production:
         galaxy.register_system(active_system)
 
         # Add planet with space dock
-        from src.ti4.core.planet import Planet
+        from ti4.core.planet import Planet
 
         planet = Planet("Test Planet", resources=2, influence=1)
         active_system.add_planet(planet)
@@ -409,7 +409,7 @@ class TestRule89Step5Production:
 
         LRR Reference: Rule 89.5 - Production abilities "in the active system"
         """
-        from src.ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.rule89_validator import Rule89Validator
 
         manager = Rule89Validator()
 
@@ -427,7 +427,7 @@ class TestRule89Step5Production:
         galaxy.register_system(other_system)
 
         # Add planet with space dock to non-active system
-        from src.ti4.core.planet import Planet
+        from ti4.core.planet import Planet
 
         planet = Planet("Test Planet", resources=2, influence=1)
         other_system.add_planet(planet)
@@ -460,7 +460,7 @@ class TestRule89TacticalActionIntegration:
 
         This ensures the new implementation works with existing components.
         """
-        from src.ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.rule89_validator import Rule89Validator
 
         manager = Rule89Validator()
 
@@ -469,7 +469,7 @@ class TestRule89TacticalActionIntegration:
         assert manager.validate_galaxy_integration(galaxy) is True
 
         # Should integrate with existing command sheet system
-        from src.ti4.core.command_sheet import CommandSheet
+        from ti4.core.command_sheet import CommandSheet
 
         command_sheet = CommandSheet()
         assert manager.validate_command_sheet_integration(command_sheet) is True
@@ -479,7 +479,7 @@ class TestRule89TacticalActionIntegration:
 
         This ensures we implement the correct rule structure.
         """
-        from src.ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.rule89_validator import Rule89Validator
 
         manager = Rule89Validator()
 
@@ -501,7 +501,7 @@ class TestRule89MovementIntegration:
 
         This ensures we use the sophisticated movement logic with technology effects.
         """
-        from src.ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.rule89_validator import Rule89Validator
 
         manager = Rule89Validator()
 
@@ -551,7 +551,7 @@ class TestRule89MovementIntegration:
 
         This test verifies the fix for the movement validation issue.
         """
-        from src.ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.rule89_validator import Rule89Validator
 
         manager = Rule89Validator()
 
@@ -598,7 +598,7 @@ class TestRule89MovementIntegration:
 
     def test_movement_plan_validation_integration(self) -> None:
         """Test that movement plan validation integrates both Rule 89 and advanced systems."""
-        from src.ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.rule89_validator import Rule89Validator
 
         manager = Rule89Validator()
 
@@ -646,7 +646,7 @@ class TestRule89MovementIntegration:
 
     def test_actions_system_integration(self) -> None:
         """Test integration with the actions movement planning system."""
-        from src.ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.rule89_validator import Rule89Validator
 
         manager = Rule89Validator()
 

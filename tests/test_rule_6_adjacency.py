@@ -8,12 +8,12 @@ This module tests the adjacency rules according to LRR Rule 6:
 Following TDD discipline: RED-GREEN-REFACTOR
 """
 
-from src.ti4.core.constants import UnitType
-from src.ti4.core.galaxy import Galaxy
-from src.ti4.core.hex_coordinate import HexCoordinate
-from src.ti4.core.planet import Planet
-from src.ti4.core.system import System
-from src.ti4.core.unit import Unit
+from ti4.core.constants import UnitType
+from ti4.core.galaxy import Galaxy
+from ti4.core.hex_coordinate import HexCoordinate
+from ti4.core.planet import Planet
+from ti4.core.system import System
+from ti4.core.unit import Unit
 
 
 class TestRule6UnitPlanetAdjacency:

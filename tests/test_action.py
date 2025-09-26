@@ -4,7 +4,7 @@ from typing import Any
 
 import pytest
 
-from src.ti4.actions.action import Action, PlayerDecision
+from ti4.actions.action import Action, PlayerDecision
 
 
 def test_player_decision_is_abstract() -> None:
@@ -65,7 +65,7 @@ def test_concrete_player_decision_implementation() -> None:
 
 def test_action_result_creation() -> None:
     """Test that ActionResult can be created with success and new state."""
-    from src.ti4.actions.action import ActionResult
+    from ti4.actions.action import ActionResult
 
     result = ActionResult(
         success=True, new_state="new_state", message="Action succeeded"

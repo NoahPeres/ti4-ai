@@ -11,8 +11,8 @@ Requirements tested:
 - 3.5: Initiative order calculated from current card assignments
 """
 
-from src.ti4.core.game_phase import GamePhase
-from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
+from ti4.core.game_phase import GamePhase
+from ti4.core.strategic_action import StrategicActionManager, StrategyCardType
 
 
 class TestRule83InitiativeOrderQueryMethods:
@@ -25,7 +25,7 @@ class TestRule83InitiativeOrderQueryMethods:
         calculated from current card assignments
         """
         # This will fail initially - RED phase
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -48,7 +48,7 @@ class TestRule83InitiativeOrderQueryMethods:
         calculated from current card assignments
         """
         # This will fail initially - RED phase
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -69,7 +69,7 @@ class TestRule83InitiativeOrderQueryMethods:
 
         Requirements: 3.4 - Players without strategy cards don't appear in initiative order
         """
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -92,7 +92,7 @@ class TestRule83InitiativeOrderQueryMethods:
         Requirements: 3.1, 3.2 - Players ordered by strategy card initiative numbers,
         sorted from lowest to highest
         """
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -133,7 +133,7 @@ class TestRule83GamePhaseIntegration:
         Requirements: Integration with existing game phase management system
         """
         # This will fail initially - RED phase
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -150,7 +150,7 @@ class TestRule83GamePhaseIntegration:
 
         Requirements: Integration with existing game phase management system
         """
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -174,7 +174,7 @@ class TestRule83GamePhaseIntegration:
 
         Requirements: 9.1, 9.2 - Comprehensive error handling and validation
         """
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)

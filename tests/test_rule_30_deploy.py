@@ -10,13 +10,13 @@ Deploy abilities allow units to be placed on the game board without producing th
 
 import pytest
 
-from src.ti4.core.constants import Faction, UnitType
-from src.ti4.core.exceptions import DeployError, ReinforcementError
-from src.ti4.core.planet import Planet
-from src.ti4.core.player import Player
-from src.ti4.core.reinforcements import Reinforcements
-from src.ti4.core.system import System
-from src.ti4.core.unit import Unit
+from ti4.core.constants import Faction, UnitType
+from ti4.core.exceptions import DeployError, ReinforcementError
+from ti4.core.planet import Planet
+from ti4.core.player import Player
+from ti4.core.reinforcements import Reinforcements
+from ti4.core.system import System
+from ti4.core.unit import Unit
 
 
 class TestRule30DeployAbilities:

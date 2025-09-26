@@ -6,8 +6,8 @@ This test file verifies that all sub-rules of Rule 99 are properly implemented:
 - 99.3: Secondary ability - Other players can spend strategy token for production
 """
 
-from src.ti4.core.command_sheet import CommandSheet
-from src.ti4.core.strategy_card import STANDARD_STRATEGY_CARDS
+from ti4.core.command_sheet import CommandSheet
+from ti4.core.strategy_card import STANDARD_STRATEGY_CARDS
 
 
 class TestRule99WarfareStrategyCard:
@@ -35,7 +35,7 @@ class TestRule99Step1CommandTokenRemoval:
         """Test that active player can remove command token from game board (Rule 99.1)."""
         # We need a minimal system to track command tokens on the board
         # For now, let's create a simple board token tracker
-        from src.ti4.core.warfare_strategy_card import WarfareStrategyCard
+        from ti4.core.warfare_strategy_card import WarfareStrategyCard
 
         warfare_card = WarfareStrategyCard()
 
@@ -43,14 +43,14 @@ class TestRule99Step1CommandTokenRemoval:
         # Player should be able to remove it
         # Note: Specific implementation requires user confirmation per manual_confirmation_protocol.md
         # For now, test that the card exists and has basic functionality
-        from src.ti4.core.strategic_action import StrategyCardType
+        from ti4.core.strategic_action import StrategyCardType
 
         assert warfare_card.get_initiative_value() == 6
         assert warfare_card.get_card_type() == StrategyCardType.WARFARE
 
     def test_removed_token_placed_in_chosen_pool(self) -> None:
         """Test that removed token is placed in pool of player's choice (Rule 99.1)."""
-        from src.ti4.core.warfare_strategy_card import WarfareStrategyCard
+        from ti4.core.warfare_strategy_card import WarfareStrategyCard
 
         CommandSheet()
         warfare_card = WarfareStrategyCard()
@@ -68,7 +68,7 @@ class TestRule99Step2CommandTokenRedistribution:
 
     def test_can_redistribute_command_tokens_between_pools(self) -> None:
         """Test that active player can redistribute command tokens (Rule 99.2)."""
-        from src.ti4.core.warfare_strategy_card import WarfareStrategyCard
+        from ti4.core.warfare_strategy_card import WarfareStrategyCard
 
         CommandSheet(tactic_pool=2, fleet_pool=3, strategy_pool=1)
         warfare_card = WarfareStrategyCard()
@@ -82,7 +82,7 @@ class TestRule99Step2CommandTokenRedistribution:
 
     def test_redistribution_preserves_total_token_count(self) -> None:
         """Test that redistribution doesn't change total number of tokens (Rule 99.2)."""
-        from src.ti4.core.warfare_strategy_card import WarfareStrategyCard
+        from ti4.core.warfare_strategy_card import WarfareStrategyCard
 
         CommandSheet(tactic_pool=2, fleet_pool=3, strategy_pool=1)
         warfare_card = WarfareStrategyCard()
@@ -100,7 +100,7 @@ class TestRule99SecondaryAbility:
 
     def test_other_players_can_spend_strategy_token_for_production(self) -> None:
         """Test that other players can spend strategy token for production ability (Rule 99.3)."""
-        from src.ti4.core.warfare_strategy_card import WarfareStrategyCard
+        from ti4.core.warfare_strategy_card import WarfareStrategyCard
 
         command_sheet = CommandSheet(strategy_pool=2)
         warfare_card = WarfareStrategyCard()
@@ -115,7 +115,7 @@ class TestRule99SecondaryAbility:
         self,
     ) -> None:
         """Test that secondary ability doesn't place command token in home system (Rule 99.3a)."""
-        from src.ti4.core.warfare_strategy_card import WarfareStrategyCard
+        from ti4.core.warfare_strategy_card import WarfareStrategyCard
 
         command_sheet = CommandSheet(strategy_pool=2)
         warfare_card = WarfareStrategyCard()

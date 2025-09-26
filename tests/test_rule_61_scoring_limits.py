@@ -9,11 +9,11 @@ Tests the enforcement of:
 
 import pytest
 
-from src.ti4.core.constants import Faction
-from src.ti4.core.game_phase import GamePhase
-from src.ti4.core.game_state import GameState
-from src.ti4.core.objective import Objective
-from src.ti4.core.player import Player
+from ti4.core.constants import Faction
+from ti4.core.game_phase import GamePhase
+from ti4.core.game_state import GameState
+from ti4.core.objective import Objective
+from ti4.core.player import Player
 
 
 class TestStatusPhaseScoringLimits:

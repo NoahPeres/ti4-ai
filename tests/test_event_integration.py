@@ -2,14 +2,14 @@
 
 from unittest.mock import Mock
 
-from src.ti4.commands.movement import MovementCommand
-from src.ti4.core.constants import Faction
-from src.ti4.core.events import GameEventBus, PhaseChangedEvent, UnitMovedEvent
-from src.ti4.core.game_controller import GameController
-from src.ti4.core.game_phase import GamePhase
-from src.ti4.core.game_state import GameState
-from src.ti4.core.player import Player
-from src.ti4.core.unit import Unit
+from ti4.commands.movement import MovementCommand
+from ti4.core.constants import Faction
+from ti4.core.events import GameEventBus, PhaseChangedEvent, UnitMovedEvent
+from ti4.core.game_controller import GameController
+from ti4.core.game_phase import GamePhase
+from ti4.core.game_state import GameState
+from ti4.core.player import Player
+from ti4.core.unit import Unit
 
 
 class TestMovementEventIntegration:

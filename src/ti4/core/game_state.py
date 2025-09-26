@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any
 
 from .game_phase import GamePhase
 from .player import Player
+from .promissory_notes import PromissoryNoteManager
 
 if TYPE_CHECKING:
     from .galaxy import Galaxy
@@ -20,13 +21,12 @@ if TYPE_CHECKING:
     from .technology import TechnologyCard
 else:
     Galaxy = "Galaxy"
-    System = "System"
     Objective = "Objective"
-    Planet = "Planet"
     PlanetCard = "PlanetCard"
     StrategyCardType = "StrategyCardType"
     StrategyCardCoordinator = "StrategyCardCoordinator"
     TechnologyCard = "TechnologyCard"
+
 
 # Victory condition constants
 VICTORY_POINTS_TO_WIN = 10
@@ -94,6 +94,32 @@ class GameState:
     planet_control_mapping: dict[str, str | None] = field(
         default_factory=dict, hash=False
     )
+
+    # Agenda card system (Rule 7)
+    player_agenda_cards: dict[str, list[Any]] = field(
+        default_factory=dict, hash=False
+    )  # player_id -> [agenda_cards]
+    agenda_discard_pile: list[Any] = field(
+        default_factory=list, hash=False
+    )  # Discarded agenda cards
+
+    # Promissory note management (Rule 69)
+    promissory_note_manager: PromissoryNoteManager = field(
+        default_factory=PromissoryNoteManager, hash=False
+    )
+
+    # Action card system (Rule 2)
+    player_action_cards: dict[str, list[str]] = field(
+        default_factory=dict, hash=False
+    )  # player_id -> [action_card_names]
+    action_card_discard_pile: list[str] = field(
+        default_factory=list, hash=False
+    )  # Discarded action cards
+
+    # Speaker system (Rule 80)
+    speaker_id: str | None = field(
+        default=None, hash=False
+    )  # Current speaker player ID
 
     def __post_init__(self) -> None:
         """Validate game state invariants after initialization."""
@@ -278,7 +304,7 @@ class GameState:
             players=kwargs.get("players", self.players),
             galaxy=self.galaxy,
             phase=self.phase,
-            systems=self.systems,
+            systems=kwargs.get("systems", self.systems),
             # player_resources parameter removed - incorrect implementation
             player_technologies=kwargs.get(
                 "player_technologies", self.player_technologies
@@ -325,6 +351,26 @@ class GameState:
             planet_control_mapping=kwargs.get(
                 "planet_control_mapping", self.planet_control_mapping
             ),
+            # Agenda card system
+            player_agenda_cards=kwargs.get(
+                "player_agenda_cards", self.player_agenda_cards
+            ),
+            agenda_discard_pile=kwargs.get(
+                "agenda_discard_pile", self.agenda_discard_pile
+            ),
+            # Promissory note system
+            promissory_note_manager=kwargs.get(
+                "promissory_note_manager", self.promissory_note_manager
+            ),
+            # Action card system
+            player_action_cards=kwargs.get(
+                "player_action_cards", self.player_action_cards
+            ),
+            action_card_discard_pile=kwargs.get(
+                "action_card_discard_pile", self.action_card_discard_pile
+            ),
+            # Speaker token system
+            speaker_id=kwargs.get("speaker_id", self.speaker_id),
         )
 
     def is_valid(self) -> bool:
@@ -697,6 +743,10 @@ class GameState:
         # Player influence tracking removed - incorrect implementation
         # Influence should be tracked on planets per Rules 47 and 75
 
+        # Initialize action card hand for new player
+        new_player_action_cards = self.player_action_cards.copy()
+        new_player_action_cards[player.id] = []
+
         return self._create_new_state(
             players=new_players,
             # player_resources parameter removed - incorrect implementation
@@ -706,290 +756,360 @@ class GameState:
             status_phase_scoring=new_status_phase_scoring,
             combat_scoring=new_combat_scoring,
             player_secret_objectives=new_player_secret_objectives,
+            player_action_cards=new_player_action_cards,
             # player_influence parameter removed - incorrect implementation
         )
 
+    def _get_next_speaker_after_elimination(
+        self, eliminated_player_id: str
+    ) -> str | None:
+        """
+        Get the next speaker after a player is eliminated.
+
+        Rule 33.8: If the speaker becomes eliminated, the speaker token passes
+        to the player to the speaker's left.
+
+        Args:
+            eliminated_player_id: ID of the player being eliminated
+
+        Returns:
+            ID of the new speaker (unchanged if eliminated player wasn't speaker)
+        """
+        # If the eliminated player wasn't the speaker, no change needed
+        if self.speaker_id != eliminated_player_id:
+            return self.speaker_id
+
+        # Find the next player to the left of the eliminated speaker
+        player_ids = [player.id for player in self.players]
+        if len(player_ids) <= 1:
+            # Edge case: if only one player left, they become speaker
+            return player_ids[0] if player_ids else self.speaker_id
+
+        try:
+            current_index = player_ids.index(eliminated_player_id)
+            # Get the next player (to the left in turn order)
+            next_index = (current_index + 1) % len(player_ids)
+            return player_ids[next_index]
+        except ValueError:
+            # Fallback: return first remaining player
+            return player_ids[0]
+
     def eliminate_player(self, player_id: str) -> GameState:
-        """Eliminate a player from the game, removing their secret objectives."""
+        """Eliminate a player from the game according to Rule 33.
+
+        Args:
+            player_id: The player to eliminate
+
+        Returns:
+            New GameState with player eliminated
+
+        LRR Reference: Rule 33.2 - Component return to game box
+        """
+        # Local import to avoid circular dependencies
+        from .planet import Planet
+        from .system import System
+
+        # Validate player exists
+        if not any(player.id == player_id for player in self.players):
+            raise ValueError(f"Player {player_id} does not exist")
+
+        # Rule 33.2: Return all components to game box
+        # Remove all units owned by the player
+        new_systems = {}
+        for system_id, system in self.systems.items():
+            # Clone system preserving all attributes
+            new_system = System(system_id)
+
+            # Preserve system-level state
+            new_system.space_units = [
+                unit for unit in system.space_units if unit.owner != player_id
+            ]
+            new_system.command_tokens = {
+                pid: token
+                for pid, token in system.command_tokens.items()
+                if pid != player_id
+            }
+
+            # Preserve system attributes if they exist
+            if hasattr(system, "wormholes"):
+                new_system.wormholes = (
+                    system.wormholes.copy()
+                    if hasattr(system.wormholes, "copy")
+                    else system.wormholes
+                )
+
+            # Copy planets preserving all attributes and flags
+            for planet in system.planets:
+                new_planet = Planet(
+                    planet.name,
+                    planet.resources,
+                    planet.influence,
+                )
+
+                # Preserve planet exhaustion state
+                if hasattr(planet, "_exhausted"):
+                    new_planet._exhausted = planet._exhausted
+
+                # Only keep units not owned by eliminated player
+                for unit in planet.units:
+                    if unit.owner != player_id:
+                        new_planet.place_unit(unit)
+
+                new_system.add_planet(new_planet)
+
+            new_systems[system_id] = new_system
+
+        # Remove player from players list
+        new_players = [player for player in self.players if player.id != player_id]
+
+        # Remove player from planet control mapping
+        # Set eliminated player's controlled planets to None instead of filtering them out
+        new_planet_control_mapping = self.planet_control_mapping.copy()
+        for planet_name, controller in list(new_planet_control_mapping.items()):
+            if controller == player_id:
+                new_planet_control_mapping[planet_name] = None
+
+        # Remove player from planet-related data structures
+        new_player_planets = {
+            pid: planets
+            for pid, planets in self.player_planets.items()
+            if pid != player_id
+        }
+
+        new_player_planet_cards = {
+            pid: cards
+            for pid, cards in self.player_planet_cards.items()
+            if pid != player_id
+        }
+
+        # Return eliminated player's planet cards to deck
+        new_planet_card_deck = self.planet_card_deck.copy()
+        if player_id in self.player_planet_cards:
+            for card in self.player_planet_cards[player_id]:
+                # Use deck.add method if available, otherwise preserve structure
+                if hasattr(new_planet_card_deck, "add"):
+                    new_planet_card_deck.add(card)
+                elif hasattr(new_planet_card_deck, "cards"):
+                    new_planet_card_deck.cards[card.name] = card
+                else:
+                    # Fallback to direct assignment preserving existing structure
+                    new_planet_card_deck[card.name] = card
+
+        # Rule 33.3: Discard eliminated player's agenda cards
+        new_agenda_discard_pile = self.agenda_discard_pile.copy()
+        if player_id in self.player_agenda_cards:
+            new_agenda_discard_pile.extend(self.player_agenda_cards[player_id])
+
+        new_player_agenda_cards = {
+            pid: cards
+            for pid, cards in self.player_agenda_cards.items()
+            if pid != player_id
+        }
+
+        # Rule 33.5: Discard eliminated player's action cards
+        new_action_card_discard_pile = self.action_card_discard_pile.copy()
+        if player_id in self.player_action_cards:
+            new_action_card_discard_pile.extend(self.player_action_cards[player_id])
+
+        new_player_action_cards = {
+            pid: cards
+            for pid, cards in self.player_action_cards.items()
+            if pid != player_id
+        }
+
+        # Rule 33.7: Remove eliminated player's secret objectives
         new_player_secret_objectives = {
             pid: objectives
             for pid, objectives in self.player_secret_objectives.items()
             if pid != player_id
         }
 
+        # Rule 33.4: Handle promissory note elimination
+        new_promissory_note_manager = PromissoryNoteManager()
+        # Copy existing state
+        new_promissory_note_manager._player_hands = {
+            pid: hand.copy()
+            for pid, hand in self.promissory_note_manager._player_hands.items()
+        }
+        new_promissory_note_manager._available_notes = (
+            self.promissory_note_manager._available_notes.copy()
+        )
+        # Handle elimination
+        new_promissory_note_manager.handle_player_elimination(player_id)
+
+        # Rule 33.6: Return eliminated player's strategy cards to common play area
+        new_strategy_card_assignments = {
+            pid: card
+            for pid, card in self.strategy_card_assignments.items()
+            if pid != player_id
+        }
+
+        # Clean up all per-player mappings
+        new_victory_points = {
+            pid: points
+            for pid, points in self.victory_points.items()
+            if pid != player_id
+        }
+
+        new_completed_objectives = {
+            pid: objectives
+            for pid, objectives in self.completed_objectives.items()
+            if pid != player_id
+        }
+
+        new_player_technologies = {
+            pid: techs
+            for pid, techs in self.player_technologies.items()
+            if pid != player_id
+        }
+
+        new_player_technology_cards = {
+            pid: cards
+            for pid, cards in self.player_technology_cards.items()
+            if pid != player_id
+        }
+
+        new_status_phase_scoring = {
+            pid: scoring
+            for pid, scoring in self.status_phase_scoring.items()
+            if pid != player_id
+        }
+
+        new_combat_scoring = {
+            pid: scoring
+            for pid, scoring in self.combat_scoring.items()
+            if pid != player_id
+        }
+
+        # Rule 33.8: Transfer speaker token if speaker is eliminated
+        new_speaker_id = self._get_next_speaker_after_elimination(player_id)
+
         return self._create_new_state(
-            player_secret_objectives=new_player_secret_objectives
-        )
-
-    # Strategy Card Management Methods (Rule 83)
-
-    def assign_strategy_card(
-        self, player_id: str, strategy_card: StrategyCardType
-    ) -> GameState:
-        """Assign a strategy card to a player.
-
-        Args:
-            player_id: The player to assign the card to
-            strategy_card: The strategy card to assign
-
-        Returns:
-            New GameState with the strategy card assigned
-
-        Raises:
-            ValueError: If inputs are invalid or card is already assigned
-
-        Requirements: 1.3, 6.2 - Strategy card tracking and state synchronization
-        """
-        # Input validation
-        if player_id is None:
-            raise ValueError("Player ID cannot be None")
-        if not isinstance(player_id, str) or not player_id.strip():
-            raise ValueError("Player ID cannot be empty")
-        if strategy_card is None:
-            raise ValueError("Strategy card cannot be None")
-        if not any(p.id == player_id for p in self.players):
-            raise ValueError(f"Player {player_id} does not exist in the game")
-
-        # Check if card is already assigned to another player
-        for existing_player, existing_card in self.strategy_card_assignments.items():
-            if existing_card == strategy_card and existing_player != player_id:
-                raise ValueError(
-                    f"Strategy card {strategy_card.value} is already assigned to player {existing_player}"
-                )
-
-        # Create new assignments
-        new_assignments = self.strategy_card_assignments.copy()
-        new_assignments[player_id] = strategy_card
-
-        return self._create_new_state(strategy_card_assignments=new_assignments)
-
-    def exhaust_strategy_card(self, strategy_card: StrategyCardType) -> GameState:
-        """Exhaust a strategy card (mark as used).
-
-        Args:
-            strategy_card: The strategy card to exhaust
-
-        Returns:
-            New GameState with the strategy card exhausted
-
-        Raises:
-            ValueError: If strategy card is None
-
-        Requirements: 4.5 - State persistence for card exhaustion
-        """
-        if strategy_card is None:
-            raise ValueError("Strategy card cannot be None")
-
-        new_exhausted_cards = self.exhausted_strategy_cards.copy()
-        new_exhausted_cards.add(strategy_card)
-
-        return self._create_new_state(exhausted_strategy_cards=new_exhausted_cards)
-
-    # Rule 25: Planet control mechanics
-    def gain_planet_control(
-        self, player_id: str, planet: Planet
-    ) -> tuple[bool, GameState]:
-        """Handle gaining control of a planet according to Rule 25.
-
-        Args:
-            player_id: The player gaining control
-            planet: The planet being controlled
-
-        Returns:
-            Tuple of (exploration_triggered, new_game_state)
-            exploration_triggered: True if exploration should be triggered (first control)
-
-        Raises:
-            ValueError: If player already controls this planet (Rule 25.2)
-        """
-        # Validate player exists
-        if not any(p.id == player_id for p in self.players):
-            raise ValueError(f"Player {player_id} does not exist in the game")
-
-        # Rule 25.2: Cannot gain control of already controlled planet
-        current_controller = self.planet_control_mapping.get(planet.name)
-        if current_controller == player_id:
-            raise ValueError("Player already controls this planet")
-
-        # Determine if this triggers exploration (Rule 25.1c)
-        was_uncontrolled = self.planet_control_mapping.get(planet.name) is None
-
-        # Handle planet card transfer
-        planet_card = self._get_or_create_planet_card(planet)
-
-        # Create new state with updated planet card management
-        new_planet_card_deck = self.planet_card_deck.copy()
-        new_player_planet_cards = {
-            pid: cards.copy() for pid, cards in self.player_planet_cards.items()
-        }
-        new_planet_control_mapping = self.planet_control_mapping.copy()
-        new_planet_control_tokens = {
-            name: tokens.copy() for name, tokens in self.planet_control_tokens.items()
-        }
-
-        # Rule 25.1b: If another player controls it, take from their play area
-        if current_controller is not None:
-            # Remove from previous player
-            if current_controller in new_player_planet_cards:
-                new_player_planet_cards[current_controller] = [
-                    card
-                    for card in new_player_planet_cards[current_controller]
-                    if card.name != planet.name
-                ]
-        else:
-            # Rule 25.1a: First control, take from deck
-            if planet.name in new_planet_card_deck:
-                del new_planet_card_deck[planet.name]
-
-        # Add to new player's play area
-        if player_id not in new_player_planet_cards:
-            new_player_planet_cards[player_id] = []
-
-        # Rule 25.1: Card is exhausted when gained - create fresh copy to avoid mutating shared instance
-        from .planet_card import PlanetCard as PlanetCardClass
-
-        exhausted_card = PlanetCardClass(
-            planet_card.name,
-            planet_card.resources,
-            planet_card.influence,
-            planet_card.trait,
-        )
-        if not exhausted_card.is_exhausted():
-            exhausted_card.exhaust()
-        new_player_planet_cards[player_id].append(exhausted_card)
-
-        # Update planet control in centralized mapping (don't mutate Planet object)
-        new_planet_control_mapping[planet.name] = player_id
-
-        # Rule 25.4: Control token management - ensure exclusivity and cleanup
-        if len(planet.units) == 0:
-            # Remove any existing control tokens from previous controller
-            if planet.name in new_planet_control_tokens:
-                new_planet_control_tokens[planet.name].clear()
-            else:
-                new_planet_control_tokens[planet.name] = set()
-            # Add control token for new controller
-            new_planet_control_tokens[planet.name].add(player_id)
-        else:
-            # If there are units, remove any control tokens (units provide control)
-            if planet.name in new_planet_control_tokens:
-                new_planet_control_tokens[planet.name].clear()
-
-        # Update player_planets mapping for consistency
-        new_player_planets = {
-            pid: planets.copy() for pid, planets in self.player_planets.items()
-        }
-
-        # Remove from previous controller if any
-        if current_controller is not None and current_controller in new_player_planets:
-            new_player_planets[current_controller] = [
-                p
-                for p in new_player_planets[current_controller]
-                if p.name != planet.name
-            ]
-
-        # Add to new controller
-        if player_id not in new_player_planets:
-            new_player_planets[player_id] = []
-        # Only add if not already present (by name)
-        if all(p.name != planet.name for p in new_player_planets[player_id]):
-            new_player_planets[player_id].append(planet)
-
-        # Create new state
-        new_state = self._create_new_state(
-            planet_card_deck=new_planet_card_deck,
-            player_planet_cards=new_player_planet_cards,
-            planet_control_tokens=new_planet_control_tokens,
+            players=new_players,
+            systems=new_systems,
             planet_control_mapping=new_planet_control_mapping,
             player_planets=new_player_planets,
+            planet_card_deck=new_planet_card_deck,
+            player_planet_cards=new_player_planet_cards,
+            player_agenda_cards=new_player_agenda_cards,
+            agenda_discard_pile=new_agenda_discard_pile,
+            player_action_cards=new_player_action_cards,
+            action_card_discard_pile=new_action_card_discard_pile,
+            player_secret_objectives=new_player_secret_objectives,
+            promissory_note_manager=new_promissory_note_manager,
+            strategy_card_assignments=new_strategy_card_assignments,
+            speaker_id=new_speaker_id,
+            victory_points=new_victory_points,
+            completed_objectives=new_completed_objectives,
+            player_technologies=new_player_technologies,
+            player_technology_cards=new_player_technology_cards,
+            status_phase_scoring=new_status_phase_scoring,
+            combat_scoring=new_combat_scoring,
         )
 
-        return was_uncontrolled, new_state
-
-    def lose_planet_control(self, player_id: str, planet: Planet) -> GameState:
-        """Handle losing control of a planet according to Rule 25.
+    def discard_player_agenda_cards(self, player_id: str) -> GameState:
+        """Discard all agenda cards owned by a player according to Rule 33.3.
 
         Args:
-            player_id: The player losing control
-            planet: The planet being lost
+            player_id: The player whose agenda cards should be discarded
 
         Returns:
-            New GameState with updated control
+            New GameState with player's agenda cards discarded
+
+        LRR Reference: Rule 33.3 - Agenda card discard on elimination
+        """
+        # Move player's agenda cards to discard pile
+        new_agenda_discard_pile = self.agenda_discard_pile.copy()
+        if player_id in self.player_agenda_cards:
+            new_agenda_discard_pile.extend(self.player_agenda_cards[player_id])
+
+        # Remove player from agenda cards mapping
+        new_player_agenda_cards = {
+            pid: cards
+            for pid, cards in self.player_agenda_cards.items()
+            if pid != player_id
+        }
+
+        return self._create_new_state(
+            player_agenda_cards=new_player_agenda_cards,
+            agenda_discard_pile=new_agenda_discard_pile,
+        )
+
+    def should_eliminate_player(self, player_id: str) -> bool:
+        """Check if a player should be eliminated according to Rule 33.1.
+
+        A player is eliminated if they have:
+        - No ground forces
+        - No production units
+        - Control no planets
+
+        Args:
+            player_id: The player to check for elimination
+
+        Returns:
+            True if the player should be eliminated
+
+        Raises:
+            ValueError: If player does not exist
+
+        LRR Reference: Rule 33.1 - Elimination Conditions
         """
         # Validate player exists
         if not any(player.id == player_id for player in self.players):
             raise ValueError(f"Player {player_id} does not exist")
 
-        current_controller = self.planet_control_mapping.get(planet.name)
-        if current_controller != player_id:
-            return self  # Player doesn't control this planet
+        # Import here to avoid circular imports
+        from .constants import GameConstants
 
-        # Create new state with updated control tokens and planet cards
-        new_planet_control_tokens = {
-            name: tokens.copy() for name, tokens in self.planet_control_tokens.items()
-        }
-        new_player_planet_cards = {
-            pid: cards.copy() for pid, cards in self.player_planet_cards.items()
-        }
-        new_planet_control_mapping = self.planet_control_mapping.copy()
+        # Check if player has ground forces
+        has_ground_forces = False
+        for system in self.systems.values():
+            # Check planets for ground forces
+            for planet in system.planets:
+                for unit in planet.units:
+                    if (
+                        unit.owner == player_id
+                        and unit.unit_type in GameConstants.GROUND_FORCE_TYPES
+                    ):
+                        has_ground_forces = True
+                        break
+                if has_ground_forces:
+                    break
+            if has_ground_forces:
+                break
 
-        # Rule 25.7: Remove control token if present
-        if planet.name in new_planet_control_tokens:
-            new_planet_control_tokens[planet.name].discard(player_id)
-            if not new_planet_control_tokens[planet.name]:
-                del new_planet_control_tokens[planet.name]
-
-        # Remove planet card from player's play area and return to deck in readied state
-        new_planet_card_deck = self.planet_card_deck.copy()
-        if player_id in new_player_planet_cards:
-            # Find the planet card being removed
-            removed_card = None
-            for card in new_player_planet_cards[player_id]:
-                if card.name == planet.name:
-                    removed_card = card
+        # Check if player has production units
+        has_production_units = False
+        for system in self.systems.values():
+            # Check planets for production units
+            for planet in system.planets:
+                for unit in planet.units:
+                    if unit.owner == player_id and unit.has_production():
+                        has_production_units = True
+                        break
+                if has_production_units:
                     break
 
-            # Remove from player's cards
-            new_player_planet_cards[player_id] = [
-                card
-                for card in new_player_planet_cards[player_id]
-                if card.name != planet.name
-            ]
+            # Check space for production units
+            if not has_production_units:
+                for unit in system.space_units:
+                    if unit.owner == player_id and unit.has_production():
+                        has_production_units = True
+                        break
 
-            # Return readied copy to deck
-            if removed_card:
-                from .planet_card import PlanetCard as PlanetCardClass
+            if has_production_units:
+                break
 
-                readied_card = PlanetCardClass(
-                    removed_card.name,
-                    removed_card.resources,
-                    removed_card.influence,
-                    removed_card.trait,
-                )
-                if readied_card.is_exhausted():
-                    readied_card.ready()
-                new_planet_card_deck[planet.name] = readied_card
+        # Check if player controls any planets
+        controls_planets = any(
+            controller == player_id
+            for controller in self.planet_control_mapping.values()
+        )
 
-        # Clear planet control in centralized mapping (don't mutate Planet object)
-        new_planet_control_mapping[planet.name] = None
-
-        # Update player_planets mapping for consistency
-        new_player_planets = {
-            pid: planets.copy() for pid, planets in self.player_planets.items()
-        }
-
-        # Remove planet from player's controlled planets
-        if player_id in new_player_planets:
-            new_player_planets[player_id] = [
-                p for p in new_player_planets[player_id] if p.name != planet.name
-            ]
-
-        return self._create_new_state(
-            player_planet_cards=new_player_planet_cards,
-            planet_control_tokens=new_planet_control_tokens,
-            planet_control_mapping=new_planet_control_mapping,
-            player_planets=new_player_planets,
-            planet_card_deck=new_planet_card_deck,
+        # Rule 33.1: Player is eliminated if ALL three conditions are true:
+        # - No ground forces AND no production units AND controls no planets
+        return (
+            not has_ground_forces and not has_production_units and not controls_planets
         )
 
     def resolve_planet_control_change(self, planet: Planet) -> GameState:
@@ -1034,6 +1154,175 @@ class GameState:
 
         return self
 
+    def gain_planet_control(
+        self, player_id: str, planet: Planet
+    ) -> tuple[bool, GameState]:
+        """Handle gaining control of a planet according to Rule 25.
+
+        Args:
+            player_id: The player gaining control
+            planet: The planet being controlled
+
+        Returns:
+            Tuple of (exploration_triggered, new_game_state)
+        """
+        # Rule 25.2: Cannot gain control of already controlled planet
+        current_controller = self.planet_control_mapping.get(planet.name)
+        if current_controller == player_id:
+            raise ValueError("Player already controls this planet")
+
+        # Determine if this triggers exploration (Rule 25.1c)
+        was_uncontrolled = current_controller is None
+
+        # Get or create planet card
+        planet_card = self._get_or_create_planet_card(planet)
+
+        # Rule 25.1: Planet card is exhausted when gained
+        if not planet_card.is_exhausted():
+            planet_card.exhaust()
+
+        # Update planet control mapping
+        new_planet_control_mapping = self.planet_control_mapping.copy()
+        new_planet_control_mapping[planet.name] = player_id
+
+        # Update player planets list
+        new_player_planets = {
+            pid: planets.copy() for pid, planets in self.player_planets.items()
+        }
+        if player_id not in new_player_planets:
+            new_player_planets[player_id] = []
+        if planet not in new_player_planets[player_id]:
+            new_player_planets[player_id].append(planet)
+
+        # Rule 25.4: If player controls planet without units, place control token
+        new_planet_control_tokens = {
+            planet_name: tokens.copy()
+            for planet_name, tokens in self.planet_control_tokens.items()
+        }
+
+        # Check if player has units on the planet
+        player_has_units = any(unit.owner == player_id for unit in planet.units)
+        if not player_has_units:
+            if planet.name not in new_planet_control_tokens:
+                new_planet_control_tokens[planet.name] = set()
+            new_planet_control_tokens[planet.name].add(player_id)
+
+        # Handle planet card transfer
+        new_planet_card_deck = self.planet_card_deck.copy()
+        new_player_planet_cards = {
+            pid: cards.copy() for pid, cards in self.player_planet_cards.items()
+        }
+
+        if was_uncontrolled:
+            # Transfer from deck to player
+            if planet_card.name in new_planet_card_deck:
+                del new_planet_card_deck[planet_card.name]
+            if player_id not in new_player_planet_cards:
+                new_player_planet_cards[player_id] = []
+            new_player_planet_cards[player_id].append(planet_card)
+        else:
+            # Transfer from previous controller to new controller
+            if current_controller in new_player_planet_cards:
+                new_player_planet_cards[current_controller] = [
+                    card
+                    for card in new_player_planet_cards[current_controller]
+                    if card.name != planet_card.name
+                ]
+            if player_id not in new_player_planet_cards:
+                new_player_planet_cards[player_id] = []
+            new_player_planet_cards[player_id].append(planet_card)
+
+        new_state = self._create_new_state(
+            planet_control_mapping=new_planet_control_mapping,
+            player_planets=new_player_planets,
+            planet_card_deck=new_planet_card_deck,
+            player_planet_cards=new_player_planet_cards,
+            planet_control_tokens=new_planet_control_tokens,
+        )
+
+        return was_uncontrolled, new_state
+
+    def lose_planet_control(self, player_id: str, planet: Planet) -> GameState:
+        """Handle losing control of a planet according to Rule 25.
+
+        Args:
+            player_id: The player losing control
+            planet: The planet being lost
+
+        Returns:
+            New GameState with updated control
+        """
+        # Update planet control mapping
+        new_planet_control_mapping = self.planet_control_mapping.copy()
+        new_planet_control_mapping[planet.name] = None
+
+        # Update player planets list
+        new_player_planets = {
+            pid: planets.copy() for pid, planets in self.player_planets.items()
+        }
+        if player_id in new_player_planets:
+            new_player_planets[player_id] = [
+                p for p in new_player_planets[player_id] if p.name != planet.name
+            ]
+
+        # Rule 25.7: Remove control token when losing control
+        new_planet_control_tokens = {
+            planet_name: tokens.copy()
+            for planet_name, tokens in self.planet_control_tokens.items()
+        }
+        if planet.name in new_planet_control_tokens:
+            new_planet_control_tokens[planet.name].discard(player_id)
+            # Remove empty sets to keep data clean
+            if not new_planet_control_tokens[planet.name]:
+                del new_planet_control_tokens[planet.name]
+
+        # Handle planet card - return to deck
+        new_planet_card_deck = self.planet_card_deck.copy()
+        new_player_planet_cards = {
+            pid: cards.copy() for pid, cards in self.player_planet_cards.items()
+        }
+
+        if player_id in new_player_planet_cards:
+            for card in new_player_planet_cards[player_id]:
+                if card.name == planet.name:
+                    new_planet_card_deck[card.name] = card
+                    break
+            new_player_planet_cards[player_id] = [
+                card
+                for card in new_player_planet_cards[player_id]
+                if card.name != planet.name
+            ]
+
+        return self._create_new_state(
+            planet_control_mapping=new_planet_control_mapping,
+            player_planets=new_player_planets,
+            planet_card_deck=new_planet_card_deck,
+            player_planet_cards=new_player_planet_cards,
+            planet_control_tokens=new_planet_control_tokens,
+        )
+
+    def _get_or_create_planet_card(self, planet: Planet) -> PlanetCard:
+        """Get or create a planet card for the given planet."""
+        # Local import to avoid circular dependencies
+        from .planet_card import PlanetCard
+
+        # First check if it's already in the deck
+        if planet.name in self.planet_card_deck:
+            return self.planet_card_deck[planet.name]
+
+        # Check if it's in any player's cards
+        for player_cards in self.player_planet_cards.values():
+            for card in player_cards:
+                if card.name == planet.name:
+                    return card
+
+        # Create new planet card if not found
+        return PlanetCard(
+            name=planet.name,
+            resources=planet.resources,
+            influence=planet.influence,
+        )
+
     def get_player_planet_cards(self, player_id: str) -> list[PlanetCard]:
         """Get all planet cards in a player's play area.
 
@@ -1075,31 +1364,6 @@ class GameState:
             True if player has control token on planet
         """
         return player_id in self.planet_control_tokens.get(planet.name, set())
-
-    def _get_or_create_planet_card(self, planet: Planet) -> PlanetCard:
-        """Get or create a planet card for the given planet.
-
-        Args:
-            planet: The planet
-
-        Returns:
-            The corresponding planet card
-        """
-        # Check if card exists in deck
-        if planet.name in self.planet_card_deck:
-            return self.planet_card_deck[planet.name]
-
-        # Check if card exists in any player's play area
-        for player_cards in self.player_planet_cards.values():
-            for card in player_cards:
-                if card.name == planet.name:
-                    return card
-
-        # Create new card if it doesn't exist
-        from .planet_card import PlanetCard as PlanetCardClass
-
-        planet_card = PlanetCardClass(planet.name, planet.resources, planet.influence)
-        return planet_card
 
     def _transfer_planet_card_from_deck(
         self, player_id: str, planet_card: PlanetCard
@@ -1316,3 +1580,53 @@ class GameState:
         if objective not in new_deck:
             new_deck.append(objective)
         return self._create_new_state(secret_objective_deck=new_deck)
+
+    def assign_strategy_card(self, player_id: str, card: StrategyCardType) -> GameState:
+        """Assign a strategy card to a player.
+
+        Args:
+            player_id: The player ID to assign the card to
+            card: The strategy card to assign
+
+        Returns:
+            New GameState with updated strategy card assignments
+
+        Raises:
+            ValueError: If player_id is None/empty or card is None, or if card is already assigned
+        """
+        if player_id is None:
+            raise ValueError("Player ID cannot be None")
+        if player_id == "":
+            raise ValueError("Player ID cannot be empty")
+        if card is None:
+            raise ValueError("Strategy card cannot be None")
+
+        # Check if card is already assigned to another player
+        for existing_player_id, existing_card in self.strategy_card_assignments.items():
+            if existing_card == card and existing_player_id != player_id:
+                raise ValueError(
+                    f"Strategy card {card} is already assigned to player {existing_player_id}"
+                )
+
+        new_assignments = self.strategy_card_assignments.copy()
+        new_assignments[player_id] = card
+        return self._create_new_state(strategy_card_assignments=new_assignments)
+
+    def exhaust_strategy_card(self, card: StrategyCardType) -> GameState:
+        """Exhaust a strategy card.
+
+        Args:
+            card: The strategy card to exhaust
+
+        Returns:
+            New GameState with card added to exhausted set
+
+        Raises:
+            ValueError: If card is None
+        """
+        if card is None:
+            raise ValueError("Strategy card cannot be None")
+
+        new_exhausted = self.exhausted_strategy_cards.copy()
+        new_exhausted.add(card)
+        return self._create_new_state(exhausted_strategy_cards=new_exhausted)

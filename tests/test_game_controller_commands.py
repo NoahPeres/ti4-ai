@@ -2,9 +2,9 @@
 
 from unittest.mock import Mock
 
-from src.ti4.core.game_controller import GameController
-from src.ti4.core.game_state import GameState
-from src.ti4.core.player import Player
+from ti4.core.game_controller import GameController
+from ti4.core.game_state import GameState
+from ti4.core.player import Player
 
 
 def test_game_controller_has_command_manager() -> None:
@@ -28,7 +28,7 @@ def test_game_controller_has_command_manager() -> None:
 
 def test_game_controller_undo_functionality() -> None:
     """Test that GameController can undo actions."""
-    from src.ti4.commands.movement import MovementCommand
+    from ti4.commands.movement import MovementCommand
 
     # Create test players
     players = [

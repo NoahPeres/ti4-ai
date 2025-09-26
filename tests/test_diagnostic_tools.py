@@ -4,8 +4,8 @@ import time
 from typing import Any
 from unittest.mock import Mock
 
-from src.ti4.commands.base import GameCommand
-from src.ti4.core.game_state import GameState
+from ti4.commands.base import GameCommand
+from ti4.core.game_state import GameState
 
 
 class MockCommand(GameCommand):
@@ -39,7 +39,7 @@ class TestGameStateInspector:
     def test_game_state_inspector_creation(self) -> None:
         """Test GameStateInspector creation and basic functionality."""
         # RED: This will fail because GameStateInspector doesn't exist yet
-        from src.ti4.core.diagnostics import GameStateInspector
+        from ti4.core.diagnostics import GameStateInspector
 
         inspector = GameStateInspector()
 
@@ -58,7 +58,7 @@ class TestGameStateInspector:
     def test_detailed_state_analysis(self) -> None:
         """Test detailed game state analysis."""
         # RED: This will fail because GameStateInspector doesn't exist yet
-        from src.ti4.core.diagnostics import GameStateInspector
+        from ti4.core.diagnostics import GameStateInspector
 
         inspector = GameStateInspector()
 
@@ -80,7 +80,7 @@ class TestGameStateInspector:
     def test_state_validation_checks(self) -> None:
         """Test game state validation and consistency checks."""
         # RED: This will fail because GameStateInspector doesn't exist yet
-        from src.ti4.core.diagnostics import GameStateInspector
+        from ti4.core.diagnostics import GameStateInspector
 
         inspector = GameStateInspector()
 
@@ -104,7 +104,7 @@ class TestCommandHistoryAnalyzer:
     def test_command_history_analyzer_creation(self) -> None:
         """Test CommandHistoryAnalyzer creation and basic functionality."""
         # RED: This will fail because CommandHistoryAnalyzer doesn't exist yet
-        from src.ti4.core.diagnostics import CommandHistoryAnalyzer
+        from ti4.core.diagnostics import CommandHistoryAnalyzer
 
         analyzer = CommandHistoryAnalyzer()
 
@@ -126,7 +126,7 @@ class TestCommandHistoryAnalyzer:
     def test_command_pattern_detection(self) -> None:
         """Test detection of command patterns and anomalies."""
         # RED: This will fail because CommandHistoryAnalyzer doesn't exist yet
-        from src.ti4.core.diagnostics import CommandHistoryAnalyzer
+        from ti4.core.diagnostics import CommandHistoryAnalyzer
 
         analyzer = CommandHistoryAnalyzer()
 
@@ -148,7 +148,7 @@ class TestCommandHistoryAnalyzer:
     def test_command_performance_analysis(self) -> None:
         """Test command execution performance analysis."""
         # RED: This will fail because CommandHistoryAnalyzer doesn't exist yet
-        from src.ti4.core.diagnostics import CommandHistoryAnalyzer
+        from ti4.core.diagnostics import CommandHistoryAnalyzer
 
         analyzer = CommandHistoryAnalyzer()
 
@@ -172,7 +172,7 @@ class TestPerformanceProfiler:
     def test_performance_profiler_creation(self) -> None:
         """Test PerformanceProfiler creation and basic functionality."""
         # RED: This will fail because PerformanceProfiler doesn't exist yet
-        from src.ti4.core.diagnostics import PerformanceProfiler
+        from ti4.core.diagnostics import PerformanceProfiler
 
         profiler = PerformanceProfiler()
 
@@ -189,7 +189,7 @@ class TestPerformanceProfiler:
     def test_nested_profiling(self) -> None:
         """Test nested operation profiling."""
         # RED: This will fail because PerformanceProfiler doesn't exist yet
-        from src.ti4.core.diagnostics import PerformanceProfiler
+        from ti4.core.diagnostics import PerformanceProfiler
 
         profiler = PerformanceProfiler()
 
@@ -211,7 +211,7 @@ class TestPerformanceProfiler:
     def test_profiling_statistics(self) -> None:
         """Test profiling statistics and reporting."""
         # RED: This will fail because PerformanceProfiler doesn't exist yet
-        from src.ti4.core.diagnostics import PerformanceProfiler
+        from ti4.core.diagnostics import PerformanceProfiler
 
         profiler = PerformanceProfiler()
 

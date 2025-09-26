@@ -1,12 +1,12 @@
 """Tests for Tactical Action Integration - demonstrates no redundancy and clear separation."""
 
-from src.ti4.core.constants import UnitType
-from src.ti4.core.galaxy import Galaxy
-from src.ti4.core.hex_coordinate import HexCoordinate
-from src.ti4.core.system import System
-from src.ti4.core.tactical_action_coordinator import TacticalActionCoordinator
-from src.ti4.core.unit import Unit
 from tests.test_constants import MockPlayer, MockSystem
+from ti4.core.constants import UnitType
+from ti4.core.galaxy import Galaxy
+from ti4.core.hex_coordinate import HexCoordinate
+from ti4.core.system import System
+from ti4.core.tactical_action_coordinator import TacticalActionCoordinator
+from ti4.core.unit import Unit
 
 
 class TestTacticalActionIntegration:
@@ -79,7 +79,7 @@ class TestTacticalActionIntegration:
 
     def test_rule89_validator_independence(self) -> None:
         """Test that Rule89Validator works independently."""
-        from src.ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.rule89_validator import Rule89Validator
 
         validator = Rule89Validator()
 
@@ -105,7 +105,7 @@ class TestTacticalActionIntegration:
 
     def test_movement_engine_independence(self) -> None:
         """Test that MovementEngine works independently."""
-        from src.ti4.actions.movement_engine import MovementPlan
+        from ti4.actions.movement_engine import MovementPlan
 
         # Test MovementEngine independently
         movement_plan = MovementPlan()
@@ -122,7 +122,7 @@ class TestTacticalActionIntegration:
     def test_no_circular_dependencies(self) -> None:
         """Test that there are no circular dependencies between systems."""
         # Rule89Validator should not import MovementEngine
-        from src.ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.rule89_validator import Rule89Validator
 
         validator = Rule89Validator()
 
@@ -131,7 +131,7 @@ class TestTacticalActionIntegration:
         assert len(steps) == 5
 
         # MovementEngine should not import Rule89Validator directly
-        from src.ti4.actions.movement_engine import MovementPlan
+        from ti4.actions.movement_engine import MovementPlan
 
         plan = MovementPlan()
 

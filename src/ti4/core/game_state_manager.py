@@ -20,17 +20,17 @@ class PlayerState:
     player: Player
     tactic_tokens: int = field(
         default_factory=lambda: __import__(
-            "src.ti4.core.constants", fromlist=["GameStateConstants"]
+            "ti4.core.constants", fromlist=["GameStateConstants"]
         ).GameStateConstants.DEFAULT_TACTIC_TOKENS
     )
     fleet_tokens: int = field(
         default_factory=lambda: __import__(
-            "src.ti4.core.constants", fromlist=["GameStateConstants"]
+            "ti4.core.constants", fromlist=["GameStateConstants"]
         ).GameStateConstants.DEFAULT_FLEET_TOKENS
     )
     strategy_tokens: int = field(
         default_factory=lambda: __import__(
-            "src.ti4.core.constants", fromlist=["GameStateConstants"]
+            "ti4.core.constants", fromlist=["GameStateConstants"]
         ).GameStateConstants.DEFAULT_STRATEGY_TOKENS
     )
     strategy_cards: list[StrategyCard] = field(default_factory=list)
@@ -38,12 +38,12 @@ class PlayerState:
     fleets: list[Fleet] = field(default_factory=list)
     resources: int = field(
         default_factory=lambda: __import__(
-            "src.ti4.core.constants", fromlist=["GameStateConstants"]
+            "ti4.core.constants", fromlist=["GameStateConstants"]
         ).GameStateConstants.DEFAULT_RESOURCES
     )
     influence: int = field(
         default_factory=lambda: __import__(
-            "src.ti4.core.constants", fromlist=["GameStateConstants"]
+            "ti4.core.constants", fromlist=["GameStateConstants"]
         ).GameStateConstants.DEFAULT_INFLUENCE
     )
 
@@ -58,12 +58,12 @@ class GameState:
     current_phase: GamePhase = GamePhase.SETUP
     current_player_index: int = field(
         default_factory=lambda: __import__(
-            "src.ti4.core.constants", fromlist=["GameStateConstants"]
+            "ti4.core.constants", fromlist=["GameStateConstants"]
         ).GameStateConstants.DEFAULT_CURRENT_PLAYER_INDEX
     )
     round_number: int = field(
         default_factory=lambda: __import__(
-            "src.ti4.core.constants", fromlist=["GameStateConstants"]
+            "ti4.core.constants", fromlist=["GameStateConstants"]
         ).GameStateConstants.DEFAULT_ROUND_NUMBER
     )
     unit_stats_provider: UnitStatsProvider = field(default_factory=UnitStatsProvider)

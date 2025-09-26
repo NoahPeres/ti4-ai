@@ -5,7 +5,7 @@ New code should import from src.ti4.core.strategy_cards.actions.strategy_card_ac
 """
 
 # Backward compatibility imports
-from src.ti4.core.strategy_cards.actions.strategy_card_actions import (
+from ti4.core.strategy_cards.actions.strategy_card_actions import (
     SecondaryAbilityDecision,
     StrategyCardActivationDecision,
     StrategyCardSelectionDecision,

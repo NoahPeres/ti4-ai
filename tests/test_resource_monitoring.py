@@ -5,8 +5,8 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from src.ti4.core.game_state import GameState
-from src.ti4.performance.monitoring import (
+from ti4.core.game_state import GameState
+from ti4.performance.monitoring import (
     GameStateResourceManager,
     PerformanceMetrics,
     ResourceMonitor,
@@ -30,7 +30,7 @@ class TestResourceMonitor:
         monitor = ResourceMonitor()
 
         # Test with psutil available
-        with patch("src.ti4.performance.monitoring.PSUTIL_AVAILABLE", True):
+        with patch("ti4.performance.monitoring.PSUTIL_AVAILABLE", True):
             mock_process = Mock()
             mock_process.memory_info.return_value.rss = (
                 100 * 1024 * 1024
@@ -46,7 +46,7 @@ class TestResourceMonitor:
         monitor = ResourceMonitor()
 
         # Test with psutil available
-        with patch("src.ti4.performance.monitoring.PSUTIL_AVAILABLE", True):
+        with patch("ti4.performance.monitoring.PSUTIL_AVAILABLE", True):
             mock_process = Mock()
             mock_process.cpu_percent.return_value = 25.5
             monitor._process = mock_process

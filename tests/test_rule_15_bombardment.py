@@ -8,10 +8,10 @@ LRR Reference: Rule 15 - BOMBARDMENT (UNIT ABILITY)
 
 import pytest
 
-from src.ti4.core.constants import Faction, UnitType
-from src.ti4.core.planet import Planet
-from src.ti4.core.system import System
-from src.ti4.core.unit import Unit
+from ti4.core.constants import Faction, UnitType
+from ti4.core.planet import Planet
+from ti4.core.system import System
+from ti4.core.unit import Unit
 
 
 class TestRule15BombardmentRolls:
@@ -38,7 +38,7 @@ class TestRule15BombardmentRolls:
         system.place_unit_in_space(dreadnought)
 
         # Execute bombardment
-        from src.ti4.core.bombardment import BombardmentSystem
+        from ti4.core.bombardment import BombardmentSystem
 
         bombardment = BombardmentSystem()
         result = bombardment.execute_bombardment(
@@ -75,7 +75,7 @@ class TestRule15BombardmentRolls:
         LRR: "A hit is produced for each die roll that is equal to or greater
         than the unit's 'Bombardment' value."
         """
-        from src.ti4.core.bombardment import BombardmentRoll
+        from ti4.core.bombardment import BombardmentRoll
 
         # Test with fixed dice rolls
         roll = BombardmentRoll(bombardment_value=5, dice_count=2)
@@ -91,7 +91,7 @@ class TestRule15BombardmentRolls:
         LRR: "Game effects that reroll, modify, or otherwise affect combat rolls
         do not affect bombardment rolls."
         """
-        from src.ti4.core.bombardment import BombardmentRoll
+        from ti4.core.bombardment import BombardmentRoll
 
         # Create a bombardment roll
         roll = BombardmentRoll(bombardment_value=5, dice_count=1)
@@ -140,7 +140,7 @@ class TestRule15PlanetTargeting:
         system.place_unit_in_space(dreadnought2)
 
         # Execute bombardment with targeting declaration
-        from src.ti4.core.bombardment import BombardmentSystem
+        from ti4.core.bombardment import BombardmentSystem
 
         bombardment = BombardmentSystem()
 
@@ -170,7 +170,7 @@ class TestRule15PlanetTargeting:
         dreadnought = Unit(unit_type=UnitType.DREADNOUGHT, owner="attacker")
         system.place_unit_in_space(dreadnought)
 
-        from src.ti4.core.bombardment import BombardmentSystem
+        from ti4.core.bombardment import BombardmentSystem
 
         bombardment = BombardmentSystem()
 
@@ -205,7 +205,7 @@ class TestRule15ShieldInteraction:
         dreadnought = Unit(unit_type=UnitType.DREADNOUGHT, owner="attacker")
         system.place_unit_in_space(dreadnought)
 
-        from src.ti4.core.bombardment import BombardmentSystem
+        from ti4.core.bombardment import BombardmentSystem
 
         bombardment = BombardmentSystem()
 
@@ -236,7 +236,7 @@ class TestRule15ShieldInteraction:
         dreadnought = Unit(unit_type=UnitType.DREADNOUGHT, owner="attacker")
         system.place_unit_in_space(dreadnought)
 
-        from src.ti4.core.bombardment import BombardmentSystem
+        from ti4.core.bombardment import BombardmentSystem
 
         bombardment = BombardmentSystem()
 
@@ -281,7 +281,7 @@ class TestRule15GroundForceDestruction:
         )  # 3 bombardment dice
         system.place_unit_in_space(war_sun)
 
-        from src.ti4.core.bombardment import BombardmentSystem
+        from ti4.core.bombardment import BombardmentSystem
 
         bombardment = BombardmentSystem()
 
@@ -318,7 +318,7 @@ class TestRule15GroundForceDestruction:
         dreadnought = Unit(unit_type=UnitType.DREADNOUGHT, owner="attacker")
         system.place_unit_in_space(dreadnought)
 
-        from src.ti4.core.bombardment import BombardmentSystem
+        from ti4.core.bombardment import BombardmentSystem
 
         bombardment = BombardmentSystem()
 
@@ -356,7 +356,7 @@ class TestRule15FactionSpecificRules:
         dreadnought = Unit(unit_type=UnitType.DREADNOUGHT, owner="l1z1x_player")
         system.place_unit_in_space(dreadnought)
 
-        from src.ti4.core.bombardment import BombardmentSystem
+        from ti4.core.bombardment import BombardmentSystem
 
         bombardment = BombardmentSystem()
 
@@ -397,7 +397,7 @@ class TestRule15IntegrationWithInvasion:
         dreadnought = Unit(unit_type=UnitType.DREADNOUGHT, owner="attacker")
         system.place_unit_in_space(dreadnought)
 
-        from src.ti4.core.bombardment import BombardmentSystem
+        from ti4.core.bombardment import BombardmentSystem
 
         bombardment = BombardmentSystem()
 
@@ -435,7 +435,7 @@ class TestRule15IntegrationWithInvasion:
         dreadnought = Unit(unit_type=UnitType.DREADNOUGHT, owner="attacker")
         system.place_unit_in_space(dreadnought)
 
-        from src.ti4.core.bombardment import BombardmentSystem
+        from ti4.core.bombardment import BombardmentSystem
 
         bombardment = BombardmentSystem()
 
@@ -477,8 +477,8 @@ class TestRule15TechnologyIntegration:
         dreadnought = Unit(unit_type=UnitType.DREADNOUGHT, owner="attacker")
         system.place_unit_in_space(dreadnought)
 
-        from src.ti4.core.bombardment import BombardmentSystem
-        from src.ti4.core.constants import Technology
+        from ti4.core.bombardment import BombardmentSystem
+        from ti4.core.constants import Technology
 
         bombardment = BombardmentSystem()
 

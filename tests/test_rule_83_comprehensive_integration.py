@@ -21,12 +21,12 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     pass
 
-from src.ti4.core.constants import Technology
-from src.ti4.core.game_state import GameState
-from src.ti4.core.player import Player
-from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
-from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
-from src.ti4.testing.test_utilities import TestUtilities
+from ti4.core.constants import Technology
+from ti4.core.game_state import GameState
+from ti4.core.player import Player
+from ti4.core.strategic_action import StrategicActionManager, StrategyCardType
+from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+from ti4.testing.test_utilities import TestUtilities
 
 
 class IntegrationTestHelper:
@@ -179,7 +179,7 @@ class TestRule83Rule82Integration:
         strategic_action_manager.set_action_phase(True)
 
         # Use legacy strategic action functionality
-        from src.ti4.core.strategic_action import StrategyCard
+        from ti4.core.strategic_action import StrategyCard
 
         warfare_card = StrategyCard(
             StrategyCardType.WARFARE,
@@ -208,7 +208,7 @@ class TestRule83Rule91Integration:
 
         Requirements: 6.1, 6.5 - Technology strategy card integration
         """
-        from src.ti4.core.technology_strategy_card import TechnologyStrategyCard
+        from ti4.core.technology_strategy_card import TechnologyStrategyCard
 
         # Create integrated system using helper
         strategic_action_manager, coordinator = (
@@ -246,7 +246,7 @@ class TestRule83Rule91Integration:
 
         Requirements: 6.3, 6.5 - Card abilities work with coordinator
         """
-        from src.ti4.core.technology_strategy_card import TechnologyStrategyCard
+        from ti4.core.technology_strategy_card import TechnologyStrategyCard
 
         # Create technology card instance
         tech_card = TechnologyStrategyCard()

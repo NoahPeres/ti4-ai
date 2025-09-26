@@ -1,6 +1,6 @@
 """Tests for hex coordinate system."""
 
-from src.ti4.core.hex_coordinate import HexCoordinate
+from ti4.core.hex_coordinate import HexCoordinate
 
 
 class TestHexCoordinate:

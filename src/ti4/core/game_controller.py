@@ -3,18 +3,18 @@
 # Import for type hints
 from typing import TYPE_CHECKING, Any, Optional, Union
 
-from src.ti4.commands.base import GameCommand
-from src.ti4.commands.manager import CommandManager
-from src.ti4.core.events import create_phase_changed_event
-from src.ti4.core.exceptions import InvalidPlayerError
-from src.ti4.core.game_phase import GamePhase
-from src.ti4.core.game_state_machine import GameStateMachine
-from src.ti4.core.player import Player
-from src.ti4.core.strategy_card import STANDARD_STRATEGY_CARDS, StrategyCard
-from src.ti4.core.validation import ValidationError
+from ti4.commands.base import GameCommand
+from ti4.commands.manager import CommandManager
+from ti4.core.events import create_phase_changed_event
+from ti4.core.exceptions import InvalidPlayerError
+from ti4.core.game_phase import GamePhase
+from ti4.core.game_state_machine import GameStateMachine
+from ti4.core.player import Player
+from ti4.core.strategy_card import STANDARD_STRATEGY_CARDS, StrategyCard
+from ti4.core.validation import ValidationError
 
 if TYPE_CHECKING:
-    from src.ti4.core.strategy_cards.strategic_action import StrategyCardType
+    from ti4.core.strategy_cards.strategic_action import StrategyCardType
 
 
 class GameController:
@@ -27,6 +27,7 @@ class GameController:
         if len(players) < 3:
             raise InvalidPlayerError("At least 3 players are required for TI4")
         self._players = players
+        self._initial_player_count = len(players)  # Track initial count for Rule 33.9
         self._current_player_index = 0
         self._state_machine = GameStateMachine()
         self._available_strategy_cards = list(STANDARD_STRATEGY_CARDS)
@@ -46,6 +47,30 @@ class GameController:
         self._strategy_card_type_to_id = {
             c.name.lower(): c.id for c in STANDARD_STRATEGY_CARDS
         }
+
+    @classmethod
+    def with_remaining_players(
+        cls, original_controller: "GameController", remaining_players: list[Player]
+    ) -> "GameController":
+        """Create a new GameController with remaining players while preserving original player count.
+
+        This method is used for Rule 33.9 testing where we need to simulate player elimination
+        while preserving the original player count for strategy card distribution rules.
+
+        Args:
+            original_controller: The original GameController instance
+            remaining_players: List of players that remain after elimination
+
+        Returns:
+            New GameController instance with preserved initial player count
+        """
+        # Create new controller with remaining players
+        new_controller = cls(remaining_players)
+
+        # Preserve the original initial player count for Rule 33.9
+        new_controller._initial_player_count = original_controller._initial_player_count
+
+        return new_controller
 
     def get_turn_order(self) -> list[Player]:
         """Get the current turn order."""
@@ -348,9 +373,21 @@ class GameController:
         return [player for player, _ in player_initiatives]
 
     def _get_cards_per_player(self) -> int:
-        """Calculate how many strategy cards each player should have."""
+        """Calculate how many strategy cards each player should have.
+
+        Rule 33.9: If the game drops from 5+ players to 4 or fewer due to elimination,
+        players still only select one strategy card during the strategy phase.
+        """
         total_strategy_cards = len(STANDARD_STRATEGY_CARDS)  # 8 cards
-        return total_strategy_cards // len(self._players)
+        player_count = len(self._players)
+
+        # Rule 33.9: If we started with 5+ players and now have 4 or fewer,
+        # each player still only gets 1 strategy card
+        if self._initial_player_count >= 5 and player_count <= 4:
+            return 1
+
+        # Standard distribution: divide cards evenly among players
+        return total_strategy_cards // player_count
 
     def is_strategy_phase_complete(self) -> bool:
         """Check if all players have selected their required number of strategy cards."""

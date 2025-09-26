@@ -11,7 +11,7 @@ Requirements tested:
 - 2.5: Strategy phase completes when all players have selected cards
 """
 
-from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
+from ti4.core.strategic_action import StrategicActionManager, StrategyCardType
 
 
 class TestRule83StrategyPhaseCardSelection:
@@ -23,7 +23,7 @@ class TestRule83StrategyPhaseCardSelection:
         Requirements: 2.1 - Players can select cards in speaker order during strategy phase
         """
         # This will fail initially - RED phase
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -46,7 +46,7 @@ class TestRule83StrategyPhaseCardSelection:
 
         Requirements: 2.3 - Selected cards are no longer available to other players
         """
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -69,7 +69,7 @@ class TestRule83StrategyPhaseCardSelection:
 
         Requirements: 2.1 - Players can select cards in speaker order during strategy phase
         """
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -98,7 +98,7 @@ class TestRule83StrategyPhaseCardSelection:
 
         Requirements: 2.4 - Invalid card selections are rejected
         """
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -124,7 +124,7 @@ class TestRule83StrategyPhaseCardSelection:
 
         Requirements: 2.5 - Strategy phase completes when all players have selected cards
         """
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -152,7 +152,7 @@ class TestRule83StrategyPhaseCardSelection:
 
         Requirements: 2.2 - Selected cards move from common play area to player's play area
         """
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -174,7 +174,7 @@ class TestRule83StrategyPhaseCardSelection:
 
         Requirements: 7.1, 7.2 - Support games with 3-8 players, unselected cards remain
         """
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -199,7 +199,7 @@ class TestRule83StrategyPhaseCardSelection:
 
         Requirements: 9.1, 9.2 - Comprehensive error handling and validation
         """
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)

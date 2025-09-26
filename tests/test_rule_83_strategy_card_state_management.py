@@ -12,7 +12,7 @@ Requirements tested:
 - 4.5: System accurately reports readied/exhausted status
 """
 
-from src.ti4.core.strategic_action import StrategicActionManager, StrategyCardType
+from ti4.core.strategic_action import StrategicActionManager, StrategyCardType
 
 
 class TestRule83StrategyCardStateTracking:
@@ -24,7 +24,7 @@ class TestRule83StrategyCardStateTracking:
         Requirements: 4.1 - Strategy cards start in readied state when first assigned
         """
         # This will fail initially - RED phase
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -49,7 +49,7 @@ class TestRule83StrategyCardStateTracking:
         Requirements: 4.2 - Strategic actions cause strategy cards to become exhausted
         """
         # This will fail initially - RED phase
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -80,7 +80,7 @@ class TestRule83StrategyCardStateTracking:
         Requirements: 4.3 - Exhausted cards cannot use primary abilities again this round
         """
         # This will fail initially - RED phase
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -103,7 +103,7 @@ class TestRule83StrategyCardStateTracking:
         Requirements: 4.1, 4.3 - Readied cards can use primary abilities
         """
         # This will fail initially - RED phase
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -123,7 +123,7 @@ class TestRule83StrategyCardStateTracking:
         Requirements: 4.4 - Status phase readies all strategy cards for next round
         """
         # This will fail initially - RED phase
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -168,7 +168,7 @@ class TestRule83StrategyCardStateTracking:
         Requirements: 4.5 - System accurately reports readied/exhausted status
         """
         # This will fail initially - RED phase
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -215,7 +215,7 @@ class TestRule83StrategicActionManagerIntegration:
         Requirements: 4.2, 6.1 - Integration with existing StrategicActionManager
         """
         # This will fail initially - RED phase
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -232,7 +232,7 @@ class TestRule83StrategicActionManagerIntegration:
         Requirements: 4.2, 6.2 - Strategic action manager uses coordinator for validation
         """
         # This will fail initially - RED phase
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -264,7 +264,7 @@ class TestRule83StateManagementEdgeCases:
         Requirements: 4.5, 9.1 - Accurate state reporting and error handling
         """
         # This will fail initially - RED phase
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -283,7 +283,7 @@ class TestRule83StateManagementEdgeCases:
         Requirements: 9.1, 9.2 - Error handling and validation
         """
         # This will fail initially - RED phase
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -305,7 +305,7 @@ class TestRule83StateManagementEdgeCases:
         Requirements: 9.1, 9.2 - Error handling and validation
         """
         # This will fail initially - RED phase
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -330,7 +330,7 @@ class TestRule83StateManagementInputValidation:
 
         Requirements: 9.1, 9.2 - Error handling and validation
         """
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -345,7 +345,7 @@ class TestRule83StateManagementInputValidation:
 
         Requirements: 9.1, 9.2 - Error handling and validation
         """
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -362,7 +362,7 @@ class TestRule83StateManagementInputValidation:
 
         Requirements: 4.2, 6.2, 9.1 - Integration and error handling
         """
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)

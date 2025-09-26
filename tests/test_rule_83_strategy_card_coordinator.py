@@ -20,8 +20,8 @@ class TestRule83StrategyCardCoordinatorBasics:
         Requirements: 1.1 - System initialization with all eight strategy cards
         """
         # This will fail initially - RED phase
-        from src.ti4.core.strategic_action import StrategicActionManager
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategic_action import StrategicActionManager
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -32,11 +32,11 @@ class TestRule83StrategyCardCoordinatorBasics:
 
         Requirements: 1.2 - Card assignment and tracking functionality
         """
-        from src.ti4.core.strategic_action import (
+        from ti4.core.strategic_action import (
             StrategicActionManager,
             StrategyCardType,
         )
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -50,11 +50,11 @@ class TestRule83StrategyCardCoordinatorBasics:
 
         Requirements: 1.2 - Input validation for card assignment
         """
-        from src.ti4.core.strategic_action import (
+        from ti4.core.strategic_action import (
             StrategicActionManager,
             StrategyCardType,
         )
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -68,8 +68,8 @@ class TestRule83StrategyCardCoordinatorBasics:
 
         Requirements: 1.2 - Input validation for card assignment
         """
-        from src.ti4.core.strategic_action import StrategicActionManager
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategic_action import StrategicActionManager
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -87,11 +87,11 @@ class TestRule83InitiativeOrderCalculation:
 
         Requirements: 1.3 - Initiative order calculation as pure function
         """
-        from src.ti4.core.strategic_action import (
+        from ti4.core.strategic_action import (
             StrategicActionManager,
             StrategyCardType,
         )
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -106,11 +106,11 @@ class TestRule83InitiativeOrderCalculation:
 
         Requirements: 1.3 - Initiative order calculation as pure function
         """
-        from src.ti4.core.strategic_action import (
+        from ti4.core.strategic_action import (
             StrategicActionManager,
             StrategyCardType,
         )
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -130,8 +130,8 @@ class TestRule83InitiativeOrderCalculation:
 
         Requirements: 1.3 - Initiative order calculation as pure function
         """
-        from src.ti4.core.strategic_action import StrategicActionManager
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategic_action import StrategicActionManager
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)
@@ -148,10 +148,10 @@ class TestRule83StrategicActionIntegration:
 
         Requirements: 6.1, 6.2 - Integration with strategic action system
         """
-        from src.ti4.core.strategic_action import (
+        from ti4.core.strategic_action import (
             StrategicActionManager,
         )
-        from src.ti4.core.strategy_card_coordinator import StrategyCardCoordinator
+        from ti4.core.strategy_card_coordinator import StrategyCardCoordinator
 
         strategic_action_manager = StrategicActionManager()
         coordinator = StrategyCardCoordinator(strategic_action_manager)

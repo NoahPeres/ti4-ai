@@ -2,7 +2,7 @@
 
 import pytest
 
-from src.ti4.core.validation import (
+from ti4.core.validation import (
     ValidationError,
     validate_callable,
     validate_collection_not_empty,

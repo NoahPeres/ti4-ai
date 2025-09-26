@@ -1,6 +1,6 @@
 """Tests for GamePhase management."""
 
-from src.ti4.core.game_phase import GamePhase, is_valid_transition
+from ti4.core.game_phase import GamePhase, is_valid_transition
 
 
 def test_game_phase_enum_exists() -> None:

@@ -13,7 +13,7 @@ Key timing windows tested:
 
 from unittest.mock import Mock
 
-from src.ti4.core.abilities import (
+from ti4.core.abilities import (
     Ability,
     AbilityCost,
     AbilityEffect,
@@ -22,8 +22,8 @@ from src.ti4.core.abilities import (
     AbilityPrecedence,
     TimingWindow,
 )
-from src.ti4.core.game_state import GameState
-from src.ti4.core.player import Player
+from ti4.core.game_state import GameState
+from ti4.core.player import Player
 
 
 class TestRule01Abilities:
