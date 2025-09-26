@@ -1,10 +1,16 @@
 """Player implementation for TI4 game state management."""
 
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
 
 from .command_sheet import CommandSheet, PoolType
-from .constants import Faction
+from .constants import Faction, UnitType
+from .exceptions import DeployError, ReinforcementError
 from .faction_data import FactionData
+
+if TYPE_CHECKING:
+    from .reinforcements import Reinforcements
+    from .system import System
 
 
 @dataclass(frozen=True)
@@ -18,6 +24,10 @@ class Player:
         8  # Rule 20.3: 16 total tokens - 8 on sheet = 8 in reinforcements
     )
     _commodity_count: int = field(default=0, init=False)  # Current commodity count
+    _timing_window_id: int = field(default=0, init=False)  # Current timing window
+    _deploy_used_this_window: set[str] = field(
+        default_factory=set, init=False
+    )  # Deploy abilities used this timing window
 
     def is_valid(self) -> bool:
         """Validate the player data."""
@@ -194,3 +204,121 @@ class Player:
                 f"Player only has {self._commodity_count} commodities, cannot remove {amount}"
             )
         object.__setattr__(self, "_commodity_count", self._commodity_count - amount)
+
+    def advance_timing_window(self) -> None:
+        """Advance to a new timing window, resetting deploy ability usage (Rule 30.3)."""
+        object.__setattr__(self, "_timing_window_id", self._timing_window_id + 1)
+        object.__setattr__(self, "_deploy_used_this_window", set())
+
+    def deploy_unit(
+        self,
+        unit_type: UnitType,
+        target_system: "System",
+        target_planet: str | None = None,
+        reinforcements: "Reinforcements | None" = None,
+    ) -> bool:
+        """Deploy a unit using deploy ability (Rule 30: DEPLOY).
+
+        Args:
+            unit_type: The type of unit to deploy
+            target_system: The system to deploy to
+            target_planet: The planet to deploy to (if applicable)
+            reinforcements: The reinforcements pool to use (optional)
+
+        Returns:
+            True if deployment successful
+
+        Raises:
+            DeployError: If deployment conditions are not met
+            ReinforcementError: If no units available in reinforcements
+        """
+        from .unit import Unit
+
+        # Rule 30.1: Check if unit type has deploy ability
+        temp_unit = Unit(unit_type=unit_type, owner=self.id, faction=self.faction)
+        if not temp_unit.has_deploy():
+            raise DeployError(f"Unit {unit_type.value} does not have deploy ability")
+
+        # Rule 30.3: Check timing window restriction
+        deploy_key = f"{unit_type.value}_deploy"
+        if deploy_key in self._deploy_used_this_window:
+            raise DeployError(
+                f"Deploy ability already used for {unit_type} in this timing window"
+            )
+
+        # Rule 30.2: Check reinforcements for available units
+        if reinforcements is None:
+            raise ReinforcementError("Reinforcements pool is required for deployment")
+        pool = reinforcements.get_pool(self.id)
+
+        # Rule 30.2.a: Check if there are any units with deploy ability in reinforcements
+        has_deployable_units = False
+        for unit_type_in_pool in pool.get_all_unit_counts():
+            if pool.get_unit_count(unit_type_in_pool) > 0:
+                # Reuse the temp_unit for capability check instead of creating new instances
+                if unit_type_in_pool == unit_type:
+                    # We already have the temp_unit for this type
+                    if temp_unit.has_deploy():
+                        has_deployable_units = True
+                        break
+                else:
+                    temp_check_unit = Unit(
+                        unit_type=unit_type_in_pool, owner=self.id, faction=self.faction
+                    )
+                    if temp_check_unit.has_deploy():
+                        has_deployable_units = True
+                        break
+
+        if not has_deployable_units:
+            raise ReinforcementError(
+                "No units with deploy ability available in reinforcements"
+            )
+
+        # Check if the specific unit type is available in reinforcements
+        if not reinforcements.has_units_available(self.id, unit_type, 1):
+            raise ReinforcementError(
+                f"No {unit_type.value} available in reinforcements"
+            )
+
+        # For deploy ability, we need to deploy to a planet
+        if target_planet is None:
+            raise DeployError("Deploy ability requires a target planet")
+
+        # Find the target planet in the system
+        target_planet_obj = None
+        for planet in target_system.planets:
+            if planet.name == target_planet:
+                target_planet_obj = planet
+                break
+
+        if target_planet_obj is None:
+            raise DeployError(
+                f"Planet {target_planet} not found in system {target_system.system_id}"
+            )
+
+        # Rule 30.1: Check if player controls the target planet
+        if target_planet_obj.controlled_by != self.id:
+            raise DeployError(
+                f"Cannot deploy to {target_planet}: planet not controlled by player"
+            )
+
+        # Remove from reinforcements first to maintain atomicity
+        pool.remove_units(unit_type, 1)
+
+        # Create and place the unit
+        try:
+            unit_to_deploy = Unit(
+                unit_type=unit_type, owner=self.id, faction=self.faction
+            )
+            target_planet_obj.place_unit(unit_to_deploy)
+        except Exception:
+            # If placement fails, restore the unit to reinforcements using proper API
+            pool.return_destroyed_unit(unit_type)
+            raise
+
+        # Mark deploy ability as used in this timing window
+        new_used_set = self._deploy_used_this_window.copy()
+        new_used_set.add(deploy_key)
+        object.__setattr__(self, "_deploy_used_this_window", new_used_set)
+
+        return True

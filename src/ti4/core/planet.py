@@ -108,3 +108,7 @@ class Planet:
     def can_hold_structures(self) -> bool:
         """Check if structures can be placed on this planet (Rule 88.5)."""
         return True  # All planets can hold structures
+
+    def get_units(self) -> list[Unit]:
+        """Get all units on this planet."""
+        return self.units.copy()
