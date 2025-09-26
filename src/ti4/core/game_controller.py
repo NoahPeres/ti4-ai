@@ -11,7 +11,7 @@ from src.ti4.core.game_phase import GamePhase
 from src.ti4.core.game_state_machine import GameStateMachine
 from src.ti4.core.player import Player
 from src.ti4.core.strategy_card import STANDARD_STRATEGY_CARDS, StrategyCard
-from src.ti4.core.validation import ValidationError
+from ti4.core.validation import ValidationError
 
 if TYPE_CHECKING:
     from src.ti4.core.strategy_cards.strategic_action import StrategyCardType

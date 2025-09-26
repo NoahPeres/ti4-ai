@@ -1,8 +1,9 @@
 """Test Rule 33.4: Promissory note handling on player elimination."""
 
-from src.ti4.core.game_state import GameState
-from src.ti4.core.player import Player
-from src.ti4.core.transactions import PromissoryNote, PromissoryNoteType
+from ti4.core.game_state import GameState
+from ti4.core.player import Player
+from ti4.core.transactions import PromissoryNote, PromissoryNoteType
+from ti4.core.constants import Faction
 
 
 class TestRule334PromissoryNoteElimination:
@@ -17,9 +18,9 @@ class TestRule334PromissoryNoteElimination:
         """
         # Create game state with players
         players = [
-            Player("player1", "red", "The Emirates of Hacan"),
-            Player("player2", "blue", "The Federation of Sol"),
-            Player("player3", "green", "The Barony of Letnev"),
+            Player("player1", Faction.HACAN),
+            Player("player2", Faction.SOL),
+            Player("player3", Faction.BARONY),
         ]
         game_state = GameState(players=players)
 
@@ -78,8 +79,8 @@ class TestRule334PromissoryNoteElimination:
         """
         # Create game state with players
         players = [
-            Player("player1", "red", "The Emirates of Hacan"),
-            Player("player2", "blue", "The Federation of Sol"),
+            Player("player1", Faction.HACAN),
+            Player("player2", Faction.SOL),
         ]
         game_state = GameState(players=players)
 
@@ -109,8 +110,8 @@ class TestRule334PromissoryNoteElimination:
         """Test that elimination works correctly when no promissory notes are involved."""
         # Create game state with players
         players = [
-            Player("player1", "red", "The Emirates of Hacan"),
-            Player("player2", "blue", "The Federation of Sol"),
+            Player("player1", Faction.HACAN),
+            Player("player2", Faction.SOL),
         ]
         game_state = GameState(players=players)
 

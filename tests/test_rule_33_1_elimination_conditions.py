@@ -6,12 +6,12 @@ have no unit with a production value on the game board, and do not control any p
 
 import pytest
 
-from src.ti4.core.constants import Faction, UnitType
-from src.ti4.core.game_state import GameState
-from src.ti4.core.planet import Planet
-from src.ti4.core.player import Player
-from src.ti4.core.system import System
-from src.ti4.core.unit import Unit
+from ti4.core.constants import Faction, UnitType
+from ti4.core.game_state import GameState
+from ti4.core.planet import Planet
+from ti4.core.player import Player
+from ti4.core.system import System
+from ti4.core.unit import Unit
 
 
 class TestRule33_1EliminationConditions:

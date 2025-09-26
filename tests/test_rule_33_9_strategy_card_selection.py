@@ -9,10 +9,10 @@ players due to elimination, players still only select one strategy card during t
 
 import pytest
 
-from src.ti4.core.validation import ValidationError
 from ti4.core.constants import Faction
 from ti4.core.game_controller import GameController
 from ti4.core.player import Player
+from ti4.core.validation import ValidationError
 
 
 class TestRule339StrategyCardSelection:
@@ -259,6 +259,7 @@ class TestRule339StrategyCardSelection:
         # Attempting to select a second card should raise ValidationError
         # since Rule 33.9 limits players to 1 card each
         second_card = available_cards[1]
+
         with pytest.raises(
             ValidationError,
             match="Player player1 cannot select more than 1 strategy cards",

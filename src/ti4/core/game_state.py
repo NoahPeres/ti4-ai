@@ -807,6 +807,7 @@ class GameState:
         """
         # Local import to avoid circular dependencies
         from .system import System
+        from .planet import Planet
 
         # Validate player exists
         if not any(player.id == player_id for player in self.players):
@@ -816,25 +817,45 @@ class GameState:
         # Remove all units owned by the player
         new_systems = {}
         for system_id, system in self.systems.items():
+            # Clone system preserving all attributes
             new_system = System(system_id)
+            
+            # Preserve system-level state
+            new_system.space_units = [unit for unit in system.space_units if unit.owner != player_id]
+            new_system.command_tokens = [token for token in system.command_tokens if token.owner != player_id]
+            
+            # Preserve system attributes if they exist
+            if hasattr(system, 'wormholes'):
+                new_system.wormholes = system.wormholes.copy() if hasattr(system.wormholes, 'copy') else system.wormholes
+            if hasattr(system, 'nebula'):
+                new_system.nebula = system.nebula
+            if hasattr(system, 'gravity_rift'):
+                new_system.gravity_rift = system.gravity_rift
+            if hasattr(system, 'supernova'):
+                new_system.supernova = system.supernova
+            if hasattr(system, 'asteroid_field'):
+                new_system.asteroid_field = system.asteroid_field
 
-            # Copy planets and remove player's units
+            # Copy planets preserving all attributes and flags
             for planet in system.planets:
                 new_planet = Planet(
                     planet.name,
                     planet.resources,
                     planet.influence,
                 )
+                
+                # Preserve planet flags and metadata
+                if hasattr(planet, 'exhausted'):
+                    new_planet.exhausted = planet.exhausted
+                if hasattr(planet, 'metadata'):
+                    new_planet.metadata = planet.metadata.copy() if hasattr(planet.metadata, 'copy') else planet.metadata
+                
                 # Only keep units not owned by eliminated player
                 for unit in planet.units:
                     if unit.owner != player_id:
                         new_planet.place_unit(unit)
+                        
                 new_system.add_planet(new_planet)
-
-            # Copy space units, excluding eliminated player's units
-            for unit in system.space_units:
-                if unit.owner != player_id:
-                    new_system.place_unit_in_space(unit)
 
             new_systems[system_id] = new_system
 
@@ -865,7 +886,14 @@ class GameState:
         new_planet_card_deck = self.planet_card_deck.copy()
         if player_id in self.player_planet_cards:
             for card in self.player_planet_cards[player_id]:
-                new_planet_card_deck[card.name] = card
+                # Use deck.add method if available, otherwise preserve structure
+                if hasattr(new_planet_card_deck, 'add'):
+                    new_planet_card_deck.add(card)
+                elif hasattr(new_planet_card_deck, 'cards'):
+                    new_planet_card_deck.cards[card.name] = card
+                else:
+                    # Fallback to direct assignment preserving existing structure
+                    new_planet_card_deck[card.name] = card
 
         # Rule 33.3: Discard eliminated player's agenda cards
         new_agenda_discard_pile = self.agenda_discard_pile.copy()
@@ -916,6 +944,43 @@ class GameState:
             if pid != player_id
         }
 
+        # Clean up all per-player mappings
+        new_victory_points = {
+            pid: points
+            for pid, points in self.victory_points.items()
+            if pid != player_id
+        }
+
+        new_completed_objectives = {
+            pid: objectives
+            for pid, objectives in self.completed_objectives.items()
+            if pid != player_id
+        }
+
+        new_player_technologies = {
+            pid: techs
+            for pid, techs in self.player_technologies.items()
+            if pid != player_id
+        }
+
+        new_player_technology_cards = {
+            pid: cards
+            for pid, cards in self.player_technology_cards.items()
+            if pid != player_id
+        }
+
+        new_status_phase_scoring = {
+            pid: scoring
+            for pid, scoring in self.status_phase_scoring.items()
+            if pid != player_id
+        }
+
+        new_combat_scoring = {
+            pid: scoring
+            for pid, scoring in self.combat_scoring.items()
+            if pid != player_id
+        }
+
         # Rule 33.8: Transfer speaker token if speaker is eliminated
         new_speaker_id = self._get_next_speaker_after_elimination(player_id)
 
@@ -934,6 +999,12 @@ class GameState:
             promissory_note_manager=new_promissory_note_manager,
             strategy_card_assignments=new_strategy_card_assignments,
             speaker_id=new_speaker_id,
+            victory_points=new_victory_points,
+            completed_objectives=new_completed_objectives,
+            player_technologies=new_player_technologies,
+            player_technology_cards=new_player_technology_cards,
+            status_phase_scoring=new_status_phase_scoring,
+            combat_scoring=new_combat_scoring,
         )
 
     def discard_player_agenda_cards(self, player_id: str) -> GameState:
