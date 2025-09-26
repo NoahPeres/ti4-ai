@@ -129,3 +129,7 @@ class PromissoryNoteManager:
             if note.issuing_player == eliminated_player
         }
         self._available_notes -= notes_to_remove
+
+        # Clear the eliminated player's hand (they no longer exist)
+        if eliminated_player in self._player_hands:
+            del self._player_hands[eliminated_player]

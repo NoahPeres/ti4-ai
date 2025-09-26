@@ -44,17 +44,27 @@ f If the Mahact Gene-Sorcerers have an eliminated player's command token on thei
 RELATED TOPICS: Agenda Card, Control, Ground Forces, Production, Promissory Notes
 ```
 
+**Source:** <mcreference link="https://www.tirules.com/R_elimination" index="1">1</mcreference>
+
 ## Sub-Rules Analysis
 
 ### 33.1 Elimination Conditions
-- **Status:** NOT IMPLEMENTED
+- **Status:** IMPLEMENTED
 - **Description:** Three-condition check for elimination (no ground forces, no production units, no planets)
-- **Gap:** No elimination condition checking system
+- **Implementation:** `should_eliminate_player` method in GameState checks all three conditions
+- **Test Cases:** 
+  - `test_player_not_eliminated_with_ground_forces` - verifies ground forces prevent elimination
+  - `test_player_not_eliminated_with_production_units` - verifies production units prevent elimination
+  - `test_player_not_eliminated_with_controlled_planet` - verifies planet control prevents elimination
+  - `test_player_eliminated_with_all_three_conditions` - verifies elimination when all conditions met
+  - `test_player_not_eliminated_with_only_two_conditions` - verifies no elimination with only 2/3 conditions
+  - `test_elimination_check_for_nonexistent_player` - verifies error handling for invalid player
 
 ### 33.2 Component Return to Game Box
-- **Status:** NOT IMPLEMENTED
+- **Status:** IMPLEMENTED
 - **Description:** Return all player components to game box
-- **Gap:** No component cleanup or game box management
+- **Implementation:** `eliminate_player` method in GameState removes all units, control tokens, and player data
+- **Test Cases:** `test_component_return_on_elimination` verifies units are removed and player is eliminated
 
 ### 33.3 Agenda Card Discard
 - **Status:** NOT IMPLEMENTED
@@ -62,14 +72,23 @@ RELATED TOPICS: Agenda Card, Control, Ground Forces, Production, Promissory Note
 - **Gap:** No agenda card ownership tracking or discard system
 
 ### 33.4 Promissory Note Return
-- **Status:** NOT IMPLEMENTED
+- **Status:** IMPLEMENTED
 - **Description:** Return other players' promissory notes to their owners
-- **Gap:** No promissory note ownership or return mechanics
+- **Implementation:** Integrated `PromissoryNoteManager.handle_player_elimination` into `GameState.eliminate_player` method
+- **Test Cases:** 
+  - `test_promissory_notes_returned_on_elimination` - verifies promissory notes are properly handled on elimination
+  - `test_promissory_notes_removed_from_available_pool` - verifies eliminated player's notes removed from available pool
+  - `test_elimination_with_no_promissory_notes` - verifies elimination works when no promissory notes involved
 
 ### 33.5 Action Card Discard
-- **Status:** NOT IMPLEMENTED
+- **Status:** IMPLEMENTED
 - **Description:** Discard all action cards in hand
-- **Gap:** No action card hand management or discard system
+- **Implementation:** `eliminate_player` method in GameState adds eliminated player's action cards to discard pile and removes them from player's hand
+- **Test Cases:** 
+  - `test_action_cards_discarded_on_elimination` - verifies action cards are discarded when player eliminated
+  - `test_elimination_with_no_action_cards` - verifies elimination works when player has no action cards
+  - `test_elimination_does_not_affect_other_players_action_cards` - verifies other players' action cards unaffected
+  - `test_action_cards_added_to_existing_discard_pile` - verifies action cards added to existing discard pile
 
 ### 33.6 Strategy Card Return
 - **Status:** NOT IMPLEMENTED
