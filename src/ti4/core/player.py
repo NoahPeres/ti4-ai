@@ -1,5 +1,7 @@
 """Player implementation for TI4 game state management."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
@@ -9,6 +11,7 @@ from .exceptions import DeployError, ReinforcementError
 from .faction_data import FactionData
 
 if TYPE_CHECKING:
+    from .exploration import ExplorationCard
     from .reinforcements import Reinforcements
     from .system import System
 
@@ -28,6 +31,9 @@ class Player:
     _deploy_used_this_window: set[str] = field(
         default_factory=set, init=False
     )  # Deploy abilities used this timing window
+    relic_fragments: list[ExplorationCard] = field(
+        default_factory=list, init=False
+    )  # Rule 35: Relic fragments from exploration
 
     def is_valid(self) -> bool:
         """Validate the player data."""
