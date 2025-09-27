@@ -2,8 +2,8 @@
 
 ## Category Overview
 **Rule Type:** Core Game Mechanic
-**Priority:** MEDIUM-HIGH
-**Status:** NOT IMPLEMENTED
+**Priority:** Completed
+**Status:** FULLY IMPLEMENTED
 **Complexity:** High
 
 ## Raw LRR Text
