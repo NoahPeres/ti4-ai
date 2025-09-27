@@ -1,6 +1,6 @@
 # TI4 AI Implementation Roadmap
 
-## 🎯 Overall Progress: 32/101 Rules (31.7% Complete)
+## 🎯 Overall Progress: 33/101 Rules (32.7% Complete)
 
 ### Last Updated
 January 2025 (Quality Audit Completed)
@@ -58,10 +58,11 @@ Core Game Mechanics
 
 ## 📊 Implementation Status Summary
 
-### ✅ Completed Rules (37/101)
+### ✅ Completed Rules (38/101)
 
-#### Foundation Layer (14/101)
+#### Foundation Layer (15/101)
 - Rule 6: ADJACENCY - Spatial relationships and system connections
+- Rule 12: ATTACH - Card attachment system for exploration/agenda effects ✅ NEW
 - Rule 13: ATTACKER - Combat role definition and assignment
 - Rule 14: BLOCKADED - Production restrictions and space dock blockades
 - Rule 17: CAPTURE - Unit capture mechanics and faction sheet management
@@ -111,16 +112,15 @@ Core Game Mechanics
 
 ### Phase 1: Combat & Unit Management (Priority: HIGH)
 #### Target
-4 additional rules → 36/101 (35.6% coverage)
+3 additional rules → 36/101 (35.6% coverage)
 
 #### Timeline
 1-2 months
 
-#### Immediate Priority (Next 4 Rules)
+#### Immediate Priority (Next 3 Rules)
 1. Rule 33: ELIMINATION - Player elimination and component cleanup ⚠️ CRITICAL GAP IDENTIFIED
-2. Rule 12: ATTACH - Card attachment system for exploration/agenda effects
-3. Rule 35: EXPLORATION - Planet exploration with trait-based rewards
-4. Rule 74: REROLLS - Dice reroll mechanics for combat
+2. Rule 35: EXPLORATION - Planet exploration with trait-based rewards
+3. Rule 74: REROLLS - Dice reroll mechanics for combat
 
 #### Secondary Priority (Next 4 Rules)
 5. Rule 95: TRANSPORT - Unit transportation and capacity mechanics
