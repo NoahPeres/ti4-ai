@@ -112,33 +112,34 @@ class TestRule74_2MultipleRerollRestrictions(unittest.TestCase):
 class TestRule74_3RerollTiming(unittest.TestCase):
     """Test Rule 74.3: Die rerolls must occur after rolling the dice, before other abilities are resolved."""
 
-    def test_rerolls_occur_before_other_abilities(self) -> None:
-        """Test that rerolls must be resolved before other abilities.
-
-        LRR 74.3: Die rerolls must occur after rolling the dice, before other abilities are resolved.
-        """
+    def test_reroll_phase_enforcement(self):
+        """Test Rule 74.3: Rerolls must occur during the reroll phase."""
+        dice_roll = DiceRoll([5, 3, 8])
         reroll_system = RerollSystem()
 
-        # Mock other abilities that should wait for rerolls
-        post_roll_ability = Mock()
-        post_roll_ability.name = "Post-Roll Modifier"
-
-        # Verify reroll system enforces timing
+        # Complete the reroll phase using the timing enforcer
         timing_enforcer = reroll_system.get_timing_enforcer()
-
-        # Should be in reroll phase initially
-        assert timing_enforcer.is_reroll_phase() is True, "Should start in reroll phase"
-        assert timing_enforcer.can_use_post_roll_abilities() is False, (
-            "Post-roll abilities should wait"
-        )
-
-        # After all rerolls are complete, should move to post-roll phase
         timing_enforcer.complete_reroll_phase()
 
-        assert timing_enforcer.is_reroll_phase() is False, "Should exit reroll phase"
-        assert timing_enforcer.can_use_post_roll_abilities() is True, (
-            "Post-roll abilities should be available"
+        # Attempt to reroll after phase completion should fail
+        with self.assertRaises(RuntimeError) as context:
+            reroll_system.reroll_die(dice_roll, 0)
+
+        self.assertIn(
+            "Rerolls must occur during the reroll phase", str(context.exception)
         )
+
+        # Verify die result unchanged
+        self.assertEqual(dice_roll.get_result(0), 5)
+
+        # Test with ability-based reroll - should return False
+        ability = Mock()
+        ability.name = "Test Ability"
+        result = reroll_system.reroll_die_with_ability(dice_roll, 1, ability)
+        self.assertFalse(result)
+
+        # Verify die result unchanged
+        self.assertEqual(dice_roll.get_result(1), 3)
 
 
 if __name__ == "__main__":

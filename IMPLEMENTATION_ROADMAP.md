@@ -1,6 +1,6 @@
 # TI4 AI Implementation Roadmap
 
-## 🎯 Overall Progress: 33/101 Rules (32.7% Complete)
+## 🎯 Overall Progress: 35/101 Rules (34.7% Complete)
 
 ### Last Updated
 January 2025 (Quality Audit Completed)
@@ -118,25 +118,28 @@ Core Game Mechanics
 1-2 months
 
 #### Immediate Priority (Next 3 Rules)
-1. Rule 33: ELIMINATION - Player elimination and component cleanup ⚠️ CRITICAL GAP IDENTIFIED
-2. Rule 35: EXPLORATION - Planet exploration with trait-based rewards
-3.- Rule 74: REROLLS - Complete Implementation ✅
+1. Rule 35: EXPLORATION - Planet exploration with trait-based rewards
+2. Rule 95: TRANSPORT - Unit transportation and capacity mechanics
+3. Rule 12: ATTACH - Unit attachment system
 
 #### Secondary Priority (Next 4 Rules)
-5. Rule 95: TRANSPORT - Unit transportation and capacity mechanics
+1. Rule 7: AGENDA CARDS - Political cards and law outcomes
+2. Rule 66: POLITICS - Politics strategy card
+3. Rule 80: SPEAKER - Speaker token privileges and powers
+4. Rule 28: DEALS - Binding agreement system
 
 ### Phase 2: Political & Economic Systems (Priority: MEDIUM-HIGH)
 #### Target
-8 additional rules → 44/101 (43.6% coverage)
+6 additional rules → 41/101 (40.6% coverage)
 
 #### Timeline
 3-4 months
 
 #### Political Framework
-- Rule 7: AGENDA CARDS - Political cards and law outcomes
-- Rule 66: POLITICS - Politics strategy card
-- Rule 80: SPEAKER - Speaker token privileges and powers
-- Rule 28: DEALS - Binding agreement system
+- Rule 9: ANOMALIES - Space anomaly effects
+- Rule 10: ANTI-FIGHTER BARRAGE - Pre-combat mechanics
+- Rule 11: ASTEROID FIELD - Terrain effects
+- Rule 16: CAPACITY - Unit capacity limits
 
 #### Economic Enhancement
 - Rule 47: INFLUENCE - Influence spending mechanics
@@ -218,15 +221,14 @@ Core Game Mechanics
 
 ---
 
-## 🚫 Not Implemented (69/101 Rules)
+## 🚫 Not Implemented (67/101 Rules)
 
 The following rules require implementation to achieve full TI4 compliance:
 
 ### High Priority (Critical Gaps)
-- Rule 33 ELIMINATION - Player elimination mechanics (CRITICAL GAP)
 - Rule 12 ATTACH - Unit attachment system
-- Rule 74 REROLLS - Dice reroll mechanics
 - Rule 95 TRANSPORT - Unit transport capabilities
+- Rule 35 EXPLORATION - Planet exploration with trait-based rewards
 
 ### Medium Priority (Core Gameplay)
 - Rule 07 AGENDA CARD - Political agenda system

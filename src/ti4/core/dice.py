@@ -109,6 +109,8 @@ class RerollSystem:
 
         LRR Reference: Rule 74.1 - New result is used instead of previous result
         """
+        if not self._timing_enforcer.is_reroll_phase():
+            raise RuntimeError("Rerolls must occur during the reroll phase")
         new_result = random.randint(1, 10)  # nosec B311 - game RNG, not crypto
         dice_roll.set_result(die_index, new_result)
 
@@ -127,6 +129,8 @@ class RerollSystem:
 
         LRR Reference: Rule 74.2 - Same ability cannot reroll same die multiple times
         """
+        if not self._timing_enforcer.is_reroll_phase():
+            return False
         ability_name = getattr(ability, "name", str(ability))
 
         # Check if this ability already rerolled this die

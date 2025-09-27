@@ -67,9 +67,10 @@ RELATED TOPICS: Agenda Card, Control, Ground Forces, Production, Promissory Note
 - **Test Cases:** `test_component_return_on_elimination` verifies units are removed and player is eliminated
 
 ### 33.3 Agenda Card Discard
-- **Status:** NOT IMPLEMENTED
+- **Status:** IMPLEMENTED
 - **Description:** Discard all owned agenda cards
-- **Gap:** No agenda card ownership tracking or discard system
+- **Implementation:** `discard_agenda_cards_for_player` method in GameState handles agenda card discard on elimination
+- **Test Cases:** Agenda card discard is tested as part of the comprehensive elimination test suite
 
 ### 33.4 Promissory Note Return
 - **Status:** IMPLEMENTED
@@ -91,24 +92,30 @@ RELATED TOPICS: Agenda Card, Control, Ground Forces, Production, Promissory Note
   - `test_action_cards_added_to_existing_discard_pile` - verifies action cards added to existing discard pile
 
 ### 33.6 Strategy Card Return
-- **Status:** NOT IMPLEMENTED
+- **Status:** IMPLEMENTED
 - **Description:** Return strategy cards to common area regardless of exhaustion
-- **Gap:** No strategy card state management or return system
+- **Implementation:** `eliminate_player` method in GameState handles strategy card return to common play area
+- **Test Cases:** `test_strategy_cards_returned_on_elimination` verifies strategy cards are returned to common area
 
 ### 33.7 Secret Objective Return
-- **Status:** NOT IMPLEMENTED
+- **Status:** IMPLEMENTED
 - **Description:** Shuffle secret objectives back into deck
-- **Gap:** No secret objective tracking or deck management
+- **Implementation:** `eliminate_player` method in GameState handles secret objective return to deck
+- **Test Cases:** Secret objective handling is tested as part of the comprehensive elimination test suite
 
 ### 33.8 Speaker Token Transfer
-- **Status:** NOT IMPLEMENTED
+- **Status:** IMPLEMENTED
 - **Description:** Pass speaker token to left player when speaker eliminated
-- **Gap:** No speaker token management or transfer system
+- **Implementation:** `eliminate_player` method in GameState handles speaker token transfer when speaker is eliminated
+- **Test Cases:**
+  - `test_speaker_token_passes_on_speaker_elimination` - verifies speaker token passes to next player
+  - `test_speaker_token_unchanged_on_non_speaker_elimination` - verifies token unchanged when non-speaker eliminated
 
 ### 33.9 Strategy Card Selection Adjustment
-- **Status:** NOT IMPLEMENTED
+- **Status:** IMPLEMENTED
 - **Description:** Maintain single card selection when player count drops
-- **Gap:** No dynamic strategy phase adjustment
+- **Implementation:** `GameController` tracks initial player count and enforces Rule 33.9 strategy card selection limits
+- **Test Cases:** Comprehensive test suite in `test_rule_33_9_strategy_card_selection.py` with 8 test cases covering all scenarios
 
 ### 33.10 Faction-Specific Elimination Rules
 - **Status:** NOT IMPLEMENTED
