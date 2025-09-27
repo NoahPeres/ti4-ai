@@ -1,6 +1,6 @@
 # TI4 AI Implementation Roadmap
 
-## 🎯 Overall Progress: 35/101 Rules (34.7% Complete)
+## 🎯 Overall Progress: 37/101 Rules (36.6% Complete)
 
 ### Last Updated
 January 2025 (Quality Audit Completed)
@@ -58,9 +58,9 @@ Core Game Mechanics
 
 ## 📊 Implementation Status Summary
 
-### ✅ Completed Rules (38/101)
+### ✅ Completed Rules (39/101)
 
-#### Foundation Layer (15/101)
+#### Foundation Layer (16/101)
 - Rule 6: ADJACENCY - Spatial relationships and system connections
 - Rule 12: ATTACH - Card attachment system for exploration/agenda effects ✅ NEW
 - Rule 13: ATTACKER - Combat role definition and assignment
@@ -70,6 +70,7 @@ Core Game Mechanics
 - Rule 30: DEPLOY - Unit deployment abilities with timing restrictions
 - Rule 31: DESTROYED - Unit destruction vs removal mechanics ✅ VERIFIED
 - Rule 34: EXHAUSTED - Card exhaustion mechanics for planets/technology/strategy cards
+- Rule 35: EXPLORATION - Planet exploration system ✅ COMPLETE
 - Rule 37: FLEET POOL - Fleet command token mechanics and ship limits
 - Rule 60: NEIGHBORS - System neighbor determination with wormhole support
 - Rule 76: SHIPS - Ship unit mechanics, fleet pool limits, and attributes
@@ -118,15 +119,15 @@ Core Game Mechanics
 1-2 months
 
 #### Immediate Priority (Next 3 Rules)
-1. Rule 35: EXPLORATION - Planet exploration with trait-based rewards
-2. Rule 95: TRANSPORT - Unit transportation and capacity mechanics
-3. Rule 12: ATTACH - Unit attachment system
+1. Rule 95: TRANSPORT - Unit transportation and capacity mechanics
+2. Rule 12: ATTACH - Unit attachment system
+3. Rule 7: AGENDA CARDS - Political cards and law outcomes
 
 #### Secondary Priority (Next 4 Rules)
-1. Rule 7: AGENDA CARDS - Political cards and law outcomes
-2. Rule 66: POLITICS - Politics strategy card
-3. Rule 80: SPEAKER - Speaker token privileges and powers
-4. Rule 28: DEALS - Binding agreement system
+1. Rule 66: POLITICS - Politics strategy card
+2. Rule 80: SPEAKER - Speaker token privileges and powers
+3. Rule 28: DEALS - Binding agreement system
+4. Rule 9: ANOMALIES - Space anomaly effects
 
 ### Phase 2: Political & Economic Systems (Priority: MEDIUM-HIGH)
 #### Target
@@ -228,7 +229,6 @@ The following rules require implementation to achieve full TI4 compliance:
 ### High Priority (Critical Gaps)
 - Rule 12 ATTACH - Unit attachment system
 - Rule 95 TRANSPORT - Unit transport capabilities
-- Rule 35 EXPLORATION - Planet exploration with trait-based rewards
 
 ### Medium Priority (Core Gameplay)
 - Rule 07 AGENDA CARD - Political agenda system
@@ -242,7 +242,6 @@ The following rules require implementation to achieve full TI4 compliance:
 - Rule 26 COST - Resource spending mechanics
 - Rule 27 CUSTODIANS TOKEN - Mecatol Rex control
 - Rule 28 DEALS - Player negotiations
-- Rule 35 EXPLORATION - Planet exploration system
 - Rule 36 FIGHTER TOKENS - Fighter unit tokens
 - Rule 38 FRONTIER TOKENS - Frontier exploration
 - Rule 39 GAME BOARD - Board setup and management
