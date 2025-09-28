@@ -45,9 +45,6 @@ RELATED TOPICS: Attach, Control, Planets, Relics
 ## Sub-Rules Analysis
 
 ### 35.1 Planet Control Exploration Trigger
-- **Status:** NOT IMPLEMENTED
-- **Description:** Automatic exploration when taking control of uncontrolled planets
-### 35.1 Planet Control Exploration Trigger
 - **Status:** ✅ IMPLEMENTED
 - **Description:** Automatic exploration when taking control of uncontrolled planets
 - **Implementation:** `should_trigger_exploration()` method checks for exploration tokens

@@ -230,6 +230,7 @@ class ExplorationSystem:
         game_state: GameState,
         chosen_trait: Optional[PlanetTrait] = None,
         force_exploration: bool = False,
+        previous_controller: Optional[str] = None,
     ) -> ExplorationResult:
         """Explore a planet according to Rule 35.
 
@@ -239,11 +240,14 @@ class ExplorationSystem:
             game_state: Current game state
             chosen_trait: For multi-trait planets, the chosen trait (Rule 35.2c)
             force_exploration: Force exploration even if normally not allowed (Rule 35.3)
+            previous_controller: The previous controller of the planet (if any)
         """
         result = ExplorationResult(success=True, planet_name=planet.name)
 
         # Check if exploration should be triggered
-        if not force_exploration and not self.should_trigger_exploration(planet):
+        if not force_exploration and not self.should_trigger_exploration(
+            planet, previous_controller
+        ):
             result.exploration_triggered = False
             return result
 

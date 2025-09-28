@@ -120,14 +120,14 @@ Core Game Mechanics
 
 #### Immediate Priority (Next 3 Rules)
 1. Rule 95: TRANSPORT - Unit transportation and capacity mechanics
-2. Rule 12: ATTACH - Unit attachment system
-3. Rule 7: AGENDA CARDS - Political cards and law outcomes
+2. Rule 7: AGENDA CARDS - Political cards and law outcomes
+3. Rule 66: POLITICS - Politics strategy card
 
 #### Secondary Priority (Next 4 Rules)
-1. Rule 66: POLITICS - Politics strategy card
-2. Rule 80: SPEAKER - Speaker token privileges and powers
-3. Rule 28: DEALS - Binding agreement system
-4. Rule 9: ANOMALIES - Space anomaly effects
+1. Rule 80: SPEAKER - Speaker token privileges and powers
+2. Rule 28: DEALS - Binding agreement system
+3. Rule 9: ANOMALIES - Space anomaly effects
+4. Rule 51: LEADERS - Leader units and abilities
 
 ### Phase 2: Political & Economic Systems (Priority: MEDIUM-HIGH)
 #### Target
@@ -227,7 +227,6 @@ Core Game Mechanics
 The following rules require implementation to achieve full TI4 compliance:
 
 ### High Priority (Critical Gaps)
-- Rule 12 ATTACH - Unit attachment system
 - Rule 95 TRANSPORT - Unit transport capabilities
 
 ### Medium Priority (Core Gameplay)

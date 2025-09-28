@@ -86,9 +86,9 @@ class TestRule35Exploration:
             )
 
             # Assert
-        assert result.success is True
-        assert result.deck_used == trait
-        assert result.card_drawn.deck_type == trait.value
+            assert result.success is True
+            assert result.deck_used == trait
+            assert result.card_drawn.deck_type == trait.value
 
     def test_no_exploration_for_traitless_planets(self) -> None:
         """Test Rule 35.2b: Planets that do not have traits, such as Mecatol Rex

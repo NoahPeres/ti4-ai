@@ -58,8 +58,16 @@ class TestExplorationGameStateIntegration:
         should_explore = self.exploration_system.should_trigger_exploration(
             self.planet, previous_controller=other_player.id
         )
-
         assert not should_explore
+
+        exploration_result = self.exploration_system.explore_planet(
+            player=self.player,
+            planet=self.planet,
+            game_state=self.game_state,
+            previous_controller=other_player.id,
+        )
+        assert not exploration_result.exploration_triggered
+        assert not exploration_result.card_drawn
 
     def test_forced_exploration_overrides_control_check(self):
         """Test that forced exploration works even when planet was controlled."""

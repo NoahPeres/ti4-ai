@@ -139,7 +139,7 @@ class Player:
         """
         return self.command_sheet.spend_trade_goods(amount)
 
-    def give_commodities_to_player(self, other_player: "Player", amount: int) -> None:
+    def give_commodities_to_player(self, other_player: Player, amount: int) -> None:
         """Give commodities to another player, converting them to trade goods (Rule 21.5, 21.6).
         Passing amount==0 is a no-op.
 
@@ -219,9 +219,9 @@ class Player:
     def deploy_unit(
         self,
         unit_type: UnitType,
-        target_system: "System",
+        target_system: System,
         target_planet: str | None = None,
-        reinforcements: "Reinforcements | None" = None,
+        reinforcements: Reinforcements | None = None,
     ) -> bool:
         """Deploy a unit using deploy ability (Rule 30: DEPLOY).
 
