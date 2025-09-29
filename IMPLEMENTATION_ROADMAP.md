@@ -3,7 +3,7 @@
 ## 🎯 Overall Progress: 36.5/101 Rules (36.1% Complete)
 
 ### Last Updated
-January 2025 (Quality Audit Completed)
+September 2025 (Quality Audit Completed)
 
 ### Current Phase
 Core Game Mechanics
@@ -61,6 +61,8 @@ Core Game Mechanics
 ### ✅ Completed Rules (38/101)
 ### ⚠️ Mostly Complete Rules (1/101)
 - Rule 35: EXPLORATION - Missing technology prerequisite validation for frontier exploration (Rule 35.4)
+
+### 🚫 Not Implemented (62/101 Rules)
 
 #### Foundation Layer (16/101)
 - Rule 6: ADJACENCY - Spatial relationships and system connections
@@ -224,7 +226,7 @@ Core Game Mechanics
 
 ---
 
-## 🚫 Not Implemented (67/101 Rules)
+
 
 The following rules require implementation to achieve full TI4 compliance:
 

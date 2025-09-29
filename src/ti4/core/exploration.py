@@ -9,7 +9,7 @@ determined by the cards drawn from the exploration decks.
 import random
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from ti4.core.abilities import Ability
 from ti4.core.card_types import ExplorationCardProtocol, PlanetTrait
@@ -61,7 +61,7 @@ class ExplorationResult:
 
     success: bool = False
     exploration_triggered: bool = False
-    deck_used: Optional[Union[PlanetTrait, str]] = None
+    deck_used: Optional[PlanetTrait] = None
     card_drawn: Optional[ExplorationCard] = None
     card_discarded: bool = False
     card_attached: bool = False
@@ -253,11 +253,6 @@ class ExplorationSystem:
             result.exploration_triggered = False
             return result
 
-        # No exploration for traitless planets (Rule 35.2b)
-        if not planet.traits:
-            result.exploration_triggered = False
-            return result
-
         # Determine which deck to use (Rule 35.2c for multiple traits)
         # Convert string traits to PlanetTrait enums
         trait_enums: list[PlanetTrait] = []
@@ -360,8 +355,7 @@ class ExplorationSystem:
         if card:
             result.card_drawn = card
             card_result = self.resolve_exploration_card(card, player, None, game_state)
-            result.card_discarded = card_result.card_discarded
-            result.effect_applied = card_result.effect_applied
+            self._merge_card_results(result, card_result)
 
         # Remove frontier token (Rule 35.6)
         self._remove_frontier_token(system)

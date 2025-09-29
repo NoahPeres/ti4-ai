@@ -53,12 +53,15 @@ class AbilityCostManager:
 
     def _extract_trait_from_cost_type(self, cost_type: str) -> Optional[PlanetTrait]:
         """Extract planet trait from cost type string"""
-        trait_mapping = {
-            "purge_hazardous_relic_fragments": PlanetTrait.HAZARDOUS,
-            "purge_cultural_relic_fragments": PlanetTrait.CULTURAL,
-            "purge_industrial_relic_fragments": PlanetTrait.INDUSTRIAL,
-        }
-        return trait_mapping.get(cost_type)
+        prefix = "purge_"
+        suffix = "_relic_fragments"
+        if not (cost_type.startswith(prefix) and cost_type.endswith(suffix)):
+            return None
+        key = cost_type[len(prefix) : -len(suffix)]
+        try:
+            return PlanetTrait(key)
+        except ValueError:
+            return None
 
     def _can_purge_relic_fragments(
         self, player: Any, trait: PlanetTrait, amount: int
@@ -77,12 +80,9 @@ class AbilityCostManager:
         if not self._can_purge_relic_fragments(player, trait, amount):
             return False
 
-        matching_fragments = get_matching_fragments(player.relic_fragments, trait)
-
-        # Remove the fragments (purge them)
-        for _ in range(amount):
-            fragment_to_remove = matching_fragments.pop()
-            player.relic_fragments.remove(fragment_to_remove)
+        to_remove = get_matching_fragments(player.relic_fragments, trait)[-amount:]
+        for fragment in to_remove:
+            player.relic_fragments.remove(fragment)
 
         return True
 

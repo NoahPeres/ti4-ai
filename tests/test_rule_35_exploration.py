@@ -79,12 +79,12 @@ class TestRule35Exploration:
         """
         # Test each trait type
         traits_to_test = [
-            (PlanetTrait.CULTURAL, "cultural_deck"),
-            (PlanetTrait.HAZARDOUS, "hazardous_deck"),
-            (PlanetTrait.INDUSTRIAL, "industrial_deck"),
+            PlanetTrait.CULTURAL,
+            PlanetTrait.HAZARDOUS,
+            PlanetTrait.INDUSTRIAL,
         ]
 
-        for trait, _expected_deck in traits_to_test:
+        for trait in traits_to_test:
             # Arrange
             planet = Planet(f"test_planet_{trait.value}", resources=1, influence=1)
             planet.traits = [trait]
@@ -264,7 +264,7 @@ class TestRule35Exploration:
         normal_card = ExplorationCard(
             name="Mining World",
             trait=PlanetTrait.INDUSTRIAL,
-            card_type="normal",
+            card_type=ExplorationCardType.NORMAL,
             effect="Gain 2 trade goods",
         )
 
@@ -289,8 +289,12 @@ class TestRule35Exploration:
         empty_deck = ExplorationDeck(PlanetTrait.CULTURAL)
         empty_deck.cards = []  # Empty deck
         empty_deck.discard_pile = [
-            ExplorationCard("Card 1", PlanetTrait.CULTURAL, "normal", "Effect 1"),
-            ExplorationCard("Card 2", PlanetTrait.CULTURAL, "normal", "Effect 2"),
+            ExplorationCard(
+                "Card 1", PlanetTrait.CULTURAL, ExplorationCardType.NORMAL, "Effect 1"
+            ),
+            ExplorationCard(
+                "Card 2", PlanetTrait.CULTURAL, ExplorationCardType.NORMAL, "Effect 2"
+            ),
         ]
 
         # Act
@@ -446,7 +450,7 @@ class TestRule35Exploration:
         relic_fragment = ExplorationCard(
             name="Relic Fragment",
             trait=PlanetTrait.CULTURAL,
-            card_type="relic_fragment",
+            card_type=ExplorationCardType.RELIC_FRAGMENT,
             effect="Purge this card to draw 1 relic",
         )
 

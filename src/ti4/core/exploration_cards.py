@@ -7,18 +7,16 @@ from ti4.core.exploration import ExplorationCard, ExplorationCardType
 
 def _make_relic_fragment_of_trait(trait: PlanetTrait) -> ExplorationCard:
     return ExplorationCard(
-        name=f"{trait.name} Relic Fragment",
+        name=f"{trait.value.title()} Relic Fragment",
         trait=trait,
         card_type=ExplorationCardType.RELIC_FRAGMENT,
-        effect=f"ACTION: Purge 3 of your {trait.name.lower()} relic fragments to gain 1 Relic.",
+        effect=f"ACTION: Purge 3 of your {trait.value} relic fragments to gain 1 Relic.",
         ability=Ability(
-            name=f"{trait.name.lower()}_relic_fragments",
+            name=f"{trait.value}_relic_fragments",
             timing=TimingWindow.ACTION,
             trigger="player_action",
             effect=AbilityEffect(type="draw", value="relic_deck"),
-            cost=AbilityCost(
-                type=f"purge_{trait.name.lower()}_relic_fragments", amount=3
-            ),
+            cost=AbilityCost(type=f"purge_{trait.value}_relic_fragments", amount=3),
         ),
     )
 

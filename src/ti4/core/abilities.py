@@ -96,6 +96,7 @@ class PlayerProtocol(Protocol):
     trade_goods: int
     command_tokens: int
     relic_fragments: list[ExplorationCardProtocol]
+    relics: list[Any]  # Simplified relic container for draw effects
 
 
 @dataclass
@@ -391,6 +392,33 @@ class AbilityManager:
         """
         Resolve a specific ability with cost checking and conditional effects
         """
+        # Enforce timing/frequency before paying any cost
+        if hasattr(ability, "is_active") and not ability.is_active():
+            return AbilityResolutionResult(
+                success=False, resolved_abilities=[], errors=["Ability is not active"]
+            )
+
+        if hasattr(ability, "can_trigger") and not ability.can_trigger(
+            ability.trigger, context
+        ):
+            return AbilityResolutionResult(
+                success=False,
+                resolved_abilities=[],
+                errors=["Ability cannot trigger in current context"],
+            )
+
+        # Pre-flight viability for known effect types (avoid paying cost if effect cannot resolve)
+        if (
+            ability.effect.type == "draw"
+            and ability.effect.value == "relic_deck"
+            and (not player or not hasattr(player, "relics"))
+        ):
+            return AbilityResolutionResult(
+                success=False,
+                resolved_abilities=[],
+                errors=["Player missing relics collection"],
+            )
+
         # Check costs (Rules 1.11, 1.12) - player must be present for costs
         if ability.cost:
             if not player:
