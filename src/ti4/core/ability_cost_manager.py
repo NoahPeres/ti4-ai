@@ -67,6 +67,8 @@ class AbilityCostManager:
         self, player: Any, trait: PlanetTrait, amount: int
     ) -> bool:
         """Check if player can purge the required number of relic fragments"""
+        if amount is None or amount <= 0:
+            return False
         if not hasattr(player, "relic_fragments"):
             return False
 
@@ -77,6 +79,8 @@ class AbilityCostManager:
         self, player: Any, trait: PlanetTrait, amount: int
     ) -> bool:
         """Purge relic fragments of a specific trait"""
+        if amount is None or amount <= 0:
+            return False
         if not self._can_purge_relic_fragments(player, trait, amount):
             return False
 

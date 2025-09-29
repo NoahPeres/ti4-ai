@@ -74,7 +74,7 @@ Core Game Mechanics
 - Rule 30: DEPLOY - Unit deployment abilities with timing restrictions
 - Rule 31: DESTROYED - Unit destruction vs removal mechanics ✅ VERIFIED
 - Rule 34: EXHAUSTED - Card exhaustion mechanics for planets/technology/strategy cards
-- Rule 35: EXPLORATION - Planet exploration system ⚠️ MOSTLY COMPLETE (missing Rule 35.4 technology prerequisites)
+
 - Rule 37: FLEET POOL - Fleet command token mechanics and ship limits
 - Rule 60: NEIGHBORS - System neighbor determination with wormhole support
 - Rule 76: SHIPS - Ship unit mechanics, fleet pool limits, and attributes

@@ -111,7 +111,11 @@ class AbilityCost:
 
     def can_pay(self, player: PlayerProtocol) -> bool:
         """Check if player can pay the ability cost"""
-        if self.type and self.amount:
+        if self.type is not None and self.amount is not None:
+            if self.amount < 0:
+                return False
+            if self.amount == 0:
+                return True
             # Single cost type
             return self._can_pay_single_cost(player, self.type, self.amount)
 
@@ -490,6 +494,10 @@ class AbilityManager:
         player: Optional[PlayerProtocol] = None,
     ) -> bool:
         """Resolve a single ability's effect"""
+        # Derive player from context if not explicitly provided
+        if player is None and context is not None:
+            player = context.get("player")
+
         try:
             # Handle "cannot" effects (Rule 1.6)
             if ability.effect.is_cannot_effect():

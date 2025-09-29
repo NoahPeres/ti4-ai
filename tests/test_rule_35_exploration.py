@@ -564,8 +564,7 @@ class TestRule35Exploration:
         if they own the 'Dark Energy Tap' technology or if another game effect
         allows them to."
 
-        NOTE: This test currently fails as the technology prerequisite validation
-        is not yet implemented. This demonstrates the missing functionality.
+        NOTE: Validation is not implemented yet; this documents current behavior.
         """
         # Arrange
         system_with_frontier = Mock()
@@ -590,16 +589,8 @@ class TestRule35Exploration:
             game_state=self.mock_game_state,
         )
 
-        # This should fail when technology prerequisite validation is implemented
-        # Currently passes because validation is missing - this test demonstrates the gap
-        # TODO: Uncomment these assertions when Rule 35.4 is fully implemented
-        # assert result_without_tech.success is False  # Should fail without tech
-        # assert "Dark Energy Tap" in result_without_tech.error_message
-
-        # For now, we expect it to succeed (showing the missing validation)
-        assert (
-            result_without_tech.success is True
-        )  # Currently passes - shows missing validation
+        # Current behavior (no validation): succeeds
+        assert result_without_tech.success is True
 
         # Act & Assert - Player with technology should succeed
         result_with_tech = self.exploration_system.explore_frontier_token(
