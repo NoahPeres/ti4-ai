@@ -460,6 +460,51 @@ class TestRule35Exploration:
         # Assert
         assert can_trade is True
 
+    def test_matching_fragments_purged_before_unknown_fragments(self) -> None:
+        """Test that when resolving relic fragment abilities, matching fragments
+        are purged first before using unknown fragments as wildcards.
+
+        This ensures optimal resource management - players should use specific
+        fragments before consuming their flexible unknown fragments.
+
+        The implementation works by:
+        1. get_matching_fragments() returns [unknown_fragments + matching_fragments]
+        2. _purge_relic_fragments() uses pop() which removes from the end
+        3. Therefore matching fragments (at the end) are purged first
+        """
+        # Arrange - Player has 2 matching hazardous fragments and 2 unknown fragments
+        hazardous_fragment_1 = make_hazardous_relic_fragment()
+        hazardous_fragment_2 = make_hazardous_relic_fragment()
+        unknown_fragment_1 = make_unknown_relic_fragment()
+        unknown_fragment_2 = make_unknown_relic_fragment()
+
+        self.mock_player.relic_fragments = [
+            hazardous_fragment_1,
+            hazardous_fragment_2,
+            unknown_fragment_1,
+            unknown_fragment_2,
+        ]
+
+        # Act - Resolve hazardous relic fragment ability (requires 3 fragments)
+        result = self.ability_manager.resolve_ability(
+            ability=hazardous_fragment_1.ability, player=self.mock_player
+        )
+
+        # Assert - Should succeed and purge 2 matching + 1 unknown
+        assert result.success is True
+        assert len(self.mock_player.relic_fragments) == 1  # 1 unknown fragment left
+
+        # The remaining fragment should be an unknown fragment (not a hazardous one)
+        remaining_fragment = self.mock_player.relic_fragments[0]
+        assert (
+            remaining_fragment.trait == PlanetTrait.FRONTIER
+        )  # Unknown fragments use FRONTIER trait
+        assert "Unknown" in remaining_fragment.name
+
+        # Verify that both hazardous fragments were purged first
+        remaining_names = [f.name for f in self.mock_player.relic_fragments]
+        assert "HAZARDOUS Relic Fragment" not in remaining_names
+
     def test_integration_with_planet_control_system(self) -> None:
         """Test integration between exploration and planet control systems.
 

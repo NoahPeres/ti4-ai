@@ -6,7 +6,7 @@
 **Status:** ⚠️ MOSTLY COMPLETE
 **Complexity:** High
 **Implementation Date:** January 2025
-**Test Coverage:** 32 tests across 2 test files
+**Test Coverage:** 33 tests across 2 test files
 **Missing:** Technology prerequisite validation for frontier exploration (Rule 35.4)
 
 ## Raw LRR Text
@@ -156,7 +156,7 @@ RELATED TOPICS: Attach, Control, Planets, Relics
 - `test_exploration_cleanup` - Resource cleanup
 - `test_exploration_thread_safety` - Thread safety validation
 
-### Test Coverage: 32 tests total
+### Test Coverage: 33 tests total
 
 ## Implementation Files
 
