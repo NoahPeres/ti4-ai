@@ -1,6 +1,6 @@
 # TI4 AI Implementation Roadmap
 
-## 🎯 Overall Progress: 37/101 Rules (36.6% Complete)
+## 🎯 Overall Progress: 36.5/101 Rules (36.1% Complete)
 
 ### Last Updated
 January 2025 (Quality Audit Completed)
@@ -58,7 +58,9 @@ Core Game Mechanics
 
 ## 📊 Implementation Status Summary
 
-### ✅ Completed Rules (39/101)
+### ✅ Completed Rules (38/101)
+### ⚠️ Mostly Complete Rules (1/101)
+- Rule 35: EXPLORATION - Missing technology prerequisite validation for frontier exploration (Rule 35.4)
 
 #### Foundation Layer (16/101)
 - Rule 6: ADJACENCY - Spatial relationships and system connections
@@ -70,7 +72,7 @@ Core Game Mechanics
 - Rule 30: DEPLOY - Unit deployment abilities with timing restrictions
 - Rule 31: DESTROYED - Unit destruction vs removal mechanics ✅ VERIFIED
 - Rule 34: EXHAUSTED - Card exhaustion mechanics for planets/technology/strategy cards
-- Rule 35: EXPLORATION - Planet exploration system ✅ COMPLETE
+- Rule 35: EXPLORATION - Planet exploration system ⚠️ MOSTLY COMPLETE (missing Rule 35.4 technology prerequisites)
 - Rule 37: FLEET POOL - Fleet command token mechanics and ship limits
 - Rule 60: NEIGHBORS - System neighbor determination with wormhole support
 - Rule 76: SHIPS - Ship unit mechanics, fleet pool limits, and attributes

@@ -34,6 +34,9 @@ class Player:
     relic_fragments: list[ExplorationCard] = field(
         default_factory=list, init=False
     )  # Rule 35: Relic fragments from exploration
+    relics: list[str] = field(
+        default_factory=list, init=False
+    )  # Rule 35: Relics drawn from relic deck
 
     def is_valid(self) -> bool:
         """Validate the player data."""

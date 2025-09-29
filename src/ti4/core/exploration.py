@@ -11,20 +11,14 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Optional, Union
 
+from ti4.core.abilities import Ability
+from ti4.core.card_types import ExplorationCardProtocol, PlanetTrait
 from ti4.core.game_state import GameState
 from ti4.core.planet import Planet
 from ti4.core.player import Player
 
 
-class PlanetTrait(Enum):
-    """Planet traits that determine exploration deck."""
-
-    CULTURAL = "cultural"
-    HAZARDOUS = "hazardous"
-    INDUSTRIAL = "industrial"
-
-
-class CardType(Enum):
+class ExplorationCardType(Enum):
     """Types of exploration cards."""
 
     NORMAL = "normal"
@@ -33,31 +27,27 @@ class CardType(Enum):
 
 
 @dataclass
-class ExplorationCard:
+class ExplorationCard(ExplorationCardProtocol):
     """Represents an exploration card.
 
     LRR 35.7: Exploration cards have different types that affect resolution.
     """
 
     name: str
-    deck_type: str  # PlanetTrait value or "frontier"
-    card_type: str  # CardType value
+    trait: PlanetTrait
+    card_type: ExplorationCardType
     effect: str
-
-    def __post_init__(self) -> None:
-        """Ensure deck_type is properly handled."""
-        if isinstance(self.deck_type, PlanetTrait):
-            self.deck_type = self.deck_type.value
+    ability: Optional[Ability] = None
 
     @property
     def is_attachment(self) -> bool:
         """Check if this is an attachment card (Rule 35.8)."""
-        return self.card_type == CardType.ATTACHMENT.value
+        return self.card_type == ExplorationCardType.ATTACHMENT
 
     @property
     def is_relic_fragment(self) -> bool:
         """Check if this is a relic fragment card (Rule 35.9)."""
-        return self.card_type == CardType.RELIC_FRAGMENT.value
+        return self.card_type == ExplorationCardType.RELIC_FRAGMENT
 
     @property
     def should_be_discarded(self) -> bool:
@@ -88,8 +78,8 @@ class ExplorationDeck:
     LRR 35.7a: When deck is empty, discard pile is shuffled to form new deck.
     """
 
-    def __init__(self, deck_type: str):
-        self.deck_type = deck_type
+    def __init__(self, trait: PlanetTrait):
+        self.trait = trait
         self.cards: list[ExplorationCard] = []
         self.discard_pile: list[ExplorationCard] = []
         self._initialize_deck()
@@ -100,68 +90,80 @@ class ExplorationDeck:
         Note: In a full implementation, this would load from game data files.
         """
         deck_configs = {
-            PlanetTrait.CULTURAL.value: [
+            PlanetTrait.CULTURAL: [
                 (
                     "Ancient Burial Sites",
-                    CardType.ATTACHMENT.value,
+                    ExplorationCardType.ATTACHMENT,
                     "This planet provides +1 influence",
                 ),
-                ("Cultural Research", CardType.NORMAL.value, "Gain 2 influence"),
+                (
+                    "Cultural Research",
+                    ExplorationCardType.NORMAL,
+                    "Gain 2 influence",
+                ),
                 (
                     "Relic Fragment",
-                    CardType.RELIC_FRAGMENT.value,
+                    ExplorationCardType.RELIC_FRAGMENT,
                     "Purge this card to draw 1 relic",
                 ),
             ],
-            PlanetTrait.HAZARDOUS.value: [
+            PlanetTrait.HAZARDOUS: [
                 (
                     "Volatile Fuel Source",
-                    CardType.ATTACHMENT.value,
+                    ExplorationCardType.ATTACHMENT,
                     "This planet provides +1 resource",
                 ),
                 (
                     "Dangerous Wildlife",
-                    CardType.NORMAL.value,
+                    ExplorationCardType.NORMAL,
                     "Lose 1 infantry or gain 1 trade good",
                 ),
                 (
                     "Relic Fragment",
-                    CardType.RELIC_FRAGMENT.value,
+                    ExplorationCardType.RELIC_FRAGMENT,
                     "Purge this card to draw 1 relic",
                 ),
             ],
-            PlanetTrait.INDUSTRIAL.value: [
-                ("Mining World", CardType.NORMAL.value, "Gain 2 trade goods"),
+            PlanetTrait.INDUSTRIAL: [
+                (
+                    "Mining World",
+                    ExplorationCardType.NORMAL,
+                    "Gain 2 trade goods",
+                ),
                 (
                     "Industrial Complex",
-                    CardType.ATTACHMENT.value,
+                    ExplorationCardType.ATTACHMENT,
                     "This planet provides +1 resource",
                 ),
                 (
                     "Relic Fragment",
-                    CardType.RELIC_FRAGMENT.value,
+                    ExplorationCardType.RELIC_FRAGMENT,
                     "Purge this card to draw 1 relic",
                 ),
             ],
-            "frontier": [
+            PlanetTrait.FRONTIER: [
                 (
                     "Ion Storm",
-                    CardType.NORMAL.value,
+                    ExplorationCardType.NORMAL,
                     "Each ship in this system sustains 1 hit",
                 ),
-                ("Derelict Vessel", CardType.NORMAL.value, "Gain 2 trade goods"),
+                (
+                    "Derelict Vessel",
+                    ExplorationCardType.NORMAL,
+                    "Gain 2 trade goods",
+                ),
                 (
                     "Relic Fragment",
-                    CardType.RELIC_FRAGMENT.value,
+                    ExplorationCardType.RELIC_FRAGMENT,
                     "Purge this card to draw 1 relic",
                 ),
             ],
         }
 
-        if self.deck_type in deck_configs:
+        if self.trait in deck_configs:
             self.cards = [
-                ExplorationCard(name, self.deck_type, card_type, effect)
-                for name, card_type, effect in deck_configs[self.deck_type]
+                ExplorationCard(name, self.trait, card_type, effect)
+                for name, card_type, effect in deck_configs[self.trait]
             ]
 
     def draw_card(self) -> Optional[ExplorationCard]:
@@ -192,15 +194,15 @@ class ExplorationSystem:
     """Manages the exploration system according to Rule 35."""
 
     def __init__(self) -> None:
-        self.decks: dict[str, ExplorationDeck] = self._initialize_decks()
+        self.decks: dict[PlanetTrait, ExplorationDeck] = self._initialize_decks()
 
-    def _initialize_decks(self) -> dict[str, ExplorationDeck]:
+    def _initialize_decks(self) -> dict[PlanetTrait, ExplorationDeck]:
         """Initialize all exploration decks."""
         return {
-            PlanetTrait.CULTURAL.value: ExplorationDeck(PlanetTrait.CULTURAL.value),
-            PlanetTrait.HAZARDOUS.value: ExplorationDeck(PlanetTrait.HAZARDOUS.value),
-            PlanetTrait.INDUSTRIAL.value: ExplorationDeck(PlanetTrait.INDUSTRIAL.value),
-            "frontier": ExplorationDeck("frontier"),
+            PlanetTrait.CULTURAL: ExplorationDeck(PlanetTrait.CULTURAL),
+            PlanetTrait.HAZARDOUS: ExplorationDeck(PlanetTrait.HAZARDOUS),
+            PlanetTrait.INDUSTRIAL: ExplorationDeck(PlanetTrait.INDUSTRIAL),
+            PlanetTrait.FRONTIER: ExplorationDeck(PlanetTrait.FRONTIER),
         }
 
     def should_trigger_exploration(
@@ -307,7 +309,7 @@ class ExplorationSystem:
         self, deck_trait: PlanetTrait
     ) -> Optional[ExplorationCard]:
         """Draw a card from the appropriate exploration deck."""
-        deck = self.decks[deck_trait.value]
+        deck = self.decks[deck_trait]
         return deck.draw_card()
 
     def _merge_card_results(
@@ -351,10 +353,10 @@ class ExplorationSystem:
             return result
 
         result.exploration_triggered = True
-        result.deck_used = "frontier"
+        result.deck_used = PlanetTrait.FRONTIER
 
         # Draw from frontier deck
-        card = self.decks["frontier"].draw_card()
+        card = self.decks[PlanetTrait.FRONTIER].draw_card()
         if card:
             result.card_drawn = card
             card_result = self.resolve_exploration_card(card, player, None, game_state)
@@ -433,8 +435,8 @@ class ExplorationSystem:
         )
 
         # Add to discard pile
-        if card.deck_type in self.decks:
-            self.decks[card.deck_type].discard_card(card)
+        if card.trait in self.decks:
+            self.decks[card.trait].discard_card(card)
 
         return result
 

@@ -142,12 +142,12 @@ class TestExplorationPlayerIntegration:
         with patch.object(
             self.exploration_system, "_draw_exploration_card"
         ) as mock_draw:
-            from ti4.core.exploration import CardType, ExplorationCard
+            from ti4.core.exploration import ExplorationCard, ExplorationCardType
 
             relic_card = ExplorationCard(
                 "Test Relic Fragment",
-                PlanetTrait.CULTURAL.value,
-                CardType.RELIC_FRAGMENT.value,
+                PlanetTrait.CULTURAL,
+                ExplorationCardType.RELIC_FRAGMENT,
                 "Test relic fragment",
             )
             mock_draw.return_value = relic_card
@@ -167,12 +167,12 @@ class TestExplorationPlayerIntegration:
         with patch.object(
             self.exploration_system, "_draw_exploration_card"
         ) as mock_draw:
-            from ti4.core.exploration import CardType, ExplorationCard
+            from ti4.core.exploration import ExplorationCard, ExplorationCardType
 
             attachment_card = ExplorationCard(
                 "Test Attachment",
-                PlanetTrait.INDUSTRIAL.value,
-                CardType.ATTACHMENT.value,
+                PlanetTrait.INDUSTRIAL,
+                ExplorationCardType.ATTACHMENT,
                 "Test attachment effect",
             )
             mock_draw.return_value = attachment_card
@@ -189,13 +189,13 @@ class TestExplorationPlayerIntegration:
 
     def test_relic_fragment_ability_resolution(self):
         """Test that relic fragment abilities can be resolved."""
-        from ti4.core.exploration import CardType, ExplorationCard
+        from ti4.core.exploration import ExplorationCard, ExplorationCardType
 
         # Add relic fragment to player
         fragment = ExplorationCard(
             "Test Fragment",
-            PlanetTrait.CULTURAL.value,
-            CardType.RELIC_FRAGMENT.value,
+            PlanetTrait.CULTURAL,
+            ExplorationCardType.RELIC_FRAGMENT,
             "Purge to draw relic",
         )
 
@@ -214,12 +214,12 @@ class TestExplorationPlayerIntegration:
 
     def test_relic_fragment_trading_eligibility(self):
         """Test that relic fragments can be identified for trading."""
-        from ti4.core.exploration import CardType, ExplorationCard
+        from ti4.core.exploration import ExplorationCard, ExplorationCardType
 
         fragment = ExplorationCard(
             "Tradeable Fragment",
-            PlanetTrait.HAZARDOUS.value,
-            CardType.RELIC_FRAGMENT.value,
+            PlanetTrait.HAZARDOUS,
+            ExplorationCardType.RELIC_FRAGMENT,
             "Test fragment",
         )
 
@@ -259,7 +259,7 @@ class TestExplorationFrontierIntegration:
 
         assert result.success
         assert result.exploration_triggered
-        assert result.deck_used == "frontier"
+        assert result.deck_used == PlanetTrait.FRONTIER
         assert result.card_drawn is not None
         assert result.frontier_token_removed
         mock_system.remove_frontier_token.assert_called_once()
@@ -324,7 +324,7 @@ class TestExplorationDeckManagement:
 
     def test_deck_reshuffling_when_empty(self):
         """Test that decks reshuffle when empty."""
-        deck = self.exploration_system.decks[PlanetTrait.CULTURAL.value]
+        deck = self.exploration_system.decks[PlanetTrait.CULTURAL]
 
         # Draw all cards to empty the deck
         drawn_cards = []

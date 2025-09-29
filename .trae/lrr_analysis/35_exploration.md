@@ -3,10 +3,11 @@
 ## Category Overview
 **Rule Type:** Core Game Mechanic
 **Priority:** MEDIUM
-**Status:** ✅ COMPLETE
+**Status:** ⚠️ MOSTLY COMPLETE
 **Complexity:** High
 **Implementation Date:** January 2025
-**Test Coverage:** 31 tests across 2 test files
+**Test Coverage:** 32 tests across 2 test files
+**Missing:** Technology prerequisite validation for frontier exploration (Rule 35.4)
 
 ## Raw LRR Text
 ```
@@ -63,10 +64,11 @@ RELATED TOPICS: Attach, Control, Planets, Relics
 - **Tests:** `test_multiple_planet_exploration`
 
 ### 35.4 Frontier Token Exploration Prerequisites
-- **Status:** ✅ IMPLEMENTED
+- **Status:** ⚠️ PARTIALLY IMPLEMENTED
 - **Description:** Requires "Dark Energy Tap" technology or other game effects
-- **Implementation:** Frontier deck support in `ExplorationManager`
+- **Implementation:** Frontier deck support in `ExplorationManager`, but prerequisite validation missing
 - **Tests:** `test_exploration_manager_initialization` (frontier deck creation)
+- **Missing:** Technology prerequisite validation for frontier exploration
 
 ### 35.5 Frontier Exploration Deck
 - **Status:** ✅ IMPLEMENTED
@@ -154,7 +156,7 @@ RELATED TOPICS: Attach, Control, Planets, Relics
 - `test_exploration_cleanup` - Resource cleanup
 - `test_exploration_thread_safety` - Thread safety validation
 
-### Test Coverage: 31 tests total
+### Test Coverage: 32 tests total
 
 ## Implementation Files
 
@@ -200,15 +202,20 @@ RELATED TOPICS: Attach, Control, Planets, Relics
 1. ✅ **Implement planet trait system** - Cultural, hazardous, industrial, and frontier traits
 2. ✅ **Create exploration deck management** - 4 exploration decks with discard piles and reshuffling
 3. ✅ **Add exploration triggering system** - Trigger exploration on planet control changes
-4. ✅ **Implement frontier token system** - Frontier tokens with placement and exploration mechanics
-5. ✅ **Create exploration card resolution engine** - Handle card drawing, resolution, and effects
-6. ✅ **Add card attachment mechanics** - Support attaching exploration cards to planet cards
-7. ✅ **Implement relic fragment system** - Handle relic fragment placement and abilities
-8. ✅ **Create relic deck management** - Support relic deck drawing from fragment abilities
-9. ✅ **Add exploration ordering system** - Handle multiple simultaneous explorations with player choice
+4. ✅ **Create exploration card resolution engine** - Handle card drawing, resolution, and effects
+5. ✅ **Add card attachment mechanics** - Support attaching exploration cards to planet cards
+6. ✅ **Implement relic fragment system** - Handle relic fragment placement and abilities
+7. ✅ **Create relic deck management** - Support relic deck drawing from fragment abilities
+8. ✅ **Add exploration ordering system** - Handle multiple simultaneous explorations with player choice
+
+### 🚧 PARTIALLY COMPLETED
+1. ⚠️ **Implement frontier token system** - Frontier tokens with placement and exploration mechanics (missing technology prerequisite validation)
+
+### 📋 REMAINING TASKS
+1. **Add technology prerequisite validation for frontier exploration** - Validate "Dark Energy Tap" technology or other game effects before allowing frontier exploration (Rule 35.4)
+2. **Add comprehensive frontier exploration tests** - Test cases for technology prerequisite validation and error handling
 
 ### Future Enhancements
-- Enhanced technology prerequisite validation for frontier exploration
 - Advanced relic fragment trading mechanics
 - Exploration event logging and analytics
 
