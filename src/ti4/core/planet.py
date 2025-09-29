@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from .exploration import ExplorationCard
     from .unit import Unit
 
 
@@ -18,6 +19,10 @@ class Planet:
         self.controlled_by: str | None = None
         self.units: list[Unit] = []
         self._exhausted = False  # Rule 34: Track exhausted state
+        self.traits: list[str] = []  # Rule 35: Planet traits for exploration
+        self.attached_cards: list[
+            ExplorationCard
+        ] = []  # Rule 35: Cards attached to this planet
 
     def set_control(self, player_id: str) -> None:
         """Set the controlling player of this planet."""

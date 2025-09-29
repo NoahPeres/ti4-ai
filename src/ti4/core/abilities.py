@@ -21,7 +21,9 @@ import itertools
 import logging
 from dataclasses import dataclass, field
 from enum import Enum, IntEnum
-from typing import TYPE_CHECKING, Any, Callable, Optional, Protocol
+from typing import TYPE_CHECKING, Any, Optional, Protocol
+
+from ti4.core.card_types import ExplorationCardProtocol
 
 if TYPE_CHECKING:
     from ti4.core.game_state import GameState
@@ -93,6 +95,8 @@ class PlayerProtocol(Protocol):
     resources: int
     trade_goods: int
     command_tokens: int
+    relic_fragments: list[ExplorationCardProtocol]
+    relics: list[Any]  # Simplified relic container for draw effects
 
 
 @dataclass
@@ -107,7 +111,11 @@ class AbilityCost:
 
     def can_pay(self, player: PlayerProtocol) -> bool:
         """Check if player can pay the ability cost"""
-        if self.type and self.amount:
+        if self.type is not None and self.amount is not None:
+            if self.amount < 0:
+                return False
+            if self.amount == 0:
+                return True
             # Single cost type
             return self._can_pay_single_cost(player, self.type, self.amount)
 
@@ -124,17 +132,10 @@ class AbilityCost:
         self, player: PlayerProtocol, cost_type: str, amount: int
     ) -> bool:
         """Check if player can pay a single cost type"""
-        cost_checkers: dict[str, Callable[[PlayerProtocol], bool]] = {
-            "resources": lambda p: p.resources >= amount,
-            "trade_goods": lambda p: p.trade_goods >= amount,
-            "command_tokens": lambda p: p.command_tokens >= amount,
-            "exhaust_card": lambda p: True,  # Simplified for now - would need card_id context
-        }
+        from ti4.core.ability_cost_manager import AbilityCostManager
 
-        checker = cost_checkers.get(cost_type)
-        if checker:
-            return bool(checker(player))
-        return False
+        cost_manager = AbilityCostManager()
+        return cost_manager.can_pay_cost(cost_type, amount, player)
 
 
 @dataclass
@@ -395,6 +396,33 @@ class AbilityManager:
         """
         Resolve a specific ability with cost checking and conditional effects
         """
+        # Enforce timing/frequency before paying any cost
+        if hasattr(ability, "is_active") and not ability.is_active():
+            return AbilityResolutionResult(
+                success=False, resolved_abilities=[], errors=["Ability is not active"]
+            )
+
+        if hasattr(ability, "can_trigger") and not ability.can_trigger(
+            ability.trigger, context
+        ):
+            return AbilityResolutionResult(
+                success=False,
+                resolved_abilities=[],
+                errors=["Ability cannot trigger in current context"],
+            )
+
+        # Pre-flight viability for known effect types (avoid paying cost if effect cannot resolve)
+        if (
+            ability.effect.type == "draw"
+            and ability.effect.value == "relic_deck"
+            and (not player or not hasattr(player, "relics"))
+        ):
+            return AbilityResolutionResult(
+                success=False,
+                resolved_abilities=[],
+                errors=["Player missing relics collection"],
+            )
+
         # Check costs (Rules 1.11, 1.12) - player must be present for costs
         if ability.cost:
             if not player:
@@ -410,6 +438,14 @@ class AbilityManager:
                     errors=["Cannot pay ability cost"],
                 )
 
+            # Pay the cost
+            if not self._pay_ability_cost(ability.cost, player):
+                return AbilityResolutionResult(
+                    success=False,
+                    resolved_abilities=[],
+                    errors=["Failed to pay ability cost"],
+                )
+
         # Handle conditional effects (Rule 1.17: "then")
         if ability.effect.is_conditional():
             result = self._resolve_conditional_ability(ability, player, context)
@@ -418,8 +454,8 @@ class AbilityManager:
                 ability.mark_used(ability.trigger, context)
             return result
 
-        # Standard resolution
-        success = self._resolve_single_ability(ability, context)
+        # Standard resolution - apply the effect
+        success = self._resolve_single_ability(ability, context, player)
 
         # Mark usage if successful
         if success:
@@ -431,16 +467,37 @@ class AbilityManager:
             failed_abilities=[] if success else [ability],
         )
 
-        return AbilityResolutionResult(
-            success=success,
-            resolved_abilities=[ability] if success else [],
-            failed_abilities=[] if success else [ability],
-        )
+    def _pay_ability_cost(self, cost: AbilityCost, player: PlayerProtocol) -> bool:
+        """Pay the cost for an ability"""
+        from ti4.core.ability_cost_manager import AbilityCostManager
+
+        cost_manager = AbilityCostManager()
+
+        if cost.type and cost.amount:
+            return cost_manager.pay_cost(cost.type, cost.amount, player)
+
+        if cost.costs:
+            # Pay all costs
+            for cost_item in cost.costs:
+                if not cost_manager.pay_cost(
+                    cost_item["type"], cost_item.get("amount", 1), player
+                ):
+                    return False
+            return True
+
+        return True  # No cost to pay
 
     def _resolve_single_ability(
-        self, ability: Ability, context: Optional[dict[str, Any]] = None
+        self,
+        ability: Ability,
+        context: Optional[dict[str, Any]] = None,
+        player: Optional[PlayerProtocol] = None,
     ) -> bool:
         """Resolve a single ability's effect"""
+        # Derive player from context if not explicitly provided
+        if player is None and context is not None:
+            player = context.get("player")
+
         try:
             # Handle "cannot" effects (Rule 1.6)
             if ability.effect.is_cannot_effect():
@@ -453,12 +510,28 @@ class AbilityManager:
                 # Apply effect with resolved context
                 return True
 
+            # Handle specific effect types
+            if ability.effect.type == "draw" and ability.effect.value == "relic_deck":
+                return self._draw_relic(player)
+
             # Standard effect resolution
             return True
 
         except Exception as e:
             logger.error(f"Failed to resolve ability {ability.name}: {e}")
             return False
+
+    def _draw_relic(self, player: Optional[PlayerProtocol]) -> bool:
+        """Draw a relic from the relic deck"""
+        if not player:
+            return False
+
+        # Add a relic to the player's relics (simplified - would draw from actual deck)
+        if hasattr(player, "relics"):
+            player.relics.append("Sample Relic")
+            return True
+
+        return False
 
     def _resolve_conditional_ability(
         self,

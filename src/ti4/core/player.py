@@ -1,5 +1,7 @@
 """Player implementation for TI4 game state management."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
@@ -9,6 +11,7 @@ from .exceptions import DeployError, ReinforcementError
 from .faction_data import FactionData
 
 if TYPE_CHECKING:
+    from .exploration import ExplorationCard
     from .reinforcements import Reinforcements
     from .system import System
 
@@ -28,6 +31,12 @@ class Player:
     _deploy_used_this_window: set[str] = field(
         default_factory=set, init=False
     )  # Deploy abilities used this timing window
+    relic_fragments: list[ExplorationCard] = field(
+        default_factory=list, init=False
+    )  # Rule 35: Relic fragments from exploration
+    relics: list[str] = field(
+        default_factory=list, init=False
+    )  # Rule 35: Relics drawn from relic deck
 
     def is_valid(self) -> bool:
         """Validate the player data."""
@@ -133,7 +142,7 @@ class Player:
         """
         return self.command_sheet.spend_trade_goods(amount)
 
-    def give_commodities_to_player(self, other_player: "Player", amount: int) -> None:
+    def give_commodities_to_player(self, other_player: Player, amount: int) -> None:
         """Give commodities to another player, converting them to trade goods (Rule 21.5, 21.6).
         Passing amount==0 is a no-op.
 
@@ -213,9 +222,9 @@ class Player:
     def deploy_unit(
         self,
         unit_type: UnitType,
-        target_system: "System",
+        target_system: System,
         target_planet: str | None = None,
-        reinforcements: "Reinforcements | None" = None,
+        reinforcements: Reinforcements | None = None,
     ) -> bool:
         """Deploy a unit using deploy ability (Rule 30: DEPLOY).
 
