@@ -248,10 +248,18 @@ class TestExplorationFrontierIntegration:
 
     def test_frontier_token_exploration(self):
         """Test exploration of frontier tokens."""
+        from ti4.core.constants import Technology
+        from ti4.core.technology import TechnologyManager
+
         # Mock system with frontier token
         mock_system = Mock()
         mock_system.has_frontier_token = True
         mock_system.remove_frontier_token = Mock()
+
+        # Set up technology manager with Dark Energy Tap
+        tech_manager = TechnologyManager()
+        tech_manager.gain_technology(self.player.id, Technology.DARK_ENERGY_TAP)
+        object.__setattr__(self.game_state, "technology_manager", tech_manager)
 
         result = self.exploration_system.explore_frontier_token(
             self.player, mock_system, self.game_state

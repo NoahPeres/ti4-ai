@@ -121,6 +121,12 @@ class Technology(Enum):
     # Hacan Emirates faction technologies
     QUANTUM_DATAHUB_NODE = "quantum_datahub_node"  # Confirmed Hacan faction tech - yellow, 3x yellow prereq
 
+    # Prophecy of Kings technologies
+    DARK_ENERGY_TAP = (
+        "dark_energy_tap"  # Confirmed: Blue tech, no prerequisites, Prophecy of Kings
+    )
+    AI_DEVELOPMENT_ALGORITHM = "ai_development_algorithm"  # Confirmed: Yellow tech, no prerequisites, Prophecy of Kings
+
 
 class TechnologyConstants:
     """Technology-related constants (deprecated - use Technology enum instead)."""
@@ -136,6 +142,93 @@ class TechnologyConstants:
     CARRIER_II_TECH = Technology.CARRIER_II.value
     DESTROYER_II_TECH = Technology.DESTROYER_II.value
     FIGHTER_II_TECH = Technology.FIGHTER_II.value
+
+
+class Expansion(Enum):
+    """Enumeration of TI4 expansions for technology framework."""
+
+    BASE = "base"
+    PROPHECY_OF_KINGS = "prophecy_of_kings"
+    CODEX_I = "codex_i"
+    CODEX_II = "codex_ii"
+    CODEX_III = "codex_iii"
+
+
+class AbilityTrigger(Enum):
+    """Enumeration of ability triggers for technology framework."""
+
+    ACTION = "action"
+    AFTER_ACTIVATE_SYSTEM = "after_activate_system"
+    AFTER_TACTICAL_ACTION = "after_tactical_action"
+    WHEN_RESEARCH_TECHNOLOGY = "when_research_technology"
+    START_OF_TURN = "start_of_turn"
+    END_OF_TURN = "end_of_turn"
+    # Additional triggers from TI4 ability compendium analysis
+    WHEN_RETREAT_DECLARED = "when_retreat_declared"
+    BEFORE_COMBAT = "before_combat"
+    AFTER_COMBAT = "after_combat"
+    WHEN_PRODUCING_UNITS = "when_producing_units"
+    START_OF_PHASE = "start_of_phase"
+    END_OF_PHASE = "end_of_phase"
+
+
+class AbilityEffectType(Enum):
+    """Enumeration of ability effect types for technology framework."""
+
+    EXPLORE_FRONTIER_TOKEN = "explore_frontier_token"
+    ALLOW_RETREAT_TO_EMPTY_ADJACENT = "allow_retreat_to_empty_adjacent"
+    MODIFY_UNIT_STATS = "modify_unit_stats"
+    GAIN_TRADE_GOODS = "gain_trade_goods"
+    # Additional effect types from TI4 ability compendium analysis
+    GAIN_RESOURCES = "gain_resources"
+    GAIN_INFLUENCE = "gain_influence"
+    GAIN_COMMAND_TOKENS = "gain_command_tokens"
+    MODIFY_MOVEMENT = "modify_movement"
+    MODIFY_COMBAT_VALUE = "modify_combat_value"
+    MODIFY_CAPACITY = "modify_capacity"
+    DRAW_ACTION_CARDS = "draw_action_cards"
+    RESEARCH_TECHNOLOGY = "research_technology"
+
+
+class AbilityCondition(Enum):
+    """Enumeration of ability conditions for technology framework."""
+
+    HAS_SHIPS_IN_SYSTEM = "has_ships_in_system"
+    CONTROL_PLANET = "control_planet"
+    SYSTEM_CONTAINS_FRONTIER = "system_contains_frontier"
+    # Additional conditions from TI4 ability compendium analysis
+    HAS_GROUND_FORCES_ON_PLANET = "has_ground_forces_on_planet"
+    SYSTEM_CONTAINS_WORMHOLE = "system_contains_wormhole"
+    ADJACENT_TO_MECATOL_REX = "adjacent_to_mecatol_rex"
+    DURING_COMBAT = "during_combat"
+    DURING_TACTICAL_ACTION = "during_tactical_action"
+    HAS_TECHNOLOGY_OF_COLOR = "has_technology_of_color"
+    CONTROLS_LEGENDARY_PLANET = "controls_legendary_planet"
+
+
+class UnitStatModification(Enum):
+    """Enumeration of unit stat modification types for technology framework."""
+
+    # Fundamental unit properties
+    COST = "cost"
+    COMBAT_VALUE = "combat_value"
+    COMBAT_DICE = "combat_dice"
+    MOVEMENT = "movement"
+    CAPACITY = "capacity"
+    PRODUCTION = "production"
+
+    # Unit abilities
+    SUSTAIN_DAMAGE = "sustain_damage"
+    ANTI_FIGHTER_BARRAGE = "anti_fighter_barrage"
+    BOMBARDMENT = "bombardment"
+    BOMBARDMENT_VALUE = "bombardment_value"
+    BOMBARDMENT_DICE = "bombardment_dice"
+    DEPLOY = "deploy"
+    PLANETARY_SHIELD = "planetary_shield"
+    SPACE_CANNON = "space_cannon"
+    SPACE_CANNON_VALUE = "space_cannon_value"
+    SPACE_CANNON_DICE = "space_cannon_dice"
+    HAS_PRODUCTION = "has_production"
 
 
 class Faction(Enum):

@@ -211,9 +211,17 @@ class TestRule35Exploration:
         LRR 35.5: "When a player explores a frontier token, they draw and resolve
         a card from the frontier exploration deck."
         """
+        from ti4.core.constants import Technology
+        from ti4.core.technology import TechnologyManager
+
         # Arrange
         system_with_frontier = Mock()
         system_with_frontier.has_frontier_token = True
+
+        # Set up technology manager with Dark Energy Tap
+        tech_manager = TechnologyManager()
+        tech_manager.gain_technology(self.mock_player.id, Technology.DARK_ENERGY_TAP)
+        self.mock_game_state.technology_manager = tech_manager
 
         # Act
         result = self.exploration_system.explore_frontier_token(
@@ -234,9 +242,17 @@ class TestRule35Exploration:
         LRR 35.6: "After a frontier token is explored, it is discarded and
         returned to the supply."
         """
+        from ti4.core.constants import Technology
+        from ti4.core.technology import TechnologyManager
+
         # Arrange
         system_with_frontier = Mock()
         system_with_frontier.has_frontier_token = True
+
+        # Set up technology manager with Dark Energy Tap
+        tech_manager = TechnologyManager()
+        tech_manager.gain_technology(self.mock_player.id, Technology.DARK_ENERGY_TAP)
+        self.mock_game_state.technology_manager = tech_manager
 
         # Act
         result = self.exploration_system.explore_frontier_token(
@@ -249,6 +265,30 @@ class TestRule35Exploration:
         assert result.success is True
         assert system_with_frontier.remove_frontier_token.called
         assert result.frontier_token_removed is True
+
+    def test_frontier_exploration_blocked_without_technology_manager(self) -> None:
+        """Test that frontier exploration is blocked when no technology manager exists.
+
+        This ensures the system fails safely when the technology manager is not available.
+        """
+        # Arrange
+        system_with_frontier = Mock()
+        system_with_frontier.has_frontier_token = True
+
+        # No technology manager in game state
+
+        # Act
+        result = self.exploration_system.explore_frontier_token(
+            player=self.mock_player,
+            system=system_with_frontier,
+            game_state=self.mock_game_state,
+        )
+
+        # Assert
+        assert result.success is False
+        assert result.exploration_triggered is False
+        assert result.deck_used is None
+        assert result.card_drawn is None
 
     def test_exploration_card_resolution_and_discard(self) -> None:
         """Test Rule 35.7: To resolve an exploration card, a player reads the card,
@@ -563,24 +603,26 @@ class TestRule35Exploration:
         LRR 35.4: "Players can explore space areas that contain frontier tokens
         if they own the 'Dark Energy Tap' technology or if another game effect
         allows them to."
-
-        NOTE: Validation is not implemented yet; this documents current behavior.
         """
+        from ti4.core.constants import Technology
+        from ti4.core.technology import TechnologyManager
+
         # Arrange
         system_with_frontier = Mock()
         system_with_frontier.has_frontier_token = True
 
+        # Create technology manager and add it to game state
+        tech_manager = TechnologyManager()
+        self.mock_game_state.technology_manager = tech_manager
+
         # Player without Dark Energy Tap technology
         player_without_tech = Mock(spec=Player)
         player_without_tech.id = "player_without_tech"
-        # Add the has_technology method to the mock
-        player_without_tech.has_technology = Mock(return_value=False)
 
         # Player with Dark Energy Tap technology
         player_with_tech = Mock(spec=Player)
         player_with_tech.id = "player_with_tech"
-        # Add the has_technology method to the mock
-        player_with_tech.has_technology = Mock(return_value=True)
+        tech_manager.gain_technology(player_with_tech.id, Technology.DARK_ENERGY_TAP)
 
         # Act & Assert - Player without technology should be blocked
         result_without_tech = self.exploration_system.explore_frontier_token(
@@ -589,8 +631,9 @@ class TestRule35Exploration:
             game_state=self.mock_game_state,
         )
 
-        # Current behavior (no validation): succeeds
-        assert result_without_tech.success is True
+        # Should fail because player doesn't have Dark Energy Tap
+        assert result_without_tech.success is False
+        assert result_without_tech.exploration_triggered is False
 
         # Act & Assert - Player with technology should succeed
         result_with_tech = self.exploration_system.explore_frontier_token(
@@ -600,4 +643,5 @@ class TestRule35Exploration:
         )
 
         assert result_with_tech.success is True
+        assert result_with_tech.exploration_triggered is True
         assert result_with_tech.deck_used == PlanetTrait.FRONTIER
