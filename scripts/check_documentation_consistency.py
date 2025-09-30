@@ -139,7 +139,7 @@ def check_documentation_consistency() -> bool:
         references = find_enum_references(md_file)
         if references:
             for line_num, line in references:
-                if "constants.py" in line and "enum" in line.lower():
+                if "specifications.py" in line and "enum" in line.lower():
                     inconsistent_enum_refs.append((md_file, line_num, line))
 
     if inconsistent_enum_refs:

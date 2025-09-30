@@ -223,8 +223,8 @@ class EnhancedAbility(Ability):
             return False
 
         # Then validate technology-specific conditions
-        if context and self.conditions:
-            return self._validate_conditions(context)
+        if self.conditions:
+            return self._validate_conditions(context or {})
 
         return True
 

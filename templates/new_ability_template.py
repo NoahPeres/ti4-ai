@@ -20,9 +20,10 @@ from ti4.core.constants import (
     AbilityCondition,
     AbilityEffectType,
     AbilityTrigger,
-    TechnologyColor,
-    TechnologyType,
+    Expansion,
+    Technology,
 )
+from ti4.core.technology import TechnologyColor
 from ti4.core.technology_cards.base.passive_tech import PassiveTechnologyCard
 from ti4.core.technology_cards.specifications import (
     AbilitySpecification,
@@ -55,44 +56,47 @@ class NewTechnologyTemplate(PassiveTechnologyCard):
         """Initialize [TECHNOLOGY_NAME] with confirmed specifications."""
 
         # STEP 1: Define technology specification
+        # NOTE: Template requires user to add Technology enum first
         # Replace with user-confirmed values
         tech_spec = TechnologySpecification(
+            technology=Technology.YOUR_TECHNOLOGY_ENUM,  # Add to Technology enum first
             name="[USER_CONFIRMED_NAME]",
             color=TechnologyColor.BLUE,  # Replace with confirmed color
-            prerequisites=[],  # Replace with confirmed prerequisites
-            type=TechnologyType.PASSIVE,  # Replace with confirmed type
-            expansion="base",  # Replace with confirmed expansion
-            abilities=self._create_abilities(),
+            prerequisites=(),  # Tuple of TechnologyColor values
+            faction_restriction=None,  # Or specific Faction enum
+            expansion=Expansion.BASE,  # Use Expansion enum
+            abilities=tuple(self._create_abilities()),  # Returns tuple
         )
 
         super().__init__(tech_spec)
 
-    def _create_abilities(self) -> list[AbilitySpecification]:
+    def _create_abilities(self) -> tuple[AbilitySpecification, ...]:
         """
         Create ability specifications for this technology.
 
         Returns:
-            List of AbilitySpecification objects
+            Tuple of AbilitySpecification objects
         """
-        abilities = []
+        abilities_list = []
 
         # STEP 2: Define each ability with confirmed specifications
         # Example ability - replace with user-confirmed specifications
         ability = AbilitySpecification(
             trigger=AbilityTrigger.AFTER_TACTICAL_ACTION,  # Use enum!
             effect=AbilityEffectType.EXPLORE_FRONTIER_TOKEN,  # Use enum!
-            conditions=[  # Use enum values!
-                AbilityCondition.SYSTEM_CONTAINS_FRONTIER
-            ],
+            conditions=(  # Use tuple of enum values!
+                AbilityCondition.SYSTEM_CONTAINS_FRONTIER,
+            ),
             mandatory=False,  # Confirm with user
+            passive=True,  # Confirm with user (True for passive effects, False for active)
         )
-        abilities.append(ability)
+        abilities_list.append(ability)
 
         # Add additional abilities as confirmed by user
         # ability2 = AbilitySpecification(...)
-        # abilities.append(ability2)
+        # abilities_list.append(ability2)
 
-        return abilities
+        return tuple(abilities_list)
 
     def can_use_ability(
         self, ability_index: int = 0, context: Optional[dict] = None

@@ -1,7 +1,7 @@
 SHELL := bash
 .SHELLFLAGS := -euo pipefail -c
 
-.PHONY: all help install test lint lint-fix format type-check check-all clean dev-setup strict-check security-check runtime-check quality-gate pre-commit-install pre-commit-autoupdate format-check docs-check
+.PHONY: all help install test lint lint-fix format type-check check-all clean dev-setup strict-check security-check runtime-check quality-gate pre-commit-install pre-commit-autoupdate format-check docs-check trigger-check
 
 all: quality-gate
 
