@@ -36,6 +36,8 @@ class TransportState:
     def get_remaining_capacity(self) -> int:
         """Get remaining transport capacity.
 
+        Note: Currently assumes each unit occupies 1 capacity slot.
+
         Returns:
             The remaining capacity available for additional units
         """
@@ -58,6 +60,10 @@ class TransportState:
         if unit is None:
             raise ValueError("Unit cannot be None")
 
+        # Check unit ownership - cannot transport enemy units
+        if unit.owner != self.player_id:
+            return False
+
         # Check if unit type is transportable
         if unit.unit_type not in TRANSPORTABLE_UNIT_TYPES:
             return False
@@ -77,10 +83,7 @@ class TransportManager:
     """
 
     # Reference to module-level constant for transportable unit types
-
-    def __init__(self) -> None:
-        """Initialize the transport manager."""
-        pass
+    TRANSPORTABLE_UNIT_TYPES = TRANSPORTABLE_UNIT_TYPES
 
     def can_transport_units(self, ship: Unit, units: list[Unit]) -> bool:
         """Check if a ship can transport the given units.
@@ -103,6 +106,10 @@ class TransportManager:
         if units is None:
             raise ValueError("Units list cannot be None")
 
+        # Empty list is valid but trivially true
+        if not units:
+            return True
+
         # Get ship's transport capacity
         ship_capacity = ship.get_capacity()
 
@@ -116,7 +123,7 @@ class TransportManager:
                 return False
 
         # Calculate total capacity needed for units
-        # For now, assume each unit takes 1 capacity
+        # Each unit takes 1 capacity slot
         units_capacity_needed = len(units)
 
         # Check if ship has enough capacity
@@ -140,6 +147,10 @@ class TransportManager:
 
         LRR Reference: Rule 95.0 - Transport capacity limits
         """
+        # Input validation
+        if system_id is None:
+            raise ValueError("System ID cannot be None")
+
         # Validate the transport operation first
         if not self.can_transport_units(ship, units):
             raise ValueError(
@@ -180,6 +191,8 @@ class TransportManager:
         if destination_system_id is None:
             raise ValueError("Destination system ID cannot be None")
 
+        # TODO: Use destination_system_id for invasion integration (Rule 95.4)
+
         # Get the units to unload
         unloaded_units = transport_state.transported_units.copy()
 
@@ -213,8 +226,6 @@ class TransportManager:
         # Input validation
         if system_id is None:
             raise ValueError("System ID cannot be None")
-        if player_id is None:
-            raise ValueError("Player ID cannot be None")
 
         # Rule 95.3: Cannot pickup from systems with own command tokens, except active system
         if has_player_command_token and not is_active_system:
@@ -228,7 +239,6 @@ class TransportManager:
         pickup_system_id: str,
         starting_system_id: str,
         active_system_id: str,
-        intermediate_systems: list[str],
         has_command_token: bool,
     ) -> bool:
         """Validate if units can be picked up during movement based on system location.
@@ -237,7 +247,6 @@ class TransportManager:
             pickup_system_id: The system where pickup is attempted
             starting_system_id: The system where movement started
             active_system_id: The active system (destination)
-            intermediate_systems: List of systems passed through during movement
             has_command_token: Whether the pickup system has the player's command token
 
         Returns:
@@ -255,8 +264,6 @@ class TransportManager:
             raise ValueError("Starting system ID cannot be None")
         if active_system_id is None:
             raise ValueError("Active system ID cannot be None")
-        if intermediate_systems is None:
-            raise ValueError("Intermediate systems list cannot be None")
 
         # Pickup from starting system is always allowed
         if pickup_system_id == starting_system_id:
@@ -282,14 +289,13 @@ class TransportRules:
     Manages transport movement validation, space area tracking, and movement constraints.
     """
 
-    def __init__(self) -> None:
-        """Initialize the transport rules handler."""
-        pass
-
     def validate_movement_constraints(
         self, transport_state: TransportState, from_system_id: str, to_system_id: str
     ) -> bool:
         """Validate movement constraints for transported units.
+
+        Note: Current implementation always returns True. Additional validation
+        will be added as movement rules are integrated.
 
         Args:
             transport_state: The current transport state

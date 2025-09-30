@@ -253,7 +253,6 @@ class TestRule95CommandTokenRestrictions:
             pickup_system_id="start_system",
             starting_system_id="start_system",
             active_system_id="active_system",
-            intermediate_systems=["intermediate1", "intermediate2"],
             has_command_token=True,
         )
         assert can_pickup_start is True
@@ -263,7 +262,6 @@ class TestRule95CommandTokenRestrictions:
             pickup_system_id="active_system",
             starting_system_id="start_system",
             active_system_id="active_system",
-            intermediate_systems=["intermediate1", "intermediate2"],
             has_command_token=True,
         )
         assert can_pickup_active is True
@@ -273,7 +271,6 @@ class TestRule95CommandTokenRestrictions:
             pickup_system_id="intermediate1",
             starting_system_id="start_system",
             active_system_id="active_system",
-            intermediate_systems=["intermediate1", "intermediate2"],
             has_command_token=True,
         )
         assert can_pickup_intermediate is False
@@ -284,7 +281,6 @@ class TestRule95CommandTokenRestrictions:
                 pickup_system_id="intermediate1",
                 starting_system_id="start_system",
                 active_system_id="active_system",
-                intermediate_systems=["intermediate1", "intermediate2"],
                 has_command_token=False,
             )
         )
