@@ -15,6 +15,9 @@ from .constants import UnitType
 if TYPE_CHECKING:
     from .unit import Unit
 
+# Rule 95.0: Only fighters and ground forces can be transported
+TRANSPORTABLE_UNIT_TYPES = {UnitType.FIGHTER, UnitType.INFANTRY, UnitType.MECH}
+
 
 @dataclass
 class TransportState:
@@ -55,9 +58,8 @@ class TransportState:
         if unit is None:
             raise ValueError("Unit cannot be None")
 
-        # Check if unit type is transportable (avoid circular import)
-        transportable_types = {UnitType.FIGHTER, UnitType.INFANTRY, UnitType.MECH}
-        if unit.unit_type not in transportable_types:
+        # Check if unit type is transportable
+        if unit.unit_type not in TRANSPORTABLE_UNIT_TYPES:
             return False
 
         return self.get_remaining_capacity() > 0
@@ -74,8 +76,7 @@ class TransportManager:
     - Ground force landing integration (Rule 95.4)
     """
 
-    # Rule 95.0: Only fighters and ground forces can be transported
-    TRANSPORTABLE_UNIT_TYPES = {UnitType.FIGHTER, UnitType.INFANTRY, UnitType.MECH}
+    # Reference to module-level constant for transportable unit types
 
     def __init__(self) -> None:
         """Initialize the transport manager."""
@@ -111,7 +112,7 @@ class TransportManager:
 
         # Check if all units can be transported (only fighters and ground forces)
         for unit in units:
-            if unit.unit_type not in self.TRANSPORTABLE_UNIT_TYPES:
+            if unit.unit_type not in TRANSPORTABLE_UNIT_TYPES:
                 return False
 
         # Calculate total capacity needed for units
@@ -183,6 +184,8 @@ class TransportManager:
         unloaded_units = transport_state.transported_units.copy()
 
         # Clear the transport state
+        # TODO: Consider making TransportState immutable in future refactoring
+        # to prevent unintended side effects from direct mutation
         transport_state.transported_units.clear()
 
         return unloaded_units
@@ -267,7 +270,7 @@ class TransportManager:
         # Note: is_active_system is False here since we already handled active system above
         return self.can_pickup_from_system(
             pickup_system_id,
-            "",  # Player ID not used in the command token logic
+            "",  # Empty string is acceptable - player_id validation only checks for None
             has_command_token,
             False,  # Not active system (already handled above)
         )
