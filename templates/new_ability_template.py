@@ -68,7 +68,9 @@ class NewTechnologyTemplate(PassiveTechnologyCard):
             abilities=tuple(self._create_abilities()),  # Returns tuple
         )
 
-        super().__init__(tech_spec)
+        # Initialize base class with the Technology enum and name, then store the full spec
+        super().__init__(tech_spec.technology, tech_spec.name)
+        self._specification = tech_spec
 
     def _create_abilities(self) -> tuple[AbilitySpecification, ...]:
         """
@@ -118,10 +120,10 @@ class NewTechnologyTemplate(PassiveTechnologyCard):
             context = {}
 
         # Get the ability specification
-        if ability_index >= len(self.specification.abilities):
+        if ability_index >= len(self._specification.abilities):
             return False
 
-        ability = self.specification.abilities[ability_index]
+        ability = self._specification.abilities[ability_index]
 
         # Validate conditions using the framework
         from ti4.core.technology_cards.abilities_integration import (
@@ -132,7 +134,7 @@ class NewTechnologyTemplate(PassiveTechnologyCard):
             return validate_ability_conditions(ability.conditions, context)
         except NotImplementedError:
             # Log the unimplemented condition for development
-            print(f"Warning: Unimplemented condition in {self.specification.name}")
+            print(f"Warning: Unimplemented condition in {self._specification.name}")
             return False
 
     def use_ability(
@@ -156,7 +158,7 @@ class NewTechnologyTemplate(PassiveTechnologyCard):
         if context is None:
             context = {}
 
-        ability = self.specification.abilities[ability_index]
+        ability = self._specification.abilities[ability_index]
 
         # Implement the specific effect based on the ability type
         if ability.effect == AbilityEffectType.EXPLORE_FRONTIER_TOKEN:

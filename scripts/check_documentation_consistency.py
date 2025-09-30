@@ -18,12 +18,12 @@ def find_enum_references(file_path: Path) -> list[tuple[int, str]]:
     try:
         with open(file_path, encoding="utf-8") as f:
             for line_num, line in enumerate(f, 1):
-                # Look for references to constants.py or specifications.py in enum contexts
-                if re.search(r"enum.*constants\.py", line, re.IGNORECASE):
+                # Look for references to specifications.py in enum contexts
+                if re.search(r"enum.*specifications\.py", line, re.IGNORECASE):
                     references.append((line_num, line.strip()))
-                elif re.search(r"constants\.py.*enum", line, re.IGNORECASE):
+                elif re.search(r"specifications\.py.*enum", line, re.IGNORECASE):
                     references.append((line_num, line.strip()))
-                elif re.search(r"Add.*enum.*constants\.py", line, re.IGNORECASE):
+                elif re.search(r"Add.*enum.*specifications\.py", line, re.IGNORECASE):
                     references.append((line_num, line.strip()))
     except Exception as e:
         print(f"Error reading {file_path}: {e}")
