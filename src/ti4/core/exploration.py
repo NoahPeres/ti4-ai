@@ -333,7 +333,11 @@ class ExplorationSystem:
         system: Any,  # Mock system object for testing
         game_state: GameState,
     ) -> ExplorationResult:
-        """Explore a frontier token (Rule 35.5-35.6).
+        """Explore a frontier token (Rule 35.4-35.6).
+
+        LRR 35.4: Players can explore space areas that contain frontier tokens
+        if they own the "Dark Energy Tap" technology or if another game effect
+        allows them to.
 
         LRR 35.5: When a player explores a frontier token, they draw and resolve
         a card from the frontier exploration deck.
@@ -345,6 +349,12 @@ class ExplorationSystem:
 
         if not self._has_frontier_token(system):
             result.success = False
+            return result
+
+        # Rule 35.4: Check if player can explore frontier tokens
+        if not self._can_explore_frontier_tokens(player, game_state):
+            result.success = False
+            result.exploration_triggered = False
             return result
 
         result.exploration_triggered = True
@@ -371,6 +381,26 @@ class ExplorationSystem:
         """Remove frontier token from system."""
         if hasattr(system, "remove_frontier_token"):
             system.remove_frontier_token()
+
+    def _can_explore_frontier_tokens(
+        self, player: Player, game_state: GameState
+    ) -> bool:
+        """Check if player can explore frontier tokens (Rule 35.4).
+
+        LRR 35.4: Players can explore space areas that contain frontier tokens
+        if they own the "Dark Energy Tap" technology or if another game effect
+        allows them to.
+        """
+        from ti4.core.constants import Technology
+
+        tech_manager = getattr(game_state, "technology_manager", None)
+        if tech_manager is None:
+            # If no technology manager, assume exploration is not allowed
+            return False
+        player_technologies = tech_manager.get_player_technologies(player.id)
+
+        # Check if player has Dark Energy Tap technology
+        return Technology.DARK_ENERGY_TAP in player_technologies
 
     def resolve_exploration_card(
         self,

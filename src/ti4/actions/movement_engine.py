@@ -438,7 +438,7 @@ class MovementValidator:
         self,
         movement_plan: MovementPlan,
         player_id: str,
-        technologies: Optional[set[str]] = None,
+        technologies: Optional[set[Any]] = None,
     ) -> ValidationResult:
         """Validate an entire movement plan jointly."""
         technologies = technologies or set()
@@ -536,7 +536,7 @@ class MovementValidator:
     def _apply_movement_technologies(
         self,
         ships_needing_help: list[dict[str, Any]],
-        technologies: set[str],
+        technologies: set[Any],
         technology_effects: dict[str, str],
         ships_valid_without_help: list[dict[str, Any]],
     ) -> list[dict[str, Any]]:
@@ -545,10 +545,20 @@ class MovementValidator:
         This method is designed to be extensible for future technologies.
         Returns the list of ships that still need help after applying technologies.
         """
+        from ..core.constants import Technology
+
         remaining_ships = ships_needing_help.copy()
 
+        # Convert technologies to string values for comparison
+        tech_values = set()
+        for tech in technologies:
+            if hasattr(tech, "value"):
+                tech_values.add(tech.value)
+            else:
+                tech_values.add(str(tech))
+
         # Apply Gravity Drive (can only be used once per tactical action)
-        if "gravity_drive" in technologies:
+        if Technology.GRAVITY_DRIVE.value in tech_values:
             remaining_ships = self._apply_gravity_drive(
                 remaining_ships, technology_effects, ships_valid_without_help
             )

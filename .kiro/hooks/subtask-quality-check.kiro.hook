@@ -6,9 +6,13 @@
   "when": {
     "type": "fileEdited",
     "patterns": [
+      "**/*.py",
       "**/*.md",
-      "**/*.txt",
-      "**/*.toml"
+      "**/*.toml",
+      "**/*.yaml",
+      "**/*.yml",
+      "**/*.json",
+      "**/*.txt"
     ]
   },
   "then": {

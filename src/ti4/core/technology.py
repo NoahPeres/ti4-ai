@@ -134,7 +134,7 @@ class TechnologyManager:
 
         LRR Reference: Rule 90.2 - A player does not own any technology card that is in their technology deck
         """
-        # Get all available technologies
+        # Get all available technologies (including new framework technologies)
         all_technologies = {
             TechnologyEnum.CRUISER_II,
             TechnologyEnum.FIGHTER_II,
@@ -146,6 +146,7 @@ class TechnologyManager:
             TechnologyEnum.LIGHT_WAVE_DEFLECTOR,
             TechnologyEnum.PLASMA_SCORING,
             TechnologyEnum.ANTIMASS_DEFLECTORS,
+            TechnologyEnum.DARK_ENERGY_TAP,  # New framework technology
         }
 
         # Remove technologies the player already owns
@@ -237,6 +238,7 @@ class TechnologyManager:
             TechnologyEnum.GRAVITY_DRIVE: TechnologyColor.BLUE,  # Blue tech (confirmed)
             TechnologyEnum.ANTIMASS_DEFLECTORS: TechnologyColor.BLUE,  # Blue tech, no prerequisites (confirmed)
             TechnologyEnum.QUANTUM_DATAHUB_NODE: TechnologyColor.YELLOW,  # Yellow tech, Hacan faction (confirmed)
+            TechnologyEnum.DARK_ENERGY_TAP: TechnologyColor.BLUE,  # Blue tech, confirmed through framework
             # Note: SPEC_OPS_II is a unit upgrade and has no color
         }
 
@@ -283,6 +285,7 @@ class TechnologyManager:
                 TechnologyColor.YELLOW,
                 TechnologyColor.YELLOW,
             ],  # Confirmed: 3x Yellow (Hacan faction tech)
+            TechnologyEnum.DARK_ENERGY_TAP: [],  # Confirmed: No prerequisites (Level 0), confirmed through framework
         }
 
         # Return confirmed data or raise error for unconfirmed technologies
@@ -319,6 +322,7 @@ class TechnologyManager:
             TechnologyEnum.ANTIMASS_DEFLECTORS,
             TechnologyEnum.SPEC_OPS_II,
             TechnologyEnum.QUANTUM_DATAHUB_NODE,
+            TechnologyEnum.DARK_ENERGY_TAP,  # Confirmed through framework
         }:
             raise ValueError(
                 f"Technology {technology} unit upgrade status not confirmed. Please ask user for specification."
@@ -396,6 +400,7 @@ class TechnologyManager:
             TechnologyEnum.ANTIMASS_DEFLECTORS,
             TechnologyEnum.SPEC_OPS_II,
             TechnologyEnum.QUANTUM_DATAHUB_NODE,
+            TechnologyEnum.DARK_ENERGY_TAP,  # New framework technology
         }
 
         confirmed_technologies = {
@@ -405,6 +410,7 @@ class TechnologyManager:
             TechnologyEnum.ANTIMASS_DEFLECTORS,
             TechnologyEnum.SPEC_OPS_II,
             TechnologyEnum.QUANTUM_DATAHUB_NODE,
+            TechnologyEnum.DARK_ENERGY_TAP,  # Confirmed through new framework
         }
 
         return all_technologies - confirmed_technologies
