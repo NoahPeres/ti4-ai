@@ -6,7 +6,7 @@ The Technology Card Framework integrates seamlessly with existing TI4 game syste
 
 ## Integration Architecture
 
-```
+```text
 Technology Card Framework
 ├── Abilities System Integration
 ├── Unit Stats System Integration

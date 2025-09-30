@@ -105,7 +105,7 @@ The framework uses comprehensive enums for all game concepts to provide:
 ```
 
 ### Base Class Hierarchy
-```
+```text
 BaseTechnologyCard
 ├── PassiveTechnologyCard      # For passive abilities
 ├── ExhaustibleTechnologyCard  # For ACTION abilities that exhaust
@@ -148,7 +148,7 @@ The framework integrates seamlessly with:
 
 ## Framework Architecture
 
-```
+```text
 Technology Card Framework
 ├── Core Protocols (interfaces all technologies must implement)
 ├── Base Classes (common functionality for different technology types)
@@ -161,7 +161,7 @@ Technology Card Framework
 
 ## File Organization
 
-```
+```text
 src/ti4/core/technology_cards/
 ├── __init__.py                 # Public API
 ├── protocols.py                # Core interfaces

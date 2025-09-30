@@ -72,6 +72,27 @@ class TechnologyCardRegistry:
         """
         return technology in self._cards
 
+    def __contains__(self, technology: Technology) -> bool:
+        """
+        Check if a technology card is registered (supports 'in' operator).
+
+        Args:
+            technology: The technology to check
+
+        Returns:
+            True if the technology card is registered
+        """
+        return technology in self._cards
+
+    def __len__(self) -> int:
+        """
+        Get the number of registered technology cards.
+
+        Returns:
+            The number of registered technology cards
+        """
+        return len(self._cards)
+
     def unregister_card(self, technology: Technology) -> bool:
         """
         Unregister a technology card.

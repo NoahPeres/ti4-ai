@@ -111,7 +111,9 @@ class TestDarkEnergyTapAbilitiesIntegration:
         context = {"player": Mock(), "combat_id": "test_combat"}
 
         # Trigger the event
-        result = self.ability_manager.trigger_event("retreat_declared", context)
+        result = self.ability_manager.trigger_event(
+            AbilityTrigger.WHEN_RETREAT_DECLARED.value, context
+        )
 
         # Should have resolved the retreat enhancement ability
         assert result.success

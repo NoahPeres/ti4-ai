@@ -6,5 +6,6 @@ like Dark Energy Tap and Gravity Drive.
 """
 
 from .dark_energy_tap import DarkEnergyTap
+from .gravity_drive import GravityDrive
 
-__all__ = ["DarkEnergyTap"]
+__all__ = ["DarkEnergyTap", "GravityDrive"]

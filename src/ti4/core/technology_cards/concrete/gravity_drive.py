@@ -73,7 +73,7 @@ class GravityDrive(PassiveTechnologyCard):
     @property
     def prerequisites(self) -> list[TechnologyColor]:
         """Required prerequisite colors from specification."""
-        return self._specification.prerequisites
+        return list(self._specification.prerequisites)
 
     @property
     def faction_restriction(self) -> Optional[Faction]:

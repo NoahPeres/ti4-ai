@@ -32,7 +32,7 @@ To implement a new technology card:
 
 The framework follows an enum-first design philosophy with clear separation of concerns:
 
-```
+```text
 src/ti4/core/technology_cards/
 ├── __init__.py                 # Public API exports
 ├── protocols.py                # Protocol definitions

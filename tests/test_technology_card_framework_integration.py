@@ -156,7 +156,7 @@ class TestTechnologyCardLifecycleIntegration:
         retreat_context = self.fixture.create_retreat_context()
 
         retreat_result = self.fixture.ability_manager.trigger_event(
-            "retreat_declared", retreat_context
+            "when_retreat_declared", retreat_context
         )
         assert retreat_result.success
         assert len(retreat_result.resolved_abilities) >= 1
@@ -375,7 +375,9 @@ class TestDarkEnergyTapMultiSystemIntegration:
             "adjacent_systems": ["system1", "system2"],
         }
 
-        result = self.ability_manager.trigger_event("retreat_declared", retreat_context)
+        result = self.ability_manager.trigger_event(
+            "when_retreat_declared", retreat_context
+        )
 
         assert result.success
 
@@ -495,7 +497,7 @@ class TestEnumBasedSpecificationSystemIntegration:
         assert spec is not None
         assert spec.name == "Dark Energy Tap"
         assert spec.color == TechnologyColor.BLUE
-        assert spec.prerequisites == []
+        assert spec.prerequisites == ()
         assert spec.faction_restriction is None
 
         # 2. Create technology card using enum-based factory
@@ -504,7 +506,7 @@ class TestEnumBasedSpecificationSystemIntegration:
         # Should match specification
         assert card.name == spec.name
         assert card.color == spec.color
-        assert card.prerequisites == spec.prerequisites
+        assert card.prerequisites == list(spec.prerequisites)
         assert card.faction_restriction == spec.faction_restriction
 
         # 3. Abilities should be created from enum specifications
@@ -610,7 +612,7 @@ class TestEnumBasedSpecificationSystemIntegration:
         spec = self.specification_registry.get_specification(Technology.DARK_ENERGY_TAP)
 
         # Dark Energy Tap has no prerequisites
-        assert spec.prerequisites == []
+        assert spec.prerequisites == ()
 
         # Test a technology with prerequisites (when implemented)
         # This will be expanded when more technologies are added
@@ -655,7 +657,7 @@ class TestEnumBasedSpecificationSystemIntegration:
             card = self.factory.create_card(technology)
             assert card.name == spec.name
             assert card.color == spec.color
-            assert card.prerequisites == spec.prerequisites
+            assert card.prerequisites == list(spec.prerequisites)
 
 
 class TestManualConfirmationProtocolIntegration:

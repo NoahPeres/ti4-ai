@@ -266,7 +266,7 @@ ability = EnhancedAbility(...)
 
 ## File Locations
 
-```
+```text
 src/ti4/core/technology_cards/
 ├── concrete/your_new_tech.py     # Your implementation
 ├── specifications.py             # Add specification here

@@ -42,7 +42,7 @@ class AbilitySpecification:
 
     trigger: AbilityTrigger
     effect: AbilityEffectType
-    conditions: list[AbilityCondition]
+    conditions: tuple[AbilityCondition, ...]
     mandatory: bool
     passive: bool
 
@@ -59,10 +59,10 @@ class TechnologySpecification:
     technology: Technology
     name: str
     color: Optional[TechnologyColor]
-    prerequisites: list[TechnologyColor]
+    prerequisites: tuple[TechnologyColor, ...]
     faction_restriction: Optional[Faction]
     expansion: Expansion
-    abilities: list[AbilitySpecification]
+    abilities: tuple[AbilitySpecification, ...]
 
 
 class TechnologySpecificationRegistry:
@@ -87,18 +87,18 @@ class TechnologySpecificationRegistry:
             technology=Technology.GRAVITY_DRIVE,
             name="Gravity Drive",
             color=TechnologyColor.BLUE,
-            prerequisites=[TechnologyColor.BLUE],
+            prerequisites=(TechnologyColor.BLUE,),
             faction_restriction=None,
             expansion=Expansion.BASE,
-            abilities=[
+            abilities=(
                 AbilitySpecification(
                     trigger=AbilityTrigger.AFTER_ACTIVATE_SYSTEM,
                     effect=AbilityEffectType.MODIFY_UNIT_STATS,
-                    conditions=[],
+                    conditions=(),
                     mandatory=True,
                     passive=False,
                 ),
-            ],
+            ),
         )
 
         # Dark Energy Tap - CONFIRMED BY USER: Blue tech, no prerequisites, Prophecy of Kings
@@ -106,28 +106,28 @@ class TechnologySpecificationRegistry:
             technology=Technology.DARK_ENERGY_TAP,
             name="Dark Energy Tap",
             color=TechnologyColor.BLUE,
-            prerequisites=[],  # CONFIRMED: No prerequisites (Level 0 technology)
+            prerequisites=(),  # CONFIRMED: No prerequisites (Level 0 technology)
             faction_restriction=None,
             expansion=Expansion.PROPHECY_OF_KINGS,
-            abilities=[
+            abilities=(
                 AbilitySpecification(
                     trigger=AbilityTrigger.AFTER_TACTICAL_ACTION,
                     effect=AbilityEffectType.EXPLORE_FRONTIER_TOKEN,
-                    conditions=[
+                    conditions=(
                         AbilityCondition.HAS_SHIPS_IN_SYSTEM,
                         AbilityCondition.SYSTEM_CONTAINS_FRONTIER,
-                    ],
+                    ),
                     mandatory=True,
                     passive=False,
                 ),
                 AbilitySpecification(
                     trigger=AbilityTrigger.WHEN_RETREAT_DECLARED,
                     effect=AbilityEffectType.ALLOW_RETREAT_TO_EMPTY_ADJACENT,
-                    conditions=[],
+                    conditions=(),
                     mandatory=False,
                     passive=True,
                 ),
-            ],
+            ),
         )
 
     def get_specification(

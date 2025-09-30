@@ -193,7 +193,7 @@ def create_ability_from_specification(spec: AbilitySpecification) -> Ability:
         trigger=trigger_str,
         effect=effect,
         mandatory=spec.mandatory,
-        conditions=spec.conditions,
+        conditions=list(spec.conditions),
     )
 
     return ability
@@ -230,21 +230,7 @@ class EnhancedAbility(Ability):
 
     def _validate_conditions(self, context: dict[str, Any]) -> bool:
         """Validate all conditions are met in the given context."""
-        from ti4.core.constants import AbilityCondition
-
-        for condition in self.conditions:
-            if condition == AbilityCondition.HAS_SHIPS_IN_SYSTEM:
-                if not context.get("has_ships", False):
-                    return False
-            elif condition == AbilityCondition.SYSTEM_CONTAINS_FRONTIER:
-                if not context.get("has_frontier_token", False):
-                    return False
-            elif condition == AbilityCondition.CONTROL_PLANET:
-                if not context.get("controls_planet", False):
-                    return False
-            # Add more condition validations as needed
-
-        return True
+        return validate_ability_conditions(self.conditions, context)
 
     def _validate_condition_types(self) -> None:
         """Validate that all conditions are proper AbilityCondition enums."""

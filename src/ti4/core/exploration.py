@@ -393,12 +393,10 @@ class ExplorationSystem:
         """
         from ti4.core.constants import Technology
 
-        # Check if game state has technology manager
-        if not hasattr(game_state, "technology_manager"):
+        tech_manager = getattr(game_state, "technology_manager", None)
+        if tech_manager is None:
             # If no technology manager, assume exploration is not allowed
             return False
-
-        tech_manager = game_state.technology_manager
         player_technologies = tech_manager.get_player_technologies(player.id)
 
         # Check if player has Dark Energy Tap technology

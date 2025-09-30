@@ -43,8 +43,12 @@ class DarkEnergyTap(PassiveTechnologyCard):
 
     @property
     def prerequisites(self) -> list[TechnologyColor]:
-        """Required prerequisite colors (none)."""
-        return []
+        """Required prerequisite colors from specification."""
+        from ..specifications import TechnologySpecificationRegistry
+
+        registry = TechnologySpecificationRegistry()
+        spec = registry.get_specification(Technology.DARK_ENERGY_TAP)
+        return list(spec.prerequisites) if spec else []
 
     @property
     def faction_restriction(self) -> Optional[Faction]:
@@ -87,12 +91,13 @@ class DarkEnergyTap(PassiveTechnologyCard):
 
     def _create_retreat_enhancement_ability(self) -> Ability:
         """Create the retreat enhancement ability."""
+        from ti4.core.constants import AbilityTrigger
         from ti4.core.technology_cards.abilities_integration import EnhancedAbility
 
         ability = EnhancedAbility(
             name="Enhanced Retreat",
             timing=TimingWindow.WHEN,
-            trigger="retreat_declared",
+            trigger=AbilityTrigger.WHEN_RETREAT_DECLARED.value,
             effect=AbilityEffect(
                 type="allow_retreat_to_empty_adjacent",
                 value=True,

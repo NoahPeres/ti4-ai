@@ -13,6 +13,7 @@ from ti4.core.constants import Technology
 from ti4.core.unit_stats import UnitStatsProvider
 
 from .factory import TechnologyCardFactory
+from .protocols import TechnologyCardProtocol
 from .registry import TechnologyCardRegistry
 
 
@@ -75,15 +76,20 @@ class TechnologyFrameworkIntegration:
                 # Register with ability manager
                 self.ability_manager.add_ability(ability)
 
-        # Register unit stat modifications if applicable
-        if hasattr(card, "get_unit_stat_modifications"):
-            modifications = card.get_unit_stat_modifications()
-            for unit_type, stat_mods in modifications.items():
+        # Register unit stat modifications for unit-upgrade cards
+        from .protocols import UnitUpgradeTechnologyProtocol
+
+        if isinstance(card, UnitUpgradeTechnologyProtocol):
+            enum_mods = card.get_unit_stat_modifications()
+            if enum_mods:
+                stats = card.get_legacy_unit_stat_modifications()
                 self.unit_stats_provider.register_technology_modifier(
-                    technology, unit_type, stat_mods
+                    technology, card.upgraded_unit_type, stats
                 )
 
-    def get_technology_card(self, technology: Technology) -> Optional[object]:
+    def get_technology_card(
+        self, technology: Technology
+    ) -> Optional[TechnologyCardProtocol]:
         """
         Get a technology card instance.
 
@@ -148,11 +154,15 @@ class TechnologyFrameworkIntegration:
         # Check that cards have abilities
         if results["dark_energy_tap_available"]:
             det_card = self.get_technology_card(Technology.DARK_ENERGY_TAP)
-            results["dark_energy_tap_has_abilities"] = len(det_card.get_abilities()) > 0  # type: ignore
+            results["dark_energy_tap_has_abilities"] = (
+                len(det_card.get_abilities()) > 0 if det_card else False
+            )
 
         if results["gravity_drive_available"]:
             gd_card = self.get_technology_card(Technology.GRAVITY_DRIVE)
-            results["gravity_drive_has_abilities"] = len(gd_card.get_abilities()) > 0  # type: ignore
+            results["gravity_drive_has_abilities"] = (
+                len(gd_card.get_abilities()) > 0 if gd_card else False
+            )
 
         return results
 

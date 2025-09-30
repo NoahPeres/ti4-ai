@@ -5,10 +5,10 @@ This module defines the core protocols that all technology card implementations
 must follow to ensure consistency and proper integration with game systems.
 """
 
-from typing import Any, Optional, Protocol, runtime_checkable
+from typing import Any, Optional, Protocol, Union, runtime_checkable
 
 from ti4.core.abilities import Ability
-from ti4.core.constants import Faction, Technology, UnitType
+from ti4.core.constants import Faction, Technology, UnitStatModification, UnitType
 from ti4.core.technology import TechnologyColor
 
 
@@ -101,6 +101,12 @@ class UnitUpgradeTechnologyProtocol(Protocol):
         """The unit type this technology upgrades."""
         ...
 
-    def get_unit_stat_modifications(self) -> dict[str, Any]:
+    def get_unit_stat_modifications(
+        self,
+    ) -> dict[UnitStatModification, Union[int, bool]]:
         """Get the stat modifications this upgrade provides."""
+        ...
+
+    def get_legacy_unit_stat_modifications(self) -> Any:
+        """Get the stat modifications as UnitStats object for UnitStatsProvider."""
         ...

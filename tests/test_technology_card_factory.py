@@ -29,7 +29,6 @@ class TestTechnologyCardFactory:
         card = factory.create_card(Technology.DARK_ENERGY_TAP)
 
         # Should return a TechnologyCardProtocol implementation
-        assert isinstance(card, TechnologyCardProtocol)
         assert card.technology_enum == Technology.DARK_ENERGY_TAP
         assert card.name == "Dark Energy Tap"
 

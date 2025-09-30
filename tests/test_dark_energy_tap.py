@@ -61,7 +61,7 @@ class TestDarkEnergyTap:
 
         assert retreat_ability is not None
         assert retreat_ability.timing == TimingWindow.WHEN
-        assert retreat_ability.trigger == "retreat_declared"
+        assert retreat_ability.trigger == "when_retreat_declared"
         assert retreat_ability.mandatory is False
 
     def test_dark_energy_tap_implements_protocol(self):
@@ -116,6 +116,7 @@ class TestDarkEnergyTap:
 
         assert frontier_ability is not None
         assert frontier_ability.name == "Frontier Exploration"
+        assert getattr(frontier_ability, "source", None) == "Dark Energy Tap"
         assert frontier_ability.effect.type == "explore_frontier_token"
         assert frontier_ability.effect.value is True
 
@@ -139,6 +140,7 @@ class TestDarkEnergyTap:
 
         assert retreat_ability is not None
         assert retreat_ability.name == "Enhanced Retreat"
+        assert getattr(retreat_ability, "source", None) == "Dark Energy Tap"
         assert retreat_ability.effect.type == "allow_retreat_to_empty_adjacent"
         assert retreat_ability.effect.value is True
 
@@ -158,14 +160,14 @@ class TestDarkEnergyTap:
         assert spec is not None
         assert spec.name == "Dark Energy Tap"
         assert spec.color == TechnologyColor.BLUE
-        assert spec.prerequisites == []
+        assert spec.prerequisites == ()
         assert spec.faction_restriction is None
 
         # Test implementation matches specification
         dark_energy_tap = DarkEnergyTap()
         assert dark_energy_tap.name == spec.name
         assert dark_energy_tap.color == spec.color
-        assert dark_energy_tap.prerequisites == spec.prerequisites
+        assert dark_energy_tap.prerequisites == list(spec.prerequisites)
         assert dark_energy_tap.faction_restriction == spec.faction_restriction
 
     def test_dark_energy_tap_abilities_match_specification(self):

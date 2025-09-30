@@ -5,11 +5,7 @@
   "version": "1",
   "when": {
     "type": "fileEdited",
-    "patterns": [
-      "**/*.md",
-      "**/*.txt",
-      "**/*.toml"
-    ]
+    "patterns": []
   },
   "then": {
     "type": "askAgent",

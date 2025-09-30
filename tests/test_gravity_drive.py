@@ -93,7 +93,7 @@ class TestGravityDrive:
 
         # Properties should match specification
         assert gravity_drive.color == spec.color
-        assert gravity_drive.prerequisites == spec.prerequisites
+        assert gravity_drive.prerequisites == list(spec.prerequisites)
         assert gravity_drive.faction_restriction == spec.faction_restriction
 
         # Should create abilities from specification
@@ -204,11 +204,11 @@ class TestGravityDrive:
 
         # Test with Gravity Drive - should be valid and automatically applied
         result_with_tech = validator.validate_movement_plan(
-            movement_plan, "player1", technologies={"gravity_drive"}
+            movement_plan, "player1", technologies={Technology.GRAVITY_DRIVE}
         )
         assert result_with_tech.is_valid is True
         assert result_with_tech.technology_effects is not None
-        assert "gravity_drive" in result_with_tech.technology_effects
+        assert Technology.GRAVITY_DRIVE.value in result_with_tech.technology_effects
 
     def test_gravity_drive_cross_galaxy_tactical_movement(self):
         """Test Gravity Drive enables complex tactical movements across multiple systems."""
@@ -262,10 +262,10 @@ class TestGravityDrive:
 
         # With Gravity Drive - should succeed
         result_with_tech = validator.validate_movement_plan(
-            movement_plan_carrier, "player1", technologies={"gravity_drive"}
+            movement_plan_carrier, "player1", technologies={Technology.GRAVITY_DRIVE}
         )
         assert result_with_tech.is_valid is True
-        assert "gravity_drive" in result_with_tech.technology_effects
+        assert Technology.GRAVITY_DRIVE.value in result_with_tech.technology_effects
 
     def test_gravity_drive_objective_system_access(self):
         """Test Gravity Drive enables reaching objective systems for victory conditions."""
@@ -326,10 +326,10 @@ class TestGravityDrive:
 
         # With Gravity Drive - should succeed
         result_with_tech = validator.validate_movement_plan(
-            movement_plan_carrier, "player1", technologies={"gravity_drive"}
+            movement_plan_carrier, "player1", technologies={Technology.GRAVITY_DRIVE}
         )
         assert result_with_tech.is_valid is True
-        assert "gravity_drive" in result_with_tech.technology_effects
+        assert Technology.GRAVITY_DRIVE.value in result_with_tech.technology_effects
 
     def test_gravity_drive_multiple_ships_limitation(self):
         """Test that Gravity Drive has limitations when multiple ships need enhancement."""
@@ -370,7 +370,7 @@ class TestGravityDrive:
 
         # Test with Gravity Drive - should still be invalid (can only help one ship)
         result = validator.validate_movement_plan(
-            movement_plan, "player1", technologies={"gravity_drive"}
+            movement_plan, "player1", technologies={Technology.GRAVITY_DRIVE}
         )
 
         # This should be invalid because Gravity Drive can only be applied to one ship

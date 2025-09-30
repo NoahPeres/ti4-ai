@@ -12,7 +12,7 @@ Requirements: 7.1, 7.2, 7.3, 7.4, 7.5
 
 from enum import Enum
 
-from src.ti4.core.constants import (
+from ti4.core.constants import (
     AbilityCondition,
     AbilityEffectType,
     AbilityTrigger,
