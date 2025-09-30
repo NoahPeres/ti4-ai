@@ -76,11 +76,18 @@ select = [
     "B",  # flake8-bugbear
     "C4", # flake8-comprehensions
     "UP", # pyupgrade
+    "S",  # flake8-bandit (security)
+    "T20", # flake8-print (detect print statements)
 ]
 ignore = [
     "E501",  # line too long, handled by ruff format
     "B008",  # do not perform function calls in argument defaults
     "C901",  # too complex
+    "S101", # assert statements are allowed in tests
+    "S105", # possible hardcoded password (false positives for game constants)
+    "S106", # possible hardcoded password in arguments (false positives)
+    "S311", # standard pseudo-random generators (acceptable for game RNG)
+    "T201", # print statements allowed for debugging
 ]
 
 [tool.ruff.lint.per-file-ignores]

@@ -247,6 +247,9 @@ def validate_ability_conditions(conditions: list[Any], context: dict[str, Any]) 
     """
     Validate that all ability conditions are met in the given context.
 
+    This function implements fail-closed validation: any unimplemented condition
+    will raise NotImplementedError rather than being silently ignored.
+
     Args:
         conditions: List of AbilityCondition enums to validate
         context: Context dictionary with game state information
@@ -256,6 +259,7 @@ def validate_ability_conditions(conditions: list[Any], context: dict[str, Any]) 
 
     Raises:
         TypeError: If conditions contain non-AbilityCondition items
+        NotImplementedError: If any condition lacks explicit validation logic
     """
     from ti4.core.constants import AbilityCondition
 
@@ -264,7 +268,7 @@ def validate_ability_conditions(conditions: list[Any], context: dict[str, Any]) 
         if not isinstance(condition, AbilityCondition):
             raise TypeError(f"Expected AbilityCondition enum, got {type(condition)}")
 
-    # Validate each condition
+    # Validate each condition with explicit fail-closed behavior
     for condition in conditions:
         if condition == AbilityCondition.HAS_SHIPS_IN_SYSTEM:
             if not context.get("has_ships", False):
@@ -289,6 +293,26 @@ def validate_ability_conditions(conditions: list[Any], context: dict[str, Any]) 
         elif condition == AbilityCondition.CONTROLS_LEGENDARY_PLANET:
             if not context.get("controls_legendary_planet", False):
                 return False
-        # Add more condition validations as needed
+        elif condition == AbilityCondition.HAS_GROUND_FORCES_ON_PLANET:
+            raise NotImplementedError(
+                f"Validation for condition {condition.value} is not yet implemented. "
+                "This condition requires integration with the ground forces system."
+            )
+        elif condition == AbilityCondition.SYSTEM_CONTAINS_WORMHOLE:
+            raise NotImplementedError(
+                f"Validation for condition {condition.value} is not yet implemented. "
+                "This condition requires integration with the wormhole system."
+            )
+        elif condition == AbilityCondition.ADJACENT_TO_MECATOL_REX:
+            raise NotImplementedError(
+                f"Validation for condition {condition.value} is not yet implemented. "
+                "This condition requires integration with the galaxy map system."
+            )
+        else:
+            # Fail-closed: explicitly reject any unhandled conditions
+            raise NotImplementedError(
+                f"Validation for condition {condition.value} is not implemented. "
+                "All ability conditions must have explicit validation logic."
+            )
 
     return True

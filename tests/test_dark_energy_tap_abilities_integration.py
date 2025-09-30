@@ -86,7 +86,7 @@ class TestDarkEnergyTapAbilitiesIntegration:
 
         # Trigger the event
         result = self.ability_manager.trigger_event(
-            "tactical_action_in_frontier_system", context
+            AbilityTrigger.AFTER_TACTICAL_ACTION.value, context
         )
 
         # Should have resolved the frontier exploration ability
@@ -186,10 +186,10 @@ class TestDarkEnergyTapAbilitiesIntegration:
 
         # Trigger the event twice with same occurrence_id
         result1 = self.ability_manager.trigger_event(
-            "tactical_action_in_frontier_system", context
+            AbilityTrigger.AFTER_TACTICAL_ACTION.value, context
         )
         result2 = self.ability_manager.trigger_event(
-            "tactical_action_in_frontier_system", context
+            AbilityTrigger.AFTER_TACTICAL_ACTION.value, context
         )
 
         # First should succeed, second should not trigger (ONCE_PER_TRIGGER)
@@ -212,7 +212,7 @@ class TestDarkEnergyTapAbilitiesIntegration:
 
         # Should not trigger without required conditions
         result = self.ability_manager.trigger_event(
-            "tactical_action_in_frontier_system", context_no_ships
+            AbilityTrigger.AFTER_TACTICAL_ACTION.value, context_no_ships
         )
 
         # Should not resolve frontier exploration ability due to missing condition

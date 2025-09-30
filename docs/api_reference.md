@@ -729,7 +729,7 @@ def get_confirmed_technologies() -> set[Technology]:
 
 ### Technology
 
-**File**: `src/ti4/core/constants.py`
+**File**: `src/ti4/core/technology_cards/specifications.py`
 
 Enumeration of all TI4 technologies.
 
@@ -744,7 +744,7 @@ class Technology(Enum):
 
 ### Expansion
 
-**File**: `src/ti4/core/constants.py`
+**File**: `src/ti4/core/technology_cards/specifications.py`
 
 Enumeration of TI4 expansions.
 
@@ -759,7 +759,7 @@ class Expansion(Enum):
 
 ### AbilityTrigger
 
-**File**: `src/ti4/core/constants.py`
+**File**: `src/ti4/core/technology_cards/specifications.py`
 
 Enumeration of ability triggers.
 
@@ -774,7 +774,7 @@ class AbilityTrigger(Enum):
 
 ### AbilityEffectType
 
-**File**: `src/ti4/core/constants.py`
+**File**: `src/ti4/core/technology_cards/specifications.py`
 
 Enumeration of ability effect types.
 
@@ -789,7 +789,7 @@ class AbilityEffectType(Enum):
 
 ### AbilityCondition
 
-**File**: `src/ti4/core/constants.py`
+**File**: `src/ti4/core/technology_cards/specifications.py`
 
 Enumeration of ability conditions.
 
@@ -804,7 +804,7 @@ class AbilityCondition(Enum):
 
 ### UnitStatModification
 
-**File**: `src/ti4/core/constants.py`
+**File**: `src/ti4/core/technology_cards/specifications.py`
 
 Enumeration of unit stat modification types.
 

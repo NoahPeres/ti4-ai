@@ -18,7 +18,7 @@
 
 1. **Add Technology Enum**
    ```python
-   # In src/ti4/core/constants.py
+   # In src/ti4/core/technology_cards/specifications.py
    class Technology(Enum):
        YOUR_NEW_TECH = "your_new_tech"
    ```

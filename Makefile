@@ -1,7 +1,7 @@
 SHELL := bash
 .SHELLFLAGS := -euo pipefail -c
 
-.PHONY: all help install test lint lint-fix format type-check check-all clean dev-setup strict-check security-check runtime-check quality-gate pre-commit-install pre-commit-autoupdate format-check
+.PHONY: all help install test lint lint-fix format type-check check-all clean dev-setup strict-check security-check runtime-check quality-gate pre-commit-install pre-commit-autoupdate format-check docs-check
 
 all: quality-gate
 
@@ -32,6 +32,14 @@ format: ## Format code with ruff
 format-check: ## Check code formatting without making changes
 	uv run ruff format --check src tests
 
+docs-check: ## Check documentation consistency
+	@echo "Checking documentation consistency..."
+	python scripts/check_documentation_consistency.py
+
+trigger-check: ## Check for hardcoded triggers and anti-patterns
+	@echo "Checking for hardcoded triggers and anti-patterns..."
+	python scripts/detect_hardcoded_triggers.py src
+
 type-check: ## Run type checking with mypy
 	@echo "Running mypy with strict checking for src/ and standard checking for tests/..."
 	@echo "Checking src/ with strict mode..."
@@ -59,10 +67,10 @@ pre-commit-install: ## Install pre-commit hooks
 pre-commit-autoupdate: ## Update pre-commit hooks to latest versions
 	uvx pre-commit autoupdate
 
-check-all: lint type-check format-check ## Run all quality checks (lint, format-check, type-check)
+check-all: lint type-check format-check docs-check trigger-check ## Run all quality checks (lint, format-check, type-check, docs-check, trigger-check)
 	@echo "All basic quality checks passed!"
 
-quality-gate: lint strict-check security-check test runtime-check format-check ## Run the complete quality gate (all checks + tests)
+quality-gate: lint strict-check security-check test runtime-check format-check docs-check trigger-check ## Run the complete quality gate (all checks + tests)
 	@echo "🎉 All quality gate checks passed! Code is ready for production."
 
 clean: ## Clean up build artifacts

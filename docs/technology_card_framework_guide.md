@@ -21,7 +21,7 @@ The Technology Card Framework provides a comprehensive, type-safe system for imp
 
 To implement a new technology card:
 
-1. **Add the technology to the enum system** in `src/ti4/core/constants.py`
+1. **Add the technology to the enum system** in `src/ti4/core/technology_cards/specifications.py`
 2. **Get user confirmation** for all specifications (mandatory)
 3. **Add specification** to `TechnologySpecificationRegistry`
 4. **Create concrete implementation** in `src/ti4/core/technology_cards/concrete/`
@@ -67,7 +67,7 @@ The framework uses comprehensive enums to represent all game concepts:
 ### Core Technology Enums
 
 ```python
-# In src/ti4/core/constants.py
+# In src/ti4/core/technology_cards/specifications.py
 
 class Technology(Enum):
     """All TI4 technologies"""
@@ -210,7 +210,7 @@ class UnitUpgradeTechnologyCard(BaseTechnologyCard):
 
 ### Step 1: Add Technology Enum
 
-First, add your technology to the `Technology` enum in `constants.py`:
+First, add your technology to the `Technology` enum in `specifications.py`:
 
 ```python
 class Technology(Enum):
@@ -534,7 +534,7 @@ class GravityDrive(PassiveTechnologyCard):
 #### 2. Missing Enum Values
 
 **Problem**: Need to add new trigger/effect/condition types
-**Solution**: Add to appropriate enum in `constants.py`
+**Solution**: Add to appropriate enum in `specifications.py`
 
 #### 3. Integration Issues
 

@@ -147,7 +147,7 @@ class TestTechnologyCardLifecycleIntegration:
         frontier_context = self.fixture.create_frontier_exploration_context()
 
         frontier_result = self.fixture.ability_manager.trigger_event(
-            "tactical_action_in_frontier_system", frontier_context
+            AbilityTrigger.AFTER_TACTICAL_ACTION.value, frontier_context
         )
         assert frontier_result.success
         assert len(frontier_result.resolved_abilities) >= 1
@@ -350,7 +350,7 @@ class TestDarkEnergyTapMultiSystemIntegration:
             }
 
             result = self.ability_manager.trigger_event(
-                "tactical_action_in_frontier_system", context
+                AbilityTrigger.AFTER_TACTICAL_ACTION.value, context
             )
 
             assert result.success
@@ -586,6 +586,51 @@ class TestEnumBasedSpecificationSystemIntegration:
 
         for condition_enum, context, expected_result in test_conditions:
             result = validate_ability_conditions([condition_enum], context)
+            assert result == expected_result
+
+    def test_ability_condition_fail_closed_validation(self):
+        """Test fail-closed validation behavior for unimplemented conditions.
+
+        Requirements: 4.1, 4.2, 4.3, 4.4 - Fail-closed validation
+        """
+        # RED: Test that unimplemented conditions raise NotImplementedError
+        import pytest
+
+        from ti4.core.technology_cards.abilities_integration import (
+            validate_ability_conditions,
+        )
+
+        # Test unimplemented conditions raise NotImplementedError with descriptive messages
+        unimplemented_conditions = [
+            AbilityCondition.HAS_GROUND_FORCES_ON_PLANET,
+            AbilityCondition.SYSTEM_CONTAINS_WORMHOLE,
+            AbilityCondition.ADJACENT_TO_MECATOL_REX,
+        ]
+
+        for condition in unimplemented_conditions:
+            with pytest.raises(NotImplementedError) as exc_info:
+                validate_ability_conditions([condition], {})
+
+            # Verify error message is descriptive
+            error_message = str(exc_info.value)
+            assert condition.value in error_message
+            assert (
+                "not yet implemented" in error_message
+                or "not implemented" in error_message
+            )
+
+        # GREEN: Test that implemented conditions still work correctly
+        implemented_test_cases = [
+            (AbilityCondition.HAS_SHIPS_IN_SYSTEM, {"has_ships": True}, True),
+            (AbilityCondition.HAS_SHIPS_IN_SYSTEM, {"has_ships": False}, False),
+            (AbilityCondition.CONTROL_PLANET, {"controls_planet": True}, True),
+            (AbilityCondition.CONTROL_PLANET, {"controls_planet": False}, False),
+            (AbilityCondition.DURING_COMBAT, {"in_combat": True}, True),
+            (AbilityCondition.DURING_COMBAT, {"in_combat": False}, False),
+        ]
+
+        for condition, context, expected_result in implemented_test_cases:
+            result = validate_ability_conditions([condition], context)
             assert result == expected_result
 
     def test_technology_color_enum_validation(self):

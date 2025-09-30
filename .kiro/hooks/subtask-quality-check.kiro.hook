@@ -5,7 +5,15 @@
   "version": "1",
   "when": {
     "type": "fileEdited",
-    "patterns": []
+    "patterns": [
+      "**/*.py",
+      "**/*.md",
+      "**/*.toml",
+      "**/*.yaml",
+      "**/*.yml",
+      "**/*.json",
+      "**/*.txt"
+    ]
   },
   "then": {
     "type": "askAgent",

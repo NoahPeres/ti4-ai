@@ -14,7 +14,7 @@ CONFIRMED SPECIFICATIONS - DO NOT MODIFY WITHOUT USER APPROVAL:
 from typing import Optional
 
 from ti4.core.abilities import Ability, AbilityEffect, TimingWindow
-from ti4.core.constants import Faction, Technology
+from ti4.core.constants import AbilityTrigger, Faction, Technology
 from ti4.core.technology import TechnologyColor
 from ti4.core.technology_cards.base.passive_tech import PassiveTechnologyCard
 
@@ -70,7 +70,7 @@ class DarkEnergyTap(PassiveTechnologyCard):
         ability = EnhancedAbility(
             name="Frontier Exploration",
             timing=TimingWindow.AFTER,
-            trigger="tactical_action_in_frontier_system",
+            trigger=AbilityTrigger.AFTER_TACTICAL_ACTION.value,
             effect=AbilityEffect(
                 type="explore_frontier_token",
                 value=True,

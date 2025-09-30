@@ -8,6 +8,15 @@ This directory contains comprehensive documentation for the Technology Card Fram
 
 ### 📚 Core Documentation
 
+#### [Development Guidelines](development_guidelines.md)
+**Essential practices** for all developers working on the TI4 framework.
+
+- Canonical trigger usage (enum values vs hardcoded strings)
+- Fail-closed validation approach
+- Code review checklist
+- Prevention measures and templates
+- Testing guidelines and best practices
+
 #### [Technology Card Framework Developer Guide](technology_card_framework_guide.md)
 **Start here!** Comprehensive guide covering everything you need to implement technology cards.
 
@@ -70,21 +79,32 @@ This directory contains comprehensive documentation for the Technology Card Fram
 - Manual confirmation enforcement
 - Integration testing patterns
 
+#### [Validation Requirements](validation_requirements.md)
+**Comprehensive requirements** for implementing new ability condition validation.
+
+- Fail-closed validation standards
+- Type safety and error handling requirements
+- Context validation patterns
+- Testing and documentation requirements
+- Integration and quality assurance guidelines
+
 ## Getting Started
 
 ### For New Developers
 
-1. **Start with**: [Technology Card Framework Developer Guide](technology_card_framework_guide.md)
-2. **Reference**: [Quick Reference](quick_reference.md) for common patterns
-3. **Study**: [Dark Energy Tap Reference Implementation](dark_energy_tap_reference.md)
-4. **Use**: [API Reference](api_reference.md) for detailed method documentation
+1. **Read first**: [Development Guidelines](development_guidelines.md) for essential practices
+2. **Start with**: [Technology Card Framework Developer Guide](technology_card_framework_guide.md)
+3. **Reference**: [Quick Reference](quick_reference.md) for common patterns
+4. **Study**: [Dark Energy Tap Reference Implementation](dark_energy_tap_reference.md)
+5. **Use**: [API Reference](api_reference.md) for detailed method documentation
 
 ### For Experienced Developers
 
-1. **Quick Start**: [Quick Reference](quick_reference.md)
-2. **Integration**: [Integration Points Guide](integration_points_guide.md)
-3. **Enums**: [Enum Systems Reference](enum_systems_reference.md)
-4. **API Details**: [API Reference](api_reference.md)
+1. **Review**: [Development Guidelines](development_guidelines.md) for current best practices
+2. **Quick Start**: [Quick Reference](quick_reference.md)
+3. **Integration**: [Integration Points Guide](integration_points_guide.md)
+4. **Enums**: [Enum Systems Reference](enum_systems_reference.md)
+5. **API Details**: [API Reference](api_reference.md)
 
 ## Key Concepts
 
@@ -273,7 +293,7 @@ uv run ruff check src/ti4/core/technology_cards/
 
 ### Common Issues
 - **TechnologySpecificationError**: Technology needs user confirmation
-- **Missing enum values**: Add to appropriate enum in constants.py
+- **Missing enum values**: Add to appropriate enum in specifications.py
 - **Integration failures**: Check integration points documentation
 - **Test failures**: Follow TDD practices and reference implementations
 

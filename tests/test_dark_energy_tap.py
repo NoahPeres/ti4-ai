@@ -6,7 +6,7 @@ including its frontier exploration and retreat enhancement abilities.
 """
 
 from ti4.core.abilities import TimingWindow
-from ti4.core.constants import Technology
+from ti4.core.constants import AbilityTrigger, Technology
 from ti4.core.technology import TechnologyColor
 from ti4.core.technology_cards.concrete.dark_energy_tap import DarkEnergyTap
 
@@ -43,7 +43,7 @@ class TestDarkEnergyTap:
 
         assert frontier_ability is not None
         assert frontier_ability.timing == TimingWindow.AFTER
-        assert frontier_ability.trigger == "tactical_action_in_frontier_system"
+        assert frontier_ability.trigger == AbilityTrigger.AFTER_TACTICAL_ACTION.value
         assert frontier_ability.mandatory is True
 
     def test_dark_energy_tap_has_retreat_enhancement_ability(self):
