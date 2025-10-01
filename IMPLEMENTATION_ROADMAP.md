@@ -1,6 +1,6 @@
 # TI4 AI Implementation Roadmap
 
-## 🎯 Overall Progress: 36.5/101 Rules (36.1% Complete)
+## 🎯 Overall Progress: 37.5/101 Rules (37.1% Complete)
 
 ### Last Updated
 September 2025 (Quality Audit Completed)
@@ -58,7 +58,7 @@ Core Game Mechanics
 
 ## 📊 Implementation Status Summary
 
-### ✅ Completed Rules (38/101)
+### ✅ Completed Rules (39/101)
 ### ⚠️ Mostly Complete Rules (1/101)
 - Rule 35: EXPLORATION - Missing technology prerequisite validation for frontier exploration (Rule 35.4)
 
@@ -123,7 +123,7 @@ Core Game Mechanics
 1-2 months
 
 #### Immediate Priority (Next 3 Rules)
-1. Rule 95: TRANSPORT - Unit transportation and capacity mechanics
+1. ✅ Rule 95: TRANSPORT - Unit transportation and capacity mechanics - COMPLETE
 2. Rule 7: AGENDA CARDS - Political cards and law outcomes
 3. Rule 66: POLITICS - Politics strategy card
 
@@ -231,7 +231,7 @@ Core Game Mechanics
 The following rules require implementation to achieve full TI4 compliance:
 
 ### High Priority (Critical Gaps)
-- Rule 95 TRANSPORT - Unit transport capabilities
+- ✅ Rule 95 TRANSPORT - Unit transport capabilities - COMPLETE
 
 ### Medium Priority (Core Gameplay)
 - Rule 07 AGENDA CARD - Political agenda system

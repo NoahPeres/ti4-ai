@@ -101,82 +101,168 @@ Seize Artifact,1,Action:,,Choose 1 of your neighbors that has 1 or more relic fr
 Waylay,1,Before you roll dice for ANTI-FIGHTER BARRAGE:,,Hits from this roll are produced against all ships (not just fighters).,"The destroyers sprayed fire with their secondary batteries as they advanced. The Mahact dreadnought began to list, fire and atmosphere gushing from a thousand tiny wounds.",Action Card,Prophecy of Kings,Any,,
 Anti-Intellectual Revolution,1,After a player researches a technology,At the start of the next strategy phase,"FOR : After a player researches a technology, they must destroy 1 of their non-fighter ships.
 AGAINST : At the start of the next strategy phase, each player chooses and exhausts 1 planet for each technology they own.
-",,Agenda,Base,Any,,
+",,Agenda - Law,Base,Any,,
 Classified Document Leaks,1,When this agenda is revealed,,"When this agenda is revealed, if there are no scored secret objectives, discard this card and reveal another agenda from the top of the deck.
 
 Elect Scored Secret Objective
  The elected secret objective becomes a public objective; place it near the other public objectives in the common play area.
-",,Agenda,Base,Any,,
-Committee Formation,1,Before players vote on an agenda that requires a player to be elected:,,The owner of this card may discard this card to choose a player to be elected. Players do not vote on that agenda.,,Agenda,Base,Any,,
+",,Agenda - Law,Base,Any,,
+Committee Formation,1,Before players vote on an agenda that requires a player to be elected:,,The owner of this card may discard this card to choose a player to be elected. Players do not vote on that agenda.,,Agenda - Law,Base,Any,,
 Conventions of War,1,,,"FOR : Players cannot use BOMBARDMENT against units that are on cultural planets.
 
 AGAINST : Each player that voted ""Against"" discards all of their action cards.
-",,Agenda,Base,Any,,
+",,Agenda - Law,Base,Any,,
 Core Mining,1,,,"Elect Hazardous Planet
 
 Attach this card to the elected planet's card. Then, destroy 1 infantry on the planet.
-The resource value of this planet is increased by 2.",,Agenda,Base,Any,,
+The resource value of this planet is increased by 2.",,Agenda - Law,Base,Any,,
 Demilitarized Zone,1,,,"Elect Cultural Planet
 
 Attach this card to the elected planet's card. Then, destroy all units on that planet.
-Player's units cannot land, be produced, or be placed on this planet.",,Agenda,Base,Any,,
+Player's units cannot land, be produced, or be placed on this planet.",,Agenda - Law,Base,Any,,
 Enforced Travel Ban,1,,,"FOR : Alpha and beta wormholes have no effect during movement.
 AGAINST : Destroy each PDS in or adjacent to a system that contains a wormhole.
-",,Agenda,Base,Any,,
+",,Agenda - Law,Base,Any,,
 Executive Sanctions,1,,,"FOR : Each player can have a maximum of 3 action cards in their hand.
 AGAINST : Each player discards 1 random action card from their hand.
-",,Agenda,Base,Any,,
+",,Agenda - Law,Base,Any,,
 Fleet Regulations,1,,,"FOR : Each player cannot have more than 4 tokens in their fleet pool.
 AGAINST : Each player places 1 command token from their reinforcements in their fleet pool.
-",,Agenda,Base,Any,,
+",,Agenda - Law,Base,Any,,
 Holy Planet of Ixth,1,When a player gains control of this planet,When a player loses control of this planet,"Elect Cultural Planet
-Attach this card to the elected planet's card. The planet's owner gains 1 victory point. Units on this planet cannot use PRODUCTION. When a player gains control of this planet, they gain 1 victory point. When a player loses control of this planet, they lose 1 victory point.",,Agenda,Base,Any,,
+Attach this card to the elected planet's card. The planet's owner gains 1 victory point. Units on this planet cannot use PRODUCTION. When a player gains control of this planet, they gain 1 victory point. When a player loses control of this planet, they lose 1 victory point.",,Agenda - Law,Base,Any,,
 Homeland Defense Act,1,,,"FOR : Each player can have any number of PDS units on planets they control.
 AGAINST : Each player destroys 1 of their PDS unit.
-",,Agenda,Base,Any,,
-Imperial Arbiter,1,At the end of the strategy phase:,,the owner of this card may discard this card to swap 1 of their strategy cards with 1 of another player's strategy cards.,,Agenda,Base,Any,,
-Minister of Commerce,1,After the owner of this card replenishes commodities,,they gain 1 trade good for each player that is their neighbor.,,Agenda,Base,Any,,
-Minister of Exploration,1,When the owner of this card gains control of a planet:,,they gain 1 trade good.,,Agenda,Base,Any,,
-Minister of Industry,1,When the owner of this card places a space dock in a system,,their units in that system may use their PRODUCTION abilities.,,Agenda,Base,Any,,
-Minister of Peace,1,After a player activates a system that contains 1 or more of a different player's units,,the owner of this card may discard this card; immediately end the active player's turn.,,Agenda,Base,Any,,
-Minister of Policy,1,At the end of the status phase,,the owner of this card draws 1 action card.,,Agenda,Base,Any,,
-Minister of Sciences,1,"When the owner of this card resolves the primary or secondary ability of the ""Technology"" strategy card",,they do not need to spend resources to research technology.,,Agenda,Base,Any,,
-Minister of War,1,after performing an action,,The owner of this card may discard this card to remove 1 of their command counters from the game board and return it to their reinforcements; then they may perform 1 additional action.,,Agenda,Base,Any,,
-Prophecy of Ixth,1,When the owner of this card uses PRODUCTION,,they discard this card unless they produce 2 or more fighters.,,Agenda,Base,Any,,
+",,Agenda - Law,Base,Any,,
+Imperial Arbiter,1,At the end of the strategy phase:,,the owner of this card may discard this card to swap 1 of their strategy cards with 1 of another player's strategy cards.,,Agenda - Law,Base,Any,,
+Minister of Commerce,1,After the owner of this card replenishes commodities,,they gain 1 trade good for each player that is their neighbor.,,Agenda - Law,Base,Any,,
+Minister of Exploration,1,When the owner of this card gains control of a planet:,,they gain 1 trade good.,,Agenda - Law,Base,Any,,
+Minister of Industry,1,When the owner of this card places a space dock in a system,,their units in that system may use their PRODUCTION abilities.,,Agenda - Law,Base,Any,,
+Minister of Peace,1,After a player activates a system that contains 1 or more of a different player's units,,the owner of this card may discard this card; immediately end the active player's turn.,,Agenda - Law,Base,Any,,
+Minister of Policy,1,At the end of the status phase,,the owner of this card draws 1 action card.,,Agenda - Law,Base,Any,,
+Minister of Sciences,1,"When the owner of this card resolves the primary or secondary ability of the ""Technology"" strategy card",,they do not need to spend resources to research technology.,,Agenda - Law,Base,Any,,
+Minister of War,1,after performing an action,,The owner of this card may discard this card to remove 1 of their command counters from the game board and return it to their reinforcements; then they may perform 1 additional action.,,Agenda - Law,Base,Any,,
+Prophecy of Ixth,1,When the owner of this card uses PRODUCTION,,they discard this card unless they produce 2 or more fighters.,,Agenda - Law,Base,Any,,
 Publicize Weapon Schematics,1,,,"FOR : If any player owns a war sun technology, all players may ignore all prerequisites on war sun technologies. All war suns lose SUSTAIN DAMAGE.
 AGAINST : Each player that owns a war sun technology discards all of their action cards.
-",,Agenda,Base,Any,,
+",,Agenda - Law,Base,Any,,
 Regulated Conscription,1,When a player produces units,,"FOR : When a player produces units, they produce only 1 fighter and infantry for its cost instead of 2.
 AGAINST : No effect.
-",,Agenda,Base,Any,,
+",,Agenda - Law,Base,Any,,
 Research Team: Biotic,1,When the owner of this planet researches technology,,"Elect Industrial Planet
-they may exhaust this card to ignore 1 green prerequisite.",,Agenda,Base,Any,,
+they may exhaust this card to ignore 1 green prerequisite.",,Agenda - Law,Base,Any,,
 Research Team: Cybernetic,1,When the owner of this planet researches technology,,"Elect Industrial Planet
-they may exhaust this card to ignore 1 yellow prerequisite.",,Agenda,Base,Any,,
+they may exhaust this card to ignore 1 yellow prerequisite.",,Agenda - Law,Base,Any,,
 Research Team: Propulsion,1,When the owner of this planet researches technology,,"Elect Industrial Planet
-they may exhaust this card to ignore 1 blue prerequisite.",,Agenda,Base,Any,,
+they may exhaust this card to ignore 1 blue prerequisite.",,Agenda - Law,Base,Any,,
 Research Team: Warfare,1,When the owner of this planet researches technology,,"Elect Hazardous planet
-they may exhaust this card to ignore 1 red prerequisite.",,Agenda,Base,Any,,
+they may exhaust this card to ignore 1 red prerequisite.",,Agenda - Law,Base,Any,,
 Senate Sanctuary,1,,,"Elect Cultural Planet
 Attach this card to the elected planet's card.
-The influence value of this planet is increased by 2.",,Agenda,Base,Any,,
+The influence value of this planet is increased by 2.",,Agenda - Law,Base,Any,,
 Shard of the Throne,1,When a player wins a combat against the owner of this card,,"Elect Player
 The elected player gains this card and 1 victory point.
-A player gains this card and 1 victory point when they win a combat against the owner of this card. Then, the previous owner of this card loses 1 victory point.",,Agenda,Base,Any,,
+A player gains this card and 1 victory point when they win a combat against the owner of this card. Then, the previous owner of this card loses 1 victory point.",,Agenda - Law,Base,Any,,
 Shared Research,1,,,"FOR : Each player's units can move through nebulae.
 AGAINST : Each player places a command token from their reinforcements in their home system, if able.
-",,Agenda,Base,Any,,
+",,Agenda - Law,Base,Any,,
 Terraforming Initiative,1,,,"Elect Hazardous Planet
 Attach this card to the elected planet's card.
-The resource and influence values of this planet are increased by 1.",,Agenda,Base,Any,,
+The resource and influence values of this planet are increased by 1.",,Agenda - Law,Base,Any,,
 The Crown of Thalnos,1,"During each combat round, after the Roll Dice step",,"Elect player
-the owner of this card may reroll any number of dice; they must destroy each of their units that did not produce a hit with its reroll.",,Agenda,Base,Any,,
+the owner of this card may reroll any number of dice; they must destroy each of their units that did not produce a hit with its reroll.",,Agenda - Law,Base,Any,,
 The Crown of Emphidia,1,After you gain control of a planet in the home system of this card’s owner,,"Elect Player
 The elected player gains this card and 1 victory point.
-A player gains this card and 1 victory point after they gain control of a planet in the home system of this card's owner. Then, the previous owner of this card loses 1 victory point.",,Agenda,Base,Any,,
+A player gains this card and 1 victory point after they gain control of a planet in the home system of this card's owner. Then, the previous owner of this card loses 1 victory point.",,Agenda - Law,Base,Any,,
 Wormhole Reconstruction,1,,,"FOR : All systems that contain either an alpha or beta wormhole are adjacent to each other.
 AGAINST : Each player places a command token from their reinforcements in each system that contains a wormhole and 1 or more of their ships.
-",,Agenda,Base,Any,,
+",,Agenda - Law,Base,Any,,
+Archived Secret,1,,,"Elect Player
+Elected player draws 1 secret objective.",,Agenda - Directive,Base,Any,,
+Arms Reduction,1,At the start of the next strategy phase,,"FOR : Each player destroys all but 2 of their dreadnaughts and all but 4 of their cruisers.
+AGAINST : At the start of the next strategy phase, each player exhausts each of their planets that have a technology specialty.
+",,Agenda - Directive,Base,Any,,
+Colonial Redistribution,1,,,"Elect Non-home Planet other than Mecatol Rex
+Destroy each unit on the elected planet. Then, the player who controls that planet chooses 1 player with the fewest victory points; that player may place 1 infantry from their reinforcements on the elected planet.",,Agenda - Directive,Base,Any,,
+Compensated Disarmament,1,,,"Elect Planet
+Destroy each ground force on the elected planet; for each unit that was destroyed, the player who controls that planet gains 1 trade good.",,Agenda - Directive,Base,Any,,
+Economic Equality,1,,,"FOR : Each player returns all of their trade goods to the supply. Then, each player gains 5 trade goods.
+AGAINST : Each player returns all of their trade goods to the supply.
+",,Agenda - Directive,Base,Any,,
+Incentive Program,1,,,"FOR : Draw and reveal 1 stage I public objective from the deck and place it near the public objectives.
+AGAINST : Draw and reveal 1 stage II public objective from the deck and place it near the public objectives.
+",,Agenda - Directive,Base,Any,,
+Ixthian Artifact,1,,,"FOR : The speaker rolls 1 die. If the result is 6-10, each player may research 2 technologies. If the result is 1-5, destroy all units in Mecatol Rex's system, and each player with units in systems adjacent to Mecatol Rex's system destroys 3 of their units in each of those systems.
+AGAINST : No effect.
+",,Agenda - Directive,Base,Any,,
+Judicial Abolishment,1,,,"Elect Law
+When this agenda is revealed, if there are no laws in play, discard this card and reveal another agenda from the top of the deck.
+ Discard the elected law from play.
+",,Agenda - Directive,Base,Any,,
+Miscount Disclosed,1,,,"Elect Law
+When this agenda is revealed, if there are no laws in play, discard this card and reveal another agenda from the top of the deck.
+ Vote on the elected law as if it were just revealed from the top of the deck.
+",,Agenda - Directive,Base,Any,,
+Mutiny,1,,,"FOR : Each player who voted ""For"" gains 1 victory point.
+AGAINST : Each player who voted ""For"" loses 1 victory point.
+",,Agenda - Directive,Base,Any,,
+New Constitution,1,When this agenda in revealed,At the start of the next strategy phase,"When this agenda is revealed, if there are no laws in play, discard this card and reveal another agenda from the top of the deck.
+FOR : Discard all laws in play. At the start of the next strategy phase, each player exhausts each planet in their home system.
+AGAINST : No effect.
+",,Agenda - Directive,Base,Any,,
+Public Execution,1,,,"Elect Player
+The elected player discards all of their action cards. If they have the speaker token, they give it to the player on their left. The elected player cannot vote on any agendas during this agenda phase.",,Agenda - Directive,Base,Any,,
+Seed of an Empire,1,,,"FOR : The player with most victory points gains 1 victory point.
+AGAINST : The player with the fewest victory points gains 1 victory point.
+",,Agenda - Directive,Base,Any,,
+Swords to Plowshares,1,,,"FOR : Each player destroys half of their infantry on each planet they control, rounded up. Then, each player gains trade goods equal to the number of their infantry that were destroyed.
+AGAINST : Each player places 1 infantry from their reinforcements on each planet they control.
+",,Agenda - Directive,Base,Any,,
+Unconventional Measures,1,,,"FOR : Each player that voted ""For"" draws 2 action cards.
+AGAINST : Each player that voted ""For"" discards all of their action cards.
+",,Agenda - Directive,Base,Any,,
+Wormhole Research,1,,,"FOR : Each player who has 1 or more ships in a system that contains a wormhole may research 1 technology. Then, destroy all ships in systems that contain an alpha or beta wormhole.
+AGAINST : Each player that voted ""Against"" removes 1 command token from their command sheet and returns it to their reinforcements.
+",,Agenda - Directive,Base,Any,,
+Articles of War,1,,,"FOR : All mechs lose their printed abilities except for SUSTAIN DAMAGE.
+AGAINST : Each player that voted ""For"" gains 3 trade goods.
+",,Agenda - Law,Prophecy of Kings,Any,,
+Checks and Balances,1,When a player chooses a strategy card during the strategy phase,,"FOR : When a player chooses a strategy card during the strategy phase, they give that strategy card to another player that does not have 1 (or a player that does not have 2 in a three- or four-player game), if able.
+AGAINST : Each player readies only 3 of their planets at the end of this agenda phase.
+",,Agenda - Law,Prophecy of Kings,Any,,
+Nexus Sovereignty,1,,,"FOR : Alpha and beta wormholes in the wormhole nexus have no effect during movement.
+AGAINST : Place a gamma wormhole token in the Mecatol Rex system.
+",,Agenda - Law,Prophecy of Kings,Any,,
+Political Censure,1,,,"Elect Player
+The elected player gains this card and 1 victory point.
+The elected player cannot play action cards.
+If the owner of this card loses this card, they lose 1 victory point.",,Agenda - Law,Prophecy of Kings,Any,,
+Representative Government,1,At the start of the next strategy phase,,"FOR : Players cannot exhaust planets to cast votes during the agenda phase; each player may cast 1 vote on each agenda instead. Players cannot cast additional votes.
+AGAINST : At the start of the next strategy phase, each player that voted ""Against"" exhausts all of their cultural planets.
+",,Agenda - Law,Prophecy of Kings,Any,,
+Search Warrant,1,,,"Elect Player
+The elected player gains this card and draws 2 secret objectives.
+The owner of this card plays with their secret objectives revealed.",,Agenda - Law,Prophecy of Kings,Any,,
+Armed Forces Standardization,1,,,"Elect Player
+The elected player places command tokens from their reinforcements so that they have 3 tokens in their tactic pool, 3 tokens in their fleet pool and 2 tokens in their strategy pool. They return any excess tokens to their reinforcements.",,Agenda - Directive,Prophecy of Kings,Any,,
+Clandestine Operations,1,,,"FOR : Each player removes 2 command tokens from their command sheet and returns those tokens to their reinforcements.
+AGAINST : Each player removes 1 command token from their fleet pool and returns that token to their reinforcements.
+",,Agenda - Directive,Prophecy of Kings,Any,,
+Covert Legislation,1,When this agenda is revealed,,"When this agenda is revealed, the speaker draws the next card in the agenda deck but does not reveal it to the other players. Instead, the speaker reads the eligible outcomes aloud (for, against, elect player, etc.); the other players vote for these outcomes as if they were outcomes of this agenda, without knowing their effects.",,Agenda - Directive,Prophecy of Kings,Any,,
+Galactic Crisis Pact,1,,,"Elect Strategy Card
+
+Each player may perform the secondary ability of the elected strategy card without spending a command token; command tokens placed by the ability are placed from a player's reinforcements instead.",,Agenda - Directive,Prophecy of Kings,Any,,
+Minister of Antiques,1,,,"Elect Player
+
+The elected player gains 1 relic.
+",,Agenda - Directive,Prophecy of Kings,Any,,
+Rearmament Agreement,1,,,"FOR : Each player places 1 mech from their reinforcements on a planet they control in their home system.
+AGAINST : Each player replaces each of their mechs with 1 infantry from their reinforcements.
+",,Agenda - Directive,Prophecy of Kings,Any,,
+Research Grant Reallocation,1,,,"Elect Player
+
+The elected player gains any 1 technology of their choice. Then, for each prerequisite on that technology, they remove 1 token from their fleet pool and return it to their reinforcements.
+",,Agenda - Directive,Prophecy of Kings,Any,,
 Ceasefire,1,After the (color) player activates a system that contains 1 or more of your units,,"The (color) player cannot move units into the active system. Then, return this card to the (color) player.",,Promissory Note,Base,Any (except color),Color,
 Trade Agreement,1,When the (color) player replenishes commodities,,"The (color) player gives you all of their commodities. Then, return this card to the (color) player.",,Promissory Note,Base,Any (except color),Color,
 Political Secret,1,When an agenda is revealed,,"The (color) player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the (color) player. ",,Promissory Note,Base,Any (except color),Color,

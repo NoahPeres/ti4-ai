@@ -61,81 +61,81 @@ Convert the Rule 95: TRANSPORT design into a series of TDD implementation tasks.
     - Add validation for transport during ship movement
     - _Requirements: 4.1, 4.2, 4.3_
 
-  - [ ] 5.2 Add transport destruction handling
+  - [x] 5.2 Add transport destruction handling
     - Write failing tests for transport ship destruction scenarios
     - Implement transported unit destruction when transport ship destroyed
     - Add retreat handling for transported units
     - _Requirements: 4.4_
 
-- [ ] 6. Integrate with existing movement system
-  - [ ] 6.1 Enhance existing TransportValidator class
+- [x] 6. Integrate with existing movement system
+  - [x] 6.1 Enhance existing TransportValidator class
     - Write failing tests for enhanced transport validation
     - Extend existing `TransportValidator` with Rule 95 compliance
     - Integrate new transport rules with existing movement validation
     - Maintain backward compatibility with existing transport operations
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
 
-  - [ ] 6.2 Integrate with MovementOperation
+  - [x] 6.2 Integrate with MovementOperation
     - Write failing tests for transport during movement operations
     - Enhance existing `MovementOperation` to include transport state
     - Update movement execution to handle transported units
     - Add transport validation to movement planning
     - _Requirements: 4.1, 4.2, 4.3_
 
-- [ ] 7. Implement ground force landing integration (Rule 95.4)
-  - [ ] 7.1 Integrate with invasion system
+- [x] 7. Implement ground force landing integration (Rule 95.4)
+  - [x] 7.1 Integrate with invasion system
     - Write failing tests for ground force landing during invasion
     - Extend existing invasion system to handle transported ground forces
     - Implement landing validation and execution
     - Ensure fighters remain in space during invasion
     - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
-  - [ ] 7.2 Add landing validation and error handling
+  - [x] 7.2 Add landing validation and error handling
     - Write failing tests for invalid landing scenarios
     - Implement comprehensive landing validation
     - Add error handling for landing violations
     - Integrate with existing invasion step validation
     - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
-- [ ] 8. Implement multi-ship transport coordination
-  - [ ] 8.1 Create fleet-level transport management
+- [x] 8. Implement multi-ship transport coordination
+  - [x] 8.1 Create fleet-level transport management
     - Write failing tests for multi-ship transport scenarios
     - Implement fleet-wide transport capacity calculation
     - Add transport coordination across multiple ships
     - Integrate with existing `Fleet` class capacity methods
     - _Requirements: 7.1, 7.2, 7.3, 7.4_
 
-  - [ ] 8.2 Add transport optimization and validation
+  - [x] 8.2 Add transport optimization and validation
     - Write failing tests for transport distribution scenarios
     - Implement optimal unit distribution among transport ships
     - Add validation for fleet transport operations
     - Create transport planning utilities
     - _Requirements: 7.1, 7.2, 7.3, 7.4_
 
-- [ ] 9. Implement comprehensive error handling and validation
-  - [ ] 9.1 Create transport exception hierarchy
+- [x] 9. Implement comprehensive error handling and validation
+  - [x] 9.1 Create transport exception hierarchy
     - Write failing tests for all error scenarios
     - Implement `TransportCapacityError`, `TransportPickupError`, `TransportMovementError`
     - Add comprehensive error messages with context
     - Integrate with existing exception handling patterns
     - _Requirements: 8.1, 8.2, 8.3, 8.4_
 
-  - [ ] 9.2 Add validation layer integration
+  - [x] 9.2 Add validation layer integration
     - Write failing tests for validation layer interactions
     - Implement pre-transport, movement, and landing validation layers
     - Add state consistency validation
     - Create validation error recovery mechanisms
     - _Requirements: 8.1, 8.2, 8.3, 8.4_
 
-- [ ] 10. Create comprehensive integration tests and documentation
-  - [ ] 10.1 Implement end-to-end transport scenarios
+- [x] 10. Create comprehensive integration tests and documentation
+  - [x] 10.1 Implement end-to-end transport scenarios
     - Write integration tests for complete transport workflows
     - Test transport during tactical actions
     - Test multi-system transport operations
     - Test transport with invasion and combat scenarios
     - _Requirements: All requirements integration_
 
-  - [ ] 10.2 Update documentation and analysis tracking
+  - [x] 10.2 Update documentation and analysis tracking
     - Update `.trae/lrr_analysis/95_transport.md` with implementation details
     - Add test case mappings for each Rule 95 sub-rule
     - Update `IMPLEMENTATION_ROADMAP.md` with completion status
