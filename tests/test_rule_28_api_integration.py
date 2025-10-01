@@ -8,7 +8,7 @@ Requirements: 6.1, 7.2, 7.4
 
 from unittest.mock import Mock
 
-from ti4.core.rule_28_deals import (
+from ti4.core.deals import (
     TransactionAPI,
     TransactionStatus,
 )
@@ -62,7 +62,7 @@ class TestTransactionAPIIntegration:
 
         def mock_apply_transaction_effects(transaction):
             # Add to history when transaction is applied
-            from ti4.core.rule_28_deals import TransactionHistoryEntry
+            from ti4.core.deals import TransactionHistoryEntry
 
             history_entry = TransactionHistoryEntry(
                 transaction_id=transaction.transaction_id,

@@ -3,7 +3,7 @@
 This module handles complex movement operations with technology effects, transport capacity,
 and multi-system movement planning. This is the EXECUTION layer for movement operations.
 
-For Rule 89 compliance validation, use Rule89Validator in core/rule89_validator.py.
+For Rule 89 compliance validation, use TacticalActionValidator in core/tactical_actions.py.
 """
 
 from abc import ABC, abstractmethod

@@ -9,10 +9,10 @@ Requirements: 2.1, 2.2, 2.3, 2.4, 2.5
 
 from unittest.mock import Mock
 
+from ti4.core.deals import ComponentValidator, TransactionStatus
 from ti4.core.galaxy import Galaxy
 from ti4.core.game_state import GameState
 from ti4.core.hex_coordinate import HexCoordinate
-from ti4.core.rule_28_deals import ComponentValidator, TransactionStatus
 from ti4.core.system import System
 from ti4.core.transactions import TransactionOffer
 from ti4.core.unit import Unit
@@ -218,7 +218,7 @@ class TestRule28GalaxyAdjacencyIntegration:
         # Create a transaction to validate
         from datetime import datetime
 
-        from ti4.core.rule_28_deals import ComponentTransaction
+        from ti4.core.deals import ComponentTransaction
 
         transaction = ComponentTransaction(
             transaction_id="test_transaction",

@@ -30,9 +30,9 @@ class TestRule89TacticalActionBasics:
         LRR Reference: Rule 89.0 - Core tactical action concept
         """
         # This will fail initially - RED phase
-        from ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.tactical_actions import TacticalActionValidator
 
-        manager = Rule89Validator()
+        manager = TacticalActionValidator()
         assert manager is not None
 
 
@@ -44,9 +44,9 @@ class TestRule89Step1Activation:
 
         LRR Reference: Rule 89.1 - "activate a system that does not contain one of their command tokens"
         """
-        from ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.tactical_actions import TacticalActionValidator
 
-        manager = Rule89Validator()
+        manager = TacticalActionValidator()
 
         # Create galaxy and system
         galaxy = Galaxy()
@@ -67,9 +67,9 @@ class TestRule89Step1Activation:
 
         LRR Reference: Rule 89.1 - Cannot activate system with own command token
         """
-        from ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.tactical_actions import TacticalActionValidator
 
-        manager = Rule89Validator()
+        manager = TacticalActionValidator()
 
         # Create galaxy and system
         galaxy = Galaxy()
@@ -94,9 +94,9 @@ class TestRule89Step1Activation:
         LRR Reference: Rule 89.1 - "placing a command token from their tactic pool"
         """
         from ti4.core.command_sheet import CommandSheet
-        from ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.tactical_actions import TacticalActionValidator
 
-        manager = Rule89Validator()
+        manager = TacticalActionValidator()
 
         # Create galaxy and system
         galaxy = Galaxy()
@@ -128,9 +128,9 @@ class TestRule89Step2Movement:
 
         LRR Reference: Rule 89.2 - "move any number of ships... from systems without their command tokens"
         """
-        from ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.tactical_actions import TacticalActionValidator
 
-        manager = Rule89Validator()
+        manager = TacticalActionValidator()
 
         # Create galaxy with two systems
         galaxy = Galaxy()
@@ -160,9 +160,9 @@ class TestRule89Step2Movement:
 
         LRR Reference: Rule 89.2 - Ships cannot move from systems with command tokens
         """
-        from ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.tactical_actions import TacticalActionValidator
 
-        manager = Rule89Validator()
+        manager = TacticalActionValidator()
 
         # Create galaxy with two systems
         galaxy = Galaxy()
@@ -195,9 +195,9 @@ class TestRule89Step2Movement:
 
         LRR Reference: Rule 89.2 - Ships move "into the active system"
         """
-        from ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.tactical_actions import TacticalActionValidator
 
-        manager = Rule89Validator()
+        manager = TacticalActionValidator()
 
         # Create galaxy with two systems
         galaxy = Galaxy()
@@ -235,9 +235,9 @@ class TestRule89Step3SpaceCombat:
 
         LRR Reference: Rule 89.3 - "If two players have ships in the active system, those players must resolve a space combat"
         """
-        from ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.tactical_actions import TacticalActionValidator
 
-        manager = Rule89Validator()
+        manager = TacticalActionValidator()
 
         # Create galaxy and system
         galaxy = Galaxy()
@@ -267,9 +267,9 @@ class TestRule89Step3SpaceCombat:
 
         LRR Reference: Rule 89.3 - Combat only when two players have ships
         """
-        from ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.tactical_actions import TacticalActionValidator
 
-        manager = Rule89Validator()
+        manager = TacticalActionValidator()
 
         # Create galaxy and system
         galaxy = Galaxy()
@@ -303,9 +303,9 @@ class TestRule89Step4Invasion:
 
         LRR Reference: Rule 89.4 - "The active player may use 'Bombardment' abilities"
         """
-        from ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.tactical_actions import TacticalActionValidator
 
-        manager = Rule89Validator()
+        manager = TacticalActionValidator()
 
         # Create galaxy and system with planet
         galaxy = Galaxy()
@@ -338,9 +338,9 @@ class TestRule89Step4Invasion:
 
         LRR Reference: Rule 89.4 - "commit units to land on planets"
         """
-        from ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.tactical_actions import TacticalActionValidator
 
-        manager = Rule89Validator()
+        manager = TacticalActionValidator()
 
         # Create galaxy and system with planet
         galaxy = Galaxy()
@@ -375,9 +375,9 @@ class TestRule89Step5Production:
 
         LRR Reference: Rule 89.5 - "The active player may resolve each of their unit's 'Production' abilities in the active system"
         """
-        from ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.tactical_actions import TacticalActionValidator
 
-        manager = Rule89Validator()
+        manager = TacticalActionValidator()
 
         # Create galaxy and system with planet
         galaxy = Galaxy()
@@ -409,9 +409,9 @@ class TestRule89Step5Production:
 
         LRR Reference: Rule 89.5 - Production abilities "in the active system"
         """
-        from ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.tactical_actions import TacticalActionValidator
 
-        manager = Rule89Validator()
+        manager = TacticalActionValidator()
 
         # Create galaxy with two systems
         galaxy = Galaxy()
@@ -460,9 +460,9 @@ class TestRule89TacticalActionIntegration:
 
         This ensures the new implementation works with existing components.
         """
-        from ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.tactical_actions import TacticalActionValidator
 
-        manager = Rule89Validator()
+        manager = TacticalActionValidator()
 
         # Should integrate with existing galaxy system
         galaxy = Galaxy()
@@ -479,9 +479,9 @@ class TestRule89TacticalActionIntegration:
 
         This ensures we implement the correct rule structure.
         """
-        from ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.tactical_actions import TacticalActionValidator
 
-        manager = Rule89Validator()
+        manager = TacticalActionValidator()
 
         # Should have all 5 steps defined
         steps = manager.get_tactical_action_steps()
@@ -501,9 +501,9 @@ class TestRule89MovementIntegration:
 
         This ensures we use the sophisticated movement logic with technology effects.
         """
-        from ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.tactical_actions import TacticalActionValidator
 
-        manager = Rule89Validator()
+        manager = TacticalActionValidator()
 
         # Create galaxy with systems at distance 2 with intermediate system
         galaxy = Galaxy()
@@ -551,9 +551,9 @@ class TestRule89MovementIntegration:
 
         This test verifies the fix for the movement validation issue.
         """
-        from ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.tactical_actions import TacticalActionValidator
 
-        manager = Rule89Validator()
+        manager = TacticalActionValidator()
 
         # Create galaxy with systems at distance 2 with intermediate system
         galaxy = Galaxy()
@@ -598,9 +598,9 @@ class TestRule89MovementIntegration:
 
     def test_movement_plan_validation_integration(self) -> None:
         """Test that movement plan validation integrates both Rule 89 and advanced systems."""
-        from ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.tactical_actions import TacticalActionValidator
 
-        manager = Rule89Validator()
+        manager = TacticalActionValidator()
 
         # Create galaxy with adjacent systems
         galaxy = Galaxy()
@@ -646,9 +646,9 @@ class TestRule89MovementIntegration:
 
     def test_actions_system_integration(self) -> None:
         """Test integration with the actions movement planning system."""
-        from ti4.core.rule89_validator import Rule89Validator
+        from ti4.core.tactical_actions import TacticalActionValidator
 
-        manager = Rule89Validator()
+        manager = TacticalActionValidator()
 
         # Create galaxy with systems
         galaxy = Galaxy()

@@ -9,13 +9,13 @@ from unittest.mock import Mock
 
 import pytest
 
-from ti4.core.game_state import GameState
-from ti4.core.rule_28_deals import (
+from ti4.core.deals import (
     ComponentTransaction,
     EnhancedTransactionManager,
     TransactionHistoryEntry,
     TransactionStatus,
 )
+from ti4.core.game_state import GameState
 from ti4.core.transactions import TransactionOffer
 
 
@@ -64,7 +64,7 @@ class TestTransactionHistoryConsolidation:
         """
         # TransactionHistoryManager should not exist as a separate class
         with pytest.raises(ImportError):
-            from ti4.core.rule_28_deals import TransactionHistoryManager  # noqa: F401
+            from ti4.core.deals import TransactionHistoryManager  # noqa: F401
 
     def test_gamestate_is_single_source_of_truth(self) -> None:
         """Test that GameState is the only place transaction history is stored.

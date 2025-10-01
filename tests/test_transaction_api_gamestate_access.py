@@ -8,7 +8,7 @@ Requirements: 12.1, 12.2, 12.3, 12.4
 
 from unittest.mock import Mock
 
-from ti4.core.rule_28_deals import TransactionAPI, TransactionAPIResult
+from ti4.core.deals import TransactionAPI, TransactionAPIResult
 from ti4.core.transactions import TransactionOffer
 
 

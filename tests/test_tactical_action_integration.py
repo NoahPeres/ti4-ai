@@ -20,7 +20,7 @@ class TestTacticalActionIntegration:
         responsibilities = coordinator.demonstrate_no_redundancy()
 
         # Verify each system has unique methods
-        rule89_methods = set(responsibilities["Rule89Validator_unique_methods"])
+        rule89_methods = set(responsibilities["TacticalActionValidator_unique_methods"])
         movement_engine_methods = set(responsibilities["MovementEngine_unique_methods"])
         movement_primitives_methods = set(
             responsibilities["MovementPrimitives_unique_methods"]
@@ -43,7 +43,7 @@ class TestTacticalActionIntegration:
         roles = coordinator.get_system_roles()
 
         # Verify distinct roles
-        assert "Rule 89 compliance" in roles["Rule89Validator"]
+        assert "Rule 89 compliance" in roles["TacticalActionValidator"]
         assert "complex movement" in roles["MovementEngine"]
         assert (
             "Integrates validation and execution" in roles["TacticalActionCoordinator"]
@@ -78,10 +78,10 @@ class TestTacticalActionIntegration:
         assert isinstance(results["combat_required"], bool)
 
     def test_rule89_validator_independence(self) -> None:
-        """Test that Rule89Validator works independently."""
-        from ti4.core.rule89_validator import Rule89Validator
+        """Test that TacticalActionValidator works independently."""
+        from ti4.core.tactical_actions import TacticalActionValidator
 
-        validator = Rule89Validator()
+        validator = TacticalActionValidator()
 
         # Create test scenario
         galaxy = Galaxy()
@@ -121,21 +121,21 @@ class TestTacticalActionIntegration:
 
     def test_no_circular_dependencies(self) -> None:
         """Test that there are no circular dependencies between systems."""
-        # Rule89Validator should not import MovementEngine
-        from ti4.core.rule89_validator import Rule89Validator
+        # TacticalActionValidator should not import MovementEngine
+        from ti4.core.tactical_actions import TacticalActionValidator
 
-        validator = Rule89Validator()
+        validator = TacticalActionValidator()
 
         # Should work without MovementEngine
         steps = validator.get_tactical_action_steps()
         assert len(steps) == 5
 
-        # MovementEngine should not import Rule89Validator directly
+        # MovementEngine should not import TacticalActionValidator directly
         from ti4.actions.movement_engine import MovementPlan
 
         plan = MovementPlan()
 
-        # Should work without Rule89Validator
+        # Should work without TacticalActionValidator
         assert len(plan.ship_movements) == 0
 
     def test_integration_layer_prevents_confusion(self) -> None:
@@ -146,7 +146,7 @@ class TestTacticalActionIntegration:
         roles = coordinator.get_system_roles()
 
         # Clear guidance on when to use each system
-        assert "Rule 89 compliance" in roles["Rule89Validator"]
+        assert "Rule 89 compliance" in roles["TacticalActionValidator"]
         assert "complex movement" in roles["MovementEngine"]
         assert "Integrates" in roles["TacticalActionCoordinator"]
 

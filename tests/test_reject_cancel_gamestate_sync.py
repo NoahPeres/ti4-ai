@@ -9,12 +9,12 @@ Requirements: 5.3, 5.4
 from unittest.mock import Mock
 
 from ti4.core.constants import Faction
-from ti4.core.game_state import GameState
-from ti4.core.player import Player
-from ti4.core.rule_28_deals import (
+from ti4.core.deals import (
     EnhancedTransactionManager,
     TransactionStatus,
 )
+from ti4.core.game_state import GameState
+from ti4.core.player import Player
 from ti4.core.transactions import TransactionOffer
 
 
@@ -233,7 +233,7 @@ class TestRejectCancelGameStateSync:
         # Manually add transaction to manager cache but not GameState
         from datetime import datetime
 
-        from ti4.core.rule_28_deals import ComponentTransaction
+        from ti4.core.deals import ComponentTransaction
 
         transaction = ComponentTransaction(
             transaction_id="manual_tx",
@@ -277,7 +277,7 @@ class TestRejectCancelGameStateSync:
         # Manually add transaction to manager cache but not GameState
         from datetime import datetime
 
-        from ti4.core.rule_28_deals import ComponentTransaction
+        from ti4.core.deals import ComponentTransaction
 
         transaction = ComponentTransaction(
             transaction_id="manual_tx",

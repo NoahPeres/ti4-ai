@@ -21,7 +21,7 @@ class TestTransactionAPI:
         Requirements: 6.1
         """
         # Import will fail initially
-        from ti4.core.rule_28_deals import TransactionAPI
+        from ti4.core.deals import TransactionAPI
 
         # Mock dependencies
         mock_galaxy = Mock()
@@ -39,7 +39,7 @@ class TestTransactionAPI:
         RED: This test will fail until we implement propose_transaction method.
         Requirements: 6.1
         """
-        from ti4.core.rule_28_deals import TransactionAPI
+        from ti4.core.deals import TransactionAPI
 
         # Mock dependencies
         mock_galaxy = Mock()
@@ -65,7 +65,7 @@ class TestTransactionAPI:
         RED: This test will fail until we implement get_transaction_status method.
         Requirements: 7.2
         """
-        from ti4.core.rule_28_deals import TransactionAPI
+        from ti4.core.deals import TransactionAPI
 
         # Mock dependencies
         mock_galaxy = Mock()
@@ -88,7 +88,7 @@ class TestTransactionAPI:
         RED: This test will fail until we implement get_transaction_history method.
         Requirements: 7.4
         """
-        from ti4.core.rule_28_deals import TransactionAPI
+        from ti4.core.deals import TransactionAPI
 
         # Mock dependencies
         mock_galaxy = Mock()
@@ -109,7 +109,7 @@ class TestTransactionAPI:
         RED: This test will fail until we implement accept_transaction method.
         Requirements: 6.1
         """
-        from ti4.core.rule_28_deals import TransactionAPI
+        from ti4.core.deals import TransactionAPI
 
         # Mock dependencies
         mock_galaxy = Mock()
@@ -130,7 +130,7 @@ class TestTransactionAPI:
         RED: This test will fail until we implement reject_transaction method.
         Requirements: 6.1
         """
-        from ti4.core.rule_28_deals import TransactionAPI
+        from ti4.core.deals import TransactionAPI
 
         # Mock dependencies
         mock_galaxy = Mock()

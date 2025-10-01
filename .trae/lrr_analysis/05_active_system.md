@@ -8,13 +8,13 @@ System activation is a core mechanism in tactical actions.
 ### 5.1: Command Token Placement for Activation
 - **Priority**: CRITICAL
 - **Implementation Status**: ✅ COMPLETE
-- **Implementation**: Rule89Validator.activate_system() method
+- **Implementation**: TacticalActionValidator.activate_system() method
 - **Test Coverage**: test_rule89_validator.py covers activation mechanics
 
 ### 5.2: Cannot Activate System with Own Command Token
 - **Priority**: CRITICAL
 - **Implementation Status**: ✅ COMPLETE
-- **Implementation**: Rule89Validator.can_activate_system() method
+- **Implementation**: TacticalActionValidator.can_activate_system() method
 - **Test Coverage**: Validated in tactical action tests
 
 ### 5.3: Can Activate System with Other Players' Tokens
@@ -31,7 +31,7 @@ System activation is a core mechanism in tactical actions.
 
 ## Implementation Details:
 - **Command Token System**: Fully implemented in System class with place_command_token(), has_command_token(), remove_command_token()
-- **Activation Validation**: Complete validation in Rule89Validator
+- **Activation Validation**: Complete validation in TacticalActionValidator
 - **Active System Tracking**: Maintained throughout tactical action sequence
 - **Integration**: Seamlessly integrated with Rule 89 tactical action system
 

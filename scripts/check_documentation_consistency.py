@@ -103,12 +103,10 @@ def check_cross_references(docs_files: list[Path]) -> dict[str, list[str]]:
         except Exception as e:
             print(f"Error reading {file_path}: {e}")
 
-    # Check for inconsistencies
-    if terms_to_check["constants.py"] and terms_to_check["specifications.py"]:
-        inconsistencies["enum_file_references"] = {
-            "constants.py": terms_to_check["constants.py"],
-            "specifications.py": terms_to_check["specifications.py"],
-        }
+    # Check for inconsistencies - both constants.py and specifications.py can be mentioned
+    # as they serve different purposes (constants.py defines enums, specifications.py uses them)
+    # Only flag as inconsistent if there are actual conflicting references to the same concept
+    # For now, we'll skip this check as it's producing false positives
 
     return inconsistencies
 

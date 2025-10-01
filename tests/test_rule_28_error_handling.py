@@ -10,7 +10,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from ti4.core.rule_28_deals import (
+from ti4.core.deals import (
     PlayerEliminationError,
     TransactionExecutionError,
     TransactionRollbackError,
@@ -110,7 +110,7 @@ class TestDetailedErrorMessages:
         Requirements: 2.2
         """
         # RED: This will fail until we enhance error messages
-        from ti4.core.rule_28_deals import ComponentValidator
+        from ti4.core.deals import ComponentValidator
 
         mock_galaxy = Mock()
         mock_galaxy.are_players_neighbors.return_value = False
@@ -137,7 +137,7 @@ class TestDetailedErrorMessages:
         Requirements: 2.2
         """
         # RED: This will fail until we enhance error messages
-        from ti4.core.rule_28_deals import ComponentValidator
+        from ti4.core.deals import ComponentValidator
 
         mock_galaxy = Mock()
         mock_game_state = Mock()
@@ -185,7 +185,7 @@ class TestPlayerEliminationEdgeCases:
         Requirements: 5.3
         """
         # RED: This will fail until we implement elimination handling
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         mock_galaxy = Mock()
         mock_galaxy.are_players_neighbors.return_value = True
@@ -231,7 +231,7 @@ class TestPlayerEliminationEdgeCases:
         Requirements: 5.3
         """
         # RED: This will fail until we implement elimination handling
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         mock_galaxy = Mock()
         mock_game_state = self._create_mock_game_state_with_players(
@@ -283,7 +283,7 @@ class TestTransactionRollback:
         Requirements: 3.3
         """
         # RED: This will fail until we implement rollback
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         mock_galaxy = Mock()
         mock_game_state = Mock()
@@ -328,7 +328,7 @@ class TestTransactionRollback:
         Requirements: 4.3
         """
         # RED: This will fail until we implement rollback
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
         from ti4.core.transactions import PromissoryNote, PromissoryNoteType
 
         mock_galaxy = Mock()
@@ -369,7 +369,7 @@ class TestTransactionRollback:
         Requirements: 3.3, 4.3
         """
         # RED: This will fail until we implement rollback error handling
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         mock_galaxy = Mock()
         mock_game_state = Mock()
@@ -432,7 +432,7 @@ class TestErrorRecoveryScenarios:
         Requirements: 3.3
         """
         # RED: This will fail until we implement conflict detection
-        from ti4.core.rule_28_deals import (
+        from ti4.core.deals import (
             EnhancedTransactionManager,
         )
 
@@ -479,7 +479,7 @@ class TestErrorRecoveryScenarios:
         Requirements: 3.3, 4.3
         """
         # RED: This will fail until we implement state validation
-        from ti4.core.rule_28_deals import (
+        from ti4.core.deals import (
             EnhancedTransactionManager,
         )
 
@@ -511,7 +511,7 @@ class TestErrorRecoveryScenarios:
         Requirements: 2.2, 3.3, 4.3, 5.3
         """
         # RED: This will fail until we implement error logging
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         mock_galaxy = Mock()
         mock_game_state = Mock()
@@ -548,10 +548,10 @@ class TestErrorRecoveryScenarios:
         """
         # RED: This will fail until we implement proper asset type tracking
         from ti4.core.constants import Faction
+        from ti4.core.deals import EnhancedTransactionManager
         from ti4.core.galaxy import Galaxy
         from ti4.core.game_state import GameState
         from ti4.core.player import Player
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
         from ti4.core.system import System
 
         # Create test setup with proper Player construction

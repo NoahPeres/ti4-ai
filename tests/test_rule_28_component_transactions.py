@@ -12,7 +12,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from ti4.core.rule_28_deals import (
+from ti4.core.deals import (
     ComponentTransaction,
     TransactionStatus,
     ValidationResult,
@@ -390,7 +390,7 @@ class TestComponentValidator:
         Requirements: 2.1, 2.2, 2.3, 2.4, 2.5
         """
         # RED: This will fail until we create ComponentValidator
-        from ti4.core.rule_28_deals import ComponentValidator
+        from ti4.core.deals import ComponentValidator
 
         mock_galaxy = Mock()
         mock_game_state = Mock()
@@ -406,7 +406,7 @@ class TestComponentValidator:
 
         Requirements: 2.1, 2.2
         """
-        from ti4.core.rule_28_deals import ComponentValidator
+        from ti4.core.deals import ComponentValidator
 
         mock_galaxy = Mock()
         mock_galaxy.are_players_neighbors.return_value = True
@@ -424,7 +424,7 @@ class TestComponentValidator:
 
         Requirements: 2.1, 2.2
         """
-        from ti4.core.rule_28_deals import ComponentValidator
+        from ti4.core.deals import ComponentValidator
 
         mock_galaxy = Mock()
         mock_galaxy.are_players_neighbors.return_value = False
@@ -442,7 +442,7 @@ class TestComponentValidator:
 
         Requirements: 2.3
         """
-        from ti4.core.rule_28_deals import ComponentValidator
+        from ti4.core.deals import ComponentValidator
 
         mock_galaxy = Mock()
         mock_game_state = Mock()
@@ -463,7 +463,7 @@ class TestComponentValidator:
 
         Requirements: 2.3
         """
-        from ti4.core.rule_28_deals import ComponentValidator
+        from ti4.core.deals import ComponentValidator
 
         mock_galaxy = Mock()
         mock_game_state = Mock()
@@ -484,7 +484,7 @@ class TestComponentValidator:
 
         Requirements: 2.4
         """
-        from ti4.core.rule_28_deals import ComponentValidator
+        from ti4.core.deals import ComponentValidator
 
         mock_galaxy = Mock()
         mock_game_state = Mock()
@@ -505,7 +505,7 @@ class TestComponentValidator:
 
         Requirements: 2.4
         """
-        from ti4.core.rule_28_deals import ComponentValidator
+        from ti4.core.deals import ComponentValidator
 
         mock_galaxy = Mock()
         mock_game_state = Mock()
@@ -526,7 +526,7 @@ class TestComponentValidator:
 
         Requirements: 2.5
         """
-        from ti4.core.rule_28_deals import ComponentValidator
+        from ti4.core.deals import ComponentValidator
         from ti4.core.transactions import PromissoryNote, PromissoryNoteType
 
         mock_galaxy = Mock()
@@ -552,7 +552,7 @@ class TestComponentValidator:
 
         Requirements: 2.5
         """
-        from ti4.core.rule_28_deals import ComponentValidator
+        from ti4.core.deals import ComponentValidator
         from ti4.core.transactions import PromissoryNote, PromissoryNoteType
 
         mock_galaxy = Mock()
@@ -582,7 +582,7 @@ class TestComponentValidator:
 
         Requirements: 2.1, 2.2, 2.3, 2.4, 2.5
         """
-        from ti4.core.rule_28_deals import ComponentValidator
+        from ti4.core.deals import ComponentValidator
         from ti4.core.transactions import PromissoryNote, PromissoryNoteType
 
         # Setup mocks for successful validation
@@ -637,7 +637,7 @@ class TestComponentValidator:
 
         Requirements: 2.1, 2.2, 2.3, 2.4, 2.5
         """
-        from ti4.core.rule_28_deals import ComponentValidator
+        from ti4.core.deals import ComponentValidator
         from ti4.core.transactions import PromissoryNote, PromissoryNoteType
 
         # Setup mocks for failed validation
@@ -698,7 +698,7 @@ class TestComponentValidator:
 
         Requirements: 2.1, 2.2 - Defensive programming
         """
-        from ti4.core.rule_28_deals import ComponentValidator
+        from ti4.core.deals import ComponentValidator
 
         mock_galaxy = Mock()
         mock_game_state = Mock()
@@ -722,7 +722,7 @@ class TestComponentValidator:
 
         Requirements: 2.3, 2.4 - Defensive programming
         """
-        from ti4.core.rule_28_deals import ComponentValidator
+        from ti4.core.deals import ComponentValidator
 
         mock_galaxy = Mock()
         mock_game_state = Mock()
@@ -750,7 +750,7 @@ class TestComponentValidator:
 
         Requirements: 2.5 - Defensive programming
         """
-        from ti4.core.rule_28_deals import ComponentValidator
+        from ti4.core.deals import ComponentValidator
         from ti4.core.transactions import PromissoryNote, PromissoryNoteType
 
         mock_galaxy = Mock()
@@ -783,7 +783,7 @@ class TestPromissoryNoteExchangeSystem:
         Requirements: 4.4, 4.5
         """
         # RED: This will fail until we implement immediate effect activation
-        from ti4.core.rule_28_deals import PromissoryNoteExchangeHandler
+        from ti4.core.deals import PromissoryNoteExchangeHandler
         from ti4.core.transactions import PromissoryNote, PromissoryNoteType
 
         # Setup proper mocks
@@ -823,7 +823,7 @@ class TestPromissoryNoteExchangeSystem:
         Requirements: 4.1, 4.2, 4.3
         """
         # RED: This will fail until we implement the exchange handler
-        from ti4.core.rule_28_deals import PromissoryNoteExchangeHandler
+        from ti4.core.deals import PromissoryNoteExchangeHandler
         from ti4.core.transactions import PromissoryNote, PromissoryNoteType
 
         # Setup proper mocks
@@ -855,7 +855,7 @@ class TestPromissoryNoteExchangeSystem:
         Requirements: 4.2, 4.3
         """
         # RED: This will fail until we implement validation
-        from ti4.core.rule_28_deals import PromissoryNoteExchangeHandler
+        from ti4.core.deals import PromissoryNoteExchangeHandler
         from ti4.core.transactions import PromissoryNote, PromissoryNoteType
 
         mock_game_state = Mock()
@@ -884,7 +884,7 @@ class TestPromissoryNoteExchangeSystem:
         Requirements: 4.4, 4.5
         """
         # RED: This will fail until we implement specific immediate effects
-        from ti4.core.rule_28_deals import PromissoryNoteExchangeHandler
+        from ti4.core.deals import PromissoryNoteExchangeHandler
         from ti4.core.transactions import PromissoryNote, PromissoryNoteType
 
         # Setup proper mocks
@@ -925,7 +925,7 @@ class TestPromissoryNoteExchangeSystem:
         Requirements: 4.1, 4.2, 4.3
         """
         # This tests integration with existing functionality
-        from ti4.core.rule_28_deals import (
+        from ti4.core.deals import (
             PromissoryNoteExchangeHandler,
         )
         from ti4.core.transactions import PromissoryNote, PromissoryNoteType
@@ -958,7 +958,7 @@ class TestPromissoryNoteExchangeSystem:
 
         Requirements: 4.1, 4.2, 4.3 - Defensive programming
         """
-        from ti4.core.rule_28_deals import PromissoryNoteExchangeHandler
+        from ti4.core.deals import PromissoryNoteExchangeHandler
         from ti4.core.transactions import PromissoryNote, PromissoryNoteType
 
         mock_game_state = Mock()
@@ -996,7 +996,7 @@ class TestPromissoryNoteExchangeSystem:
 
         Requirements: 4.4, 4.5 - Defensive programming
         """
-        from ti4.core.rule_28_deals import PromissoryNoteImmediateEffects
+        from ti4.core.deals import PromissoryNoteImmediateEffects
         from ti4.core.transactions import PromissoryNote, PromissoryNoteType
 
         mock_game_state = Mock()
@@ -1042,7 +1042,7 @@ class TestEnhancedTransactionManager:
 
         Requirements: 1.1, 1.4, 1.5
         """
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         mock_galaxy = Mock()
         mock_game_state = Mock()
@@ -1060,7 +1060,7 @@ class TestEnhancedTransactionManager:
 
         Requirements: 1.1, 1.2, 1.4, 1.5
         """
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         # Setup mocks for successful validation
         mock_galaxy = Mock()
@@ -1098,7 +1098,7 @@ class TestEnhancedTransactionManager:
 
         Requirements: 1.1, 1.2, 1.4, 1.5
         """
-        from ti4.core.rule_28_deals import (
+        from ti4.core.deals import (
             EnhancedTransactionManager,
             TransactionValidationError,
         )
@@ -1134,7 +1134,7 @@ class TestEnhancedTransactionManager:
 
         Requirements: 1.2, 1.3, 1.4, 1.5
         """
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         # Setup mocks
         mock_galaxy = Mock()
@@ -1183,7 +1183,7 @@ class TestEnhancedTransactionManager:
 
         Requirements: 1.2, 1.3, 1.4, 1.5
         """
-        from ti4.core.rule_28_deals import (
+        from ti4.core.deals import (
             EnhancedTransactionManager,
             TransactionNotFoundError,
         )
@@ -1203,7 +1203,7 @@ class TestEnhancedTransactionManager:
 
         Requirements: 1.2, 1.3, 1.4, 1.5
         """
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         # Setup mocks
         mock_galaxy = Mock()
@@ -1241,7 +1241,7 @@ class TestEnhancedTransactionManager:
 
         Requirements: 1.2, 1.3, 1.4, 1.5
         """
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         # Setup mocks
         mock_galaxy = Mock()
@@ -1279,7 +1279,7 @@ class TestEnhancedTransactionManager:
 
         Requirements: 1.4, 1.5
         """
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         # Setup mocks
         mock_galaxy = Mock()
@@ -1333,7 +1333,7 @@ class TestEnhancedTransactionManager:
 
         Requirements: 1.4, 1.5
         """
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         # Setup mocks
         mock_galaxy = Mock()
@@ -1359,7 +1359,7 @@ class TestEnhancedTransactionManager:
 
         def mock_apply_transaction_effects(transaction):
             # Add to history when transaction is applied
-            from ti4.core.rule_28_deals import TransactionHistoryEntry
+            from ti4.core.deals import TransactionHistoryEntry
 
             history_entry = TransactionHistoryEntry(
                 transaction_id=transaction.transaction_id,

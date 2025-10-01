@@ -27,7 +27,7 @@
 **New Features**:
 - Added `has_production` boolean flag to `UnitStats` to distinguish between having production ability vs production value
 - Added `has_production()` method to `Unit` class
-- Updated `Rule89Validator.can_resolve_production_abilities()` to use the new flag
+- Updated `TacticalActionValidator.can_resolve_production_abilities()` to use the new flag
 - Fixed test expectations to match corrected behavior
 
 ### 5. Test Corrections

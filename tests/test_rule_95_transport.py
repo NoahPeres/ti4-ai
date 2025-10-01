@@ -5,8 +5,8 @@ Implements comprehensive test coverage for TI4 LRR Rule 95: TRANSPORT mechanics.
 Tests transport capacity, pickup restrictions, movement constraints, and invasion integration.
 """
 
-from src.ti4.core.constants import UnitType
-from src.ti4.core.unit import Unit
+from ti4.core.constants import UnitType
+from ti4.core.unit import Unit
 
 
 class TestRule95TransportBasics:
@@ -17,7 +17,7 @@ class TestRule95TransportBasics:
 
         LRR Reference: Rule 95.0 - Transport capacity limits
         """
-        from src.ti4.core.transport import TransportManager
+        from ti4.core.transport import TransportManager
 
         # Create a carrier with capacity 4
         carrier = Unit(UnitType.CARRIER, "player1")
@@ -43,7 +43,7 @@ class TestRule95TransportCapacityValidation:
 
         LRR Reference: Rule 95.0 - Transport capacity limits
         """
-        from src.ti4.core.transport import TransportManager
+        from ti4.core.transport import TransportManager
 
         # Create a destroyer with capacity 0
         destroyer = Unit(UnitType.DESTROYER, "player1")
@@ -65,7 +65,7 @@ class TestRule95TransportCapacityValidation:
 
         LRR Reference: Rule 95.0 - Transport capacity limits
         """
-        from src.ti4.core.transport import TransportManager
+        from ti4.core.transport import TransportManager
 
         # Create a carrier with capacity 4
         carrier = Unit(UnitType.CARRIER, "player1")
@@ -85,7 +85,7 @@ class TestRule95TransportCapacityValidation:
 
         LRR Reference: Rule 95.0 - Transport capacity limits
         """
-        from src.ti4.core.transport import TransportManager
+        from ti4.core.transport import TransportManager
 
         # Create any ship
         carrier = Unit(UnitType.CARRIER, "player1")
@@ -105,7 +105,7 @@ class TestRule95TransportCapacityValidation:
 
         LRR Reference: Rule 95.0 - Transport can carry fighters and ground forces
         """
-        from src.ti4.core.transport import TransportManager
+        from ti4.core.transport import TransportManager
 
         # Create a carrier with capacity 4
         carrier = Unit(UnitType.CARRIER, "player1")
@@ -128,7 +128,7 @@ class TestRule95TransportStateManagement:
 
         LRR Reference: Rule 95.2 - Transported units move with ship
         """
-        from src.ti4.core.transport import TransportManager
+        from ti4.core.transport import TransportManager
 
         # Create a carrier and some units to transport
         carrier = Unit(UnitType.CARRIER, "player1")
@@ -154,7 +154,7 @@ class TestRule95TransportStateManagement:
 
         LRR Reference: Rule 95.4 - Ground forces can land during invasion
         """
-        from src.ti4.core.transport import TransportManager
+        from ti4.core.transport import TransportManager
 
         # Create a carrier and some units to transport
         carrier = Unit(UnitType.CARRIER, "player1")
@@ -186,7 +186,7 @@ class TestRule95CommandTokenRestrictions:
 
         LRR Reference: Rule 95.3 - Command token pickup restrictions
         """
-        from src.ti4.core.transport import TransportManager
+        from ti4.core.transport import TransportManager
 
         transport_manager = TransportManager()
 
@@ -206,7 +206,7 @@ class TestRule95CommandTokenRestrictions:
 
         LRR Reference: Rule 95.3 - Active system exception
         """
-        from src.ti4.core.transport import TransportManager
+        from ti4.core.transport import TransportManager
 
         transport_manager = TransportManager()
 
@@ -225,7 +225,7 @@ class TestRule95CommandTokenRestrictions:
 
         LRR Reference: Rule 95.3 - Normal pickup allowed
         """
-        from src.ti4.core.transport import TransportManager
+        from ti4.core.transport import TransportManager
 
         transport_manager = TransportManager()
 
@@ -244,7 +244,7 @@ class TestRule95CommandTokenRestrictions:
 
         LRR Reference: Rule 95.3 - Pickup restrictions during movement
         """
-        from src.ti4.core.transport import TransportManager
+        from ti4.core.transport import TransportManager
 
         transport_manager = TransportManager()
 
@@ -295,7 +295,7 @@ class TestRule95TransportMovementConstraints:
 
         LRR Reference: Rule 95.2 - Transported units move with ship
         """
-        from src.ti4.core.transport import TransportManager, TransportRules
+        from ti4.core.transport import TransportManager, TransportRules
 
         # Create a carrier and some units to transport
         carrier = Unit(UnitType.CARRIER, "player1")
@@ -326,7 +326,7 @@ class TestRule95TransportMovementConstraints:
 
         LRR Reference: Rule 95.2 - Transported units remain in space
         """
-        from src.ti4.core.transport import TransportManager, TransportRules
+        from ti4.core.transport import TransportManager, TransportRules
 
         # Create a carrier and some units to transport
         carrier = Unit(UnitType.CARRIER, "player1")

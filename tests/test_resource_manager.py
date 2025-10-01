@@ -22,7 +22,7 @@ class TestResourceManagerCreation:
         Requirements: 3.1, 3.2
         """
         # RED: This will fail until we create ResourceManager
-        from ti4.core.rule_28_deals import ResourceManager
+        from ti4.core.deals import ResourceManager
 
         mock_game_state = Mock()
         resource_manager = ResourceManager(game_state=mock_game_state)
@@ -39,7 +39,7 @@ class TestResourceTracking:
 
         Requirements: 3.1
         """
-        from ti4.core.rule_28_deals import ResourceManager
+        from ti4.core.deals import ResourceManager
 
         mock_game_state = Mock()
         mock_player = Mock()
@@ -58,7 +58,7 @@ class TestResourceTracking:
 
         Requirements: 3.1
         """
-        from ti4.core.rule_28_deals import ResourceManager
+        from ti4.core.deals import ResourceManager
 
         mock_game_state = Mock()
         mock_player = Mock()
@@ -77,7 +77,7 @@ class TestResourceTracking:
 
         Requirements: 3.1
         """
-        from ti4.core.rule_28_deals import ResourceManager
+        from ti4.core.deals import ResourceManager
 
         mock_game_state = Mock()
         mock_promissory_manager = Mock()
@@ -102,7 +102,7 @@ class TestTradeGoodsTransfer:
 
         Requirements: 3.2, 3.3
         """
-        from ti4.core.rule_28_deals import ResourceManager
+        from ti4.core.deals import ResourceManager
 
         mock_game_state = Mock()
         mock_player1 = Mock()
@@ -126,7 +126,7 @@ class TestTradeGoodsTransfer:
 
         Requirements: 3.2, 3.3
         """
-        from ti4.core.rule_28_deals import ResourceManager
+        from ti4.core.deals import ResourceManager
 
         mock_game_state = Mock()
         mock_player1 = Mock()
@@ -152,7 +152,7 @@ class TestTradeGoodsTransfer:
 
         Requirements: 3.2, 3.3
         """
-        from ti4.core.rule_28_deals import ResourceManager
+        from ti4.core.deals import ResourceManager
 
         mock_game_state = Mock()
         resource_manager = ResourceManager(game_state=mock_game_state)
@@ -178,7 +178,7 @@ class TestTradeGoodsTransfer:
 
         Requirements: 4.1, 4.4
         """
-        from ti4.core.rule_28_deals import ResourceManager
+        from ti4.core.deals import ResourceManager
 
         mock_game_state = Mock()
         mock_player1 = Mock()
@@ -205,7 +205,7 @@ class TestCommodityTransfer:
 
         Requirements: 3.4, 3.5
         """
-        from ti4.core.rule_28_deals import ResourceManager
+        from ti4.core.deals import ResourceManager
 
         mock_game_state = Mock()
         mock_player1 = Mock()
@@ -228,7 +228,7 @@ class TestCommodityTransfer:
 
         Requirements: 3.4, 3.5
         """
-        from ti4.core.rule_28_deals import ResourceManager
+        from ti4.core.deals import ResourceManager
 
         mock_game_state = Mock()
         mock_player1 = Mock()
@@ -253,7 +253,7 @@ class TestCommodityTransfer:
 
         Requirements: 3.4, 3.5
         """
-        from ti4.core.rule_28_deals import ResourceManager
+        from ti4.core.deals import ResourceManager
 
         mock_game_state = Mock()
         resource_manager = ResourceManager(game_state=mock_game_state)
@@ -279,7 +279,7 @@ class TestCommodityTransfer:
 
         Requirements: 4.2, 4.4
         """
-        from ti4.core.rule_28_deals import ResourceManager
+        from ti4.core.deals import ResourceManager
 
         mock_game_state = Mock()
         mock_player1 = Mock()
@@ -305,7 +305,7 @@ class TestPromissoryNoteTransfer:
 
         Requirements: 3.2
         """
-        from ti4.core.rule_28_deals import ResourceManager
+        from ti4.core.deals import ResourceManager
 
         mock_game_state = Mock()
         mock_promissory_manager = Mock()
@@ -334,7 +334,7 @@ class TestPromissoryNoteTransfer:
 
         Requirements: 3.2
         """
-        from ti4.core.rule_28_deals import ResourceManager
+        from ti4.core.deals import ResourceManager
 
         mock_game_state = Mock()
         resource_manager = ResourceManager(game_state=mock_game_state)
@@ -364,7 +364,7 @@ class TestPromissoryNoteTransfer:
 
         Requirements: 3.2
         """
-        from ti4.core.rule_28_deals import ResourceManager
+        from ti4.core.deals import ResourceManager
 
         mock_game_state = Mock()
         mock_promissory_manager = Mock()
@@ -394,7 +394,7 @@ class TestResourceManagerHelperMethods:
 
         Requirements: 3.1
         """
-        from ti4.core.rule_28_deals import ResourceManager
+        from ti4.core.deals import ResourceManager
 
         mock_game_state = Mock()
         mock_player1 = Mock()
@@ -413,7 +413,7 @@ class TestResourceManagerHelperMethods:
 
         Requirements: 3.1
         """
-        from ti4.core.rule_28_deals import ResourceManager
+        from ti4.core.deals import ResourceManager
 
         mock_game_state = Mock()
         mock_player1 = Mock()
@@ -430,7 +430,7 @@ class TestResourceManagerHelperMethods:
 
         Requirements: 3.2, 3.3, 3.4, 3.5
         """
-        from ti4.core.rule_28_deals import ResourceManager
+        from ti4.core.deals import ResourceManager
 
         mock_game_state = Mock()
         resource_manager = ResourceManager(game_state=mock_game_state)

@@ -12,11 +12,11 @@ from .player import Player
 from .promissory_notes import PromissoryNoteManager
 
 if TYPE_CHECKING:
+    from .deals import ComponentTransaction, TransactionHistoryEntry
     from .galaxy import Galaxy
     from .objective import Objective
     from .planet import Planet
     from .planet_card import PlanetCard
-    from .rule_28_deals import ComponentTransaction, TransactionHistoryEntry
     from .strategic_action import StrategyCardType
     from .strategy_cards.coordinator import StrategyCardCoordinator
     from .system import System
@@ -774,7 +774,7 @@ class GameState:
 
         # Add to transaction history
         new_history = self.transaction_history.copy()
-        from .rule_28_deals import TransactionHistoryEntry
+        from .deals import TransactionHistoryEntry
 
         history_entry = TransactionHistoryEntry(
             transaction_id=transaction.transaction_id,

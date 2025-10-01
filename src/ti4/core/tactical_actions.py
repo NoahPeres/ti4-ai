@@ -1,4 +1,8 @@
-"""Rule 89 validator for ground force placement."""
+"""Tactical action validation and management system.
+
+This module provides validation and coordination for tactical actions,
+implementing the mechanics described in Rule 89 of the TI4 LRR.
+"""
 
 from __future__ import annotations
 
@@ -30,8 +34,8 @@ class MovementResult:
     error_message: str = ""
 
 
-class Rule89Validator:
-    """Manages tactical action mechanics according to Rule 89.
+class TacticalActionValidator:
+    """Validates and manages tactical action mechanics.
 
     Handles:
     - Step 1: Activation (Rule 89.1) - Place command token

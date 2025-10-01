@@ -11,9 +11,9 @@ from datetime import datetime
 import pytest
 
 from ti4.core.constants import Faction
+from ti4.core.deals import ComponentTransaction, TransactionStatus
 from ti4.core.game_state import GameState
 from ti4.core.player import Player
-from ti4.core.rule_28_deals import ComponentTransaction, TransactionStatus
 from ti4.core.transactions import TransactionOffer
 
 
