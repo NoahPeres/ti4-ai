@@ -547,7 +547,7 @@ class TestErrorRecoveryScenarios:
         Requirements: 6.2, 6.4
         """
         # RED: This will fail until we implement proper asset type tracking
-        from ti4.core.faction_data import Faction
+        from ti4.core.constants import Faction
         from ti4.core.galaxy import Galaxy
         from ti4.core.game_state import GameState
         from ti4.core.player import Player
