@@ -6,6 +6,7 @@ with the GameState pending transactions.
 Requirements: 5.1
 """
 
+from types import SimpleNamespace
 from unittest.mock import Mock
 
 from ti4.core.constants import Faction
@@ -28,7 +29,6 @@ class TestTransactionManagerGameStateSync:
 
         Requirements: 5.1
         """
-        # RED: This will fail until we implement GameState synchronization
 
         # Setup
         player1 = Player(id="player1", faction=Faction.ARBOREC)
@@ -85,10 +85,8 @@ class TestTransactionManagerGameStateSync:
 
         players = [player1, player2]
 
-        # Create a mock GameState without add_pending_transaction method
-        mock_game_state = Mock(spec=[])  # Empty spec means no methods
-        mock_game_state.players = players
-        mock_game_state.pending_transactions = {}
+        # Create a GameState-like object without add_pending_transaction
+        mock_game_state = SimpleNamespace(players=players, pending_transactions={})
         # Explicitly don't add add_pending_transaction method
 
         galaxy = Mock()

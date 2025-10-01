@@ -29,7 +29,6 @@ class TestRejectCancelGameStateSync:
 
         Requirements: 5.3
         """
-        # RED: This will fail until we implement GameState synchronization for reject
 
         # Setup
         player1 = Player(id="player1", faction=Faction.ARBOREC)
@@ -85,7 +84,6 @@ class TestRejectCancelGameStateSync:
 
         Requirements: 5.4
         """
-        # RED: This will fail until we implement GameState synchronization for cancel
 
         # Setup
         player1 = Player(id="player1", faction=Faction.ARBOREC)

@@ -139,17 +139,7 @@ class TestAtomicTransactionOperations:
         # This demonstrates the atomicity violation - the transaction should NOT
         # be in history if the effects failed, but with the current implementation it will be.
 
-        # Let's check if the transaction was incorrectly committed to history
-        # despite the failure (this will demonstrate the atomicity bug)
-        try:
-            # Try to get the state after the failed operation
-            # Since apply_transaction_effects raises an exception, we need to catch it
-            # and examine what partial state changes occurred
-            pass
-        except ValueError:
-            # The exception was raised, but let's check if complete_transaction was called
-            # by examining if the transaction would be in history in a new attempt
-            pass
+        # Note: We intentionally assert using original state below to ensure no partial commits occurred.
 
         # For now, let's verify the original state is unchanged
         # (This part should work correctly)

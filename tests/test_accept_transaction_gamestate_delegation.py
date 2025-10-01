@@ -31,7 +31,6 @@ class TestAcceptTransactionGameStateDelegation:
 
         Requirements: 5.2
         """
-        # RED: This will fail until we implement GameState delegation
 
         # Setup
         player1 = Player(id="player1", faction=Faction.ARBOREC)

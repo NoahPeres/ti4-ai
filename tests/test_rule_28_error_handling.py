@@ -31,9 +31,6 @@ class TestCustomExceptionClasses:
 
         Requirements: 2.2
         """
-        # RED: This will fail until we create TransactionValidationError
-        from ti4.core.rule_28_deals import TransactionValidationError
-
         error = TransactionValidationError("Players are not neighbors")
         assert str(error) == "Players are not neighbors"
         assert isinstance(error, Exception)
@@ -315,16 +312,9 @@ class TestTransactionRollback:
         # Execution should fail and rollback
         # NOTE: This test is currently RED - rollback implementation has issues
         # TODO: Fix rollback implementation to handle promissory note failures properly
-        try:
-            result = manager.accept_transaction_with_rollback(
-                transaction.transaction_id
-            )
-            # For now, we just verify the test runs and handles the rollback error
-            assert result is not None or True  # Test completed without crashing
-        except Exception as e:
-            # Expected - rollback implementation needs work
-            # Verify it's the expected rollback error
-            assert "rollback" in str(e).lower() or "failed" in str(e).lower()
+        result = manager.accept_transaction_with_rollback(transaction.transaction_id)
+        assert result.success is False
+        assert "rolled back" in (result.error_message or "").lower()
 
         # Verify rollback occurred - player1 should get trade goods back
         mock_player1.gain_trade_goods.assert_called_with(3)
