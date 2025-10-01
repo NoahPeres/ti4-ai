@@ -6,12 +6,12 @@ Requirements: 9.1, 9.2, 9.3, 9.4
 from datetime import datetime
 from unittest.mock import Mock
 
-from ti4.core.game_state import GameState
-from ti4.core.rule_28_deals import (
+from ti4.core.deals import (
     ComponentTransaction,
     TransactionOffer,
     TransactionStatus,
 )
+from ti4.core.game_state import GameState
 
 
 class TestObserverNotificationResilience:

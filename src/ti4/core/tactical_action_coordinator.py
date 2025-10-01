@@ -1,7 +1,7 @@
 """Tactical Action Coordinator - Integration layer for Rule 89 validation and movement execution.
 
 This module coordinates between:
-1. Rule89Validator - Validates Rule 89 compliance
+1. TacticalActionValidator - Validates Rule 89 compliance
 2. MovementEngine - Executes complex movement operations
 
 This is the COORDINATION layer that ensures proper integration without redundancy.
@@ -9,7 +9,7 @@ This is the COORDINATION layer that ensures proper integration without redundanc
 
 from typing import TYPE_CHECKING
 
-from .rule89_validator import Rule89Validator
+from .tactical_actions import TacticalActionValidator
 
 if TYPE_CHECKING:
     from ..actions.movement_engine import MovementPlan
@@ -28,7 +28,7 @@ class TacticalActionCoordinator:
 
     def __init__(self) -> None:
         """Initialize the coordinator with both validation and execution systems."""
-        self.rule89_validator = Rule89Validator()
+        self.rule89_validator = TacticalActionValidator()
 
     def validate_and_execute_tactical_action(
         self,
@@ -50,7 +50,7 @@ class TacticalActionCoordinator:
         Returns:
             Dictionary with results of each step
 
-        Integration: Rule89Validator + MovementEngine
+        Integration: TacticalActionValidator + MovementEngine
         """
         results = {}
 
@@ -103,7 +103,7 @@ class TacticalActionCoordinator:
             Dictionary mapping system names to their responsibilities
         """
         return {
-            "Rule89Validator": "Validates Rule 89 compliance - what's allowed by the rules",
+            "TacticalActionValidator": "Validates Rule 89 compliance - what's allowed by the rules",
             "MovementEngine": "Executes complex movement with technology effects",
             "TacticalActionCoordinator": "Integrates validation and execution without redundancy",
             "MovementValidator": "Validates movement operations with technology effects",
@@ -117,7 +117,7 @@ class TacticalActionCoordinator:
             Dictionary showing unique responsibilities of each system
         """
         return {
-            "Rule89Validator_unique_methods": [
+            "TacticalActionValidator_unique_methods": [
                 "can_activate_system",
                 "requires_space_combat",
                 "can_commit_ground_forces",

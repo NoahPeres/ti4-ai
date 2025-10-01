@@ -23,7 +23,7 @@ The Transaction API provides a clean, simplified interface for managing componen
 The main API class that provides all transaction operations.
 
 ```python
-from ti4.core.rule_28_deals import TransactionAPI
+from ti4.core.deals import TransactionAPI
 from ti4.core.transactions import TransactionOffer
 
 # Initialize the API

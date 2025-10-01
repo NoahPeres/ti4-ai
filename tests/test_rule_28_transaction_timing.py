@@ -9,10 +9,10 @@ Requirements: 6.1, 6.2, 6.3, 6.4, 6.5
 
 from unittest.mock import Mock
 
-from ti4.core.game_phase import GamePhase
-from ti4.core.rule_28_deals import (
+from ti4.core.deals import (
     TransactionStatus,
 )
+from ti4.core.game_phase import GamePhase
 from ti4.core.transactions import TransactionOffer
 
 
@@ -68,7 +68,7 @@ class TestTransactionTimingAndAvailability:
         Requirements: 6.1
         """
         # RED: This will fail until we implement phase-independent transaction proposals
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         mock_galaxy = Mock()
         mock_galaxy.are_players_neighbors.return_value = True
@@ -95,7 +95,7 @@ class TestTransactionTimingAndAvailability:
         Requirements: 6.2
         """
         # RED: This will fail until we implement non-blocking transaction processing
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         mock_galaxy = Mock()
         mock_galaxy.are_players_neighbors.return_value = True
@@ -120,7 +120,7 @@ class TestTransactionTimingAndAvailability:
         Requirements: 6.3
         """
         # RED: This will fail until we implement immediate execution
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         mock_galaxy = Mock()
         mock_galaxy.are_players_neighbors.return_value = True
@@ -158,7 +158,7 @@ class TestTransactionTimingAndAvailability:
         Requirements: 6.4
         """
         # RED: This will fail until we implement transaction queue management
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         mock_galaxy = Mock()
         mock_galaxy.are_players_neighbors.return_value = True
@@ -208,7 +208,7 @@ class TestTransactionTimingAndAvailability:
         Requirements: 6.5
         """
         # RED: This will fail until we implement immediate game state updates
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         mock_galaxy = Mock()
         mock_galaxy.are_players_neighbors.return_value = True
@@ -247,7 +247,7 @@ class TestTransactionPhaseIntegration:
         Requirements: 6.1
         """
         # RED: This will fail until we implement phase integration
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         mock_galaxy = Mock()
         mock_galaxy.are_players_neighbors.return_value = True
@@ -266,7 +266,7 @@ class TestTransactionPhaseIntegration:
 
         Requirements: 6.1
         """
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         mock_galaxy = Mock()
         mock_galaxy.are_players_neighbors.return_value = True
@@ -285,7 +285,7 @@ class TestTransactionPhaseIntegration:
 
         Requirements: 6.1
         """
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         mock_galaxy = Mock()
         mock_galaxy.are_players_neighbors.return_value = True
@@ -304,7 +304,7 @@ class TestTransactionPhaseIntegration:
 
         Requirements: 6.1
         """
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         mock_galaxy = Mock()
         mock_galaxy.are_players_neighbors.return_value = True
@@ -323,7 +323,7 @@ class TestTransactionPhaseIntegration:
 
         Requirements: 6.1
         """
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         mock_galaxy = Mock()
         mock_galaxy.are_players_neighbors.return_value = True
@@ -350,7 +350,7 @@ class TestTransactionQueueManagement:
         Requirements: 6.4
         """
         # RED: This will fail until we implement FIFO queue management
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         mock_galaxy = Mock()
         mock_galaxy.are_players_neighbors.return_value = True
@@ -389,7 +389,7 @@ class TestTransactionQueueManagement:
 
         Requirements: 6.4
         """
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         mock_galaxy = Mock()
         mock_galaxy.are_players_neighbors.return_value = True
@@ -423,7 +423,7 @@ class TestTransactionQueueManagement:
 
         Requirements: 6.4
         """
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         mock_galaxy = Mock()
         mock_galaxy.are_players_neighbors.return_value = True
@@ -464,7 +464,7 @@ class TestTransactionExecutionTiming:
 
         Requirements: 6.3
         """
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         mock_galaxy = Mock()
         mock_galaxy.are_players_neighbors.return_value = True
@@ -497,7 +497,7 @@ class TestTransactionExecutionTiming:
 
         Requirements: 6.3
         """
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         mock_galaxy = Mock()
         mock_galaxy.are_players_neighbors.return_value = True
@@ -529,7 +529,7 @@ class TestTransactionExecutionTiming:
 
         Requirements: 6.3
         """
-        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.deals import EnhancedTransactionManager
 
         mock_galaxy = Mock()
         mock_galaxy.are_players_neighbors.return_value = True

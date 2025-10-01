@@ -9,9 +9,9 @@ Requirements: 3.1, 3.4
 from datetime import datetime
 
 from ti4.core.constants import Faction
+from ti4.core.deals import ComponentTransaction, TransactionStatus
 from ti4.core.game_state import GameState
 from ti4.core.player import Player
-from ti4.core.rule_28_deals import ComponentTransaction, TransactionStatus
 from ti4.core.transactions import TransactionOffer
 
 

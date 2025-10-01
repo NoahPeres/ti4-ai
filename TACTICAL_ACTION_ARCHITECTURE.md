@@ -11,7 +11,7 @@
 │     (Integrates validation + execution without redundancy)  │
 ├─────────────────────────────────────────────────────────────┤
 │                 VALIDATION LAYER                            │
-│                Rule89Validator                              │
+│                TacticalActionValidator                              │
 │        (Validates Rule 89 compliance - what's allowed)     │
 ├─────────────────────────────────────────────────────────────┤
 │                 EXECUTION LAYER                             │
@@ -26,7 +26,7 @@
 
 ### **🎯 Component Responsibilities**
 
-#### **1. Rule89Validator** (`src/ti4/core/rule89_validator.py`)
+#### **1. TacticalActionValidator** (`src/ti4/core/rule89_validator.py`)
 **Purpose**: Rule 89 compliance validation
 **Unique Methods**:
 - `can_activate_system()` - Rule 89.1 validation
@@ -63,9 +63,9 @@
 
 #### **When to Use Each System:**
 
-1. **Rule Validation**: Use `Rule89Validator`
+1. **Rule Validation**: Use `TacticalActionValidator`
    ```python
-   validator = Rule89Validator()
+   validator = TacticalActionValidator()
    can_activate = validator.can_activate_system(system, player, galaxy)
    ```
 
@@ -108,7 +108,7 @@
 
 ### **📊 Test Coverage**
 
-- **Rule89Validator**: 18 tests (87% coverage)
+- **TacticalActionValidator**: 18 tests (87% coverage)
 - **MovementEngine**: 16 tests (22% coverage - complex system)
 - **Integration**: 7 tests (76% coverage)
 - **Total**: 41 tests proving no redundancy and clear separation
@@ -116,7 +116,7 @@
 ### **🚀 Future Development**
 
 When adding new tactical action features:
-1. **Rule Changes**: Modify `Rule89Validator`
+1. **Rule Changes**: Modify `TacticalActionValidator`
 2. **Movement Features**: Extend `MovementEngine`
 3. **Basic Operations**: Update `MovementPrimitives`
 4. **Integration**: Use `TacticalActionCoordinator`

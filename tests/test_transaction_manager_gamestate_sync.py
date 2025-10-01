@@ -10,11 +10,11 @@ from types import SimpleNamespace
 from unittest.mock import Mock
 
 from ti4.core.constants import Faction
-from ti4.core.game_state import GameState
-from ti4.core.player import Player
-from ti4.core.rule_28_deals import (
+from ti4.core.deals import (
     EnhancedTransactionManager,
 )
+from ti4.core.game_state import GameState
+from ti4.core.player import Player
 from ti4.core.transactions import TransactionOffer
 
 

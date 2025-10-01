@@ -9,7 +9,7 @@ Requirements: 7.1, 7.2, 7.3, 7.4, 7.5
 from datetime import datetime, timedelta
 from unittest.mock import Mock
 
-from ti4.core.rule_28_deals import (
+from ti4.core.deals import (
     ComponentTransaction,
     TransactionStatus,
 )
@@ -28,7 +28,7 @@ class TestTransactionHistoryTracking:
         Requirements: 7.1, 7.2
         """
         # RED: This will fail until we create TransactionHistoryEntry
-        from ti4.core.rule_28_deals import TransactionHistoryEntry
+        from ti4.core.deals import TransactionHistoryEntry
 
         entry = TransactionHistoryEntry(
             transaction_id="tx_001",
@@ -70,8 +70,8 @@ class TestTransactionHistoryTracking:
         Requirements: 7.1, 7.2
         """
         # Transaction history is now managed directly through GameState
+        from ti4.core.deals import ComponentTransaction, TransactionOffer
         from ti4.core.game_state import GameState
-        from ti4.core.rule_28_deals import ComponentTransaction, TransactionOffer
 
         mock_game_state = Mock(spec=GameState)
         mock_game_state.transaction_history = []
@@ -100,12 +100,12 @@ class TestTransactionHistoryTracking:
         Requirements: 7.2, 7.3
         """
         # Transaction history is now managed directly through GameState
-        from ti4.core.game_state import GameState
-        from ti4.core.rule_28_deals import (
+        from ti4.core.deals import (
             ComponentTransaction,
             TransactionOffer,
             TransactionStatus,
         )
+        from ti4.core.game_state import GameState
 
         mock_game_state = Mock(spec=GameState)
         mock_game_state.transaction_history = []
@@ -177,7 +177,7 @@ class TestTransactionLogging:
         Requirements: 7.2, 7.4
         """
         # RED: This will fail until we create TransactionLogger
-        from ti4.core.rule_28_deals import TransactionLogger
+        from ti4.core.deals import TransactionLogger
 
         logger = TransactionLogger()
         assert logger is not None
@@ -188,7 +188,7 @@ class TestTransactionLogging:
         Requirements: 7.2, 7.4
         """
         # RED: This will fail until we implement log_transaction_success
-        from ti4.core.rule_28_deals import TransactionLogger
+        from ti4.core.deals import TransactionLogger
 
         logger = TransactionLogger()
 
@@ -218,7 +218,7 @@ class TestTransactionLogging:
         Requirements: 7.4, 7.5
         """
         # RED: This will fail until we implement log_transaction_failure
-        from ti4.core.rule_28_deals import TransactionLogger
+        from ti4.core.deals import TransactionLogger
 
         logger = TransactionLogger()
 
@@ -256,12 +256,12 @@ class TestTransactionSearchAndFiltering:
         Requirements: 7.3
         """
         # Transaction search is now done directly on GameState transaction history
-        from ti4.core.game_state import GameState
-        from ti4.core.rule_28_deals import (
+        from ti4.core.deals import (
             ComponentTransaction,
             TransactionOffer,
             TransactionStatus,
         )
+        from ti4.core.game_state import GameState
 
         mock_game_state = Mock(spec=GameState)
         mock_game_state.transaction_history = []
@@ -315,12 +315,12 @@ class TestTransactionSearchAndFiltering:
         Requirements: 7.3
         """
         # Transaction filtering is now done directly on GameState transaction history
-        from ti4.core.game_state import GameState
-        from ti4.core.rule_28_deals import (
+        from ti4.core.deals import (
             ComponentTransaction,
             TransactionOffer,
             TransactionStatus,
         )
+        from ti4.core.game_state import GameState
 
         mock_game_state = Mock(spec=GameState)
         mock_game_state.transaction_history = []
@@ -375,12 +375,12 @@ class TestTransactionSearchAndFiltering:
         Requirements: 7.3, 7.4
         """
         # Time range filtering is now done directly on GameState transaction history
-        from ti4.core.game_state import GameState
-        from ti4.core.rule_28_deals import (
+        from ti4.core.deals import (
             ComponentTransaction,
             TransactionOffer,
             TransactionStatus,
         )
+        from ti4.core.game_state import GameState
 
         mock_game_state = Mock(spec=GameState)
         mock_game_state.transaction_history = []
@@ -459,8 +459,8 @@ class TestGameStateIntegration:
         Requirements: 8.1, 8.2, 8.3
         """
         # RED: This will fail until we implement game state integration
+        from ti4.core.deals import TransactionHistoryEntry
         from ti4.core.game_state import GameState
-        from ti4.core.rule_28_deals import TransactionHistoryEntry
 
         game_state = GameState()
 
@@ -486,7 +486,7 @@ class TestGameStateIntegration:
         Requirements: 8.3, 8.4
         """
         # RED: This will fail until we implement consistency checks
-        from ti4.core.rule_28_deals import TransactionConsistencyValidator
+        from ti4.core.deals import TransactionConsistencyValidator
 
         mock_game_state = Mock()
         validator = TransactionConsistencyValidator(game_state=mock_game_state)
@@ -512,7 +512,7 @@ class TestGameStateIntegration:
         Requirements: 8.4, 8.5
         """
         # RED: This will fail until we implement notification system
-        from ti4.core.rule_28_deals import TransactionNotificationSystem
+        from ti4.core.deals import TransactionNotificationSystem
 
         mock_game_state = Mock()
         notification_system = TransactionNotificationSystem(game_state=mock_game_state)
