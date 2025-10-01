@@ -61,7 +61,7 @@ Convert the Rule 95: TRANSPORT design into a series of TDD implementation tasks.
     - Add validation for transport during ship movement
     - _Requirements: 4.1, 4.2, 4.3_
 
-  - [ ] 5.2 Add transport destruction handling
+  - [-] 5.2 Add transport destruction handling
     - Write failing tests for transport ship destruction scenarios
     - Implement transported unit destruction when transport ship destroyed
     - Add retreat handling for transported units
