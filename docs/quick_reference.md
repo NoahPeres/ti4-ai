@@ -18,7 +18,7 @@
 
 1. **Add Technology Enum**
    ```python
-   # In src/ti4/core/technology_cards/specifications.py
+   # In src/ti4/core/constants.py
    class Technology(Enum):
        YOUR_NEW_TECH = "your_new_tech"
    ```
@@ -28,7 +28,7 @@
 
 3. **Add Specification**
    ```python
-   # In specifications.py
+   # In src/ti4/core/technology_cards/specifications.py
    self._specifications[Technology.YOUR_NEW_TECH] = TechnologySpecification(...)
    ```
 
@@ -269,7 +269,7 @@ ability = EnhancedAbility(...)
 ```text
 src/ti4/core/technology_cards/
 ├── concrete/your_new_tech.py     # Your implementation
-├── specifications.py             # Add specification here
+├── specifications.py             # Technology specifications
 └── __init__.py                   # Export if needed
 
 tests/

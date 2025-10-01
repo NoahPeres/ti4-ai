@@ -35,6 +35,15 @@ class EventType(Enum):
     PHASE_CHANGED = "phase_changed"
 
 
+class WormholeType(Enum):
+    """Enumeration of wormhole types as defined in Rule 101."""
+
+    ALPHA = "alpha"
+    BETA = "beta"
+    GAMMA = "gamma"
+    DELTA = "delta"
+
+
 class CircuitBreakerState(Enum):
     """Enumeration of circuit breaker states."""
 

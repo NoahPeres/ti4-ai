@@ -21,7 +21,7 @@ The Technology Card Framework provides a comprehensive, type-safe system for imp
 
 To implement a new technology card:
 
-1. **Add the technology to the enum system** in `src/ti4/core/technology_cards/specifications.py`
+1. **Add the technology to the enum system** in `src/ti4/core/constants.py`
 2. **Get user confirmation** for all specifications (mandatory)
 3. **Add specification** to `TechnologySpecificationRegistry`
 4. **Create concrete implementation** in `src/ti4/core/technology_cards/concrete/`
@@ -36,7 +36,7 @@ The framework follows an enum-first design philosophy with clear separation of c
 src/ti4/core/technology_cards/
 ├── __init__.py                 # Public API exports
 ├── protocols.py                # Protocol definitions
-├── specifications.py           # Enum-based specifications
+├── specifications.py           # Technology specifications
 ├── registry.py                 # Technology card registry
 ├── confirmation.py             # Manual confirmation protocol
 ├── exceptions.py               # Framework exceptions
@@ -67,7 +67,7 @@ The framework uses comprehensive enums to represent all game concepts:
 ### Core Technology Enums
 
 ```python
-# In src/ti4/core/technology_cards/specifications.py
+# In src/ti4/core/constants.py
 
 class Technology(Enum):
     """All TI4 technologies"""
@@ -210,7 +210,7 @@ class UnitUpgradeTechnologyCard(BaseTechnologyCard):
 
 ### Step 1: Add Technology Enum
 
-First, add your technology to the `Technology` enum in `specifications.py`:
+First, add your technology to the `Technology` enum in `constants.py`:
 
 ```python
 class Technology(Enum):
@@ -236,7 +236,7 @@ class Technology(Enum):
 Add the confirmed specification to `TechnologySpecificationRegistry`:
 
 ```python
-# In specifications.py
+# In src/ti4/core/technology_cards/specifications.py
 self._specifications[Technology.YOUR_NEW_TECH] = TechnologySpecification(
     technology=Technology.YOUR_NEW_TECH,
     name="Your New Tech",
@@ -534,7 +534,7 @@ class GravityDrive(PassiveTechnologyCard):
 #### 2. Missing Enum Values
 
 **Problem**: Need to add new trigger/effect/condition types
-**Solution**: Add to appropriate enum in `specifications.py`
+**Solution**: Add to appropriate enum in `constants.py`
 
 #### 3. Integration Issues
 

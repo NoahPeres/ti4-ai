@@ -185,7 +185,7 @@ Technology Card Framework
 src/ti4/core/technology_cards/
 ├── __init__.py                 # Public API
 ├── protocols.py                # Core interfaces
-├── specifications.py           # Enum-based specifications
+├── specifications.py           # Technology specifications
 ├── registry.py                 # Technology management
 ├── confirmation.py             # Manual confirmation protocol
 ├── exceptions.py               # Framework exceptions
@@ -293,7 +293,7 @@ uv run ruff check src/ti4/core/technology_cards/
 
 ### Common Issues
 - **TechnologySpecificationError**: Technology needs user confirmation
-- **Missing enum values**: Add to appropriate enum in specifications.py
+- **Missing enum values**: Add to appropriate enum in constants.py
 - **Integration failures**: Check integration points documentation
 - **Test failures**: Follow TDD practices and reference implementations
 

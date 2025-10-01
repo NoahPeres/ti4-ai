@@ -254,7 +254,7 @@ def _create_frontier_exploration_ability(self) -> Ability:
 ### Registry Entry
 
 ```python
-# In specifications.py
+# In src/ti4/core/technology_cards/specifications.py
 self._specifications[Technology.DARK_ENERGY_TAP] = TechnologySpecification(
     technology=Technology.DARK_ENERGY_TAP,
     name="Dark Energy Tap",

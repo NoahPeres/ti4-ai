@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 from .unit import Unit
 
 if TYPE_CHECKING:
+    from .constants import WormholeType
     from .fleet import Fleet
     from .planet import Planet
 
@@ -93,7 +94,7 @@ class System:
         """Add a fleet to this system."""
         self.fleets.append(fleet)
 
-    def add_wormhole(self, wormhole_type: str) -> None:
+    def add_wormhole(self, wormhole_type: str | WormholeType) -> None:
         """
         Add a wormhole of the specified type to this system.
 
@@ -101,23 +102,31 @@ class System:
         Valid wormhole types: alpha, beta, gamma, delta
 
         Args:
-            wormhole_type: Type of wormhole to add (alpha, beta, gamma, delta)
+            wormhole_type: Type of wormhole to add (WormholeType enum or string)
 
         Raises:
             ValueError: If wormhole_type is invalid
         """
+        from .constants import WormholeType
+
         if not wormhole_type:
             raise ValueError("Wormhole type cannot be empty")
 
+        # Convert enum to string value for internal storage
+        if isinstance(wormhole_type, WormholeType):
+            wormhole_str = wormhole_type.value
+        else:
+            wormhole_str = wormhole_type
+
         valid_types = {"alpha", "beta", "gamma", "delta"}
-        if wormhole_type not in valid_types:
+        if wormhole_str not in valid_types:
             raise ValueError(
-                f"Invalid wormhole type: {wormhole_type}. Valid types: {valid_types}"
+                f"Invalid wormhole type: {wormhole_str}. Valid types: {valid_types}"
             )
 
         # Avoid duplicates
-        if wormhole_type not in self.wormholes:
-            self.wormholes.append(wormhole_type)
+        if wormhole_str not in self.wormholes:
+            self.wormholes.append(wormhole_str)
 
     def has_wormhole(self, wormhole_type: str) -> bool:
         """
