@@ -44,7 +44,14 @@ def create_mock_game_state_with_players() -> Mock:
     mock_game_state.players = [mock_player1, mock_player2, mock_player3, mock_player4]
     mock_game_state.promissory_note_manager = Mock()
     mock_game_state.promissory_note_manager.get_player_hand.return_value = []
-    mock_game_state.update_transaction_effects = Mock()
+
+    # Set up the new GameState methods
+    mock_game_state.pending_transactions = {}
+    mock_game_state.transaction_history = []
+
+    # Create Mock objects that can track calls
+    mock_game_state.add_pending_transaction = Mock(return_value=mock_game_state)
+    mock_game_state.apply_transaction_effects = Mock(return_value=mock_game_state)
 
     return mock_game_state
 
@@ -225,7 +232,7 @@ class TestTransactionTimingAndAvailability:
 
         # Verify that game state update methods were called
         # This will be mocked for now, but should verify actual resource transfers
-        mock_game_state.update_transaction_effects.assert_called_once()
+        mock_game_state.apply_transaction_effects.assert_called_once()
 
 
 class TestTransactionPhaseIntegration:

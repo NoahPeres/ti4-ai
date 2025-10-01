@@ -1138,7 +1138,8 @@ class TestEnhancedTransactionManager:
 
         # Setup mocks
         mock_galaxy = Mock()
-        mock_game_state = Mock()
+        # Create a mock that doesn't have apply_transaction_effects method
+        mock_game_state = Mock(spec=[])  # Empty spec means no attributes
         mock_validator = Mock()
         mock_validator.validate_transaction.return_value = ValidationResult(
             is_valid=True
@@ -1337,6 +1338,9 @@ class TestEnhancedTransactionManager:
         # Setup mocks
         mock_galaxy = Mock()
         mock_game_state = Mock()
+        # Set up transaction_history as a proper list that can be iterated
+        transaction_history = []
+        mock_game_state.transaction_history = transaction_history
         mock_validator = Mock()
         mock_validator.validate_transaction.return_value = ValidationResult(
             is_valid=True
@@ -1348,6 +1352,30 @@ class TestEnhancedTransactionManager:
         )
         manager._validator = mock_validator
         manager._resource_manager = mock_resource_manager
+
+        # Mock the GameState methods for the new implementation
+        def mock_add_pending_transaction(transaction):
+            return mock_game_state
+
+        def mock_apply_transaction_effects(transaction):
+            # Add to history when transaction is applied
+            from ti4.core.rule_28_deals import TransactionHistoryEntry
+
+            history_entry = TransactionHistoryEntry(
+                transaction_id=transaction.transaction_id,
+                proposing_player=transaction.proposing_player,
+                target_player=transaction.target_player,
+                offer=transaction.offer,
+                request=transaction.request,
+                status=transaction.status,
+                timestamp=transaction.timestamp,
+                completion_timestamp=transaction.completion_timestamp,
+            )
+            transaction_history.append(history_entry)
+            return mock_game_state
+
+        mock_game_state.add_pending_transaction = mock_add_pending_transaction
+        mock_game_state.apply_transaction_effects = mock_apply_transaction_effects
 
         # Create and accept a transaction
         offer = TransactionOffer(trade_goods=3)

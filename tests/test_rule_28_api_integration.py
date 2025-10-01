@@ -49,6 +49,42 @@ class TestTransactionAPIIntegration:
         self.mock_promissory_manager.get_player_hand.return_value = []
         self.mock_game_state.promissory_note_manager = self.mock_promissory_manager
 
+        # Mock transaction history and pending transactions for new implementation
+        self.mock_game_state.transaction_history = []
+        self.mock_game_state.pending_transactions = {}
+
+        # Mock the new GameState methods
+        def mock_add_pending_transaction(transaction):
+            self.mock_game_state.pending_transactions[transaction.transaction_id] = (
+                transaction
+            )
+            return self.mock_game_state
+
+        def mock_apply_transaction_effects(transaction):
+            # Add to history when transaction is applied
+            from ti4.core.rule_28_deals import TransactionHistoryEntry
+
+            history_entry = TransactionHistoryEntry(
+                transaction_id=transaction.transaction_id,
+                proposing_player=transaction.proposing_player,
+                target_player=transaction.target_player,
+                offer=transaction.offer,
+                request=transaction.request,
+                status=transaction.status,
+                timestamp=transaction.timestamp,
+                completion_timestamp=transaction.completion_timestamp,
+            )
+            self.mock_game_state.transaction_history.append(history_entry)
+            # Remove from pending
+            if transaction.transaction_id in self.mock_game_state.pending_transactions:
+                del self.mock_game_state.pending_transactions[
+                    transaction.transaction_id
+                ]
+            return self.mock_game_state
+
+        self.mock_game_state.add_pending_transaction = mock_add_pending_transaction
+        self.mock_game_state.apply_transaction_effects = mock_apply_transaction_effects
+
         # Create API instance
         self.api = TransactionAPI(self.mock_galaxy, self.mock_game_state)
 

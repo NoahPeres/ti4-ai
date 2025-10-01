@@ -13,6 +13,7 @@ The Transaction API provides a clean, simplified interface for managing componen
 - **Input Validation**: Comprehensive validation of all inputs
 - **Transaction History**: Complete tracking of transaction history
 - **Status Queries**: Real-time transaction status information
+- **GameState Access**: Direct access to updated GameState after operations
 - **Integration Ready**: Designed for easy integration with game clients
 
 ## API Classes
@@ -40,7 +41,10 @@ class TransactionAPIResult:
     transaction_id: Optional[str] = None
     transaction: Optional[ComponentTransaction] = None
     error_message: Optional[str] = None
+    game_state: Optional[GameState] = None
 ```
+
+**Note**: The `game_state` field provides access to the updated GameState after transaction operations complete. This allows callers to access the current system state following successful operations.
 
 ### TransactionStatusInfo
 
@@ -150,6 +154,26 @@ for transaction in pending:
     print(f"  {transaction.transaction_id}: waiting for response")
     print(f"    Proposed to {transaction.target_player}")
     print(f"    Offering: {transaction.offer}")
+```
+
+### 7. Accessing Updated GameState
+
+```python
+# Get the current GameState after operations
+current_state = api.get_game_state()
+
+# The GameState is automatically updated after transaction operations
+result = api.accept_transaction(transaction_id)
+if result.success:
+    # Access updated state through the API
+    updated_state = api.get_game_state()
+
+    # Or through the result object (if provided)
+    if result.game_state:
+        updated_state = result.game_state
+
+    print(f"Transaction completed. Game state updated.")
+    print(f"Current game phase: {updated_state.phase}")
 ```
 
 ## Advanced Usage Examples
@@ -408,6 +432,63 @@ handler.on_event('transaction_proposed',
                 lambda tx: print(f"New proposal: {tx.transaction_id}"))
 handler.on_event('transaction_accepted',
                 lambda tx: print(f"Trade completed: {tx.transaction_id}"))
+```
+
+### GameState Integration
+
+```python
+class StatefulTransactionManager:
+    """Transaction manager that tracks GameState changes."""
+
+    def __init__(self, api: TransactionAPI):
+        self.api = api
+        self.state_history = []
+
+    def execute_transaction_with_state_tracking(self, transaction_id: str) -> bool:
+        """Execute transaction and track state changes."""
+        # Capture state before transaction
+        initial_state = self.api.get_game_state()
+        self.state_history.append(('before_transaction', initial_state))
+
+        # Execute transaction
+        result = self.api.accept_transaction(transaction_id)
+
+        if result.success:
+            # Capture state after transaction
+            final_state = self.api.get_game_state()
+            self.state_history.append(('after_transaction', final_state))
+
+            # Analyze changes
+            self._analyze_state_changes(initial_state, final_state)
+
+        return result.success
+
+    def _analyze_state_changes(self, before: "GameState", after: "GameState"):
+        """Analyze what changed between states."""
+        # Compare player resources, transaction history, etc.
+        print(f"State changed from {before.game_id} to {after.game_id}")
+        # Add specific analysis logic here
+
+    def get_current_state(self) -> "GameState":
+        """Get the current GameState."""
+        return self.api.get_game_state()
+
+    def rollback_to_previous_state(self):
+        """Example of how you might handle rollback scenarios."""
+        if len(self.state_history) >= 2:
+            previous_state = self.state_history[-2][1]
+            print(f"Would rollback to state: {previous_state.game_id}")
+            # Note: Actual rollback would require additional implementation
+
+# Usage
+manager = StatefulTransactionManager(api)
+
+# Execute transaction with state tracking
+success = manager.execute_transaction_with_state_tracking("tx_001")
+
+# Access current state
+current_state = manager.get_current_state()
+print(f"Current game phase: {current_state.phase}")
 ```
 
 ## Best Practices

@@ -657,6 +657,10 @@ class ResourceManager:
         Raises:
             ValueError: If validation fails or insufficient trade goods
         """
+        # Early return for zero amounts (no-op behavior)
+        if amount == 0:
+            return
+
         self._validate_transfer_inputs(from_player, to_player, amount)
 
         from_player_obj = self._find_player(from_player)
@@ -687,6 +691,10 @@ class ResourceManager:
         Raises:
             ValueError: If validation fails or insufficient commodities
         """
+        # Early return for zero amounts (no-op behavior)
+        if amount == 0:
+            return
+
         self._validate_transfer_inputs(from_player, to_player, amount)
 
         from_player_obj = self._find_player(from_player)
@@ -776,8 +784,8 @@ class ResourceManager:
             raise ValueError("To player ID cannot be empty")
         if from_player == to_player:
             raise ValueError("Cannot transfer to the same player")
-        if amount <= 0:
-            raise ValueError("Amount must be positive")
+        if amount < 0:
+            raise ValueError("Amount cannot be negative")
 
 
 # Custom exceptions for enhanced transaction management
@@ -816,11 +824,20 @@ class PlayerEliminationError(TransactionError):
 
 
 class TransactionRollbackError(TransactionError):
-    """Raised when transaction rollback fails."""
+    """Raised when transaction rollback fails.
 
-    def __init__(self, message: str, rollback_step: str):
+    This error includes context information to help diagnose rollback issues,
+    particularly the commodity rollback problem where commodities are converted
+    to trade goods during transfer but need to be restored as commodities
+    during rollback to preserve asset type distinctions.
+    """
+
+    def __init__(
+        self, message: str, rollback_step: str, context: dict[str, Any] | None = None
+    ):
         super().__init__(message)
         self.rollback_step = rollback_step
+        self.context = context or {}
 
 
 @dataclass
@@ -1029,100 +1046,6 @@ class PromissoryNoteExchangeHandler:
             raise ValueError("Cannot exchange promissory note with the same player")
         if note is None:
             raise ValueError("Promissory note cannot be None")
-
-
-class TransactionHistoryManager:
-    """Manages transaction history tracking for Rule 28 component deals.
-
-    Handles adding completed transactions to history, retrieving history for players,
-    and providing search and filtering capabilities.
-    """
-
-    def __init__(self, game_state: "GameState") -> None:
-        """Initialize with game state for transaction history tracking.
-
-        Args:
-            game_state: Game state for transaction history storage
-        """
-        self._game_state = game_state
-        self._transaction_history: list[TransactionHistoryEntry] = []
-
-    def add_transaction_to_history(self, transaction: ComponentTransaction) -> None:
-        """Add a completed transaction to history.
-
-        Args:
-            transaction: Completed transaction to add to history
-        """
-        history_entry = TransactionHistoryEntry(
-            transaction_id=transaction.transaction_id,
-            proposing_player=transaction.proposing_player,
-            target_player=transaction.target_player,
-            offer=transaction.offer,
-            request=transaction.request,
-            status=transaction.status,
-            timestamp=transaction.timestamp,
-            completion_timestamp=transaction.completion_timestamp,
-        )
-        self._transaction_history.append(history_entry)
-
-    def get_transaction_history(self, player_id: str) -> list[TransactionHistoryEntry]:
-        """Get transaction history for a specific player.
-
-        Args:
-            player_id: Player ID to get history for
-
-        Returns:
-            List of transaction history entries involving the player
-        """
-        history = []
-        for entry in self._transaction_history:
-            if entry.proposing_player == player_id or entry.target_player == player_id:
-                history.append(entry)
-        return history
-
-    def search_transactions_by_player(
-        self, player_id: str
-    ) -> list[TransactionHistoryEntry]:
-        """Search for transactions involving a specific player.
-
-        Args:
-            player_id: Player ID to search for
-
-        Returns:
-            List of transactions involving the player
-        """
-        return self.get_transaction_history(player_id)
-
-    def filter_transactions_by_status(
-        self, status: TransactionStatus
-    ) -> list[TransactionHistoryEntry]:
-        """Filter transactions by status.
-
-        Args:
-            status: Transaction status to filter by
-
-        Returns:
-            List of transactions with the specified status
-        """
-        return [entry for entry in self._transaction_history if entry.status == status]
-
-    def filter_transactions_by_time_range(
-        self, start_time: datetime, end_time: datetime
-    ) -> list[TransactionHistoryEntry]:
-        """Filter transactions by time range.
-
-        Args:
-            start_time: Start of time range
-            end_time: End of time range
-
-        Returns:
-            List of transactions within the time range
-        """
-        return [
-            entry
-            for entry in self._transaction_history
-            if start_time <= entry.timestamp <= end_time
-        ]
 
 
 class TransactionLogger:
@@ -1464,6 +1387,10 @@ class EnhancedTransactionManager:
         # Store transaction
         self._transactions[transaction_id] = transaction
 
+        # Sync with GameState (with backward compatibility)
+        if hasattr(self._game_state, "add_pending_transaction"):
+            self._game_state = self._game_state.add_pending_transaction(transaction)
+
         return transaction
 
     def accept_transaction(self, transaction_id: str) -> TransactionResult:
@@ -1490,10 +1417,7 @@ class EnhancedTransactionManager:
             )
 
         try:
-            # Execute resource transfers
-            self._execute_transaction(transaction)
-
-            # Update transaction status
+            # Build completed transaction before calling GameState method
             completed_transaction = ComponentTransaction(
                 transaction_id=transaction.transaction_id,
                 proposing_player=transaction.proposing_player,
@@ -1505,6 +1429,17 @@ class EnhancedTransactionManager:
                 completion_timestamp=datetime.now(),
             )
 
+            # Use GameState for transaction execution if available (Requirements: 5.2)
+            if hasattr(self._game_state, "apply_transaction_effects"):
+                # Delegate to GameState.apply_transaction_effects
+                self._game_state = self._game_state.apply_transaction_effects(
+                    completed_transaction
+                )
+            else:
+                # Fallback to direct resource manager calls for backward compatibility
+                self._execute_transaction(transaction)
+
+            # Update manager cache after successful GameState execution
             self._transactions[transaction_id] = completed_transaction
 
             return TransactionResult(success=True, transaction=completed_transaction)
@@ -1533,6 +1468,9 @@ class EnhancedTransactionManager:
         transaction = self._transactions[transaction_id]
         self._update_transaction_status(transaction, TransactionStatus.REJECTED)
 
+        # Remove from GameState pending_transactions
+        self._remove_from_gamestate_pending(transaction_id)
+
         # Return the updated transaction
         rejected_transaction = self._transactions[transaction_id]
         return TransactionResult(success=True, transaction=rejected_transaction)
@@ -1560,6 +1498,9 @@ class EnhancedTransactionManager:
             )
 
         self._update_transaction_status(transaction, TransactionStatus.CANCELLED)
+
+        # Remove from GameState pending_transactions
+        self._remove_from_gamestate_pending(transaction_id)
 
     def get_transaction(self, transaction_id: str) -> ComponentTransaction:
         """Get a transaction by ID.
@@ -1609,26 +1550,22 @@ class EnhancedTransactionManager:
         pending.sort(key=lambda t: t.timestamp)
         return pending
 
-    def get_transaction_history(self, player_id: str) -> list[ComponentTransaction]:
+    def get_transaction_history(self, player_id: str) -> list[TransactionHistoryEntry]:
         """Get completed transaction history for a player.
+
+        Delegates to GameState as the single source of truth for transaction history.
 
         Args:
             player_id: Player ID to get history for
 
         Returns:
-            List of completed transactions involving the player
+            List of completed transaction history entries involving the player
         """
+        # Delegate to GameState as single source of truth
         history = []
-        for transaction in self._transactions.values():
-            if transaction.status in [
-                TransactionStatus.ACCEPTED,
-                TransactionStatus.REJECTED,
-                TransactionStatus.CANCELLED,
-            ] and (
-                transaction.proposing_player == player_id
-                or transaction.target_player == player_id
-            ):
-                history.append(transaction)
+        for entry in self._game_state.transaction_history:
+            if entry.proposing_player == player_id or entry.target_player == player_id:
+                history.append(entry)
         return history
 
     def _execute_transaction(self, transaction: ComponentTransaction) -> None:
@@ -1708,6 +1645,22 @@ class EnhancedTransactionManager:
         )
 
         self._transactions[transaction.transaction_id] = updated_transaction
+
+    def _remove_from_gamestate_pending(self, transaction_id: str) -> None:
+        """Remove transaction from GameState pending_transactions using safe removal.
+
+        Args:
+            transaction_id: ID of the transaction to remove
+
+        Note:
+            Uses copy() and pop() with default for safe removal that doesn't fail
+            if the transaction doesn't exist in GameState (handles sync issues).
+        """
+        new_pending = self._game_state.pending_transactions.copy()
+        new_pending.pop(transaction_id, None)  # Safe removal with default
+        self._game_state = self._game_state._create_new_state(
+            pending_transactions=new_pending
+        )
 
     def _update_game_state_after_transaction(
         self, transaction: ComponentTransaction
@@ -1904,9 +1857,28 @@ class EnhancedTransactionManager:
                     error_message=f"Transaction execution failed and was rolled back: {str(e)}",
                 )
             except Exception as rollback_error:
+                context = {
+                    "rollback_step": "multiple_operations",
+                    "original_error": str(e),
+                    "rollback_error": str(rollback_error),
+                    "rollback_actions_attempted": len(rollback_actions),
+                }
+
+                # If the rollback error is a TransactionRollbackError, preserve its context
+                if isinstance(rollback_error, TransactionRollbackError):
+                    context.update(rollback_error.context)
+                    # Ensure asset_type is available at the top level for easy access
+                    if "asset_type" in rollback_error.context:
+                        context["asset_type"] = rollback_error.context["asset_type"]
+                    if "original_amount" in rollback_error.context:
+                        context["original_amount"] = rollback_error.context[
+                            "original_amount"
+                        ]
+
                 raise TransactionRollbackError(
                     f"Transaction execution failed and rollback also failed: {str(rollback_error)}",
                     rollback_step="multiple_operations",
+                    context=context,
                 ) from e
 
     def _perform_rollback(
@@ -1940,9 +1912,28 @@ class EnhancedTransactionManager:
                         from_player, to_player, amount_or_item
                     )
             except Exception as e:
+                # Create context information for rollback error
+                context = {
+                    "asset_type": action_type,
+                    "original_amount": amount_or_item,
+                    "from_player": from_player,
+                    "to_player": to_player,
+                    "rollback_step": action_type,
+                }
+
+                # Document the commodity rollback issue
+                if action_type == "commodities":
+                    context["rollback_issue"] = (
+                        "Commodity rollback converts to trade goods instead of preserving asset type"
+                    )
+                    context["expected_behavior"] = (
+                        "Should restore original commodities, not convert to trade goods"
+                    )
+
                 raise TransactionRollbackError(
                     f"Failed to rollback {action_type} transfer",
                     rollback_step=action_type,
+                    context=context,
                 ) from e
 
     def _cancel_transaction_internal(self, transaction_id: str, reason: str) -> None:
@@ -1975,6 +1966,7 @@ class TransactionAPIResult:
     transaction_id: Optional[str] = None
     transaction: Optional[ComponentTransaction] = None
     error_message: Optional[str] = None
+    game_state: Optional["GameState"] = None
 
 
 @dataclass
@@ -2039,7 +2031,7 @@ class TransactionAPI:
             raise ValueError("Player ID cannot be empty")
 
     def _convert_to_status_info(
-        self, transaction: ComponentTransaction
+        self, transaction: ComponentTransaction | TransactionHistoryEntry
     ) -> TransactionStatusInfo:
         """Convert ComponentTransaction to TransactionStatusInfo.
 
@@ -2221,3 +2213,17 @@ class TransactionAPI:
         except Exception:
             # Return empty list on any error for API consistency
             return []
+
+    def get_game_state(self) -> "GameState":
+        """Get the current GameState.
+
+        Returns the current GameState, which may have been updated by transaction operations.
+        This provides access to the updated state after operations complete.
+
+        Returns:
+            Current GameState instance
+
+        Requirements: 12.1, 12.3
+        """
+        # Return the current state from the transaction manager, which is kept synchronized
+        return self._transaction_manager._game_state

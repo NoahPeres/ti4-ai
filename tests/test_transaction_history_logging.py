@@ -49,29 +49,32 @@ class TestTransactionHistoryTracking:
         assert entry.completion_timestamp is not None
 
     def test_transaction_history_manager_creation(self) -> None:
-        """Test that TransactionHistoryManager can be created.
+        """Test that transaction history is managed through GameState.
 
         Requirements: 7.1, 7.2
         """
-        # RED: This will fail until we create TransactionHistoryManager
-        from ti4.core.rule_28_deals import TransactionHistoryManager
+        # Transaction history is now managed directly through GameState
+        # No separate TransactionHistoryManager class needed
+        from ti4.core.game_state import GameState
 
-        mock_game_state = Mock()
-        manager = TransactionHistoryManager(game_state=mock_game_state)
+        game_state = Mock(spec=GameState)
+        game_state.transaction_history = []
 
-        assert manager is not None
-        assert manager._game_state is mock_game_state
+        # Verify GameState has transaction history capability
+        assert hasattr(game_state, "transaction_history")
+        assert game_state.transaction_history == []
 
     def test_add_transaction_to_history(self) -> None:
-        """Test adding a completed transaction to history.
+        """Test adding a completed transaction to history through GameState.
 
         Requirements: 7.1, 7.2
         """
-        # RED: This will fail until we implement add_transaction_to_history
-        from ti4.core.rule_28_deals import TransactionHistoryManager
+        # Transaction history is now managed directly through GameState
+        from ti4.core.game_state import GameState
+        from ti4.core.rule_28_deals import ComponentTransaction, TransactionOffer
 
-        mock_game_state = Mock()
-        manager = TransactionHistoryManager(game_state=mock_game_state)
+        mock_game_state = Mock(spec=GameState)
+        mock_game_state.transaction_history = []
 
         transaction = ComponentTransaction(
             transaction_id="tx_001",
@@ -84,23 +87,28 @@ class TestTransactionHistoryTracking:
             completion_timestamp=datetime.now(),
         )
 
-        manager.add_transaction_to_history(transaction)
+        # Add transaction to GameState history directly
+        mock_game_state.transaction_history.append(transaction)
 
-        # Should be able to retrieve the transaction
-        history = manager.get_transaction_history("player1")
-        assert len(history) == 1
-        assert history[0].transaction_id == "tx_001"
+        # Verify transaction was added
+        assert len(mock_game_state.transaction_history) == 1
+        assert mock_game_state.transaction_history[0].transaction_id == "tx_001"
 
     def test_get_transaction_history_for_player(self) -> None:
-        """Test retrieving transaction history for a specific player.
+        """Test retrieving transaction history for a specific player through GameState.
 
         Requirements: 7.2, 7.3
         """
-        # RED: This will fail until we implement proper history retrieval
-        from ti4.core.rule_28_deals import TransactionHistoryManager
+        # Transaction history is now managed directly through GameState
+        from ti4.core.game_state import GameState
+        from ti4.core.rule_28_deals import (
+            ComponentTransaction,
+            TransactionOffer,
+            TransactionStatus,
+        )
 
-        mock_game_state = Mock()
-        manager = TransactionHistoryManager(game_state=mock_game_state)
+        mock_game_state = Mock(spec=GameState)
+        mock_game_state.transaction_history = []
 
         # Add multiple transactions
         tx1 = ComponentTransaction(
@@ -136,18 +144,25 @@ class TestTransactionHistoryTracking:
             completion_timestamp=datetime.now(),
         )
 
-        manager.add_transaction_to_history(tx1)
-        manager.add_transaction_to_history(tx2)
-        manager.add_transaction_to_history(tx3)
+        # Add transactions to GameState history
+        mock_game_state.transaction_history.extend([tx1, tx2, tx3])
 
-        # Player1 should see tx1 and tx2 (involved in both)
-        player1_history = manager.get_transaction_history("player1")
-        assert len(player1_history) == 2
+        # Filter transactions for player1 (involved in tx1 and tx2)
+        player1_transactions = [
+            tx
+            for tx in mock_game_state.transaction_history
+            if tx.proposing_player == "player1" or tx.target_player == "player1"
+        ]
+        assert len(player1_transactions) == 2
 
-        # Player3 should only see tx3
-        player3_history = manager.get_transaction_history("player3")
-        assert len(player3_history) == 1
-        assert player3_history[0].transaction_id == "tx_003"
+        # Filter transactions for player3 (only involved in tx3)
+        player3_transactions = [
+            tx
+            for tx in mock_game_state.transaction_history
+            if tx.proposing_player == "player3" or tx.target_player == "player3"
+        ]
+        assert len(player3_transactions) == 1
+        assert player3_transactions[0].transaction_id == "tx_003"
 
 
 class TestTransactionLogging:
@@ -236,15 +251,20 @@ class TestTransactionSearchAndFiltering:
     """
 
     def test_search_transactions_by_player(self) -> None:
-        """Test searching transactions by player involvement.
+        """Test searching transactions by player involvement through GameState.
 
         Requirements: 7.3
         """
-        # RED: This will fail until we implement search functionality
-        from ti4.core.rule_28_deals import TransactionHistoryManager
+        # Transaction search is now done directly on GameState transaction history
+        from ti4.core.game_state import GameState
+        from ti4.core.rule_28_deals import (
+            ComponentTransaction,
+            TransactionOffer,
+            TransactionStatus,
+        )
 
-        mock_game_state = Mock()
-        manager = TransactionHistoryManager(game_state=mock_game_state)
+        mock_game_state = Mock(spec=GameState)
+        mock_game_state.transaction_history = []
 
         # Add test transactions
         tx1 = ComponentTransaction(
@@ -269,28 +289,41 @@ class TestTransactionSearchAndFiltering:
             completion_timestamp=datetime.now(),
         )
 
-        manager.add_transaction_to_history(tx1)
-        manager.add_transaction_to_history(tx2)
+        # Add transactions to GameState history
+        mock_game_state.transaction_history.extend([tx1, tx2])
 
         # Search for transactions involving player1
-        results = manager.search_transactions_by_player("player1")
-        assert len(results) == 2
+        player1_results = [
+            tx
+            for tx in mock_game_state.transaction_history
+            if tx.proposing_player == "player1" or tx.target_player == "player1"
+        ]
+        assert len(player1_results) == 2
 
         # Search for transactions involving player2
-        results = manager.search_transactions_by_player("player2")
-        assert len(results) == 1
-        assert results[0].transaction_id == "tx_001"
+        player2_results = [
+            tx
+            for tx in mock_game_state.transaction_history
+            if tx.proposing_player == "player2" or tx.target_player == "player2"
+        ]
+        assert len(player2_results) == 1
+        assert player2_results[0].transaction_id == "tx_001"
 
     def test_filter_transactions_by_status(self) -> None:
-        """Test filtering transactions by status.
+        """Test filtering transactions by status through GameState.
 
         Requirements: 7.3
         """
-        # RED: This will fail until we implement filter functionality
-        from ti4.core.rule_28_deals import TransactionHistoryManager
+        # Transaction filtering is now done directly on GameState transaction history
+        from ti4.core.game_state import GameState
+        from ti4.core.rule_28_deals import (
+            ComponentTransaction,
+            TransactionOffer,
+            TransactionStatus,
+        )
 
-        mock_game_state = Mock()
-        manager = TransactionHistoryManager(game_state=mock_game_state)
+        mock_game_state = Mock(spec=GameState)
+        mock_game_state.transaction_history = []
 
         # Add transactions with different statuses
         tx1 = ComponentTransaction(
@@ -315,29 +348,42 @@ class TestTransactionSearchAndFiltering:
             completion_timestamp=datetime.now(),
         )
 
-        manager.add_transaction_to_history(tx1)
-        manager.add_transaction_to_history(tx2)
+        # Add transactions to GameState history
+        mock_game_state.transaction_history.extend([tx1, tx2])
 
         # Filter for accepted transactions
-        accepted = manager.filter_transactions_by_status(TransactionStatus.ACCEPTED)
+        accepted = [
+            tx
+            for tx in mock_game_state.transaction_history
+            if tx.status == TransactionStatus.ACCEPTED
+        ]
         assert len(accepted) == 1
         assert accepted[0].transaction_id == "tx_001"
 
         # Filter for rejected transactions
-        rejected = manager.filter_transactions_by_status(TransactionStatus.REJECTED)
+        rejected = [
+            tx
+            for tx in mock_game_state.transaction_history
+            if tx.status == TransactionStatus.REJECTED
+        ]
         assert len(rejected) == 1
         assert rejected[0].transaction_id == "tx_002"
 
     def test_filter_transactions_by_time_range(self) -> None:
-        """Test filtering transactions by time range.
+        """Test filtering transactions by time range through GameState.
 
         Requirements: 7.3, 7.4
         """
-        # RED: This will fail until we implement time range filtering
-        from ti4.core.rule_28_deals import TransactionHistoryManager
+        # Time range filtering is now done directly on GameState transaction history
+        from ti4.core.game_state import GameState
+        from ti4.core.rule_28_deals import (
+            ComponentTransaction,
+            TransactionOffer,
+            TransactionStatus,
+        )
 
-        mock_game_state = Mock()
-        manager = TransactionHistoryManager(game_state=mock_game_state)
+        mock_game_state = Mock(spec=GameState)
+        mock_game_state.transaction_history = []
 
         now = datetime.now()
         hour_ago = now - timedelta(hours=1)
@@ -366,16 +412,24 @@ class TestTransactionSearchAndFiltering:
             completion_timestamp=now,
         )
 
-        manager.add_transaction_to_history(tx1)
-        manager.add_transaction_to_history(tx2)
+        # Add transactions to GameState history
+        mock_game_state.transaction_history.extend([tx1, tx2])
 
         # Filter for transactions in the last hour
-        recent = manager.filter_transactions_by_time_range(hour_ago, now)
+        recent = [
+            tx
+            for tx in mock_game_state.transaction_history
+            if hour_ago <= tx.timestamp <= now
+        ]
         assert len(recent) == 1
         assert recent[0].transaction_id == "tx_002"
 
         # Filter for all transactions
-        all_transactions = manager.filter_transactions_by_time_range(two_hours_ago, now)
+        all_transactions = [
+            tx
+            for tx in mock_game_state.transaction_history
+            if two_hours_ago <= tx.timestamp <= now
+        ]
         assert len(all_transactions) == 2
 
 

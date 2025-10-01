@@ -170,12 +170,31 @@ class TestTradeGoodsTransfer:
             resource_manager.transfer_trade_goods("player1", "player1", 3)
 
         # Test negative amount
-        with pytest.raises(ValueError, match="Amount must be positive"):
+        with pytest.raises(ValueError, match="Amount cannot be negative"):
             resource_manager.transfer_trade_goods("player1", "player2", -1)
 
-        # Test zero amount
-        with pytest.raises(ValueError, match="Amount must be positive"):
-            resource_manager.transfer_trade_goods("player1", "player2", 0)
+    def test_transfer_trade_goods_zero_amount_noop(self) -> None:
+        """Test that zero amount trade goods transfer is a no-op.
+
+        Requirements: 4.1, 4.4
+        """
+        from ti4.core.rule_28_deals import ResourceManager
+
+        mock_game_state = Mock()
+        mock_player1 = Mock()
+        mock_player1.id = "player1"
+        mock_player2 = Mock()
+        mock_player2.id = "player2"
+        mock_game_state.players = [mock_player1, mock_player2]
+
+        resource_manager = ResourceManager(game_state=mock_game_state)
+
+        # Should not raise an exception and should not call any player methods
+        resource_manager.transfer_trade_goods("player1", "player2", 0)
+
+        # Verify no player methods were called (no-op behavior)
+        mock_player1.spend_trade_goods.assert_not_called()
+        mock_player2.gain_trade_goods.assert_not_called()
 
 
 class TestCommodityTransfer:
@@ -252,12 +271,30 @@ class TestCommodityTransfer:
             resource_manager.transfer_commodities("player1", "player1", 2)
 
         # Test negative amount
-        with pytest.raises(ValueError, match="Amount must be positive"):
+        with pytest.raises(ValueError, match="Amount cannot be negative"):
             resource_manager.transfer_commodities("player1", "player2", -1)
 
-        # Test zero amount
-        with pytest.raises(ValueError, match="Amount must be positive"):
-            resource_manager.transfer_commodities("player1", "player2", 0)
+    def test_transfer_commodities_zero_amount_noop(self) -> None:
+        """Test that zero amount commodity transfer is a no-op.
+
+        Requirements: 4.2, 4.4
+        """
+        from ti4.core.rule_28_deals import ResourceManager
+
+        mock_game_state = Mock()
+        mock_player1 = Mock()
+        mock_player1.id = "player1"
+        mock_player2 = Mock()
+        mock_player2.id = "player2"
+        mock_game_state.players = [mock_player1, mock_player2]
+
+        resource_manager = ResourceManager(game_state=mock_game_state)
+
+        # Should not raise an exception and should not call any player methods
+        resource_manager.transfer_commodities("player1", "player2", 0)
+
+        # Verify no player methods were called (no-op behavior)
+        mock_player1.give_commodities_to_player.assert_not_called()
 
 
 class TestPromissoryNoteTransfer:
@@ -414,9 +451,8 @@ class TestResourceManagerHelperMethods:
             resource_manager._validate_transfer_inputs("player1", "player1", 5)
 
         # Test negative amount
-        with pytest.raises(ValueError, match="Amount must be positive"):
+        with pytest.raises(ValueError, match="Amount cannot be negative"):
             resource_manager._validate_transfer_inputs("player1", "player2", -1)
 
-        # Test zero amount
-        with pytest.raises(ValueError, match="Amount must be positive"):
-            resource_manager._validate_transfer_inputs("player1", "player2", 0)
+        # Test zero amount - should now be allowed
+        resource_manager._validate_transfer_inputs("player1", "player2", 0)

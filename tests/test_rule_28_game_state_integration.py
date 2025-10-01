@@ -25,6 +25,56 @@ class TestGameStateTransactionTracking:
     Requirements: 8.1
     """
 
+    def test_duplicate_transaction_id_prevention(self) -> None:
+        """Test that duplicate transaction IDs are prevented.
+
+        Requirements: 1.1, 1.2, 1.3
+        """
+        # RED: This will fail until we implement duplicate ID validation
+        game_state = GameState()
+
+        transaction = ComponentTransaction(
+            transaction_id="tx_001",
+            proposing_player="player1",
+            target_player="player2",
+            offer=TransactionOffer(trade_goods=3),
+            request=TransactionOffer(commodities=2),
+            status=TransactionStatus.PENDING,
+            timestamp=datetime.now(),
+        )
+
+        # Add first transaction
+        new_state = game_state.add_pending_transaction(transaction)
+        assert new_state is not game_state  # Immutability check
+        assert len(new_state.pending_transactions) == 1
+
+        # Attempt to add duplicate transaction ID
+        duplicate_transaction = ComponentTransaction(
+            transaction_id="tx_001",  # Same ID
+            proposing_player="player2",
+            target_player="player3",
+            offer=TransactionOffer(trade_goods=1),
+            request=TransactionOffer(commodities=1),
+            status=TransactionStatus.PENDING,
+            timestamp=datetime.now(),
+        )
+
+        # Should raise ValueError with descriptive message including transaction ID
+        try:
+            new_state.add_pending_transaction(duplicate_transaction)
+            assert False, "Should have raised ValueError for duplicate transaction ID"
+        except ValueError as e:
+            error_message = str(e)
+            assert "tx_001" in error_message, (
+                f"Error message should include transaction ID: {error_message}"
+            )
+            assert "already exists" in error_message.lower(), (
+                f"Error message should indicate duplication: {error_message}"
+            )
+            assert "pending transaction" in error_message.lower(), (
+                f"Error message should specify pending transaction: {error_message}"
+            )
+
     def test_game_state_tracks_pending_transactions(self) -> None:
         """Test that game state can track pending transactions.
 

@@ -6,12 +6,16 @@ including custom exceptions, detailed error messages, edge cases, and rollback m
 Requirements: 2.2, 3.3, 4.3, 5.3
 """
 
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import pytest
 
 from ti4.core.rule_28_deals import (
+    PlayerEliminationError,
+    TransactionExecutionError,
+    TransactionRollbackError,
     TransactionStatus,
+    TransactionValidationError,
 )
 from ti4.core.transactions import TransactionOffer
 
@@ -40,8 +44,6 @@ class TestCustomExceptionClasses:
         Requirements: 3.3, 4.3
         """
         # RED: This will fail until we create TransactionExecutionError
-        from ti4.core.rule_28_deals import TransactionExecutionError
-
         context = {"transaction_id": "tx_001", "step": "resource_transfer"}
         error = TransactionExecutionError(
             "Failed to transfer trade goods", context=context
@@ -57,8 +59,6 @@ class TestCustomExceptionClasses:
         Requirements: 5.3
         """
         # RED: This will fail until we create PlayerEliminationError
-        from ti4.core.rule_28_deals import PlayerEliminationError
-
         error = PlayerEliminationError(
             "Player eliminated during pending transaction", player_id="player1"
         )
@@ -71,13 +71,34 @@ class TestCustomExceptionClasses:
         Requirements: 3.3, 4.3
         """
         # RED: This will fail until we create TransactionRollbackError
-        from ti4.core.rule_28_deals import TransactionRollbackError
-
         error = TransactionRollbackError(
             "Failed to rollback resource transfer", rollback_step="trade_goods"
         )
         assert str(error) == "Failed to rollback resource transfer"
         assert error.rollback_step == "trade_goods"
+
+    def test_transaction_rollback_error_with_context(self) -> None:
+        """Test TransactionRollbackError with context information.
+
+        Requirements: 6.2, 6.4
+        """
+        # RED: This will fail until we add context support
+        context = {
+            "asset_type": "commodities",
+            "original_amount": 3,
+            "player_id": "player1",
+            "transaction_id": "tx_001",
+        }
+        error = TransactionRollbackError(
+            "Failed to preserve commodity type during rollback",
+            rollback_step="commodities",
+            context=context,
+        )
+        assert str(error) == "Failed to preserve commodity type during rollback"
+        assert error.rollback_step == "commodities"
+        assert error.context == context
+        assert error.context["asset_type"] == "commodities"
+        assert error.context["original_amount"] == 3
 
 
 class TestDetailedErrorMessages:
@@ -105,7 +126,7 @@ class TestDetailedErrorMessages:
         validator = ComponentValidator(galaxy=mock_galaxy, game_state=mock_game_state)
 
         # Should provide detailed error with system information
-        with pytest.raises(Exception) as exc_info:
+        with pytest.raises(TransactionValidationError) as exc_info:
             validator.validate_neighbor_requirement_detailed("player1", "player2")
 
         error_msg = str(exc_info.value)
@@ -131,7 +152,7 @@ class TestDetailedErrorMessages:
         validator = ComponentValidator(galaxy=mock_galaxy, game_state=mock_game_state)
 
         # Should provide detailed error with current vs required amounts
-        with pytest.raises(Exception) as exc_info:
+        with pytest.raises(TransactionValidationError) as exc_info:
             validator.validate_trade_goods_availability_detailed("player1", 5)
 
         error_msg = str(exc_info.value)
@@ -213,10 +234,7 @@ class TestPlayerEliminationEdgeCases:
         Requirements: 5.3
         """
         # RED: This will fail until we implement elimination handling
-        from ti4.core.rule_28_deals import (
-            EnhancedTransactionManager,
-            TransactionExecutionError,
-        )
+        from ti4.core.rule_28_deals import EnhancedTransactionManager
 
         mock_galaxy = Mock()
         mock_game_state = self._create_mock_game_state_with_players(
@@ -361,10 +379,7 @@ class TestTransactionRollback:
         Requirements: 3.3, 4.3
         """
         # RED: This will fail until we implement rollback error handling
-        from ti4.core.rule_28_deals import (
-            EnhancedTransactionManager,
-            TransactionRollbackError,
-        )
+        from ti4.core.rule_28_deals import EnhancedTransactionManager
 
         mock_galaxy = Mock()
         mock_game_state = Mock()
@@ -535,3 +550,80 @@ class TestErrorRecoveryScenarios:
         # TODO: Implement error logging to make this test pass
         # For now, we just verify the test runs without crashing
         assert manager is not None
+
+    def test_commodity_rollback_preservation(self) -> None:
+        """Test that commodity rollback preserves asset types.
+
+        Requirements: 6.2, 6.4
+        """
+        # RED: This will fail until we implement proper asset type tracking
+        from ti4.core.faction_data import Faction
+        from ti4.core.galaxy import Galaxy
+        from ti4.core.game_state import GameState
+        from ti4.core.player import Player
+        from ti4.core.rule_28_deals import EnhancedTransactionManager
+        from ti4.core.system import System
+
+        # Create test setup with proper Player construction
+        player1 = Player(id="player1", faction=Faction.SOL)
+        player1.gain_trade_goods(5)
+        player1.add_commodities(3)
+
+        player2 = Player(id="player2", faction=Faction.HACAN)
+        player2.gain_trade_goods(2)
+        player2.add_commodities(1)
+
+        players = [player1, player2]
+
+        # Create simple galaxy with one system and place units to make players neighbors
+        from ti4.core.unit import Unit
+
+        system = System("test_system")
+        galaxy = Galaxy()
+        galaxy.register_system(system)
+
+        # Place units for both players in the same system to make them neighbors
+        unit1 = Unit(unit_type="fighter", owner="player1")
+        unit2 = Unit(unit_type="fighter", owner="player2")
+        system.place_unit_in_space(unit1)
+        system.place_unit_in_space(unit2)
+
+        game_state = GameState(players=players, galaxy=galaxy)
+
+        manager = EnhancedTransactionManager(galaxy, game_state)
+
+        # Propose transaction with commodities
+        from ti4.core.transactions import TransactionOffer
+
+        offer = TransactionOffer(commodities=2)
+        request = TransactionOffer(trade_goods=1)
+
+        transaction = manager.propose_transaction("player1", "player2", offer, request)
+
+        # Mock a failure during execution that requires rollback
+        with patch.object(
+            manager._resource_manager,
+            "transfer_trade_goods",
+            side_effect=Exception("Simulated failure"),
+        ):
+            # Should preserve original asset types during rollback
+            with pytest.raises(TransactionRollbackError) as exc_info:
+                manager.accept_transaction_with_rollback(transaction.transaction_id)
+
+            # Verify context includes asset type information
+            error = exc_info.value
+            assert "asset_type" in error.context
+            assert "original_amount" in error.context
+
+            # Verify player1 still has original commodities (not converted to trade goods)
+            # Access the game state directly from the manager
+            updated_state = manager._game_state
+            player1_updated = next(
+                p for p in updated_state.players if p.id == "player1"
+            )
+            assert (
+                player1_updated.get_commodities() == 3
+            )  # Should be restored as commodities
+            assert (
+                player1_updated.get_trade_goods() == 5
+            )  # Should not have extra trade goods from failed conversion
