@@ -455,7 +455,7 @@ def get_card_with_confirmation(self, technology: Technology) -> TechnologyCardPr
 
     return card
 
-# In specifications.py
+# In src/ti4/core/technology_cards/specifications.py
 def get_specification_with_confirmation(self, technology: Technology) -> TechnologySpecification:
     """Get specification with confirmation enforcement."""
     require_confirmation(technology, "specification")

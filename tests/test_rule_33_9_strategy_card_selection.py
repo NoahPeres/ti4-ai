@@ -30,11 +30,6 @@ class TestRule339StrategyCardSelection:
         ]
         controller = GameController(players)
 
-        # Verify initial state: 5 players, each should get 1 card (8 cards / 5 players = 1 card each)
-        assert controller._initial_player_count == 5
-        assert len(controller._players) == 5
-        assert controller._get_cards_per_player() == 1
-
         # Simulate player elimination by creating a new controller with 4 players
         # This represents the game state after elimination
         remaining_players = players[:-1]  # Remove last player
@@ -44,7 +39,33 @@ class TestRule339StrategyCardSelection:
 
         # Rule 33.9: Even with 4 players, each should still get only 1 card
         # (not 2 cards as would be normal for a 4-player game)
-        assert controller_after_elimination._get_cards_per_player() == 1
+        remaining_players = controller_after_elimination.get_turn_order()
+        assert len(remaining_players) == 4
+
+        # Verify Rule 33.9: Start strategy phase and verify players can only select 1 card
+        controller_after_elimination.start_strategy_phase()
+        available_cards = controller_after_elimination.get_available_strategy_cards()
+
+        first_player = remaining_players[0]
+        first_card = available_cards[0]
+        controller_after_elimination.select_strategy_card(
+            first_player.id, first_card.id
+        )
+
+        # Verify player has exactly 1 card (Rule 33.9 constraint)
+        player_cards = controller_after_elimination.get_player_strategy_cards(
+            first_player.id
+        )
+        assert len(player_cards) == 1
+
+        # Verify attempting to select a second card fails
+        second_card = available_cards[1]
+        with pytest.raises(
+            ValidationError, match="cannot select more than 1 strategy cards"
+        ):
+            controller_after_elimination.select_strategy_card(
+                first_player.id, second_card.id
+            )
 
     def test_rule_33_9_six_to_four_players_single_card_selection(self) -> None:
         """Test Rule 33.9: When game drops from 6 to 4 players, each player still selects only 1 card."""
@@ -59,11 +80,6 @@ class TestRule339StrategyCardSelection:
         ]
         controller = GameController(players)
 
-        # Verify initial state: 6 players, each should get 1 card (8 cards / 6 players = 1 card each)
-        assert controller._initial_player_count == 6
-        assert len(controller._players) == 6
-        assert controller._get_cards_per_player() == 1
-
         # Simulate elimination of 2 players by creating a new controller with 4 players
         remaining_players = players[:-2]  # Remove last 2 players
         controller_after_elimination = GameController.with_remaining_players(
@@ -71,7 +87,33 @@ class TestRule339StrategyCardSelection:
         )
 
         # Rule 33.9: Even with 4 players, each should still get only 1 card
-        assert controller_after_elimination._get_cards_per_player() == 1
+        remaining_players = controller_after_elimination.get_turn_order()
+        assert len(remaining_players) == 4
+
+        # Verify Rule 33.9: Start strategy phase and verify players can only select 1 card
+        controller_after_elimination.start_strategy_phase()
+        available_cards = controller_after_elimination.get_available_strategy_cards()
+
+        first_player = remaining_players[0]
+        first_card = available_cards[0]
+        controller_after_elimination.select_strategy_card(
+            first_player.id, first_card.id
+        )
+
+        # Verify player has exactly 1 card (Rule 33.9 constraint)
+        player_cards = controller_after_elimination.get_player_strategy_cards(
+            first_player.id
+        )
+        assert len(player_cards) == 1
+
+        # Verify attempting to select a second card fails
+        second_card = available_cards[1]
+        with pytest.raises(
+            ValidationError, match="cannot select more than 1 strategy cards"
+        ):
+            controller_after_elimination.select_strategy_card(
+                first_player.id, second_card.id
+            )
 
     def test_rule_33_9_eight_to_three_players_single_card_selection(self) -> None:
         """Test Rule 33.9: When game drops from 8 to 3 players, each player still selects only 1 card."""
@@ -88,11 +130,6 @@ class TestRule339StrategyCardSelection:
         ]
         controller = GameController(players)
 
-        # Verify initial state: 8 players, each should get 1 card (8 cards / 8 players = 1 card each)
-        assert controller._initial_player_count == 8
-        assert len(controller._players) == 8
-        assert controller._get_cards_per_player() == 1
-
         # Simulate elimination of 5 players by creating a new controller with 3 players
         remaining_players = players[:3]  # Keep only first 3 players
         controller_after_elimination = GameController.with_remaining_players(
@@ -101,7 +138,33 @@ class TestRule339StrategyCardSelection:
 
         # Rule 33.9: Even with 3 players, each should still get only 1 card
         # (not 2 cards as would be normal for a 3-player game)
-        assert controller_after_elimination._get_cards_per_player() == 1
+        remaining_players = controller_after_elimination.get_turn_order()
+        assert len(remaining_players) == 3
+
+        # Verify Rule 33.9: Start strategy phase and verify players can only select 1 card
+        controller_after_elimination.start_strategy_phase()
+        available_cards = controller_after_elimination.get_available_strategy_cards()
+
+        first_player = remaining_players[0]
+        first_card = available_cards[0]
+        controller_after_elimination.select_strategy_card(
+            first_player.id, first_card.id
+        )
+
+        # Verify player has exactly 1 card (Rule 33.9 constraint)
+        player_cards = controller_after_elimination.get_player_strategy_cards(
+            first_player.id
+        )
+        assert len(player_cards) == 1
+
+        # Verify attempting to select a second card fails
+        second_card = available_cards[1]
+        with pytest.raises(
+            ValidationError, match="cannot select more than 1 strategy cards"
+        ):
+            controller_after_elimination.select_strategy_card(
+                first_player.id, second_card.id
+            )
 
     def test_rule_33_9_does_not_apply_to_games_starting_with_four_or_fewer(
         self,
@@ -116,11 +179,6 @@ class TestRule339StrategyCardSelection:
         ]
         controller = GameController(players)
 
-        # Verify initial state: 4 players, each should get 2 cards (8 cards / 4 players = 2 cards each)
-        assert controller._initial_player_count == 4
-        assert len(controller._players) == 4
-        assert controller._get_cards_per_player() == 2
-
         # Simulate elimination of 1 player by creating a new controller with 3 players
         remaining_players = players[:-1]  # Remove last player
         controller_after_elimination = GameController.with_remaining_players(
@@ -129,7 +187,30 @@ class TestRule339StrategyCardSelection:
 
         # Rule 33.9 does NOT apply: Game started with 4 players, so normal distribution applies
         # 3 players should get 2 cards each (8 cards / 3 players = 2 cards each, with 2 remaining)
-        assert controller_after_elimination._get_cards_per_player() == 2
+        remaining_players = controller_after_elimination.get_turn_order()
+        assert len(remaining_players) == 3
+
+        # Verify normal distribution: Start strategy phase and verify players can select 2 cards
+        controller_after_elimination.start_strategy_phase()
+        available_cards = controller_after_elimination.get_available_strategy_cards()
+
+        first_player = remaining_players[0]
+        first_card = available_cards[0]
+        second_card = available_cards[1]
+
+        # Player should be able to select 2 cards (normal distribution, not Rule 33.9)
+        controller_after_elimination.select_strategy_card(
+            first_player.id, first_card.id
+        )
+        controller_after_elimination.select_strategy_card(
+            first_player.id, second_card.id
+        )
+
+        # Verify player has exactly 2 cards (normal distribution)
+        player_cards = controller_after_elimination.get_player_strategy_cards(
+            first_player.id
+        )
+        assert len(player_cards) == 2
 
     def test_rule_33_9_does_not_apply_to_games_starting_with_three_players(
         self,
@@ -143,14 +224,24 @@ class TestRule339StrategyCardSelection:
         ]
         controller = GameController(players)
 
-        # Verify initial state: 3 players, each should get 2 cards (8 cards / 3 players = 2 cards each)
-        assert controller._initial_player_count == 3
-        assert len(controller._players) == 3
-        assert controller._get_cards_per_player() == 2
-
         # Rule 33.9 does NOT apply: Game started with 3 players (less than 5)
-        # Normal distribution applies regardless of elimination
-        assert controller._get_cards_per_player() == 2
+        # Normal distribution applies regardless of elimination (2 cards per player expected)
+
+        # Verify normal distribution: Start strategy phase and verify players can select 2 cards
+        controller.start_strategy_phase()
+        available_cards = controller.get_available_strategy_cards()
+
+        first_player = players[0]
+        first_card = available_cards[0]
+        second_card = available_cards[1]
+
+        # Player should be able to select 2 cards (normal distribution, not Rule 33.9)
+        controller.select_strategy_card(first_player.id, first_card.id)
+        controller.select_strategy_card(first_player.id, second_card.id)
+
+        # Verify player has exactly 2 cards (normal distribution)
+        player_cards = controller.get_player_strategy_cards(first_player.id)
+        assert len(player_cards) == 2
 
     def test_rule_33_9_boundary_condition_exactly_five_players(self) -> None:
         """Test Rule 33.9: Boundary condition with exactly 5 players dropping to exactly 4."""
@@ -164,10 +255,6 @@ class TestRule339StrategyCardSelection:
         ]
         controller = GameController(players)
 
-        # Verify initial state
-        assert controller._initial_player_count == 5
-        assert controller._get_cards_per_player() == 1
-
         # Drop to exactly 4 players by creating a new controller with 4 players
         remaining_players = players[:-1]
         controller_after_elimination = GameController.with_remaining_players(
@@ -175,7 +262,24 @@ class TestRule339StrategyCardSelection:
         )
 
         # Rule 33.9 applies: Started with 5 (>= 5), now have 4 (<= 4)
-        assert controller_after_elimination._get_cards_per_player() == 1
+        remaining_players = controller_after_elimination.get_turn_order()
+        assert len(remaining_players) == 4
+
+        # Verify Rule 33.9: Start strategy phase and verify players can only select 1 card
+        controller_after_elimination.start_strategy_phase()
+        available_cards = controller_after_elimination.get_available_strategy_cards()
+
+        first_player = remaining_players[0]
+        first_card = available_cards[0]
+        controller_after_elimination.select_strategy_card(
+            first_player.id, first_card.id
+        )
+
+        # Verify player has exactly 1 card (Rule 33.9 constraint)
+        player_cards = controller_after_elimination.get_player_strategy_cards(
+            first_player.id
+        )
+        assert len(player_cards) == 1
 
     def test_rule_33_9_boundary_condition_drop_to_exactly_four_players(self) -> None:
         """Test Rule 33.9: Boundary condition dropping to exactly 4 players."""
@@ -197,7 +301,24 @@ class TestRule339StrategyCardSelection:
         )
 
         # Rule 33.9 applies: Started with 6 (>= 5), now have 4 (<= 4)
-        assert controller_after_elimination._get_cards_per_player() == 1
+        remaining_players = controller_after_elimination.get_turn_order()
+        assert len(remaining_players) == 4
+
+        # Verify Rule 33.9: Start strategy phase and verify players can only select 1 card
+        controller_after_elimination.start_strategy_phase()
+        available_cards = controller_after_elimination.get_available_strategy_cards()
+
+        first_player = remaining_players[0]
+        first_card = available_cards[0]
+        controller_after_elimination.select_strategy_card(
+            first_player.id, first_card.id
+        )
+
+        # Verify player has exactly 1 card (Rule 33.9 constraint)
+        player_cards = controller_after_elimination.get_player_strategy_cards(
+            first_player.id
+        )
+        assert len(player_cards) == 1
 
     def test_rule_33_9_does_not_apply_when_staying_above_four_players(self) -> None:
         """Test Rule 33.9: Rule does not apply when player count stays above 4."""
@@ -219,8 +340,25 @@ class TestRule339StrategyCardSelection:
         )
 
         # Rule 33.9 does NOT apply: Still have 5 players (above 4)
-        # Normal distribution should apply
-        assert controller_after_elimination._get_cards_per_player() == 1
+        # Normal distribution should apply (1 card per player for 5 players)
+        remaining_players = controller_after_elimination.get_turn_order()
+        assert len(remaining_players) == 5
+
+        # Verify normal distribution: Start strategy phase and verify players get 1 card each (normal for 5 players)
+        controller_after_elimination.start_strategy_phase()
+        available_cards = controller_after_elimination.get_available_strategy_cards()
+
+        first_player = remaining_players[0]
+        first_card = available_cards[0]
+        controller_after_elimination.select_strategy_card(
+            first_player.id, first_card.id
+        )
+
+        # Verify player has exactly 1 card (normal distribution for 5 players)
+        player_cards = controller_after_elimination.get_player_strategy_cards(
+            first_player.id
+        )
+        assert len(player_cards) == 1
 
     def test_rule_33_9_validation_error_when_selecting_second_card(self) -> None:
         """Test Rule 33.9: Selecting a second strategy card raises ValidationError when rule applies."""

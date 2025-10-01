@@ -204,6 +204,25 @@ class Player:
         self._remove_commodities(amount)
         self.gain_trade_goods(amount)
 
+    def spend_commodities(self, amount: int) -> bool:
+        """Spend commodities for transactions or game effects.
+
+        Args:
+            amount: Number of commodities to spend
+
+        Returns:
+            True if successful, False if insufficient commodities
+        """
+        if amount < 0:
+            raise ValueError("Cannot spend negative commodities")
+        if amount == 0:
+            return True
+        if self._commodity_count < amount:
+            return False
+
+        self._remove_commodities(amount)
+        return True
+
     def _remove_commodities(self, amount: int) -> None:
         """Helper method to remove commodities (DRY principle)."""
         if amount < 0:

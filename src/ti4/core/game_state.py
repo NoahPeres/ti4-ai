@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import uuid
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
@@ -15,17 +16,22 @@ if TYPE_CHECKING:
     from .objective import Objective
     from .planet import Planet
     from .planet_card import PlanetCard
+    from .rule_28_deals import ComponentTransaction, TransactionHistoryEntry
     from .strategic_action import StrategyCardType
     from .strategy_cards.coordinator import StrategyCardCoordinator
     from .system import System
     from .technology import TechnologyCard
+    from .transactions import TransactionOffer
 else:
+    ComponentTransaction = "ComponentTransaction"
     Galaxy = "Galaxy"
     Objective = "Objective"
     PlanetCard = "PlanetCard"
     StrategyCardType = "StrategyCardType"
     StrategyCardCoordinator = "StrategyCardCoordinator"
     TechnologyCard = "TechnologyCard"
+    TransactionHistoryEntry = "TransactionHistoryEntry"
+    TransactionOffer = "TransactionOffer"
 
 
 # Victory condition constants
@@ -124,6 +130,21 @@ class GameState:
     speaker_id: str | None = field(
         default=None, hash=False
     )  # Current speaker player ID
+
+    # Transaction history system (Rule 28)
+    transaction_history: list[Any] = field(
+        default_factory=list, hash=False
+    )  # Transaction history for Rule 28 deals
+
+    # Pending transactions system (Rule 28)
+    pending_transactions: dict[str, Any] = field(
+        default_factory=dict, hash=False
+    )  # transaction_id -> ComponentTransaction for pending transactions
+
+    # Transaction observers for notifications (Rule 28)
+    _transaction_observers: list[Any] = field(
+        default_factory=list, hash=False, init=False
+    )  # Observers for transaction notifications
 
     def __post_init__(self) -> None:
         """Validate game state invariants after initialization."""
@@ -384,6 +405,14 @@ class GameState:
             ),
             # Speaker token system
             speaker_id=kwargs.get("speaker_id", self.speaker_id),
+            # Transaction history system
+            transaction_history=kwargs.get(
+                "transaction_history", self.transaction_history
+            ),
+            # Pending transactions system
+            pending_transactions=kwargs.get(
+                "pending_transactions", self.pending_transactions
+            ),
         )
 
         # Ensure every planet card now points at this cloned state for token bookkeeping.
@@ -404,6 +433,11 @@ class GameState:
             cloned_player_planet_cards[player_id] = cloned_cards
         # Use object.__setattr__ to bypass frozen dataclass restriction
         object.__setattr__(new_state, "player_planet_cards", cloned_player_planet_cards)
+
+        # Copy transaction observers to new state
+        object.__setattr__(
+            new_state, "_transaction_observers", self._transaction_observers.copy()
+        )
 
         return new_state
 
@@ -698,6 +732,352 @@ class GameState:
 
         return False
 
+    # Transaction Integration Methods (Rule 28)
+
+    def add_pending_transaction(self, transaction: ComponentTransaction) -> GameState:
+        """Add a pending transaction to the game state.
+
+        Args:
+            transaction: ComponentTransaction to add
+
+        Returns:
+            New GameState with the pending transaction added
+
+        Raises:
+            ValueError: If a pending transaction with the same ID already exists
+
+        Requirements: 8.1, 1.1, 1.2, 1.3
+        """
+        new_pending = self.pending_transactions.copy()
+        if transaction.transaction_id in new_pending:
+            raise ValueError(
+                f"Pending transaction {transaction.transaction_id} already exists"
+            )
+        new_pending[transaction.transaction_id] = transaction
+        return self._create_new_state(pending_transactions=new_pending)
+
+    def complete_transaction(self, transaction: ComponentTransaction) -> GameState:
+        """Complete a transaction, moving it from pending to history.
+
+        Args:
+            transaction: Completed ComponentTransaction
+
+        Returns:
+            New GameState with transaction completed
+
+        Requirements: 8.1
+        """
+        # Remove from pending transactions
+        new_pending = self.pending_transactions.copy()
+        if transaction.transaction_id in new_pending:
+            del new_pending[transaction.transaction_id]
+
+        # Add to transaction history
+        new_history = self.transaction_history.copy()
+        from .rule_28_deals import TransactionHistoryEntry
+
+        history_entry = TransactionHistoryEntry(
+            transaction_id=transaction.transaction_id,
+            proposing_player=transaction.proposing_player,
+            target_player=transaction.target_player,
+            offer=transaction.offer,
+            request=transaction.request,
+            status=transaction.status,
+            timestamp=transaction.timestamp,
+            completion_timestamp=transaction.completion_timestamp,
+        )
+        new_history.append(history_entry)
+
+        return self._create_new_state(
+            pending_transactions=new_pending, transaction_history=new_history
+        )
+
+    def apply_transaction_effects(self, transaction: ComponentTransaction) -> GameState:
+        """Apply the effects of a completed transaction to the game state.
+
+        This method implements atomic transaction operations by applying all effects
+        and validation BEFORE committing the transaction to history.
+
+        Args:
+            transaction: Completed ComponentTransaction
+
+        Returns:
+            New GameState with transaction effects applied
+
+        Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 8.2, 8.3, 8.4, 8.5
+        """
+        # ATOMIC OPERATION ORDER (Requirements: 2.1, 2.2, 2.3):
+        # 1. Apply resource effects first
+        # 2. Apply promissory note effects
+        # 3. Validate resulting state
+        # 4. ONLY THEN commit to history
+
+        # Step 1: Apply resource effects (Requirements: 2.1)
+        new_state = self._apply_resource_effects(transaction)
+
+        # Step 2: Apply promissory note effects (Requirements: 2.2)
+        new_state = new_state._apply_promissory_note_effects(transaction)
+
+        # Step 3: Validate consistency (Requirements: 2.3)
+        if not new_state.is_valid():
+            raise ValueError("Transaction effects resulted in invalid game state")
+
+        # Step 4: ONLY NOW commit to history (Requirements: 2.4, 2.5)
+        # If we reach this point, all effects succeeded and validation passed
+        new_state = new_state.complete_transaction(transaction)
+
+        # Notify observers after successful completion
+        new_state._notify_transaction_observers(transaction)
+
+        return new_state
+
+    def apply_concurrent_transaction_effects(
+        self, transactions: list[Any]
+    ) -> GameState:
+        """Apply effects of multiple concurrent transactions.
+
+        Args:
+            transactions: List of completed ComponentTransactions
+
+        Returns:
+            New GameState with all transaction effects applied
+
+        Requirements: 8.5
+        """
+        current_state = self
+
+        # Apply transactions in order
+        for transaction in transactions:
+            current_state = current_state.apply_transaction_effects(transaction)
+
+        return current_state
+
+    def register_transaction_observer(self, observer: Any) -> None:
+        """Register an observer for transaction notifications.
+
+        Args:
+            observer: Object with on_transaction_completed method
+
+        Requirements: 8.4
+        """
+        if observer not in self._transaction_observers:
+            self._transaction_observers.append(observer)
+
+    def _apply_resource_effects(self, transaction: ComponentTransaction) -> GameState:
+        """Apply resource transfer effects of a transaction.
+
+        Args:
+            transaction: ComponentTransaction to apply
+
+        Returns:
+            New GameState with resource effects applied
+
+        Requirements: 3.1, 3.4, 8.2
+        """
+
+        # Create new players list with updated resources
+        new_players = []
+
+        for player in self.players:
+            if player.id == transaction.proposing_player:
+                # Proposing player: lose offer, gain request
+                # Use deep copy to avoid mutating the original player (Requirements: 3.1, 3.4)
+                updated_player = copy.deepcopy(player)
+
+                # Apply the offer (what proposing player gives)
+                self._apply_transaction_offer(
+                    updated_player, transaction.offer, player.id
+                )
+
+                # Apply the request (what proposing player receives)
+                self._apply_transaction_receipt(updated_player, transaction.request)
+
+                new_players.append(updated_player)
+
+            elif player.id == transaction.target_player:
+                # Target player: gain offer, lose request
+                # Use deep copy to avoid mutating the original player (Requirements: 3.1, 3.4)
+                updated_player = copy.deepcopy(player)
+
+                # Apply the request (what target player gives)
+                self._apply_transaction_offer(
+                    updated_player, transaction.request, player.id
+                )
+
+                # Apply the offer (what target player receives)
+                self._apply_transaction_receipt(updated_player, transaction.offer)
+
+                new_players.append(updated_player)
+            else:
+                # Other players unchanged
+                new_players.append(player)
+
+        return self._create_new_state(players=new_players)
+
+    def _apply_transaction_offer(
+        self,
+        giving_player: Player,
+        offer: TransactionOffer,
+        giving_player_id: str,
+    ) -> None:
+        """Apply the effects of a transaction offer.
+
+        Args:
+            giving_player: Player giving the resources
+            offer: TransactionOffer with resources to transfer
+            giving_player_id: ID of the giving player (for error messages)
+
+        Raises:
+            ValueError: If the giving player has insufficient trade goods when offer.trade_goods > 0
+            ValueError: If the giving player has insufficient commodities when offer.commodities > 0
+        """
+        # Apply trade goods transfer
+        if offer.trade_goods > 0:
+            if not giving_player.spend_trade_goods(offer.trade_goods):
+                raise ValueError(
+                    f"Player {giving_player_id} has insufficient trade goods"
+                )
+
+        # Apply commodities transfer
+        if offer.commodities > 0:
+            if not giving_player.spend_commodities(offer.commodities):
+                raise ValueError(
+                    f"Player {giving_player_id} has insufficient commodities"
+                )
+
+    def _apply_transaction_receipt(
+        self, receiving_player: Player, offer: TransactionOffer
+    ) -> None:
+        """Apply the effects of receiving resources from a transaction.
+
+        Args:
+            receiving_player: Player receiving the resources
+            offer: TransactionOffer with resources to receive
+        """
+        # Receive trade goods
+        if offer.trade_goods > 0:
+            receiving_player.gain_trade_goods(offer.trade_goods)
+
+        # Receive commodities (converted to trade goods per Rule 21.5)
+        if offer.commodities > 0:
+            receiving_player.gain_trade_goods(offer.commodities)
+
+    def _apply_promissory_note_effects(
+        self, transaction: ComponentTransaction
+    ) -> GameState:
+        """Apply promissory note transfer effects of a transaction.
+
+        Args:
+            transaction: ComponentTransaction to apply
+
+        Returns:
+            New GameState with promissory note effects applied
+
+        Requirements: 3.2, 3.3, 3.4, 8.2
+        """
+        # Create a new promissory note manager with proper cloning (Requirements: 3.2, 3.3, 3.4)
+        new_promissory_manager = self._clone_promissory_note_manager()
+
+        # Transfer promissory notes from offer (proposing player to target player)
+        for note in transaction.offer.promissory_notes:
+            # Remove from proposing player
+            proposing_hand = new_promissory_manager.get_player_hand(
+                transaction.proposing_player
+            )
+            if note not in proposing_hand:
+                raise ValueError(
+                    f"Player {transaction.proposing_player} does not own promissory note"
+                )
+            proposing_hand.remove(note)
+
+            # Add to target player
+            new_promissory_manager.add_note_to_hand(note, transaction.target_player)
+
+        # Transfer promissory notes from request (target player to proposing player)
+        for note in transaction.request.promissory_notes:
+            # Remove from target player
+            target_hand = new_promissory_manager.get_player_hand(
+                transaction.target_player
+            )
+            if note not in target_hand:
+                raise ValueError(
+                    f"Player {transaction.target_player} does not own promissory note"
+                )
+            target_hand.remove(note)
+
+            # Add to proposing player
+            new_promissory_manager.add_note_to_hand(note, transaction.proposing_player)
+
+        return self._create_new_state(promissory_note_manager=new_promissory_manager)
+
+    def _clone_promissory_note_manager(self) -> PromissoryNoteManager:
+        """Create a proper clone of the PromissoryNoteManager preserving both player hands and available notes.
+
+        Returns:
+            New PromissoryNoteManager with complete state preservation
+
+        Requirements: 3.2, 3.3, 3.4
+        """
+        from .promissory_notes import PromissoryNoteManager
+
+        new_manager = PromissoryNoteManager()
+
+        # Copy player hands (Requirements: 3.2, 3.3)
+        new_manager._player_hands = {
+            player_id: hand.copy()
+            for player_id, hand in self.promissory_note_manager._player_hands.items()
+        }
+
+        # Copy available notes (Requirements: 3.2, 3.3)
+        new_manager._available_notes = (
+            self.promissory_note_manager._available_notes.copy()
+        )
+
+        return new_manager
+
+    def _notify_transaction_observers(self, transaction: ComponentTransaction) -> None:
+        """Notify all registered observers of a completed transaction.
+
+        Args:
+            transaction: Completed ComponentTransaction
+
+        Requirements: 9.1, 9.2, 9.3, 9.4
+        """
+        for observer in self._transaction_observers:
+            if hasattr(observer, "on_transaction_completed"):
+                try:
+                    observer.on_transaction_completed(transaction)
+                except Exception as e:
+                    # Continue with remaining observers if one fails
+                    # Log the error for debugging purposes
+                    import logging
+
+                    logging.warning(
+                        f"Transaction observer failed: {e}. Continuing with remaining observers."
+                    )
+
+    def is_fleet_supply_consistent(self) -> bool:
+        """Check if fleet supply is consistent after transactions.
+
+        Returns:
+            True if fleet supply is consistent
+
+        Requirements: 8.3
+        """
+        # Placeholder implementation - actual fleet supply validation would go here
+        return True
+
+    def is_production_system_consistent(self) -> bool:
+        """Check if production system is consistent after transactions.
+
+        Returns:
+            True if production system is consistent
+
+        Requirements: 8.3
+        """
+        # Placeholder implementation - actual production system validation would go here
+        return True
+
     # Secret Objective Deck Management
 
     def get_secret_objective_deck_size(self) -> int:
@@ -707,6 +1087,21 @@ class GameState:
             The number of secret objectives in the deck
         """
         return len(self.secret_objective_deck)
+
+    def add_transaction_to_history(
+        self, transaction_entry: TransactionHistoryEntry
+    ) -> GameState:
+        """Add a transaction entry to the transaction history.
+
+        Args:
+            transaction_entry: Transaction history entry to add
+
+        Returns:
+            New GameState with the transaction added to history
+        """
+        new_transaction_history = self.transaction_history.copy()
+        new_transaction_history.append(transaction_entry)
+        return self._create_new_state(transaction_history=new_transaction_history)
 
     def shuffle_secret_objective_deck(self) -> GameState:
         """Shuffle the secret objective deck.

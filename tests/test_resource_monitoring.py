@@ -21,9 +21,15 @@ class TestResourceMonitor:
     def test_monitor_initialization(self) -> None:
         """Test that monitor initializes correctly."""
         monitor = ResourceMonitor()
-        assert monitor._peak_memory == 0.0
-        assert len(monitor._metrics_history) == 0
-        assert len(monitor._operation_times) == 0
+        # Test behavior instead of private attributes
+        assert monitor.get_current_memory_usage() >= 0.0
+        # Verify initial state through public interface
+        metrics_history = monitor.get_metrics_history()
+        assert isinstance(metrics_history, list)
+        assert len(metrics_history) == 0  # No metrics collected yet
+
+        # Test uptime is reasonable
+        assert monitor.get_uptime() >= 0.0
 
     def test_memory_usage_tracking(self) -> None:
         """Test memory usage tracking."""
@@ -39,7 +45,9 @@ class TestResourceMonitor:
 
             memory_usage = monitor.get_current_memory_usage()
             assert memory_usage == 100.0  # Should be 100 MB
-            assert monitor._peak_memory == 100.0
+            # Peak memory should be tracked internally and reflected in metrics
+            metrics = monitor.collect_metrics()
+            assert metrics.peak_memory_mb == 100.0
 
     def test_cpu_usage_tracking(self) -> None:
         """Test CPU usage tracking."""
@@ -101,9 +109,13 @@ class TestResourceMonitor:
 
         monitor.cleanup_resources()
 
-        # Should be reduced to 100 or fewer
-        assert len(monitor._metrics_history) <= 100
-        assert len(monitor._operation_times["test_op"]) <= 100
+        # Should be reduced to 100 or fewer - test through public interface
+        metrics_history = monitor.get_metrics_history()
+        assert len(metrics_history) <= 100
+
+        # Test operation stats to verify cleanup
+        operation_stats = monitor.get_operation_stats("test_op")
+        assert operation_stats["count"] <= 100
 
 
 class TestGameStateResourceManager:
@@ -112,8 +124,10 @@ class TestGameStateResourceManager:
     def test_manager_initialization(self) -> None:
         """Test that manager initializes correctly."""
         manager = GameStateResourceManager(max_states=50)
-        assert manager._max_states == 50
-        assert len(manager._game_states) == 0
+        # Test behavior instead of private attributes
+        stats = manager.get_resource_stats()
+        assert stats["max_states"] == 50
+        assert stats["managed_states"] == 0
 
     def test_game_state_registration(self) -> None:
         """Test game state registration."""
@@ -122,9 +136,13 @@ class TestGameStateResourceManager:
 
         manager.register_game_state("test_game", game_state)
 
-        assert "test_game" in manager._game_states
-        assert "test_game" in manager._access_times
-        assert manager._game_states["test_game"] == game_state
+        # Test through public interface
+        retrieved_state = manager.access_game_state("test_game")
+        assert retrieved_state is not None
+        assert retrieved_state == game_state
+
+        stats = manager.get_resource_stats()
+        assert stats["managed_states"] == 1
 
     def test_game_state_access(self) -> None:
         """Test game state access and time tracking."""
@@ -151,8 +169,12 @@ class TestGameStateResourceManager:
         manager.register_game_state("test_game", game_state)
         manager.remove_game_state("test_game")
 
-        assert "test_game" not in manager._game_states
-        assert "test_game" not in manager._access_times
+        # Test through public interface
+        retrieved_state = manager.access_game_state("test_game")
+        assert retrieved_state is None
+
+        stats = manager.get_resource_stats()
+        assert stats["managed_states"] == 0
 
     def test_automatic_cleanup(self) -> None:
         """Test automatic cleanup when max states exceeded."""
@@ -165,7 +187,8 @@ class TestGameStateResourceManager:
             time.sleep(0.01)  # Ensure different access times
 
         # Should have cleaned up to be within limits
-        assert len(manager._game_states) <= manager._max_states
+        stats = manager.get_resource_stats()
+        assert stats["managed_states"] <= stats["max_states"]
 
     def test_resource_stats(self) -> None:
         """Test resource statistics collection."""
@@ -199,8 +222,8 @@ class TestGameStateResourceManager:
         manager.cleanup_resources()
 
         # Old game should be removed, new game should remain
-        assert "old_game" not in manager._game_states
-        assert "new_game" in manager._game_states
+        assert manager.access_game_state("old_game") is None
+        assert manager.access_game_state("new_game") is not None
 
 
 class TestGlobalResourceManager:
