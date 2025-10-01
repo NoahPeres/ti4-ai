@@ -670,6 +670,15 @@ class FleetTransportManager:
             if not units_remaining:
                 break
 
+        if units_remaining:
+            total_capacity = fleet.get_total_capacity()
+            raise TransportCapacityError(
+                f"Cannot distribute {len(units)} units across fleet capacity {total_capacity}",
+                ship_type=None,
+                ship_capacity=total_capacity,
+                units_requested=len(units),
+            )
+
         # Add empty transport states for remaining ships
         self._add_empty_transport_states(transport_states, ships_with_capacity, fleet)
 
@@ -761,6 +770,15 @@ class TransportOptimizer:
 
             if not units_remaining:
                 break
+
+        if units_remaining:
+            total_capacity = fleet.get_total_capacity()
+            raise TransportCapacityError(
+                f"Cannot distribute {len(units)} units across fleet capacity {total_capacity}",
+                ship_type=None,
+                ship_capacity=total_capacity,
+                units_requested=len(units),
+            )
 
         return transport_states
 
@@ -879,6 +897,15 @@ class TransportPlanningUtilities:
             assignment = TransportAssignment(transport_ship=ship, units=units_for_ship)
             assignments.append(assignment)
 
+        if units_remaining:
+            total_capacity = fleet.get_total_capacity()
+            raise TransportCapacityError(
+                f"Cannot distribute {len(units)} units across fleet capacity {total_capacity}",
+                ship_type=None,
+                ship_capacity=total_capacity,
+                units_requested=len(units),
+            )
+
         return TransportPlan(transport_assignments=assignments)
 
 
@@ -910,6 +937,12 @@ class TransportValidationLayer:
             ship_capacity = ship.get_capacity()
             units_requested = len(units)
 
+            invalid_types = [
+                unit.unit_type.name
+                for unit in units
+                if unit.unit_type not in TRANSPORTABLE_UNIT_TYPES
+            ]
+
             if units_requested > ship_capacity:
                 raise TransportCapacityError(
                     f"Pre-transport validation failed: Cannot transport {units_requested} units with ship capacity {ship_capacity}",
@@ -917,6 +950,21 @@ class TransportValidationLayer:
                     ship_capacity=ship_capacity,
                     units_requested=units_requested,
                 )
+
+            if invalid_types:
+                raise TransportCapacityError(
+                    "Pre-transport validation failed: only fighters, infantry, and mechs may be transported",
+                    ship_type=ship.unit_type.name,
+                    ship_capacity=ship_capacity,
+                    units_requested=units_requested,
+                )
+
+            raise TransportCapacityError(
+                "Pre-transport validation failed: transport manager rejected the requested units",
+                ship_type=ship.unit_type.name,
+                ship_capacity=ship_capacity,
+                units_requested=units_requested,
+            )
 
     def validate_movement(
         self, transport_state: TransportState, from_system_id: str, to_system_id: str

@@ -281,8 +281,9 @@ class MovementExecutor:
 
         # Move all transported units with the ship
         for transported_unit in transport_state.transported_units:
-            # Remove from source system (they should be in space)
-            from_system.remove_unit_from_space(transported_unit)
+            # Remove from source system (guard against missing units)
+            if transported_unit in from_system.get_units_in_space():
+                from_system.remove_unit_from_space(transported_unit)
             # Place in destination system (transported units remain in space)
             to_system.place_unit_in_space(transported_unit)
 

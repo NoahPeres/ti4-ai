@@ -135,7 +135,7 @@ class InvasionController:
         # Check for transported ground forces (Rule 95.4)
         has_transported_ground_forces = False
         for transport_state in self.transport_states:
-            if self.can_land_transported_ground_forces(transport_state, ""):
+            if self._has_ground_forces_in_transport(transport_state):
                 has_transported_ground_forces = True
                 break
 
@@ -327,6 +327,14 @@ class InvasionController:
         """
         if transport_state is None:
             raise ValueError("Transport state cannot be None")
+
+        if not planet_name:
+            return False
+
+        try:
+            self._find_planet_by_name(planet_name)
+        except ValueError:
+            return False
 
         return self._has_ground_forces_in_transport(transport_state)
 
