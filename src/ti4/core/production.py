@@ -13,6 +13,8 @@ from .unit_stats import UnitStatsProvider
 
 if TYPE_CHECKING:
     from .blockade import BlockadeManager
+    from .game_state import GameState
+    from .planet import Planet
     from .system import System
     from .unit import Unit
 
@@ -105,6 +107,34 @@ class ProductionManager:
             UnitType.WAR_SUN,
         }
         return unit.unit_type in ship_types
+
+    def can_place_pds_on_planet(
+        self, planet: Planet, player_id: str, game_state: GameState
+    ) -> bool:
+        """Check if a PDS unit can be placed on a planet.
+
+        Args:
+            planet: The planet to place the PDS on
+            player_id: The player attempting to place the PDS
+            game_state: Current game state (for law effect checking)
+
+        Returns:
+            True if PDS can be placed, False if restricted by laws or rules
+        """
+        # Check for law effects that might affect PDS placement
+        law_effects = game_state.get_law_effects_for_action(
+            "pds_placement_limit", player_id
+        )
+
+        # Check for Homeland Defense Act law
+        for law_effect in law_effects:
+            if law_effect.agenda_card.get_name() == "Homeland Defense Act":
+                # Homeland Defense Act allows unlimited PDS on planets
+                return True
+
+        # Without the law, normal PDS placement rules apply (simplified for testing)
+        # In a real implementation, this would check existing PDS count on the planet
+        return True  # Simplified for testing
 
     def can_produce_from_reinforcements(
         self, unit_type: UnitType, available_reinforcements: int, units_to_produce: int

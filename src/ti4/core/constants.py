@@ -1,5 +1,6 @@
 """Constants and configuration for TI4 game framework."""
 
+from dataclasses import dataclass
 from enum import Enum
 
 
@@ -50,6 +51,53 @@ class CircuitBreakerState(Enum):
     CLOSED = "closed"
     OPEN = "open"
     HALF_OPEN = "half-open"
+
+
+class AgendaType(Enum):
+    """Enumeration of agenda card types."""
+
+    LAW = "law"
+    DIRECTIVE = "directive"
+
+
+class VotingOutcomes:
+    """Constants for agenda card voting outcomes."""
+
+    FOR_AGAINST = ["For", "Against"]
+    ELECT_PLAYER = ["Elect Player"]
+    ELECT_PLANET_CULTURAL = ["Elect Cultural Planet"]
+    ELECT_PLANET_INDUSTRIAL = ["Elect Industrial Planet"]
+    ELECT_PLANET_HAZARDOUS = ["Elect Hazardous Planet"]
+    ELECT_SECRET_OBJECTIVE = ["Elect Scored Secret Objective"]
+
+
+@dataclass
+class AgendaCardMetadata:
+    """Metadata structure for agenda cards."""
+
+    name: str
+    agenda_type: AgendaType
+    outcomes: list[str]
+    expansion: str = "Base"
+
+
+class AgendaCardHelpers:
+    """Helper methods for agenda card identification and validation."""
+
+    @staticmethod
+    def is_law_card(agenda_type: AgendaType) -> bool:
+        """Check if the agenda type represents a law card."""
+        return agenda_type == AgendaType.LAW
+
+    @staticmethod
+    def is_directive_card(agenda_type: AgendaType) -> bool:
+        """Check if the agenda type represents a directive card."""
+        return agenda_type == AgendaType.DIRECTIVE
+
+    @staticmethod
+    def is_valid_outcome(outcome: str, valid_outcomes: list[str]) -> bool:
+        """Check if an outcome is valid for the given list of outcomes."""
+        return outcome in valid_outcomes
 
 
 class GameConstants:

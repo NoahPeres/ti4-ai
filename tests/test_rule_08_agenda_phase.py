@@ -353,7 +353,7 @@ class TestRule08LawVsDirectiveResolution:
 
         # "For" outcome wins
         vote_result = VoteResult(
-            winning_outcome="For", vote_tally={"For": 8, "Against": 3}
+            outcome="For", winning_outcome="For", vote_tally={"For": 8, "Against": 3}
         )
 
         resolution_result = agenda_phase.resolve_agenda_outcome(law_agenda, vote_result)
@@ -382,6 +382,7 @@ class TestRule08LawVsDirectiveResolution:
         )
 
         vote_result = VoteResult(
+            outcome="Elect Hazardous Planet",
             winning_outcome="Elect Hazardous Planet",
             vote_tally={"Elect Hazardous Planet": 5},
             elected_planet="Muaat",

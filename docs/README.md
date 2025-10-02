@@ -1,8 +1,8 @@
-# Technology Card Framework Documentation
+# TI4 AI Framework Documentation
 
 ## Overview
 
-This directory contains comprehensive documentation for the Technology Card Framework, a type-safe, extensible system for implementing all TI4 technology cards.
+This directory contains comprehensive documentation for the TI4 AI Framework, including type-safe, extensible systems for implementing all TI4 game components including technology cards, agenda cards, and other game mechanics.
 
 ## Documentation Structure
 
@@ -18,15 +18,24 @@ This directory contains comprehensive documentation for the Technology Card Fram
 - Testing guidelines and best practices
 
 #### [Technology Card Framework Developer Guide](technology_card_framework_guide.md)
-**Start here!** Comprehensive guide covering everything you need to implement technology cards.
+**Comprehensive guide** covering everything you need to implement technology cards.
 
 - Framework architecture and design principles
 - Step-by-step implementation process
 - Base class selection guide
 - Integration with existing systems
 - Manual confirmation protocol
-- Testing guidelines
-- Best practices and troubleshooting
+- Testing guidelines and best practices
+
+#### [Agenda Card Framework Developer Guide](agenda_card_framework_guide.md)
+**Comprehensive guide** covering everything you need to implement agenda cards.
+
+- Framework architecture and design principles
+- Law vs Directive card implementation
+- Planet attachment system
+- Voting outcome handling
+- Law persistence and management
+- Testing guidelines and best practices
 
 #### [Quick Reference](quick_reference.md)
 **Essential cheat sheet** for developers implementing technology cards.
@@ -69,6 +78,24 @@ This directory contains comprehensive documentation for the Technology Card Fram
 - Testing patterns and best practices
 - Usage as a template for new implementations
 
+#### [Agenda Card Usage Examples](agenda_card_usage_examples.md)
+**Comprehensive examples** showing how to implement different types of agenda cards.
+
+- Law card implementations (For/Against and Election)
+- Directive card implementations (Simple and Election)
+- Planet attachable card implementations
+- Complex multi-effect cards
+- Integration patterns and testing examples
+
+#### [Agenda Card Troubleshooting Guide](agenda_card_troubleshooting_guide.md)
+**Comprehensive troubleshooting guide** for agenda card framework issues.
+
+- Common error messages and solutions
+- Debugging techniques and tools
+- Framework-specific issues
+- Integration problems
+- Performance and testing issues
+
 #### [Integration Points Guide](integration_points_guide.md)
 **Detailed guide** to how the framework integrates with existing game systems.
 
@@ -93,18 +120,20 @@ This directory contains comprehensive documentation for the Technology Card Fram
 ### For New Developers
 
 1. **Read first**: [Development Guidelines](development_guidelines.md) for essential practices
-2. **Start with**: [Technology Card Framework Developer Guide](technology_card_framework_guide.md)
-3. **Reference**: [Quick Reference](quick_reference.md) for common patterns
-4. **Study**: [Dark Energy Tap Reference Implementation](dark_energy_tap_reference.md)
-5. **Use**: [API Reference](api_reference.md) for detailed method documentation
+2. **Technology Cards**: [Technology Card Framework Developer Guide](technology_card_framework_guide.md)
+3. **Agenda Cards**: [Agenda Card Framework Developer Guide](agenda_card_framework_guide.md)
+4. **Reference**: [Quick Reference](quick_reference.md) for common patterns
+5. **Examples**: [Dark Energy Tap Reference](dark_energy_tap_reference.md) and [Agenda Card Usage Examples](agenda_card_usage_examples.md)
+6. **Use**: [API Reference](api_reference.md) for detailed method documentation
 
 ### For Experienced Developers
 
 1. **Review**: [Development Guidelines](development_guidelines.md) for current best practices
 2. **Quick Start**: [Quick Reference](quick_reference.md)
 3. **Integration**: [Integration Points Guide](integration_points_guide.md)
-4. **Enums**: [Enum Systems Reference](enum_systems_reference.md)
-5. **API Details**: [API Reference](api_reference.md)
+4. **Troubleshooting**: [Agenda Card Troubleshooting Guide](agenda_card_troubleshooting_guide.md)
+5. **Enums**: [Enum Systems Reference](enum_systems_reference.md)
+6. **API Details**: [API Reference](api_reference.md)
 
 ## Key Concepts
 

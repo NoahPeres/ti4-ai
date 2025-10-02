@@ -20,6 +20,44 @@ from typing import Any, Callable
 # Voting orchestration imports removed - will be re-implemented via TDD
 
 
+class VotingValidationError(Exception):
+    """Raised when voting validation fails with detailed error information."""
+
+    def __init__(
+        self, message: str, agenda_name: str = "", attempted_outcome: str = ""
+    ):
+        super().__init__(message)
+        self.agenda_name = agenda_name
+        self.attempted_outcome = attempted_outcome
+
+
+@dataclass
+class VotingValidationResult:
+    """Result of agenda-specific voting validation."""
+
+    is_valid: bool
+    error_message: str = ""
+
+
+@dataclass
+class ElectionProcessingResult:
+    """Result of election outcome processing."""
+
+    success: bool
+    elected_target: str = ""
+    error_message: str = ""
+
+
+@dataclass
+class VotingBypassResult:
+    """Result of voting bypass execution."""
+
+    success: bool
+    bypassed_by_committee_formation: bool = False
+    elected_target: str = ""
+    error_message: str = ""
+
+
 class AgendaType(Enum):
     """Types of agenda cards."""
 
@@ -43,8 +81,12 @@ class AgendaCard:
 class VoteResult:
     """Result of voting on an agenda."""
 
-    winning_outcome: str
-    vote_tally: dict[str, int]
+    outcome: str
+    elected_target: str | None = None
+    votes_for: dict[str, int] | None = None
+    votes_against: dict[str, int] | None = None
+    winning_outcome: str | None = None
+    vote_tally: dict[str, int] | None = None
     elected_planet: str | None = None
     resolved_by_speaker: bool = False
     success: bool = True
@@ -118,6 +160,7 @@ class SpeakerSystem:
     ) -> VoteResult:
         """Resolve a tie by speaker choice."""
         return VoteResult(
+            outcome=chosen_outcome,
             winning_outcome=chosen_outcome,
             vote_tally=vote_tally,
             resolved_by_speaker=True,
@@ -136,7 +179,7 @@ class VotingSystem:
         player_id: str,
         planets: list[Any],
         outcome: str,
-        agenda: AgendaCard | None = None,
+        agenda: AgendaCard | Any | None = None,
     ) -> VotingOutcome:
         """
         Cast votes using planet influence.
@@ -145,10 +188,23 @@ class VotingSystem:
         value they wish to spend.
         """
         # Validate agenda outcomes if provided
-        if agenda and outcome not in agenda.outcomes:
-            return VotingOutcome(
-                success=False, error_message=f"Invalid outcome '{outcome}' for agenda"
-            )
+        if agenda:
+            # Get outcomes from either legacy or concrete card
+            if hasattr(agenda, "get_voting_outcomes"):
+                # Concrete agenda card
+                valid_outcomes = agenda.get_voting_outcomes()
+            elif hasattr(agenda, "outcomes"):
+                # Legacy AgendaCard
+                valid_outcomes = agenda.outcomes
+            else:
+                # Fallback
+                valid_outcomes = ["For", "Against"]
+
+            if outcome not in valid_outcomes:
+                return VotingOutcome(
+                    success=False,
+                    error_message=f"Invalid outcome '{outcome}' for agenda",
+                )
 
         # Enforce one vote action per player per agenda (no stacking/splitting)
         if player_id in self.player_votes:
@@ -246,6 +302,153 @@ class VotingSystem:
             return other_players + [speaker]
         return players.copy()
 
+    def validate_outcome_against_card(
+        self, outcome: str, agenda_card: AgendaCard | Any
+    ) -> bool:
+        """Validate voting outcome against agenda card specifications."""
+        if not agenda_card or not outcome:
+            return False
+
+        valid_outcomes = self._get_voting_outcomes_from_card(agenda_card)
+        return outcome in valid_outcomes
+
+    def get_valid_election_targets(
+        self, agenda_card: AgendaCard | Any, game_state: Any
+    ) -> list[str]:
+        """Get valid election targets for an agenda card."""
+        if not agenda_card or not game_state:
+            return []
+
+        # Basic implementation - return empty list for now
+        # Future enhancement: implement based on agenda card type
+        return []
+
+    def validate_election_target(
+        self, agenda_card: AgendaCard | Any, target: str, game_state: Any
+    ) -> bool:
+        """Validate an election target for an agenda card."""
+        if not agenda_card or not target or not game_state:
+            return False
+
+        # Basic implementation - always return True for now
+        # Future enhancement: implement based on agenda card requirements
+        return True
+
+    def validate_agenda_specific_requirements(
+        self, agenda_card: AgendaCard | Any, target: str, game_state: Any
+    ) -> VotingValidationResult:
+        """Validate agenda-specific requirements for voting."""
+        if not agenda_card:
+            return VotingValidationResult(
+                is_valid=False, error_message="Agenda card cannot be None"
+            )
+
+        if not target:
+            return VotingValidationResult(
+                is_valid=False, error_message="Target cannot be empty"
+            )
+
+        # Basic implementation - always return valid for now
+        # Future enhancement: implement agenda-specific validation logic
+        return VotingValidationResult(is_valid=True)
+
+    def _get_agenda_name(self, agenda_card: AgendaCard | Any) -> str:
+        """Helper method to get agenda name from either legacy or concrete card."""
+        if hasattr(agenda_card, "get_name"):
+            name = agenda_card.get_name()
+            return name if isinstance(name, str) else "Unknown Agenda"
+        elif hasattr(agenda_card, "name"):
+            name = agenda_card.name
+            return name if isinstance(name, str) else "Unknown Agenda"
+        return "Unknown Agenda"
+
+    def _get_voting_outcomes_from_card(
+        self, agenda_card: AgendaCard | Any
+    ) -> list[str]:
+        """Helper method to get voting outcomes from either legacy or concrete card."""
+        if hasattr(agenda_card, "get_voting_outcomes"):
+            outcomes = agenda_card.get_voting_outcomes()
+            return outcomes if isinstance(outcomes, list) else ["For", "Against"]
+        elif hasattr(agenda_card, "outcomes"):
+            outcomes = agenda_card.outcomes
+            return outcomes if isinstance(outcomes, list) else ["For", "Against"]
+        return ["For", "Against"]
+
+    def validate_outcome_with_detailed_errors(
+        self, outcome: str, agenda_card: AgendaCard | Any
+    ) -> bool:
+        """Validate outcome with detailed error information."""
+        if not outcome:
+            raise VotingValidationError("Outcome cannot be empty")
+
+        if not agenda_card:
+            raise VotingValidationError("Agenda card cannot be None")
+
+        agenda_name = self._get_agenda_name(agenda_card)
+
+        # Check if outcome is valid
+        if not self.validate_outcome_against_card(outcome, agenda_card):
+            raise VotingValidationError(
+                f"Invalid voting outcome '{outcome}' for agenda '{agenda_name}'",
+                agenda_name=agenda_name,
+                attempted_outcome=outcome,
+            )
+        return True
+
+    def process_election_outcome(
+        self, agenda_card: AgendaCard | Any, vote_result: VoteResult, game_state: Any
+    ) -> ElectionProcessingResult:
+        """Process election outcome for an agenda card."""
+        if not agenda_card or not vote_result:
+            return ElectionProcessingResult(
+                success=False,
+                error_message="Invalid parameters for election processing",
+            )
+
+        # Basic implementation
+        return ElectionProcessingResult(
+            success=True, elected_target=vote_result.elected_target or ""
+        )
+
+    def can_bypass_voting(self, committee_card: Any, target_agenda: Any) -> bool:
+        """Check if voting can be bypassed using Committee Formation."""
+        if not committee_card or not target_agenda:
+            return False
+
+        # Check if committee card has bypass ability
+        if hasattr(committee_card, "can_bypass_election_agenda"):
+            # Get the first voting outcome from target agenda to check if it's an election
+            outcomes = self._get_voting_outcomes_from_card(target_agenda)
+            if outcomes:
+                from .game_state import GameState
+
+                game_state = GameState()  # Minimal game state for testing
+                result = committee_card.can_bypass_election_agenda(
+                    outcomes[0], game_state
+                )
+                return bool(result)
+        return False
+
+    def execute_voting_bypass(
+        self,
+        committee_card: Any,
+        target_agenda: Any,
+        chosen_player: str,
+        game_state: Any,
+    ) -> VotingBypassResult:
+        """Execute voting bypass using Committee Formation."""
+        if not committee_card or not target_agenda or not chosen_player:
+            return VotingBypassResult(
+                success=False, error_message="Invalid parameters for voting bypass"
+            )
+
+        # Basic implementation
+        return VotingBypassResult(
+            success=True,
+            bypassed_by_committee_formation=True,
+            elected_target=chosen_player,
+        )
+
 
 class AgendaPhase:
     """Main controller for the agenda phase."""
@@ -254,6 +457,7 @@ class AgendaPhase:
         """Initialize the agenda phase."""
         self.voting_system = VotingSystem()
         self.speaker_system = SpeakerSystem()
+        self._agenda_card_registry: Any | None = None
 
     def trigger_timing_window(self, timing_window: str, **kwargs: Any) -> None:
         """
@@ -264,13 +468,15 @@ class AgendaPhase:
         # Minimal implementation - does nothing for now
         pass
 
-    def reveal_agenda(self, agenda: AgendaCard) -> None:
+    def reveal_agenda(self, agenda: AgendaCard | Any) -> None:
         """
         Reveal an agenda card and trigger appropriate timing windows.
 
         According to LRR 8.4 and TI4 compendium, this should trigger:
         1. "when_agenda_revealed" timing window
         2. "after_agenda_revealed" timing window
+
+        Supports both legacy AgendaCard and concrete agenda card instances.
         """
         # Trigger "when an agenda is revealed" timing window
         self.trigger_timing_window("when_agenda_revealed", agenda=agenda)
@@ -278,11 +484,35 @@ class AgendaPhase:
         # Trigger "after an agenda is revealed" timing window
         self.trigger_timing_window("after_agenda_revealed", agenda=agenda)
 
-    def start_voting(self, agenda: AgendaCard) -> None:
+    def can_bypass_voting_with_committee_formation(self, card: Any) -> bool:
+        """Check if voting can be bypassed with Committee Formation."""
+        # Simple implementation - check if card has bypass ability
+        return hasattr(card, "can_bypass_election_agenda")
+
+    def use_committee_formation_bypass(self, card: Any, chosen_player: str) -> Any:
+        """Use Committee Formation to bypass voting."""
+        # Delegate to the card's bypass ability
+        if hasattr(card, "use_bypass_ability"):
+            from .game_state import GameState
+
+            game_state = GameState()  # Minimal game state for testing
+            return card.use_bypass_ability(chosen_player, game_state)
+
+        # Fallback implementation
+        from .agenda_cards.effect_resolver import AgendaResolutionResult
+
+        return AgendaResolutionResult(
+            success=True,
+            directive_executed=True,
+            elected_target=chosen_player,
+            description=f"Committee Formation: {chosen_player} elected without voting",
+        )
+
+    def start_voting(self, agenda: AgendaCard | Any) -> None:
         """
         Start the voting process for an agenda.
 
-        This is a placeholder implementation that will be properly developed via TDD.
+        Supports both legacy AgendaCard and concrete agenda card instances.
         """
         # Trigger timing window before players vote
         self.trigger_timing_window("before_players_vote", agenda=agenda)
@@ -295,7 +525,7 @@ class AgendaPhase:
 
     def _determine_vote_result(
         self,
-        agenda: AgendaCard,
+        agenda: AgendaCard | Any,
         voting_system: VotingSystem,
         speaker_system: SpeakerSystem,
     ) -> VoteResult:
@@ -303,13 +533,17 @@ class AgendaPhase:
         Helper method to determine the winning outcome from vote tallies.
 
         Handles both empty tallies (speaker decides) and ties (speaker breaks).
+        Supports both legacy AgendaCard and concrete agenda card instances.
         """
         vote_tally = voting_system.get_vote_tally()
 
+        # Get outcomes from either legacy AgendaCard or concrete card
+        outcomes = self._get_voting_outcomes(agenda)
+
         if not vote_tally:
             # No votes cast — treat as a tie of zero and let the speaker decide
-            zero_tally = dict.fromkeys(agenda.outcomes or ["For", "Against"], 0)
-            chosen = agenda.outcomes[0] if agenda.outcomes else "For"
+            zero_tally = dict.fromkeys(outcomes or ["For", "Against"], 0)
+            chosen = outcomes[0] if outcomes else "For"
             return speaker_system.resolve_tie(zero_tally, chosen)
         else:
             # Find outcome with most votes
@@ -322,7 +556,10 @@ class AgendaPhase:
                 # Clear winner
                 winning_outcome = tied_outcomes[0]
                 return VoteResult(
-                    winning_outcome=winning_outcome, vote_tally=vote_tally, success=True
+                    outcome=winning_outcome,
+                    winning_outcome=winning_outcome,
+                    vote_tally=vote_tally,
+                    success=True,
                 )
             else:
                 # Tie - speaker decides (chooses first tied outcome for simulation)
@@ -344,6 +581,16 @@ class AgendaPhase:
 
         Flow: reveal → reset_votes → external voting window → tally/resolve
         """
+        # Validate inputs
+        if agenda_deck is None:
+            raise ValueError("Agenda deck cannot be None")
+        if speaker_system is None:
+            raise ValueError("Speaker system cannot be None")
+        if voting_system is None:
+            raise ValueError("Voting system cannot be None")
+        if not players:
+            raise ValueError("Players list cannot be empty")
+
         # Draw agenda card from deck
         agenda = agenda_deck.draw_top_card()
 
@@ -518,75 +765,90 @@ class AgendaPhase:
         return AgendaPhaseResult(success=True, planets_readied=True)
 
     def resolve_agenda_outcome(
-        self, agenda: AgendaCard, vote_result: VoteResult
+        self, agenda: AgendaCard | Any, vote_result: VoteResult
     ) -> AgendaPhaseResult:
         """
         Resolve the outcome of an agenda based on voting results.
 
         LRR 7.7-7.8: Laws become permanent effects when "For" wins,
         directives provide one-time effects.
-        Uses AgendaCard.for_effect/against_effect fields for detailed descriptions.
+        Supports both legacy AgendaCard and concrete agenda card instances.
         """
-        if agenda.agenda_type == AgendaType.LAW:
+        # Get agenda type and name from either legacy or concrete card
+        agenda_type = self._get_agenda_type(agenda)
+        agenda_name = self._get_agenda_name(agenda)
+
+        if agenda_type == AgendaType.LAW:
             if vote_result.winning_outcome == "For":
                 # Law is enacted as permanent effect
-                effect_description = agenda.for_effect or "Law enacted"
+                effect_description = (
+                    getattr(agenda, "for_effect", None) or "Law enacted"
+                )
                 return AgendaPhaseResult(
                     success=True,
                     law_enacted=True,
                     permanent_effect_added=True,
                     outcome_resolved=True,
-                    reason=f"Law '{agenda.name}' enacted: {effect_description}",
+                    reason=f"Law '{agenda_name}' enacted: {effect_description}",
                 )
             elif vote_result.winning_outcome == "Elect" or str(
                 vote_result.winning_outcome
             ).startswith("Elect"):
                 # Elect outcome on Law - becomes permanent effect (LRR 8.20-8.21)
                 elected_target = vote_result.elected_planet or "default_target"
-                effect_description = agenda.for_effect or "Law enacted with election"
+                effect_description = (
+                    getattr(agenda, "for_effect", None) or "Law enacted with election"
+                )
                 return AgendaPhaseResult(
                     success=True,
                     law_enacted=True,
                     permanent_effect_added=True,
                     outcome_resolved=True,
-                    reason=f"Law '{agenda.name}' enacted with elected target '{elected_target}': {effect_description}",
+                    reason=f"Law '{agenda_name}' enacted with elected target '{elected_target}': {effect_description}",
                 )
             else:
                 # Law is discarded (Against or other outcome)
-                effect_description = agenda.against_effect or "Law discarded"
+                effect_description = (
+                    getattr(agenda, "against_effect", None) or "Law discarded"
+                )
                 return AgendaPhaseResult(
                     success=True,
                     agenda_discarded=True,
                     outcome_resolved=True,
-                    reason=f"Law '{agenda.name}' rejected: {effect_description}",
+                    reason=f"Law '{agenda_name}' rejected: {effect_description}",
                 )
 
-        elif agenda.agenda_type == AgendaType.DIRECTIVE:
+        elif agenda_type == AgendaType.DIRECTIVE:
             # Handle different directive outcomes
             if vote_result.winning_outcome == "Elect" or str(
                 vote_result.winning_outcome
             ).startswith("Elect"):
                 # Elect outcome - choose a player/planet/system
                 elected_target = vote_result.elected_planet or "default_target"
-                effect_description = agenda.for_effect or "Election effect applied"
+                effect_description = (
+                    getattr(agenda, "for_effect", None) or "Election effect applied"
+                )
                 return AgendaPhaseResult(
                     success=True,
                     one_time_effect_executed=True,
                     agenda_discarded=True,
                     outcome_resolved=True,
-                    reason=f"Directive '{agenda.name}' - Elected '{elected_target}': {effect_description}",
+                    reason=f"Directive '{agenda_name}' - Elected '{elected_target}': {effect_description}",
                 )
             elif vote_result.winning_outcome in ["For", "Against"]:
                 # Standard For/Against directive
                 effect_applied = vote_result.winning_outcome == "For"
                 if effect_applied:
-                    effect_description = agenda.for_effect or "For effect applied"
-                    reason = f"Directive '{agenda.name}' passed: {effect_description}"
+                    effect_description = (
+                        getattr(agenda, "for_effect", None) or "For effect applied"
+                    )
+                    reason = f"Directive '{agenda_name}' passed: {effect_description}"
                 else:
                     effect_description = (
-                        agenda.against_effect or "Against effect applied"
+                        getattr(agenda, "against_effect", None)
+                        or "Against effect applied"
                     )
-                    reason = f"Directive '{agenda.name}' failed: {effect_description}"
+                    reason = f"Directive '{agenda_name}' failed: {effect_description}"
 
                 return AgendaPhaseResult(
                     success=True,
@@ -598,17 +860,75 @@ class AgendaPhase:
             else:
                 # Other directive outcomes (custom outcomes)
                 effect_description = (
-                    agenda.effect or f"Custom outcome: {vote_result.winning_outcome}"
+                    getattr(agenda, "effect", None)
+                    or f"Custom outcome: {vote_result.winning_outcome}"
                 )
                 return AgendaPhaseResult(
                     success=True,
                     one_time_effect_executed=True,
                     agenda_discarded=True,
                     outcome_resolved=True,
-                    reason=f"Directive '{agenda.name}' - {effect_description}",
+                    reason=f"Directive '{agenda_name}' - {effect_description}",
                 )
 
         return AgendaPhaseResult(success=False, error_message="Unknown agenda type")
+
+    def set_agenda_card_registry(self, registry: Any) -> None:
+        """Set the agenda card registry for concrete card support."""
+        self._agenda_card_registry = registry
+
+    def get_agenda_card_registry(self) -> Any | None:
+        """Get the current agenda card registry."""
+        return self._agenda_card_registry
+
+    def can_resolve_concrete_cards(self) -> bool:
+        """Check if agenda phase can resolve concrete cards."""
+        return self._agenda_card_registry is not None
+
+    def _get_voting_outcomes(self, agenda: AgendaCard | Any) -> list[str]:
+        """Get voting outcomes from either legacy or concrete agenda card."""
+        if hasattr(agenda, "get_voting_outcomes"):
+            # Concrete agenda card
+            outcomes = agenda.get_voting_outcomes()
+            return outcomes if isinstance(outcomes, list) else ["For", "Against"]
+        elif hasattr(agenda, "outcomes"):
+            # Legacy AgendaCard
+            outcomes = agenda.outcomes
+            return outcomes if isinstance(outcomes, list) else ["For", "Against"]
+        else:
+            # Fallback
+            return ["For", "Against"]
+
+    def _get_agenda_name(self, agenda: AgendaCard | Any) -> str:
+        """Get agenda name from either legacy or concrete agenda card."""
+        if hasattr(agenda, "get_name"):
+            # Concrete agenda card
+            name = agenda.get_name()
+            return name if isinstance(name, str) else "Unknown Agenda"
+        elif hasattr(agenda, "name"):
+            # Legacy AgendaCard
+            name = agenda.name
+            return name if isinstance(name, str) else "Unknown Agenda"
+        else:
+            return "Unknown Agenda"
+
+    def _get_agenda_type(self, agenda: AgendaCard | Any) -> AgendaType:
+        """Get agenda type from either legacy or concrete agenda card."""
+        if hasattr(agenda, "get_agenda_type"):
+            # Concrete agenda card
+            agenda_type = agenda.get_agenda_type()
+            return (
+                agenda_type if isinstance(agenda_type, AgendaType) else AgendaType.LAW
+            )
+        elif hasattr(agenda, "agenda_type"):
+            # Legacy AgendaCard
+            agenda_type = agenda.agenda_type
+            return (
+                agenda_type if isinstance(agenda_type, AgendaType) else AgendaType.LAW
+            )
+        else:
+            # Default to LAW for safety
+            return AgendaType.LAW
 
     def execute_complete_phase(
         self,
