@@ -2102,7 +2102,7 @@ class TestAgendaPhaseCardFrameworkIntegration:
 
         assert resolution_result.success is True
         assert resolution_result.law_enacted is True
-        assert "Minister of Commerce" in resolution_result.description
+        assert "Minister of Commerce" in resolution_result.reason
 
     def test_agenda_phase_complete_workflow_with_concrete_cards(self) -> None:
         """Test complete agenda phase workflow with concrete cards."""
@@ -3034,7 +3034,7 @@ class TestEnforcedTravelBanLawCard:
         assert "no effect" in result.description.lower()
 
     def test_enforced_travel_ban_against_effect(self) -> None:
-        """Test Enforced Travel Ban AGAINST effect (destroy PDS near wormholes)."""
+        """Test Enforced Travel Ban AGAINST effect (each player gains 1 command token)."""
         from ti4.core.agenda_cards.concrete.enforced_travel_ban import EnforcedTravelBan
         from ti4.core.agenda_phase import VoteResult
         from ti4.core.game_state import GameState
@@ -3053,8 +3053,8 @@ class TestEnforcedTravelBanLawCard:
         assert result is not None
         assert result.success is True
         assert result.directive_executed is True
-        assert "destroy" in result.description.lower()
-        assert "pds" in result.description.lower()
+        assert "command token" in result.description.lower()
+        assert "strategy pool" in result.description.lower()
 
 
 class TestExecutiveSanctionsLawCard:
@@ -3956,9 +3956,27 @@ class TestVotingOutcomeValidation:
         # RED: This should fail as planet type validation doesn't exist yet
         from ti4.core.agenda_cards.effect_resolver import AgendaEffectResolver
         from ti4.core.game_state import GameState
+        from ti4.core.planet import Planet
+        from ti4.core.player import Player
 
         resolver = AgendaEffectResolver()
-        game_state = GameState()
+
+        # Create planets with different traits
+        mecatol_rex = Planet("Mecatol Rex", resources=1, influence=6)
+        mecatol_rex.traits = ["cultural"]
+
+        wellon = Planet("Wellon", resources=1, influence=2)
+        wellon.traits = ["industrial"]
+
+        lisis_ii = Planet("Lisis II", resources=1, influence=1)
+        lisis_ii.traits = ["hazardous"]
+
+        # Create player and game state with planets
+        player1 = Player("player_1", "Red")
+        game_state = GameState()._create_new_state(
+            players=[player1],
+            player_planets={"player_1": [mecatol_rex, wellon, lisis_ii]},
+        )
 
         # Test cultural planet validation
         assert (
@@ -4050,9 +4068,20 @@ class TestVotingOutcomeValidation:
         from ti4.core.agenda_cards.base import DirectiveCard
         from ti4.core.agenda_cards.effect_resolver import AgendaEffectResolver
         from ti4.core.game_state import GameState
+        from ti4.core.planet import Planet
+        from ti4.core.player import Player
 
         resolver = AgendaEffectResolver()
-        game_state = GameState()
+
+        # Create planet for testing
+        wellon = Planet("Wellon", resources=1, influence=2)
+        wellon.traits = ["industrial"]
+
+        # Create player and game state with planets
+        player1 = Player("player_1", "Red")
+        game_state = GameState()._create_new_state(
+            players=[player1], player_planets={"player_1": [wellon]}
+        )
 
         # Test secret objective election validation
         secret_directive = DirectiveCard("Classified Document Leaks")
@@ -4171,7 +4200,7 @@ class TestActiveLawDataStructure:
 
         # Create active law
         active_law = ActiveLaw(
-            agenda_card_or_active_law=law_card,
+            agenda_card=law_card,
             enacted_round=3,
             elected_target=None,
             effect_description="After a player researches a technology, they must destroy 1 of their non-fighter ships",
@@ -4195,7 +4224,7 @@ class TestActiveLawDataStructure:
 
         # Create active law with elected player
         active_law = ActiveLaw(
-            agenda_card_or_active_law=minister_card,
+            agenda_card=minister_card,
             enacted_round=2,
             elected_target="player_1",
             effect_description="Elected player gains 1 trade good when they gain command tokens",
@@ -4215,7 +4244,7 @@ class TestActiveLawDataStructure:
         # Create law with specific trigger
         law_card = LawCard("Fleet Regulations")
         active_law = ActiveLaw(
-            agenda_card_or_active_law=law_card,
+            agenda_card=law_card,
             enacted_round=1,
             effect_description="Players cannot have more than 4 tokens in their fleet pools",
         )
@@ -4247,7 +4276,7 @@ class TestActiveLawDataStructure:
         # Create active law
         law_card = LawCard("Publicize Weapon Schematics")
         active_law = ActiveLaw(
-            agenda_card_or_active_law=law_card,
+            agenda_card=law_card,
             enacted_round=4,
             effect_description="When a player researches a unit upgrade technology, each other player may research that technology",
         )
@@ -4286,7 +4315,7 @@ class TestLawGameStateIntegration:
         # Enact a law through game state
         law_card = LawCard("Anti-Intellectual Revolution")
         game_state.law_manager.enact_law(
-            agenda_card_or_active_law=law_card,
+            law_card,
             enacted_round=1,
             effect_description="After a player researches a technology, they must destroy 1 of their non-fighter ships",
         )
@@ -4307,7 +4336,7 @@ class TestLawGameStateIntegration:
         game_state = GameState()
         law_card = LawCard("Anti-Intellectual Revolution")
         game_state.law_manager.enact_law(
-            agenda_card_or_active_law=law_card,
+            law_card,
             enacted_round=1,
             effect_description="After a player researches a technology, they must destroy 1 of their non-fighter ships",
         )
@@ -4337,7 +4366,7 @@ class TestLawGameStateIntegration:
         game_state = GameState()
         law_card = LawCard("Fleet Regulations")
         game_state.law_manager.enact_law(
-            agenda_card_or_active_law=law_card,
+            law_card,
             enacted_round=2,
             effect_description="Players cannot have more than 4 tokens in their fleet pools",
         )
@@ -4374,7 +4403,7 @@ class TestLawGameStateIntegration:
         # Add technology-related law
         tech_law = LawCard("Anti-Intellectual Revolution")
         game_state.law_manager.enact_law(
-            agenda_card_or_active_law=tech_law,
+            tech_law,
             enacted_round=1,
             effect_description="After a player researches a technology, they must destroy 1 of their non-fighter ships",
         )
@@ -4382,7 +4411,7 @@ class TestLawGameStateIntegration:
         # Add fleet-related law
         fleet_law = LawCard("Fleet Regulations")
         game_state.law_manager.enact_law(
-            agenda_card_or_active_law=fleet_law,
+            fleet_law,
             enacted_round=2,
             effect_description="Players cannot have more than 4 tokens in their fleet pools",
         )
@@ -4428,7 +4457,7 @@ class TestLawGameStateIntegration:
         # Add first minister law
         minister1 = LawCard("Minister of Commerce")
         game_state.law_manager.enact_law(
-            agenda_card_or_active_law=minister1,
+            minister1,
             enacted_round=1,
             effect_description="Elected player gains 1 trade good when they gain command tokens",
             elected_target="player_1",
@@ -4455,7 +4484,7 @@ class TestLawGameStateIntegration:
         game_state = GameState()
         old_law = LawCard("Minister of Commerce")
         game_state.law_manager.enact_law(
-            agenda_card_or_active_law=old_law,
+            old_law,
             enacted_round=1,
             effect_description="Elected player gains 1 trade good when they gain command tokens",
             elected_target="player_1",
@@ -4464,7 +4493,7 @@ class TestLawGameStateIntegration:
         # Enact conflicting law with automatic resolution
         new_law = LawCard("Minister of Commerce")
         resolved_conflicts = game_state.enact_law_with_conflict_resolution(
-            agenda_card_or_active_law=new_law,
+            new_law,
             enacted_round=2,
             effect_description="Elected player gains 1 trade good when they gain command tokens",
             elected_target="player_2",
@@ -4492,12 +4521,12 @@ class TestLawGameStateIntegration:
         law2 = LawCard("Fleet Regulations")
 
         game_state.law_manager.enact_law(
-            agenda_card_or_active_law=law1,
+            law1,
             enacted_round=1,
             effect_description="After a player researches a technology, they must destroy 1 of their non-fighter ships",
         )
         game_state.law_manager.enact_law(
-            agenda_card_or_active_law=law2,
+            law2,
             enacted_round=2,
             effect_description="Players cannot have more than 4 tokens in their fleet pools",
         )
@@ -4546,7 +4575,7 @@ class TestLawGameStateIntegration:
         # Add law and test with invalid player
         law_card = LawCard("Anti-Intellectual Revolution")
         game_state.law_manager.enact_law(
-            agenda_card_or_active_law=law_card,
+            law_card,
             enacted_round=1,
             effect_description="After a player researches a technology, they must destroy 1 of their non-fighter ships",
         )
@@ -4569,14 +4598,14 @@ class TestLawGameStateIntegration:
         # Test invalid round number
         with pytest.raises(ValueError, match="enacted_round must be positive"):
             ActiveLaw(
-                agenda_card_or_active_law=law_card,
+                law_card,
                 enacted_round=0,
                 effect_description="Test effect",
             )
 
         with pytest.raises(ValueError, match="enacted_round must be positive"):
             ActiveLaw(
-                agenda_card_or_active_law=law_card,
+                law_card,
                 enacted_round=-1,
                 effect_description="Test effect",
             )
@@ -4584,14 +4613,14 @@ class TestLawGameStateIntegration:
         # Test empty effect description
         with pytest.raises(ValueError, match="effect_description cannot be empty"):
             ActiveLaw(
-                agenda_card_or_active_law=law_card,
+                law_card,
                 enacted_round=1,
                 effect_description="",
             )
 
         with pytest.raises(ValueError, match="effect_description cannot be empty"):
             ActiveLaw(
-                agenda_card_or_active_law=law_card,
+                law_card,
                 enacted_round=1,
                 effect_description="   ",
             )
@@ -4599,7 +4628,7 @@ class TestLawGameStateIntegration:
         # Test None agenda card
         with pytest.raises(ValueError, match="agenda_card cannot be None"):
             ActiveLaw(
-                agenda_card_or_active_law=None,  # type: ignore
+                None,  # type: ignore
                 enacted_round=1,
                 effect_description="Test effect",
             )
@@ -4630,7 +4659,7 @@ class TestLawManager:
 
         # Test enacting a law
         law_manager.enact_law(
-            agenda_card_or_active_law=law_card,
+            law_card,
             enacted_round=2,
             elected_target=None,
             effect_description="After a player researches a technology, they must destroy 1 of their non-fighter ships",
@@ -4653,7 +4682,7 @@ class TestLawManager:
 
         # Test enacting minister law with elected player
         law_manager.enact_law(
-            agenda_card_or_active_law=minister_card,
+            minister_card,
             enacted_round=3,
             elected_target="player_2",
             effect_description="Elected player gains 1 trade good when they gain command tokens",
@@ -4880,7 +4909,7 @@ class TestGameStateLawIntegration:
         law_card = LawCard("Fleet Regulations")
 
         game_state.law_manager.enact_law(
-            agenda_card_or_active_law=law_card,
+            law_card,
             enacted_round=2,
             effect_description="Players cannot have more than 4 tokens in their fleet pools",
         )
@@ -4906,7 +4935,7 @@ class TestGameStateLawIntegration:
         tech_law = LawCard("Anti-Intellectual Revolution")
 
         game_state.law_manager.enact_law(
-            agenda_card_or_active_law=tech_law,
+            tech_law,
             enacted_round=1,
             effect_description="After a player researches a technology, they must destroy 1 of their non-fighter ships",
         )
@@ -4936,7 +4965,7 @@ class TestGameStateLawIntegration:
         # Enact first minister law
         minister1 = LawCard("Minister of Commerce")
         game_state.law_manager.enact_law(
-            agenda_card_or_active_law=minister1,
+            minister1,
             enacted_round=1,
             elected_target="player_1",
             effect_description="Elected player gains 1 trade good when they gain command tokens",
@@ -4952,7 +4981,7 @@ class TestGameStateLawIntegration:
 
         # Enact the new law (should replace the old one)
         game_state.enact_law_with_conflict_resolution(
-            agenda_card_or_active_law=minister2,
+            minister2,
             enacted_round=2,
             elected_target="player_2",
             effect_description="Elected player gains +1 to combat rolls",
@@ -4975,7 +5004,7 @@ class TestGameStateLawIntegration:
         # Enact fleet regulations law
         fleet_law = LawCard("Fleet Regulations")
         game_state.law_manager.enact_law(
-            agenda_card_or_active_law=fleet_law,
+            fleet_law,
             enacted_round=1,
             effect_description="Players cannot have more than 4 tokens in their fleet pools",
         )
@@ -5072,7 +5101,7 @@ class TestGameStateLawIntegration:
         # Enact law affecting players
         minister_law = LawCard("Minister of Commerce")
         game_state.law_manager.enact_law(
-            agenda_card_or_active_law=minister_law,
+            minister_law,
             enacted_round=1,
             elected_target="player_1",
             effect_description="Elected player gains 1 trade good when they gain command tokens",
@@ -5169,14 +5198,14 @@ class TestRemainingDirectiveCards:
         assert card.get_agenda_type() == AgendaType.DIRECTIVE
 
     def test_shard_of_the_throne_directive_card_creation(self) -> None:
-        """Test that Shard of the Throne directive card can be created."""
-        # RED: This should fail as ShardOfTheThrone doesn't exist yet
+        """Test that Shard of the Throne law card can be created."""
+        # FIXED: Shard of the Throne is a LAW card, not a DIRECTIVE (per CSV data)
         from ti4.core.agenda_cards.concrete.shard_of_the_throne import ShardOfTheThrone
 
         card = ShardOfTheThrone()
         assert card is not None
         assert card.get_name() == "Shard of the Throne"
-        assert card.get_agenda_type() == AgendaType.DIRECTIVE
+        assert card.get_agenda_type() == AgendaType.LAW
 
     def test_crown_directive_card_creation(self) -> None:
         """Test that Crown directive card can be created."""
@@ -5375,7 +5404,7 @@ class TestLawConflictDetectionAndResolution:
         # Enact first minister law
         minister1 = MinisterOfCommerce()
         law_manager.enact_law(
-            agenda_card_or_active_law=minister1,
+            minister1,
             enacted_round=1,
             effect_description="Minister of Commerce effect",
             elected_target="player1",
@@ -5403,7 +5432,7 @@ class TestLawConflictDetectionAndResolution:
         # Enact Minister of Commerce
         minister_commerce = MinisterOfCommerce()
         law_manager.enact_law(
-            agenda_card_or_active_law=minister_commerce,
+            minister_commerce,
             enacted_round=1,
             effect_description="Minister of Commerce effect",
             elected_target="player1",
@@ -5434,7 +5463,7 @@ class TestLawConflictDetectionAndResolution:
         # Enact first minister law
         minister1 = MinisterOfCommerce()
         law_manager.enact_law(
-            agenda_card_or_active_law=minister1,
+            minister1,
             enacted_round=1,
             effect_description="First minister effect",
             elected_target="player1",
@@ -5445,7 +5474,7 @@ class TestLawConflictDetectionAndResolution:
         # Enact conflicting minister law (should automatically remove the first)
         minister2 = MinisterOfCommerce()
         law_manager.enact_law(
-            agenda_card_or_active_law=minister2,
+            minister2,
             enacted_round=2,
             effect_description="Second minister effect",
             elected_target="player2",
@@ -5473,7 +5502,7 @@ class TestLawConflictDetectionAndResolution:
         # Enact first minister law
         minister1 = MinisterOfCommerce()
         law_manager.enact_law(
-            agenda_card_or_active_law=minister1,
+            minister1,
             enacted_round=1,
             effect_description="First minister effect",
             elected_target="player1",
@@ -5482,7 +5511,7 @@ class TestLawConflictDetectionAndResolution:
         # Enact conflicting law with messaging
         minister2 = MinisterOfCommerce()
         result = law_manager.enact_law_with_conflict_resolution(
-            agenda_card_or_active_law=minister2,
+            minister2,
             enacted_round=2,
             effect_description="Second minister effect",
             elected_target="player2",
@@ -5515,7 +5544,7 @@ class TestLawConflictDetectionAndResolution:
         # Enact minister law
         minister = MinisterOfCommerce()
         law_manager.enact_law(
-            agenda_card_or_active_law=minister,
+            minister,
             enacted_round=1,
             effect_description="Minister effect",
             elected_target="player1",
@@ -5527,7 +5556,7 @@ class TestLawConflictDetectionAndResolution:
         assert len(conflicts) == 0
 
         law_manager.enact_law(
-            agenda_card_or_active_law=regular_law,
+            regular_law,
             enacted_round=2,
             effect_description="Regular law effect",
         )
@@ -5558,7 +5587,7 @@ class TestLawConflictDetectionAndResolution:
         # Enact multiple ministers (should all conflict with each other)
         minister_commerce = MinisterOfCommerce()
         law_manager.enact_law(
-            agenda_card_or_active_law=minister_commerce,
+            minister_commerce,
             enacted_round=1,
             effect_description="Commerce effect",
             elected_target="player1",
@@ -5570,7 +5599,7 @@ class TestLawConflictDetectionAndResolution:
 
         # Enact war minister (should replace commerce minister)
         law_manager.enact_law(
-            agenda_card_or_active_law=minister_war,
+            minister_war,
             enacted_round=2,
             effect_description="War effect",
             elected_target="player2",

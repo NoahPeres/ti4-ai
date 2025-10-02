@@ -77,7 +77,9 @@ class ActiveLaw:
             return True
 
         # Fleet-related laws
-        if "fleet" in effect_lower and "fleet_pool" in action_lower:
+        if "fleet" in effect_lower and (
+            "fleet_pool" in action_lower or "fleet_pool_management" in action_lower
+        ):
             return True
 
         # PDS-related laws
