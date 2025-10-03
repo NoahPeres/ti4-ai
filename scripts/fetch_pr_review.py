@@ -18,7 +18,7 @@ import json
 import logging
 import os
 import shutil
-import subprocess
+import subprocess  # noqa: S404
 import sys
 from datetime import datetime
 from typing import Any, Optional
@@ -71,8 +71,8 @@ class GitHubPRReviewFetcher:
         headers = self._headers()
 
         try:
-            request = Request(url, headers=headers)
-            with urlopen(request, timeout=15) as response:
+            request = Request(url, headers=headers)  # noqa: S310
+            with urlopen(request, timeout=15) as response:  # noqa: S310
                 return json.loads(response.read().decode("utf-8"))
         except HTTPError as e:
             if e.code == 404:
@@ -106,8 +106,8 @@ class GitHubPRReviewFetcher:
             headers = self._headers()
 
             try:
-                request = Request(current_url, headers=headers)
-                with urlopen(request, timeout=15) as response:
+                request = Request(current_url, headers=headers)  # noqa: S310
+                with urlopen(request, timeout=15) as response:  # noqa: S310  # noqa: S310
                     data = json.loads(response.read().decode("utf-8"))
 
                     # Guard against non-list payloads
@@ -291,14 +291,10 @@ def detect_repo_from_git() -> Optional[str]:
         # Find git executable safely
         git_path = shutil.which("git")
         if not git_path:
-            return None
-        # Find git executable safely
-        git_path = shutil.which("git")
-        if not git_path:
             logging.warning("Git executable not found in PATH")
             return None
 
-        result = subprocess.run(
+        result = subprocess.run(  # noqa: S603
             [git_path, "remote", "get-url", "origin"],
             capture_output=True,
             text=True,

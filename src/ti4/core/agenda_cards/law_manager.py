@@ -141,6 +141,7 @@ class ActiveLaw:
             and self.enacted_round == other.enacted_round
             and self.effect_description == other.effect_description
             and self.elected_target == other.elected_target
+            and self.trigger_condition == other.trigger_condition
         )
 
     def __hash__(self) -> int:
@@ -151,6 +152,7 @@ class ActiveLaw:
                 self.enacted_round,
                 self.effect_description,
                 self.elected_target,
+                self.trigger_condition,
             )
         )
 

@@ -73,7 +73,7 @@ Convert the Rule 7: AGENDA CARDS design into a series of TDD implementation task
     - Create comprehensive error handling for invalid outcomes
     - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
-- [-] 6. Implement first concrete agenda cards (Laws)
+- [ ] 6. Implement first concrete agenda cards (Laws)
   - [x] 6.1 Implement Anti-Intellectual Revolution law card
     - Write failing tests for Anti-Intellectual Revolution effects
     - Create concrete `AntiIntellectualRevolution` class extending `LawCard`

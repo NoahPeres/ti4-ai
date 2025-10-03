@@ -10,9 +10,7 @@ This document provides comprehensive examples of implementing different types of
 2. [Election-Based Law Card](#election-based-law-card)
 3. [Simple Directive Card](#simple-directive-card)
 4. [Planet Attachable Card](#planet-attachable-card)
-5. [Complex Multi-Effect Card](#complex-multi-effect-card)
-6. [Custom Voting Pattern Card](#custom-voting-pattern-card)
-7. [Integration Examples](#integration-examples)
+5. [Integration Examples](#integration-examples)
 
 ## Basic Law Card Example
 

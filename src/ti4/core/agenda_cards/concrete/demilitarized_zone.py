@@ -27,12 +27,17 @@ class DemilitarizedZone(PlanetAttachableCard):
 
     def resolve_outcome(self, outcome: str, vote_result: Any, game_state: Any) -> Any:
         """Resolve the agenda based on voting outcome."""
-        # This would be implemented when we have the full voting system
-        # For now, just return a placeholder result
-        return {
-            "success": True,
-            "description": "Demilitarized Zone attached to elected planet. Ships cannot move through this system.",
-        }
+        from ti4.core.agenda_cards.effect_resolver import AgendaResolutionResult
+
+        # Placeholder implementation
+        return AgendaResolutionResult(
+            success=True,
+            directive_executed=True,
+            description="Demilitarized Zone attached to elected planet. Ships cannot move through this system.",
+            elected_target=vote_result.elected_target
+            if hasattr(vote_result, "elected_target")
+            else None,
+        )
 
     def get_attachment_effect_description(self) -> str:
         """Get the description of the effect when attached to a planet."""

@@ -118,8 +118,9 @@ class AgendaEffectResolver:
                 active_law = resolution_payload
             else:
                 # Extract or default the effect description
-                effect_description = getattr(
-                    resolution_payload, "description", f"{agenda.get_name()} law effect"
+                effect_description = (
+                    getattr(resolution_payload, "description", None)
+                    or f"{agenda.get_name()} law effect"
                 )
                 # If the resolver provided its own description, use it
                 if getattr(resolution_payload, "description", None):

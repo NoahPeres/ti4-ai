@@ -44,7 +44,7 @@ class CommandTokenManager:
         # Check for Fleet Regulations law
         for law_effect in law_effects:
             if (
-                hasattr(law_effect, "agenda_card")
+                law_effect.agenda_card
                 and law_effect.agenda_card.get_name() == "Fleet Regulations"
             ):
                 # Fleet Regulations limits fleet pool to 4 tokens

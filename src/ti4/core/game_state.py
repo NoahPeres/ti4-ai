@@ -856,14 +856,7 @@ class GameState:
         active_laws_data = []
         if self.law_manager is not None:
             for law in self.law_manager.get_active_laws():
-                active_laws_data.append(
-                    {
-                        "agenda_card_name": law.agenda_card.get_name(),
-                        "enacted_round": law.enacted_round,
-                        "effect_description": law.effect_description,
-                        "elected_target": law.elected_target,
-                    }
-                )
+                active_laws_data.append(law.to_dict())
 
         return {
             "game_id": self.game_id,
