@@ -178,30 +178,35 @@ class MovementValidator:
         Returns:
             True if movement requires alpha or beta wormholes, False otherwise
         """
-        from_system = self._galaxy.get_system(movement.from_system_id)
-        to_system = self._galaxy.get_system(movement.to_system_id)
-
-        if not from_system or not to_system:
+        path = self._galaxy.find_path(movement.from_system_id, movement.to_system_id)
+        if not path:
             return False
 
-        # Check if systems are physically adjacent (distance = 1)
-        from_coord = self._galaxy.get_system_coordinate(movement.from_system_id)
-        to_coord = self._galaxy.get_system_coordinate(movement.to_system_id)
+        for i in range(len(path) - 1):
+            current_id = path[i]
+            next_id = path[i + 1]
+            current_coord = self._galaxy.get_system_coordinate(current_id)
+            next_coord = self._galaxy.get_system_coordinate(next_id)
 
-        if from_coord and to_coord and from_coord.distance_to(to_coord) == 1:
-            return False  # Movement doesn't require wormholes
+            if (
+                current_coord
+                and next_coord
+                and current_coord.distance_to(next_coord) == 1
+            ):
+                continue  # physical adjacency, no wormhole needed
 
-        # Check if systems are only connected via alpha or beta wormholes
-        from_wormholes = set(from_system.get_wormhole_types())
-        to_wormholes = set(to_system.get_wormhole_types())
+            current_system = self._galaxy.get_system(current_id)
+            next_system = self._galaxy.get_system(next_id)
+            if not current_system or not next_system:
+                continue
 
-        # Find shared wormhole types that are alpha or beta
-        shared_alpha_beta = from_wormholes.intersection(to_wormholes).intersection(
-            {"alpha", "beta"}
-        )
+            shared = set(current_system.get_wormhole_types()).intersection(
+                next_system.get_wormhole_types()
+            )
+            if {"alpha", "beta"}.intersection(shared):
+                return True
 
-        # Movement requires alpha/beta wormholes if that's the only way they're connected
-        return len(shared_alpha_beta) > 0
+        return False
 
     def validate_movement_with_transport(self, movement: MovementOperation) -> bool:
         """Validate movement operation that includes transport state.
@@ -570,30 +575,35 @@ class TransportValidator:
         Returns:
             True if movement requires alpha or beta wormholes, False otherwise
         """
-        from_system = self._galaxy.get_system(movement.from_system_id)
-        to_system = self._galaxy.get_system(movement.to_system_id)
-
-        if not from_system or not to_system:
+        path = self._galaxy.find_path(movement.from_system_id, movement.to_system_id)
+        if not path:
             return False
 
-        # Check if systems are physically adjacent (distance = 1)
-        from_coord = self._galaxy.get_system_coordinate(movement.from_system_id)
-        to_coord = self._galaxy.get_system_coordinate(movement.to_system_id)
+        for i in range(len(path) - 1):
+            current_id = path[i]
+            next_id = path[i + 1]
+            current_coord = self._galaxy.get_system_coordinate(current_id)
+            next_coord = self._galaxy.get_system_coordinate(next_id)
 
-        if from_coord and to_coord and from_coord.distance_to(to_coord) == 1:
-            return False  # Movement doesn't require wormholes
+            if (
+                current_coord
+                and next_coord
+                and current_coord.distance_to(next_coord) == 1
+            ):
+                continue
 
-        # Check if systems are only connected via alpha or beta wormholes
-        from_wormholes = set(from_system.get_wormhole_types())
-        to_wormholes = set(to_system.get_wormhole_types())
+            current_system = self._galaxy.get_system(current_id)
+            next_system = self._galaxy.get_system(next_id)
+            if not current_system or not next_system:
+                continue
 
-        # Find shared wormhole types that are alpha or beta
-        shared_alpha_beta = from_wormholes.intersection(to_wormholes).intersection(
-            {"alpha", "beta"}
-        )
+            shared = set(current_system.get_wormhole_types()).intersection(
+                next_system.get_wormhole_types()
+            )
+            if {"alpha", "beta"}.intersection(shared):
+                return True
 
-        # Movement requires alpha/beta wormholes if that's the only way they're connected
-        return len(shared_alpha_beta) > 0
+        return False
 
 
 class TransportExecutor:
