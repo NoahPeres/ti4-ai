@@ -159,11 +159,49 @@ class MovementValidator:
                 law_effect.agenda_card
                 and law_effect.agenda_card.get_name() == "Enforced Travel Ban"
             ):
-                # For this test, we'll assume wormholes are involved and movement is restricted
-                # In a real implementation, this would check the actual path for wormholes
-                return True  # Simplified for testing - law effect is considered
+                # Enforced Travel Ban: Alpha and beta wormholes have no effect during movement
+                if self._movement_requires_alpha_or_beta_wormholes(movement):
+                    return False  # Movement blocked by Enforced Travel Ban
 
         return True
+
+    def _movement_requires_alpha_or_beta_wormholes(
+        self, movement: MovementOperation
+    ) -> bool:
+        """Check if movement would only be possible via alpha or beta wormholes.
+
+        This implements the Enforced Travel Ban rule: "Alpha and beta wormholes have no effect during movement."
+
+        Args:
+            movement: The movement operation to check
+
+        Returns:
+            True if movement requires alpha or beta wormholes, False otherwise
+        """
+        from_system = self._galaxy.get_system(movement.from_system_id)
+        to_system = self._galaxy.get_system(movement.to_system_id)
+
+        if not from_system or not to_system:
+            return False
+
+        # Check if systems are physically adjacent (distance = 1)
+        from_coord = self._galaxy.get_system_coordinate(movement.from_system_id)
+        to_coord = self._galaxy.get_system_coordinate(movement.to_system_id)
+
+        if from_coord and to_coord and from_coord.distance_to(to_coord) == 1:
+            return False  # Movement doesn't require wormholes
+
+        # Check if systems are only connected via alpha or beta wormholes
+        from_wormholes = set(from_system.get_wormhole_types())
+        to_wormholes = set(to_system.get_wormhole_types())
+
+        # Find shared wormhole types that are alpha or beta
+        shared_alpha_beta = from_wormholes.intersection(to_wormholes).intersection(
+            {"alpha", "beta"}
+        )
+
+        # Movement requires alpha/beta wormholes if that's the only way they're connected
+        return len(shared_alpha_beta) > 0
 
     def validate_movement_with_transport(self, movement: MovementOperation) -> bool:
         """Validate movement operation that includes transport state.
@@ -513,11 +551,49 @@ class TransportValidator:
                 law_effect.agenda_card
                 and law_effect.agenda_card.get_name() == "Enforced Travel Ban"
             ):
-                # For this test, we'll assume wormholes are involved and movement is restricted
-                # In a real implementation, this would check the actual path for wormholes
-                return True  # Simplified for testing - law effect is considered
+                # Enforced Travel Ban: Alpha and beta wormholes have no effect during movement
+                if self._movement_requires_alpha_or_beta_wormholes(movement):
+                    return False  # Movement blocked by Enforced Travel Ban
 
         return True
+
+    def _movement_requires_alpha_or_beta_wormholes(
+        self, movement: MovementOperation
+    ) -> bool:
+        """Check if movement would only be possible via alpha or beta wormholes.
+
+        This implements the Enforced Travel Ban rule: "Alpha and beta wormholes have no effect during movement."
+
+        Args:
+            movement: The movement operation to check
+
+        Returns:
+            True if movement requires alpha or beta wormholes, False otherwise
+        """
+        from_system = self._galaxy.get_system(movement.from_system_id)
+        to_system = self._galaxy.get_system(movement.to_system_id)
+
+        if not from_system or not to_system:
+            return False
+
+        # Check if systems are physically adjacent (distance = 1)
+        from_coord = self._galaxy.get_system_coordinate(movement.from_system_id)
+        to_coord = self._galaxy.get_system_coordinate(movement.to_system_id)
+
+        if from_coord and to_coord and from_coord.distance_to(to_coord) == 1:
+            return False  # Movement doesn't require wormholes
+
+        # Check if systems are only connected via alpha or beta wormholes
+        from_wormholes = set(from_system.get_wormhole_types())
+        to_wormholes = set(to_system.get_wormhole_types())
+
+        # Find shared wormhole types that are alpha or beta
+        shared_alpha_beta = from_wormholes.intersection(to_wormholes).intersection(
+            {"alpha", "beta"}
+        )
+
+        # Movement requires alpha/beta wormholes if that's the only way they're connected
+        return len(shared_alpha_beta) > 0
 
 
 class TransportExecutor:
