@@ -33,9 +33,9 @@ class AgendaCardRegistry:
         """
         if card is None:
             raise ValueError("Cannot register None as an agenda card")
-        if card.name in self._cards:
-            raise ValueError(f"Agenda card '{card.name}' is already registered")
-        self._cards[card.name] = card
+        if card.get_name() in self._cards:
+            raise ValueError(f"Agenda card '{card.get_name()}' is already registered")
+        self._cards[card.get_name()] = card
 
     def get_card(self, name: str) -> Optional[BaseAgendaCard]:
         """

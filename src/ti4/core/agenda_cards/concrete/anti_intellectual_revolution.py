@@ -20,7 +20,7 @@ class AntiIntellectualRevolution(LawCard):
     Anti-Intellectual Revolution agenda card.
 
     FOR: After a player researches a technology, they must destroy 1 of their non-fighter ships.
-    AGAINST: At the start of the next strategy phase, each player chooses and exhausts 1 planet for each technology they own.
+    AGAINST: At the start of the next strategy phase, each player chooses and exhaust 1 planet for each technology they own.
     """
 
     def __init__(self) -> None:
@@ -55,7 +55,7 @@ class AntiIntellectualRevolution(LawCard):
             return AgendaResolutionResult(
                 success=True,
                 directive_executed=True,
-                description="Anti-Intellectual Revolution rejected: Each player chooses and exhaust 1 planet for each technology they own",
+                description="Anti-Intellectual Revolution rejected: Each player chooses and exhausts 1 planet for each technology they own",
             )
 
     def create_active_law(

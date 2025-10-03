@@ -155,7 +155,10 @@ class MovementValidator:
 
         # Check law effects
         for law_effect in law_effects:
-            if law_effect.agenda_card.get_name() == "Enforced Travel Ban":
+            if (
+                law_effect.agenda_card
+                and law_effect.agenda_card.get_name() == "Enforced Travel Ban"
+            ):
                 # For this test, we'll assume wormholes are involved and movement is restricted
                 # In a real implementation, this would check the actual path for wormholes
                 return True  # Simplified for testing - law effect is considered
@@ -506,7 +509,10 @@ class TransportValidator:
 
         # Check law effects
         for law_effect in law_effects:
-            if law_effect.agenda_card.get_name() == "Enforced Travel Ban":
+            if (
+                law_effect.agenda_card
+                and law_effect.agenda_card.get_name() == "Enforced Travel Ban"
+            ):
                 # For this test, we'll assume wormholes are involved and movement is restricted
                 # In a real implementation, this would check the actual path for wormholes
                 return True  # Simplified for testing - law effect is considered

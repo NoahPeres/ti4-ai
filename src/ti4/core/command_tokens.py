@@ -14,7 +14,12 @@ if TYPE_CHECKING:
 
 
 class CommandTokenManager:
-    """Manages command token operations with agenda card integration."""
+    """Manages command token operations with agenda card integration.
+
+    TODO: This class should be moved to test utilities or refactored to delegate
+    fleet pool updates to game_state.players[player_id].command_sheet.fleet_pool
+    instead of maintaining an independent _fleet_tokens store.
+    """
 
     def __init__(self) -> None:
         """Initialize the command token manager."""

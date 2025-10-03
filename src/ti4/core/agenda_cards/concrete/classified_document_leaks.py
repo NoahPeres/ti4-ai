@@ -4,7 +4,7 @@ Classified Document Leaks directive card implementation.
 This module implements the Classified Document Leaks agenda card from the base game.
 """
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from ..base.directive_card import DirectiveCard
 
@@ -32,30 +32,31 @@ class ClassifiedDocumentLeaks(DirectiveCard):
 
     def should_discard_on_reveal(self, game_state: "GameState") -> bool:
         """Check if card should be discarded when revealed."""
-        # Check if any player has scored secret objectives
-        # First check completed objectives for secret objectives
-        for _player_id, completed_objectives in game_state.completed_objectives.items():
-            if completed_objectives:  # If any player has completed objectives
-                # For now, assume any completed objective could be secret
-                # This is a simplified implementation
-                return False
+        # The card should only be discarded if NO secret objectives have been scored
+        # If any secret objectives exist (completed or in hand), keep the card
 
-        # Check if any player has secret objectives (even unscored ones count for this test)
-        for (
-            _player_id,
-            secret_objectives,
-        ) in game_state.player_secret_objectives.items():
-            if secret_objectives:  # If any player has secret objectives
-                return False
-
-        # Also check if there are any secret objectives that have been scored
-        # (This is a fallback for test scenarios that might add custom fields)
+        # Check completed objectives (scored objectives)
         if (
-            hasattr(game_state, "scored_secret_objectives")
-            and game_state.scored_secret_objectives
+            hasattr(game_state, "completed_objectives")
+            and game_state.completed_objectives
         ):
-            return False
+            # Check if any player has completed any objectives (which could include secret objectives)
+            for completed_objectives in game_state.completed_objectives.values():
+                if completed_objectives:  # If any player has completed objectives
+                    return False
 
+        # Check player secret objectives (objectives in hand that could be scored)
+        if (
+            hasattr(game_state, "player_secret_objectives")
+            and game_state.player_secret_objectives
+        ):
+            # Check if any player has secret objectives that could be scored
+            for secret_objectives in game_state.player_secret_objectives.values():
+                secret_objectives_list: Any = secret_objectives  # Type hint for mypy
+                if secret_objectives_list:  # If any player has secret objectives
+                    return False
+
+        # If no objectives exist (completed or in hand), discard the card
         return True
 
     def resolve_outcome(

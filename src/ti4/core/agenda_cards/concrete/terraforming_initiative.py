@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from ti4.core.agenda_cards.base.directive_card import DirectiveCard
-from ti4.core.constants import AgendaType
 
 if TYPE_CHECKING:
     from ti4.core.game_state import GameState
@@ -20,14 +19,7 @@ class TerraformingInitiative(DirectiveCard):
     def __init__(self) -> None:
         """Initialize Terraforming Initiative directive card."""
         super().__init__("Terraforming Initiative")
-
-    def get_agenda_type(self) -> AgendaType:
-        """Return the agenda type."""
-        return AgendaType.DIRECTIVE
-
-    def get_voting_outcomes(self) -> list[str]:
-        """Return valid voting outcomes for this card."""
-        return ["For", "Against"]
+        self._voting_outcomes = ["For", "Against"]
 
     def execute_directive_effect(self, game_state: GameState, outcome: str) -> bool:
         """Execute the directive effect.

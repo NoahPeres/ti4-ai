@@ -38,8 +38,7 @@ class CrownOfThalnos(LawCard):
             elected_player = getattr(vote_result, "elected_target", None)
             if elected_player:
                 # Set the initial owner
-                if hasattr(game_state, "set_crown_thalnos_owner"):
-                    game_state.set_crown_thalnos_owner(elected_player)
+                game_state.set_crown_thalnos_owner(elected_player)
 
                 return type(
                     "AgendaResult",
@@ -61,11 +60,8 @@ class CrownOfThalnos(LawCard):
             True if the player owns the Crown and can use the reroll ability
         """
         # Check if the player owns the Crown
-        current_owner = None
-        if hasattr(game_state, "get_crown_thalnos_owner"):
-            current_owner = game_state.get_crown_thalnos_owner()
-
-        return current_owner == player
+        current_owner = game_state.get_crown_thalnos_owner()
+        return current_owner is not None and current_owner == player
 
     def apply_reroll_penalty(
         self, player: str, dice_results: list[int], game_state: Any
@@ -83,6 +79,8 @@ class CrownOfThalnos(LawCard):
         """
         destroyed_units = []
 
+        # TODO: This implementation needs to be completed with proper unit combat values
+        # and specific unit references instead of hardcoded thresholds and generic strings
         # For each die that didn't produce a hit after reroll, destroy a unit
         for result in dice_results:
             # Assuming hits are typically 6+ (this would need to be configurable based on unit combat values)

@@ -73,10 +73,15 @@ class AgendaEffectResolver:
 
         # Check if election outcome requires elected target
         if self._is_election_outcome(winning_outcome):
-            if not vote_result.elected_target:
+            elected_target = vote_result.elected_target or getattr(
+                vote_result, "elected_planet", None
+            )
+            if not elected_target:
                 raise ElectionValidationError(
                     "Election outcome requires elected_target but none provided"
                 )
+            if not vote_result.elected_target:
+                vote_result.elected_target = elected_target
 
         # Determine if this is a law or directive
         from ..constants import AgendaType
@@ -99,12 +104,35 @@ class AgendaEffectResolver:
 
         # Enact the law in the game state
         if game_state.law_manager is not None:
-            game_state.law_manager.enact_law(
-                agenda_card_or_active_law=agenda,
-                enacted_round=1,  # TODO: Get actual round number from game state
-                effect_description=f"{agenda.get_name()} law effect",
-                elected_target=vote_result.elected_target,
+            from ..agenda_cards.law_manager import ActiveLaw
+
+            # Delegate to the card's resolver for richer payload or ActiveLaw
+            winning_outcome = vote_result.winning_outcome or "For"  # Default fallback
+            resolution_payload = agenda.resolve_outcome(
+                winning_outcome, vote_result, game_state
             )
+            # Use the real current round, fall back to 1 if missing
+            enacted_round = getattr(game_state, "current_round", 1)
+
+            if isinstance(resolution_payload, ActiveLaw):
+                active_law = resolution_payload
+            else:
+                # Extract or default the effect description
+                effect_description = getattr(
+                    resolution_payload, "description", f"{agenda.get_name()} law effect"
+                )
+                # If the resolver provided its own description, use it
+                if getattr(resolution_payload, "description", None):
+                    description = resolution_payload.description
+
+                active_law = ActiveLaw(
+                    agenda_card=agenda,
+                    enacted_round=enacted_round,
+                    effect_description=effect_description,
+                    elected_target=vote_result.elected_target,
+                )
+
+            game_state.law_manager.enact_law(active_law)
 
         return AgendaResolutionResult(
             success=True,
@@ -121,9 +149,21 @@ class AgendaEffectResolver:
         game_state: GameState,
     ) -> AgendaResolutionResult:
         """Resolve directive card outcome."""
+        # Execute the directive's effects and capture any payload (including a custom description).
+        winning_outcome = vote_result.winning_outcome or "For"  # Default fallback
+        resolution_payload = agenda.resolve_outcome(
+            winning_outcome, vote_result, game_state
+        )
+
+        # Fallback description if the payload didn't override it.
         description = f"{agenda.get_name()} executed"
         if vote_result.elected_target:
             description += f" with {vote_result.elected_target} elected"
+        if (
+            hasattr(resolution_payload, "description")
+            and resolution_payload.description
+        ):
+            description = resolution_payload.description
 
         return AgendaResolutionResult(
             success=True,

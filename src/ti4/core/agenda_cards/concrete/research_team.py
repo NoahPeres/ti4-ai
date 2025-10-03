@@ -39,5 +39,7 @@ class ResearchTeam(DirectiveCard):
         Returns:
             True if effect was successfully executed
         """
-        # Placeholder implementation - specific effects need user confirmation
+        # TODO: Implement Research Team directive effect based on actual game rules
+        # This placeholder implementation needs to be replaced with actual Research Team mechanics
+        # that modify the game state according to the specific Research Team directive rules
         return True

@@ -2321,14 +2321,23 @@ class GameState:
     def _find_minister_conflicts(self, new_law_card: Any) -> list[Any]:
         """Find conflicts with Minister cards based on TI4 rules."""
         conflicts: list[Any] = []
-        if self.law_manager is None or "Minister" not in new_law_card.get_name():
+        if self.law_manager is None:
+            return conflicts
+
+        candidate_card = (
+            new_law_card.agenda_card
+            if hasattr(new_law_card, "agenda_card")
+            else new_law_card
+        )
+
+        if "Minister" not in candidate_card.get_name():
             return conflicts
 
         # In TI4, only one minister can be active at a time
         # Any minister conflicts with any other minister
         for active_law in self.law_manager.get_active_laws():
-            active_card_name = active_law.agenda_card.get_name()
-            if "Minister" in active_card_name:
+            active_card = active_law.agenda_card
+            if "Minister" in active_card.get_name():
                 conflicts.append(active_law)
 
         return conflicts
@@ -2434,3 +2443,15 @@ class GameState:
         # Create a new state with the agenda deck
         # Note: This is a placeholder implementation for testing
         pass
+
+    def set_crown_thalnos_owner(self, player_id: str) -> None:
+        """Set the owner of the Crown of Thalnos."""
+        # For now, store in a simple attribute
+        # In a full implementation, this would be part of the game state structure
+        if not hasattr(self, "_crown_thalnos_owner"):
+            object.__setattr__(self, "_crown_thalnos_owner", None)
+        object.__setattr__(self, "_crown_thalnos_owner", player_id)
+
+    def get_crown_thalnos_owner(self) -> str | None:
+        """Get the current owner of the Crown of Thalnos."""
+        return getattr(self, "_crown_thalnos_owner", None)

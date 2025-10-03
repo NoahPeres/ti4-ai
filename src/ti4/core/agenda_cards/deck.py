@@ -227,9 +227,9 @@ class AgendaDeck:
             Serialized deck state
         """
         return {
-            "deck_cards": [card.name for card in self._deck],
-            "discard_pile": [card.name for card in self._discard_pile],
-            "removed_cards": [card.name for card in self._removed_cards],
+            "deck_cards": [card.get_name() for card in self._deck],
+            "discard_pile": [card.get_name() for card in self._discard_pile],
+            "removed_cards": [card.get_name() for card in self._removed_cards],
             "reshuffle_count": self._reshuffle_count,
             "total_cards": self._total_cards,
         }

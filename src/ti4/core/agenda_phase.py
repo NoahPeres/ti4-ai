@@ -890,7 +890,10 @@ class AgendaPhase:
                 )
 
                 # Add law to game state if provided
-                if game_state and hasattr(game_state, "law_manager"):
+                law_manager = (
+                    getattr(game_state, "law_manager", None) if game_state else None
+                )
+                if law_manager:
                     from ti4.core.agenda_cards.base.agenda_card import BaseAgendaCard
                     from ti4.core.agenda_cards.law_manager import ActiveLaw
 
@@ -921,7 +924,7 @@ class AgendaPhase:
                                 effect_description=effect_description,
                             )
 
-                        game_state.law_manager.enact_law(active_law)
+                        law_manager.enact_law(active_law)
 
                 return AgendaPhaseResult(
                     success=True,
@@ -934,16 +937,80 @@ class AgendaPhase:
                 vote_result.winning_outcome
             ).startswith("Elect"):
                 # Elect outcome on Law - becomes permanent effect (LRR 8.20-8.21)
-                elected_target = vote_result.elected_planet or "default_target"
+                elected_target = (
+                    vote_result.elected_target or vote_result.elected_planet
+                )
+                if not elected_target:
+                    return AgendaPhaseResult(
+                        success=False,
+                        outcome_resolved=False,
+                        reason=f"Law '{agenda_name}' election missing target",
+                    )
+
                 effect_description = (
                     getattr(agenda, "for_effect", None) or "Law enacted with election"
                 )
+
+                law_manager = (
+                    getattr(game_state, "law_manager", None) if game_state else None
+                )
+                if law_manager:
+                    from ti4.core.agenda_cards.base.agenda_card import BaseAgendaCard
+
+                    try:
+                        # Check if this is a LawCard that has create_active_law method
+                        from ti4.core.agenda_cards.base.law_card import LawCard
+
+                        if isinstance(agenda, LawCard) and hasattr(
+                            agenda, "create_active_law"
+                        ):
+                            active_law = agenda.create_active_law(
+                                vote_result.winning_outcome,
+                                elected_target=elected_target,
+                            )
+                        else:
+                            from ti4.core.agenda_cards.law_manager import ActiveLaw
+
+                            # Only create ActiveLaw if agenda is a BaseAgendaCard
+                            if isinstance(agenda, BaseAgendaCard):
+                                active_law = ActiveLaw(
+                                    agenda_card=agenda,
+                                    enacted_round=getattr(
+                                        game_state, "current_round", 1
+                                    ),
+                                    effect_description=effect_description,
+                                    elected_target=elected_target,
+                                )
+                            else:
+                                # Skip law creation for non-BaseAgendaCard instances
+                                return AgendaPhaseResult(
+                                    success=False,
+                                    outcome_resolved=False,
+                                    reason=f"Cannot create active law for agenda type: {type(agenda)}",
+                                )
+                        active_law.enacted_round = getattr(
+                            game_state, "current_round", 1
+                        )
+                        law_manager.enact_law(active_law)
+                    except Exception:
+                        return AgendaPhaseResult(
+                            success=False,
+                            outcome_resolved=False,
+                            reason=(
+                                f"Failed to enact law '{agenda_name}' "
+                                "after resolving the election"
+                            ),
+                        )
+
                 return AgendaPhaseResult(
                     success=True,
                     law_enacted=True,
                     permanent_effect_added=True,
                     outcome_resolved=True,
-                    reason=f"Law '{agenda_name}' enacted with elected target '{elected_target}': {effect_description}",
+                    reason=(
+                        f"Law '{agenda_name}' enacted with elected target "
+                        f"'{elected_target}': {effect_description}"
+                    ),
                 )
             else:
                 # Law is discarded (Against or other outcome)

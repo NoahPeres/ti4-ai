@@ -63,12 +63,12 @@ class AgendaType(Enum):
 class VotingOutcomes:
     """Constants for agenda card voting outcomes."""
 
-    FOR_AGAINST = ["For", "Against"]
-    ELECT_PLAYER = ["Elect Player"]
-    ELECT_PLANET_CULTURAL = ["Elect Cultural Planet"]
-    ELECT_PLANET_INDUSTRIAL = ["Elect Industrial Planet"]
-    ELECT_PLANET_HAZARDOUS = ["Elect Hazardous Planet"]
-    ELECT_SECRET_OBJECTIVE = ["Elect Scored Secret Objective"]
+    FOR_AGAINST: tuple[str, ...] = ("For", "Against")
+    ELECT_PLAYER: tuple[str, ...] = ("Elect Player",)
+    ELECT_PLANET_CULTURAL: tuple[str, ...] = ("Elect Cultural Planet",)
+    ELECT_PLANET_INDUSTRIAL: tuple[str, ...] = ("Elect Industrial Planet",)
+    ELECT_PLANET_HAZARDOUS: tuple[str, ...] = ("Elect Hazardous Planet",)
+    ELECT_SECRET_OBJECTIVE: tuple[str, ...] = ("Elect Scored Secret Objective",)
 
 
 @dataclass

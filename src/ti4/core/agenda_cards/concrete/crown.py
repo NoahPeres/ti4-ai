@@ -39,5 +39,7 @@ class Crown(DirectiveCard):
         Returns:
             True if effect was successfully executed
         """
-        # Placeholder implementation - specific effects need user confirmation
+        # TODO: Implement Crown directive effect based on actual game rules
+        # This placeholder implementation needs to be replaced with actual Crown mechanics
+        # that modify the game state according to the specific Crown directive rules
         return True

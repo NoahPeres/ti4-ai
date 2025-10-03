@@ -113,6 +113,7 @@ class ActiveLaw:
             "enacted_round": self.enacted_round,
             "effect_description": self.effect_description,
             "elected_target": self.elected_target,
+            "trigger_condition": self.trigger_condition,
         }
 
     @classmethod
@@ -128,6 +129,7 @@ class ActiveLaw:
             enacted_round=data["enacted_round"],
             effect_description=data["effect_description"],
             elected_target=data.get("elected_target"),
+            trigger_condition=data.get("trigger_condition"),
         )
 
     def __eq__(self, other: object) -> bool:

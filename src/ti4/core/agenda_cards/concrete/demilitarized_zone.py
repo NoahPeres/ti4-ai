@@ -31,7 +31,7 @@ class DemilitarizedZone(PlanetAttachableCard):
         # For now, just return a placeholder result
         return {
             "success": True,
-            "description": "Demilitarized Zone attached to elected planet",
+            "description": "Demilitarized Zone attached to elected planet. Ships cannot move through this system.",
         }
 
     def get_attachment_effect_description(self) -> str:

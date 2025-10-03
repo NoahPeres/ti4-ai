@@ -34,7 +34,7 @@ class BaseAgendaCard(ABC):
 
     @property
     def name(self) -> str:
-        """Display name of the agenda card."""
+        """Get the agenda card name."""
         return self._name
 
     def get_name(self) -> str:

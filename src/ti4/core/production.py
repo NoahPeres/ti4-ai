@@ -132,9 +132,18 @@ class ProductionManager:
                 # Homeland Defense Act allows unlimited PDS on planets
                 return True
 
-        # Without the law, normal PDS placement rules apply (simplified for testing)
-        # In a real implementation, this would check existing PDS count on the planet
-        return True  # Simplified for testing
+        # Without the law, normal PDS placement rules apply (Rule 67 - Structure limits)
+        # Check existing PDS count on the planet (maximum 2 PDS per planet)
+        existing_pds_count = sum(
+            1
+            for unit in planet.units
+            if unit.unit_type == UnitType.PDS and unit.owner == player_id
+        )
+
+        if existing_pds_count >= 2:
+            return False  # Cannot place more than 2 PDS per planet
+
+        return True
 
     def can_produce_from_reinforcements(
         self, unit_type: UnitType, available_reinforcements: int, units_to_produce: int

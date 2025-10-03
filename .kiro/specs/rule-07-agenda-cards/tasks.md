@@ -43,7 +43,7 @@ Convert the Rule 7: AGENDA CARDS design into a series of TDD implementation task
     - Create deck state validation and error handling
     - _Requirements: 5.4, 5.5_
 
-- [-] 4. Implement law persistence and tracking system
+- [ ] 4. Implement law persistence and tracking system
   - [x] 4.1 Create ActiveLaw data structure and manager
     - Write failing tests for law persistence across game rounds
     - Implement `ActiveLaw` dataclass with law metadata
