@@ -292,15 +292,27 @@ class PoliticsStrategyCard(BaseStrategyCard):
             Tuple of (result, updated_game_state)
         """
         try:
-            updated_game_state = game_state.spend_command_token_from_strategy_pool(
+            spend_result = game_state.spend_command_token_from_strategy_pool(
                 player_id, 1
             )
-            return StrategyCardAbilityResult(
-                success=True, player_id=player_id
-            ), updated_game_state
         except ValueError:
             return StrategyCardAbilityResult(
                 success=False,
                 player_id=player_id,
                 error_message="Insufficient command tokens in strategy pool",
             ), game_state
+
+        if isinstance(spend_result, bool):
+            if not spend_result:
+                return StrategyCardAbilityResult(
+                    success=False,
+                    player_id=player_id,
+                    error_message="Insufficient command tokens in strategy pool",
+                ), game_state
+            return StrategyCardAbilityResult(
+                success=True, player_id=player_id
+            ), game_state
+
+        return StrategyCardAbilityResult(
+            success=True, player_id=player_id
+        ), spend_result
