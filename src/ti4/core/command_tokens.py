@@ -65,7 +65,9 @@ class CommandTokenManager:
         """
         return self._fleet_tokens.get(player_id, 0)
 
-    def spend_strategy_pool_token(self, player_id: str, game_state: GameState) -> bool:
+    def spend_strategy_pool_token(
+        self, player_id: str, game_state: GameState
+    ) -> GameState:
         """Spend a command token from a player's strategy pool.
 
         Args:
@@ -73,15 +75,13 @@ class CommandTokenManager:
             game_state: Current game state
 
         Returns:
-            True if token was spent successfully, False if insufficient tokens
+            New GameState with token spent
+
+        Raises:
+            ValueError: If player doesn't exist or has insufficient tokens
         """
         if not player_id:
-            return False
+            raise ValueError("Player ID cannot be empty")
 
-        # Delegate to game state method for consistency
-        try:
-            game_state.spend_command_token_from_strategy_pool(player_id, 1)
-            return True
-        except ValueError:
-            # Player doesn't exist or insufficient tokens
-            return False
+        # Delegate to game state method and return the new state
+        return game_state.spend_command_token_from_strategy_pool(player_id, 1)

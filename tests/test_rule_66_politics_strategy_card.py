@@ -214,19 +214,19 @@ class TestPoliticsSecondaryAbility:
             def is_valid_player(self, player_id: str) -> bool:
                 return True
 
-            def draw_action_cards(self, player_id: str, count: int) -> list[str]:
+            def draw_action_cards(self, player_id: str, count: int) -> "MockAdapter":
                 if player_id not in self.action_cards_drawn:
                     self.action_cards_drawn[player_id] = 0
                 self.action_cards_drawn[player_id] += count
-                return [f"action_card_{i}" for i in range(count)]
+                return self  # Return self to simulate GameState return
 
             def spend_command_token_from_strategy_pool(
                 self, player_id: str, count: int = 1
-            ) -> bool:
+            ) -> "MockAdapter":
                 if player_id not in self.command_tokens_spent:
                     self.command_tokens_spent[player_id] = 0
                 self.command_tokens_spent[player_id] += count
-                return True
+                return self  # Return self to simulate GameState return
 
         adapter = MockAdapter()
 
@@ -281,8 +281,8 @@ class TestPoliticsSecondaryAbility:
 
             def spend_command_token_from_strategy_pool(
                 self, player_id: str, count: int = 1
-            ) -> bool:
-                return False  # Simulate insufficient tokens
+            ) -> "MockAdapter":
+                raise ValueError("Insufficient command tokens in strategy pool")
 
         adapter = MockAdapter()
 

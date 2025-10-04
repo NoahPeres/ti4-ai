@@ -215,6 +215,7 @@ def create_game_state_adapter_from_game_state(
         players = [player.id for player in game_state.players]
 
     return StrategyCardGameStateAdapter(
+        game_state=game_state,
         action_card_system=action_card_system,
         command_token_system=command_token_system,
         agenda_deck=agenda_deck,

@@ -86,8 +86,8 @@ class PoliticsStrategyCard(BaseStrategyCard):
 
         try:
             # Execute the three primary ability steps
-            # game_state is guaranteed to be non-None due to validation above
-            assert game_state is not None
+            if game_state is None:
+                raise RuntimeError("game_state should not be None after validation")
             speaker_result, game_state = self._execute_choose_speaker(
                 game_state, chosen_speaker
             )
@@ -135,14 +135,16 @@ class PoliticsStrategyCard(BaseStrategyCard):
 
         try:
             # Step 1: Spend 1 command token from strategy pool
-            # game_state is guaranteed to be non-None due to validation above
-            assert game_state is not None
-            token_result = self._execute_spend_command_token(game_state, player_id)
+            if game_state is None:
+                raise RuntimeError("game_state should not be None after validation")
+            token_result, game_state = self._execute_spend_command_token(
+                game_state, player_id
+            )
             if not token_result.success:
                 return token_result
 
             # Step 2: Draw two action cards
-            self._execute_draw_action_cards(game_state, player_id, 2)
+            game_state = self._execute_draw_action_cards(game_state, player_id, 2)
 
             return StrategyCardAbilityResult(
                 success=True,
@@ -279,7 +281,7 @@ class PoliticsStrategyCard(BaseStrategyCard):
 
     def _execute_spend_command_token(
         self, game_state: "GameState", player_id: str
-    ) -> StrategyCardAbilityResult:
+    ) -> tuple[StrategyCardAbilityResult, "GameState"]:
         """Execute the spend command token step of the secondary ability.
 
         Args:
@@ -287,15 +289,18 @@ class PoliticsStrategyCard(BaseStrategyCard):
             player_id: The player spending the token
 
         Returns:
-            StrategyCardAbilityResult indicating success or failure
+            Tuple of (result, updated_game_state)
         """
-        # Use GameState's integrated command token system
-        token_spent = game_state.spend_command_token_from_strategy_pool(player_id, 1)
-        if not token_spent:
+        try:
+            updated_game_state = game_state.spend_command_token_from_strategy_pool(
+                player_id, 1
+            )
+            return StrategyCardAbilityResult(
+                success=True, player_id=player_id
+            ), updated_game_state
+        except ValueError:
             return StrategyCardAbilityResult(
                 success=False,
                 player_id=player_id,
                 error_message="Insufficient command tokens in strategy pool",
-            )
-
-        return StrategyCardAbilityResult(success=True, player_id=player_id)
+            ), game_state
