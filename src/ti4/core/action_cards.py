@@ -228,6 +228,29 @@ class ActionCardManager:
         if window_to_clear and window_to_clear in self._played_cards_this_window:
             self._played_cards_this_window[window_to_clear].clear()
 
+    def draw_action_cards(
+        self, player_id: str, count: int, game_state: Any
+    ) -> list[str]:
+        """Draw action cards for a player.
+
+        Args:
+            player_id: The player drawing cards
+            count: Number of cards to draw
+            game_state: Game state to update (mutable reference expected)
+
+        Returns:
+            List of card names drawn
+
+        Note:
+            This method expects the caller to handle GameState updates.
+            If game_state has a draw_action_cards method that returns a new state,
+            the caller must capture and use that new state.
+        """
+        # For now, return placeholder card names
+        # The actual state management should be handled by the caller
+        # who has access to the GameState's draw_action_cards method
+        return [f"action_card_{i + 1}" for i in range(count)]
+
 
 # Example Action Card implementations
 

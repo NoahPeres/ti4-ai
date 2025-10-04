@@ -735,6 +735,140 @@ class GameState:
                 f"Cannot score objective '{objective.id}' requiring {objective.scoring_phase.value} phase during {current_phase.value} phase"
             )
 
+    # Action Card System Integration (Rule 2)
+    def draw_action_cards(self, player_id: str, count: int) -> GameState:
+        """Draw action cards for a player.
+
+        Args:
+            player_id: The player drawing cards
+            count: Number of cards to draw
+
+        Returns:
+            New GameState with cards added to player's hand
+
+        Raises:
+            ValueError: If player doesn't exist or count is invalid
+        """
+        if not any(player.id == player_id for player in self.players):
+            raise ValueError(f"Player {player_id} does not exist in the game")
+
+        if count <= 0:
+            raise ValueError(f"Cannot draw {count} cards - must be positive")
+
+        # Create new action card state
+        new_player_action_cards = {
+            pid: cards.copy() for pid, cards in self.player_action_cards.items()
+        }
+
+        if player_id not in new_player_action_cards:
+            new_player_action_cards[player_id] = []
+
+        # Add placeholder cards (in real implementation, these would come from a deck)
+        start_count = len(new_player_action_cards[player_id])
+        for i in range(count):
+            card_name = f"action_card_{start_count + i + 1}"
+            new_player_action_cards[player_id].append(card_name)
+
+        return self._create_new_state(player_action_cards=new_player_action_cards)
+
+    # Speaker System Integration (Rule 80)
+    def set_speaker(self, player_id: str) -> GameState:
+        """Set the speaker for the game.
+
+        Args:
+            player_id: The player to become speaker
+
+        Returns:
+            New GameState with updated speaker
+
+        Raises:
+            ValueError: If player_id doesn't exist
+        """
+        if not any(player.id == player_id for player in self.players):
+            raise ValueError(f"Player {player_id} does not exist")
+
+        return self._create_new_state(speaker_id=player_id)
+
+    def get_speaker(self) -> str | None:
+        """Get the current speaker.
+
+        Returns:
+            The current speaker's player ID, or None if no speaker set
+        """
+        return self.speaker_id
+
+    # Command Token System Integration (Rule 20)
+    def spend_command_token_from_strategy_pool(
+        self, player_id: str, count: int = 1
+    ) -> GameState:
+        """Spend command tokens from a player's strategy pool.
+
+        Args:
+            player_id: The player spending tokens
+            count: Number of tokens to spend (default 1)
+
+        Returns:
+            New GameState with tokens spent
+
+        Raises:
+            ValueError: If player doesn't exist or has insufficient tokens
+        """
+        if not any(player.id == player_id for player in self.players):
+            raise ValueError(f"Player {player_id} does not exist")
+
+        # Clone players and update the specific player's tokens
+        import copy
+
+        new_players = []
+        for player in self.players:
+            if player.id == player_id:
+                # Deep copy player and update command sheet
+                updated_player = copy.deepcopy(player)
+                if not hasattr(updated_player, "command_sheet"):
+                    raise ValueError(f"Player {player_id} missing command_sheet")
+                if not hasattr(updated_player.command_sheet, "strategy_tokens"):
+                    raise ValueError(
+                        f"Player {player_id} command_sheet missing strategy_tokens"
+                    )
+                if updated_player.command_sheet.strategy_tokens < count:
+                    raise ValueError(
+                        f"Player {player_id} has insufficient tokens in strategy pool"
+                    )
+                updated_player.command_sheet.strategy_tokens -= count
+                new_players.append(updated_player)
+            else:
+                new_players.append(player)
+
+        return self._create_new_state(players=new_players)
+
+    # Agenda Deck System Integration (Rule 7)
+    def get_agenda_deck(self) -> Any:
+        """Get the agenda deck for manipulation.
+
+        Returns:
+            Agenda deck object with required methods, or None if not initialized
+        """
+        # Return the actual agenda deck if it exists
+        # In a full implementation, this would be initialized during game setup
+        return getattr(self, "_agenda_deck", None)
+
+    @property
+    def agenda_deck(self) -> Any:
+        """Property access to agenda deck."""
+        return self.get_agenda_deck()
+
+    # Agenda Phase Integration
+    @property
+    def agenda_phase(self) -> Any:
+        """Get agenda phase object for integration.
+
+        Returns:
+            Agenda phase object, or None if not initialized
+        """
+        # Return the actual agenda phase if it exists
+        # In a full implementation, this would be initialized during game setup
+        return getattr(self, "_agenda_phase", None)
+
     def _validate_objective_not_already_scored(
         self, player_id: str, objective: Objective
     ) -> None:
