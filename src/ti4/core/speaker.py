@@ -39,6 +39,13 @@ class SpeakerManager:
         if not any(player.id == player_id for player in game_state.players):
             raise ValueError(f"{context} {player_id} does not exist")
 
+    def _assign_speaker_internal(
+        self, game_state: GameState, player_id: str, context: str = "Player"
+    ) -> GameState:
+        """Internal method to assign speaker with custom validation context."""
+        self._validate_player_id(game_state, player_id, context)
+        return game_state._create_new_state(speaker_id=player_id)
+
     def assign_speaker(self, game_state: GameState, player_id: str) -> GameState:
         """Assign the speaker token to a player.
 
@@ -52,11 +59,7 @@ class SpeakerManager:
         Raises:
             ValueError: If player_id is invalid or player does not exist in the game
         """
-        # Input validation
-        self._validate_player_id(game_state, player_id, "Player")
-
-        # Create new game state with speaker assigned
-        return game_state._create_new_state(speaker_id=player_id)
+        return self._assign_speaker_internal(game_state, player_id, "Player")
 
     def get_current_speaker(self, game_state: GameState) -> str | None:
         """Get the current speaker player ID.
@@ -85,12 +88,9 @@ class SpeakerManager:
             return all_player_ids
 
         # Speaker goes first, then other players in their original order
-        result = [game_state.speaker_id]
-        for player_id in all_player_ids:
-            if player_id != game_state.speaker_id:
-                result.append(player_id)
-
-        return result
+        return [game_state.speaker_id] + [
+            pid for pid in all_player_ids if pid != game_state.speaker_id
+        ]
 
     def break_tie(self, game_state: GameState, tied_players: list[str]) -> str:
         """Break ties using speaker priority (Rule 80.2).
@@ -145,8 +145,4 @@ class SpeakerManager:
         Raises:
             ValueError: If new_speaker_id is invalid or player does not exist in the game
         """
-        # Input validation
-        self._validate_player_id(game_state, new_speaker_id, "New speaker")
-
-        # Pass the token by creating new game state with new speaker
-        return game_state._create_new_state(speaker_id=new_speaker_id)
+        return self._assign_speaker_internal(game_state, new_speaker_id, "New speaker")
