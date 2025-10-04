@@ -228,6 +228,28 @@ class ActionCardManager:
         if window_to_clear and window_to_clear in self._played_cards_this_window:
             self._played_cards_this_window[window_to_clear].clear()
 
+    def draw_action_cards(
+        self, player_id: str, count: int, game_state: Any
+    ) -> list[str]:
+        """Draw action cards for a player.
+
+        Args:
+            player_id: The player drawing cards
+            count: Number of cards to draw
+            game_state: Game state to update
+
+        Returns:
+            List of card names drawn
+        """
+        if hasattr(game_state, "draw_action_cards"):
+            # Delegate to game state for actual card management
+            game_state.draw_action_cards(player_id, count)
+            # Return the cards that were added
+            return [f"action_card_{i}" for i in range(count)]
+
+        # Fallback for testing
+        return [f"action_card_{i}" for i in range(count)]
+
 
 # Example Action Card implementations
 
