@@ -240,6 +240,11 @@ class ActionCardManager:
 
         Returns:
             List of card names drawn
+
+        Note:
+            If game_state has a draw_action_cards method, we delegate to it
+            for state management but still return placeholder names since the
+            game_state method returns a new GameState, not card identifiers.
         """
         if hasattr(game_state, "draw_action_cards"):
             # Delegate to game state for actual card management

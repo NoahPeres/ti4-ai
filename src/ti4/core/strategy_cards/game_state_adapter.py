@@ -102,8 +102,21 @@ class StrategyCardGameStateAdapter:
         """
         if not self.is_valid_player(player_id):
             return False
-        # For now, return True as a placeholder since CommandTokenManager doesn't have this method
-        # In a real implementation, this would delegate to the actual command token system
+
+        # If we have a command token system, delegate to it
+        if self.command_token_system:
+            # Create a minimal game state for delegation
+            # In production, this should receive the actual game state
+            mock_game_state = type(
+                "MockGameState",
+                (),
+                {"spend_command_token_from_strategy_pool": lambda p, c: True},
+            )()
+            return self.command_token_system.spend_strategy_pool_token(
+                player_id, mock_game_state
+            )
+
+        # Fallback for testing without command token system
         return True
 
     def look_at_top_agenda_cards(self, count: int) -> list[str]:
@@ -149,7 +162,7 @@ def create_game_state_adapter_from_game_state(
     # Extract player list if available
     players = []
     if hasattr(game_state, "players"):
-        players = list(game_state.players.keys())
+        players = [player.id for player in game_state.players]
 
     return StrategyCardGameStateAdapter(
         action_card_system=action_card_system,

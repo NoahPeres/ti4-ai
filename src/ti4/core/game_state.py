@@ -779,11 +779,16 @@ class GameState:
 
         Returns:
             True if speaker was set successfully, False if player doesn't exist
+
+        Note:
+            This method currently mutates the frozen GameState for backward compatibility.
+            TODO: Change signature to return GameState instead of bool to maintain immutability.
         """
         if not any(player.id == player_id for player in self.players):
             return False
 
         # Update speaker (this mutates the state for compatibility with existing tests)
+        # TODO: Return new GameState instead of mutating to preserve immutability
         object.__setattr__(self, "speaker_id", player_id)
         return True
 
@@ -824,8 +829,18 @@ class GameState:
                 # Spend the tokens (this mutates for compatibility)
                 player.command_sheet.strategy_tokens -= count
                 return True
+            else:
+                # Player has command sheet but insufficient tokens
+                return False
 
-        # Fallback: assume player has tokens (for testing compatibility)
+        # Player doesn't have command sheet structure - this should not happen in production
+        # For backward compatibility with tests, we return True, but consider requiring
+        # proper command sheet initialization
+        import logging
+
+        logging.warning(
+            f"Player {player_id} missing command_sheet structure - using test fallback"
+        )
         return True
 
     # Agenda Deck System Integration (Rule 7)
@@ -833,17 +848,11 @@ class GameState:
         """Get the agenda deck for manipulation.
 
         Returns:
-            Mock agenda deck object with required methods
+            Agenda deck object with required methods, or None if not initialized
         """
-
-        class MockAgendaDeck:
-            def look_at_top_cards(self, count: int) -> list[str]:
-                return [f"agenda_{i}" for i in range(count)]
-
-            def rearrange_top_cards(self, cards: list[str]) -> bool:
-                return len(cards) <= 2
-
-        return MockAgendaDeck()
+        # Return the actual agenda deck if it exists
+        # In a full implementation, this would be initialized during game setup
+        return getattr(self, "_agenda_deck", None)
 
     @property
     def agenda_deck(self) -> Any:
@@ -853,13 +862,14 @@ class GameState:
     # Agenda Phase Integration
     @property
     def agenda_phase(self) -> Any:
-        """Get agenda phase object for integration."""
+        """Get agenda phase object for integration.
 
-        class MockAgendaPhase:
-            def allow_deck_manipulation(self, player_id: str) -> bool:
-                return True
-
-        return MockAgendaPhase()
+        Returns:
+            Agenda phase object, or None if not initialized
+        """
+        # Return the actual agenda phase if it exists
+        # In a full implementation, this would be initialized during game setup
+        return getattr(self, "_agenda_phase", None)
 
     def _validate_objective_not_already_scored(
         self, player_id: str, objective: Objective

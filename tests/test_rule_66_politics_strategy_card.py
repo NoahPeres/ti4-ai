@@ -348,6 +348,15 @@ class TestPoliticsCardValidation:
         assert result.success is False
         assert "player id" in result.error_message.lower()
 
+    def test_secondary_ability_empty_player_id_validation(self) -> None:
+        """Test secondary ability validation with empty player ID."""
+        card = PoliticsStrategyCard()
+
+        result = card.execute_secondary_ability(player_id="", game_state=None)
+
+        assert result.success is False
+        assert "player id" in result.error_message.lower()
+
 
 class TestPoliticsCardIntegration:
     """Test suite for Politics card integration with game systems."""

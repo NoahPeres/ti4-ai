@@ -5,19 +5,22 @@ the game systems they interact with.
 """
 
 from abc import abstractmethod
-from typing import Protocol
+from typing import Any, Protocol
 
 
 class ActionCardSystemProtocol(Protocol):
     """Protocol for action card system integration."""
 
     @abstractmethod
-    def draw_action_cards(self, player_id: str, count: int) -> list[str]:
+    def draw_action_cards(
+        self, player_id: str, count: int, game_state: Any
+    ) -> list[str]:
         """Draw action cards for a player.
 
         Args:
             player_id: The player drawing cards
             count: Number of cards to draw
+            game_state: Game state to update
 
         Returns:
             List of action card identifiers drawn

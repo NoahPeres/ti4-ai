@@ -75,5 +75,8 @@ class CommandTokenManager:
         Returns:
             True if token was spent successfully, False if insufficient tokens
         """
+        if not player_id:
+            return False
+
         # Delegate to game state method for consistency
         return game_state.spend_command_token_from_strategy_pool(player_id, 1)
