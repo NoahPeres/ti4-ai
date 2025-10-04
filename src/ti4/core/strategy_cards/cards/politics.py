@@ -88,11 +88,13 @@ class PoliticsStrategyCard(BaseStrategyCard):
             # Execute the three primary ability steps
             # game_state is guaranteed to be non-None due to validation above
             assert game_state is not None
-            speaker_result = self._execute_choose_speaker(game_state, chosen_speaker)
+            speaker_result, game_state = self._execute_choose_speaker(
+                game_state, chosen_speaker
+            )
             if not speaker_result.success:
                 return speaker_result
 
-            self._execute_draw_action_cards(game_state, player_id, 2)
+            game_state = self._execute_draw_action_cards(game_state, player_id, 2)
             self._execute_agenda_deck_manipulation(game_state, player_id, kwargs)
 
             return StrategyCardAbilityResult(
@@ -185,7 +187,7 @@ class PoliticsStrategyCard(BaseStrategyCard):
 
     def _execute_choose_speaker(
         self, game_state: "GameState", chosen_speaker: str
-    ) -> StrategyCardAbilityResult:
+    ) -> tuple[StrategyCardAbilityResult, "GameState"]:
         """Execute the choose speaker step of the primary ability.
 
         Args:
@@ -193,7 +195,7 @@ class PoliticsStrategyCard(BaseStrategyCard):
             chosen_speaker: The player to become the new speaker
 
         Returns:
-            StrategyCardAbilityResult indicating success or failure
+            Tuple of (result, updated_game_state)
         """
         # Try GameState's integrated speaker system first, fallback to duck typing
         if hasattr(game_state, "set_speaker"):
@@ -206,36 +208,45 @@ class PoliticsStrategyCard(BaseStrategyCard):
                         return StrategyCardAbilityResult(
                             success=False,
                             error_message=f"Invalid speaker choice: {chosen_speaker}",
-                        )
+                        ), game_state
                 else:
                     # New interface - returns GameState
-                    # TODO: The caller needs to handle the new game state
-                    pass
+                    game_state = result
             except ValueError:
                 return StrategyCardAbilityResult(
                     success=False,
                     error_message=f"Invalid speaker choice: {chosen_speaker}",
-                )
+                ), game_state
         else:
             # Fallback for mock objects in tests
-            return StrategyCardAbilityResult(success=True)
+            return StrategyCardAbilityResult(success=True), game_state
 
-        return StrategyCardAbilityResult(success=True)
+        return StrategyCardAbilityResult(success=True), game_state
 
     def _execute_draw_action_cards(
         self, game_state: "GameState", player_id: str, count: int
-    ) -> None:
+    ) -> "GameState":
         """Execute the draw action cards step.
 
         Args:
             game_state: The current game state
             player_id: The player drawing cards
             count: Number of cards to draw
+
+        Returns:
+            Updated GameState with cards drawn
         """
         # Try GameState's integrated action card system first, fallback to duck typing
         if hasattr(game_state, "draw_action_cards"):
-            game_state.draw_action_cards(player_id, count)
-        # Fallback for mock objects in tests - no action needed
+            result = game_state.draw_action_cards(player_id, count)
+            # Handle both new interface (returns GameState) and old interface (returns list/other)
+            if hasattr(result, "players"):  # Duck typing check for GameState
+                return result
+            else:
+                # Old interface - returns something else, game_state unchanged
+                return game_state
+        # Fallback for mock objects in tests
+        return game_state
 
     def _execute_agenda_deck_manipulation(
         self, game_state: "GameState", player_id: str, kwargs: dict[str, Any]

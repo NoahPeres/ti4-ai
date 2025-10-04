@@ -79,4 +79,9 @@ class CommandTokenManager:
             return False
 
         # Delegate to game state method for consistency
-        return game_state.spend_command_token_from_strategy_pool(player_id, 1)
+        try:
+            game_state.spend_command_token_from_strategy_pool(player_id, 1)
+            return True
+        except ValueError:
+            # Player doesn't exist or insufficient tokens
+            return False

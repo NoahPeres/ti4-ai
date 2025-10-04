@@ -800,7 +800,7 @@ class GameState:
     # Command Token System Integration (Rule 20)
     def spend_command_token_from_strategy_pool(
         self, player_id: str, count: int = 1
-    ) -> bool:
+    ) -> GameState:
         """Spend command tokens from a player's strategy pool.
 
         Args:
@@ -808,37 +808,38 @@ class GameState:
             count: Number of tokens to spend (default 1)
 
         Returns:
-            True if tokens were spent successfully, False if insufficient tokens
+            New GameState with tokens spent
+
+        Raises:
+            ValueError: If player doesn't exist or has insufficient tokens
         """
         if not any(player.id == player_id for player in self.players):
-            return False
+            raise ValueError(f"Player {player_id} does not exist")
 
-        # Find the player
-        player = next((p for p in self.players if p.id == player_id), None)
-        if not player:
-            return False
+        # Clone players and update the specific player's tokens
+        import copy
 
-        # Check if player has sufficient strategy tokens
-        if hasattr(player, "command_sheet") and hasattr(
-            player.command_sheet, "strategy_tokens"
-        ):
-            if player.command_sheet.strategy_tokens >= count:
-                # Spend the tokens (this mutates for compatibility)
-                player.command_sheet.strategy_tokens -= count
-                return True
+        new_players = []
+        for player in self.players:
+            if player.id == player_id:
+                # Deep copy player and update command sheet
+                updated_player = copy.deepcopy(player)
+                if not hasattr(updated_player, "command_sheet"):
+                    raise ValueError(f"Player {player_id} missing command_sheet")
+                if not hasattr(updated_player.command_sheet, "strategy_tokens"):
+                    raise ValueError(
+                        f"Player {player_id} command_sheet missing strategy_tokens"
+                    )
+                if updated_player.command_sheet.strategy_tokens < count:
+                    raise ValueError(
+                        f"Player {player_id} has insufficient tokens in strategy pool"
+                    )
+                updated_player.command_sheet.strategy_tokens -= count
+                new_players.append(updated_player)
             else:
-                # Player has command sheet but insufficient tokens
-                return False
+                new_players.append(player)
 
-        # Player doesn't have command sheet structure - this should not happen in production
-        # For backward compatibility with tests, we return True, but consider requiring
-        # proper command sheet initialization
-        import logging
-
-        logging.warning(
-            f"Player {player_id} missing command_sheet structure - using test fallback"
-        )
-        return True
+        return self._create_new_state(players=new_players)
 
     # Agenda Deck System Integration (Rule 7)
     def get_agenda_deck(self) -> Any:

@@ -143,21 +143,28 @@ class StrategyCardGameStateAdapter:
         if self.command_token_system:
             # The CommandTokenManager expects a game_state parameter
             # We need to bridge between the protocol interface and the manager interface
-            # For now, create a minimal game state that delegates back to the real GameState
             if hasattr(self, "_game_state") and self._game_state is not None:
-                return self.command_token_system.spend_strategy_pool_token(
-                    player_id, self._game_state
-                )
+                try:
+                    # Use the new immutable interface that returns GameState
+                    updated_state = (
+                        self._game_state.spend_command_token_from_strategy_pool(
+                            player_id, count
+                        )
+                    )
+                    # Update our internal state reference
+                    self._game_state = updated_state
+                    return True
+                except ValueError:
+                    # Player doesn't exist or insufficient tokens
+                    return False
             else:
-                # Fallback: create a mock that implements the expected interface
-                mock_game_state = type(
-                    "MockGameState",
-                    (),
-                    {"spend_command_token_from_strategy_pool": lambda p, c: True},
-                )()
-                return self.command_token_system.spend_strategy_pool_token(
-                    player_id, mock_game_state
+                # No game state available - cannot verify or spend tokens
+                import logging
+
+                logging.warning(
+                    f"Cannot spend token for {player_id}: no game_state available"
                 )
+                return False
 
         # Fallback for testing without command token system
         return True
