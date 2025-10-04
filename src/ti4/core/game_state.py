@@ -764,33 +764,30 @@ class GameState:
             new_player_action_cards[player_id] = []
 
         # Add placeholder cards (in real implementation, these would come from a deck)
+        start_count = len(new_player_action_cards[player_id])
         for i in range(count):
-            card_name = f"action_card_{len(new_player_action_cards[player_id]) + i + 1}"
+            card_name = f"action_card_{start_count + i + 1}"
             new_player_action_cards[player_id].append(card_name)
 
         return self._create_new_state(player_action_cards=new_player_action_cards)
 
     # Speaker System Integration (Rule 80)
-    def set_speaker(self, player_id: str) -> bool:
+    def set_speaker(self, player_id: str) -> GameState:
         """Set the speaker for the game.
 
         Args:
             player_id: The player to become speaker
 
         Returns:
-            True if speaker was set successfully, False if player doesn't exist
+            New GameState with updated speaker
 
-        Note:
-            This method currently mutates the frozen GameState for backward compatibility.
-            TODO: Change signature to return GameState instead of bool to maintain immutability.
+        Raises:
+            ValueError: If player_id doesn't exist
         """
         if not any(player.id == player_id for player in self.players):
-            return False
+            raise ValueError(f"Player {player_id} does not exist")
 
-        # Update speaker (this mutates the state for compatibility with existing tests)
-        # TODO: Return new GameState instead of mutating to preserve immutability
-        object.__setattr__(self, "speaker_id", player_id)
-        return True
+        return self._create_new_state(speaker_id=player_id)
 
     def get_speaker(self) -> str | None:
         """Get the current speaker.

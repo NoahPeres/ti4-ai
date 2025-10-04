@@ -32,14 +32,17 @@ class SpeakerSystemProtocol(Protocol):
     """Protocol for speaker system integration."""
 
     @abstractmethod
-    def set_speaker(self, player_id: str) -> bool:
+    def set_speaker(self, player_id: str) -> Any:  # GameState in actual implementation
         """Set a new speaker.
 
         Args:
             player_id: The player to become speaker
 
         Returns:
-            True if speaker was successfully set, False otherwise
+            New GameState with updated speaker
+
+        Raises:
+            ValueError: If player_id doesn't exist
         """
         ...
 

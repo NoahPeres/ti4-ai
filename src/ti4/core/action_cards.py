@@ -236,24 +236,20 @@ class ActionCardManager:
         Args:
             player_id: The player drawing cards
             count: Number of cards to draw
-            game_state: Game state to update
+            game_state: Game state to update (mutable reference expected)
 
         Returns:
             List of card names drawn
 
         Note:
-            If game_state has a draw_action_cards method, we delegate to it
-            for state management but still return placeholder names since the
-            game_state method returns a new GameState, not card identifiers.
+            This method expects the caller to handle GameState updates.
+            If game_state has a draw_action_cards method that returns a new state,
+            the caller must capture and use that new state.
         """
-        if hasattr(game_state, "draw_action_cards"):
-            # Delegate to game state for actual card management
-            game_state.draw_action_cards(player_id, count)
-            # Return the cards that were added
-            return [f"action_card_{i}" for i in range(count)]
-
-        # Fallback for testing
-        return [f"action_card_{i}" for i in range(count)]
+        # For now, return placeholder card names
+        # The actual state management should be handled by the caller
+        # who has access to the GameState's draw_action_cards method
+        return [f"action_card_{i + 1}" for i in range(count)]
 
 
 # Example Action Card implementations

@@ -24,6 +24,7 @@ class StrategyCardGameStateAdapter:
 
     def __init__(
         self,
+        game_state: Optional["GameState"] = None,
         action_card_system: Optional[ActionCardManager] = None,
         command_token_system: Optional[CommandTokenManager] = None,
         agenda_deck: Optional[AgendaDeck] = None,
@@ -33,12 +34,14 @@ class StrategyCardGameStateAdapter:
         """Initialize the adapter with game systems.
 
         Args:
+            game_state: The current game state (for real integrations)
             action_card_system: The action card system
             command_token_system: The command token system
             agenda_deck: The agenda deck
             speaker_system: The speaker system
             players: List of valid player IDs
         """
+        self._game_state = game_state
         self.action_card_system = action_card_system or ActionCardManager()
         self.command_token_system = command_token_system or CommandTokenManager()
         self.agenda_deck = agenda_deck or AgendaDeck()
@@ -67,6 +70,21 @@ class StrategyCardGameStateAdapter:
         """
         if not self.is_valid_player(player_id):
             return False
+
+        # If we have a real game state, use it and update our reference
+        if (
+            hasattr(self, "_game_state")
+            and self._game_state is not None
+            and hasattr(self._game_state, "set_speaker")
+        ):
+            try:
+                new_state = self._game_state.set_speaker(player_id)
+                self._game_state = new_state  # Update our reference
+                return True
+            except ValueError:
+                return False
+
+        # Fallback to speaker system
         self.speaker_system.set_speaker(player_id)
         return True  # SpeakerSystem.set_speaker returns None, so we assume success
 
@@ -82,11 +100,29 @@ class StrategyCardGameStateAdapter:
         """
         if not self.is_valid_player(player_id):
             return []
-        # Use a mock game state for now - in real implementation this would be the actual game state
-        mock_game_state = type("MockGameState", (), {})()
-        return self.action_card_system.draw_action_cards(
-            player_id, count, mock_game_state
-        )
+
+        # Use the real game state if available
+        if self._game_state:
+            # Update our game state reference with the new state
+            new_state = self._game_state.draw_action_cards(player_id, count)
+            self._game_state = new_state
+            # Return the actual card names that were added
+            if (
+                hasattr(new_state, "player_action_cards")
+                and player_id in new_state.player_action_cards
+            ):
+                player_cards = new_state.player_action_cards[player_id]
+                # Return the last 'count' cards that were added
+                if len(player_cards) >= count:
+                    result: list[str] = player_cards[-count:]
+                    return result
+                else:
+                    result_all: list[str] = player_cards
+                    return result_all
+            return [f"action_card_{i + 1}" for i in range(count)]
+        else:
+            # Fallback to action card system
+            return self.action_card_system.draw_action_cards(player_id, count, None)
 
     def spend_command_token_from_strategy_pool(
         self, player_id: str, count: int = 1
@@ -105,16 +141,23 @@ class StrategyCardGameStateAdapter:
 
         # If we have a command token system, delegate to it
         if self.command_token_system:
-            # Create a minimal game state for delegation
-            # In production, this should receive the actual game state
-            mock_game_state = type(
-                "MockGameState",
-                (),
-                {"spend_command_token_from_strategy_pool": lambda p, c: True},
-            )()
-            return self.command_token_system.spend_strategy_pool_token(
-                player_id, mock_game_state
-            )
+            # The CommandTokenManager expects a game_state parameter
+            # We need to bridge between the protocol interface and the manager interface
+            # For now, create a minimal game state that delegates back to the real GameState
+            if hasattr(self, "_game_state") and self._game_state is not None:
+                return self.command_token_system.spend_strategy_pool_token(
+                    player_id, self._game_state
+                )
+            else:
+                # Fallback: create a mock that implements the expected interface
+                mock_game_state = type(
+                    "MockGameState",
+                    (),
+                    {"spend_command_token_from_strategy_pool": lambda p, c: True},
+                )()
+                return self.command_token_system.spend_strategy_pool_token(
+                    player_id, mock_game_state
+                )
 
         # Fallback for testing without command token system
         return True

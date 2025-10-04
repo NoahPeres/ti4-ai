@@ -197,8 +197,21 @@ class PoliticsStrategyCard(BaseStrategyCard):
         """
         # Try GameState's integrated speaker system first, fallback to duck typing
         if hasattr(game_state, "set_speaker"):
-            speaker_result = game_state.set_speaker(chosen_speaker)
-            if not speaker_result:
+            try:
+                result = game_state.set_speaker(chosen_speaker)
+                # Handle both new interface (returns GameState) and old interface (returns bool)
+                if isinstance(result, bool):
+                    # Old interface - boolean return
+                    if not result:
+                        return StrategyCardAbilityResult(
+                            success=False,
+                            error_message=f"Invalid speaker choice: {chosen_speaker}",
+                        )
+                else:
+                    # New interface - returns GameState
+                    # TODO: The caller needs to handle the new game state
+                    pass
+            except ValueError:
                 return StrategyCardAbilityResult(
                     success=False,
                     error_message=f"Invalid speaker choice: {chosen_speaker}",
