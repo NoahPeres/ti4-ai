@@ -15,11 +15,15 @@ Environment Variables:
 
 import argparse
 import json
+import logging
 import os
+import shutil
+import subprocess  # noqa: S404
 import sys
 from datetime import datetime
 from typing import Any, Optional
 from urllib.error import HTTPError, URLError
+from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
 
@@ -51,13 +55,24 @@ class GitHubPRReviewFetcher:
 
         return headers
 
+    def _validate_github_url(self, url: str) -> None:
+        """Validate that URL is a legitimate GitHub API URL."""
+        parsed = urlparse(url)
+        if parsed.scheme != "https":
+            raise ValueError(f"Only HTTPS URLs are allowed, got: {parsed.scheme}")
+        if parsed.netloc != "api.github.com":
+            raise ValueError(
+                f"Only api.github.com URLs are allowed, got: {parsed.netloc}"
+            )
+
     def _make_request(self, url: str) -> Any:
         """Make a request to the GitHub API."""
+        self._validate_github_url(url)
         headers = self._headers()
 
         try:
-            request = Request(url, headers=headers)
-            with urlopen(request, timeout=15) as response:
+            request = Request(url, headers=headers)  # noqa: S310
+            with urlopen(request, timeout=15) as response:  # noqa: S310
                 return json.loads(response.read().decode("utf-8"))
         except HTTPError as e:
             if e.code == 404:
@@ -87,11 +102,12 @@ class GitHubPRReviewFetcher:
         current_url = url
 
         while current_url:
+            self._validate_github_url(current_url)
             headers = self._headers()
 
             try:
-                request = Request(current_url, headers=headers)
-                with urlopen(request, timeout=15) as response:
+                request = Request(current_url, headers=headers)  # noqa: S310
+                with urlopen(request, timeout=15) as response:  # noqa: S310  # noqa: S310
                     data = json.loads(response.read().decode("utf-8"))
 
                     # Guard against non-list payloads
@@ -272,13 +288,18 @@ class GitHubPRReviewFetcher:
 def detect_repo_from_git() -> Optional[str]:
     """Try to detect the GitHub repository from git remote."""
     try:
-        import subprocess
+        # Find git executable safely
+        git_path = shutil.which("git")
+        if not git_path:
+            logging.warning("Git executable not found in PATH")
+            return None
 
-        result = subprocess.run(
-            ["git", "remote", "get-url", "origin"],
+        result = subprocess.run(  # noqa: S603
+            [git_path, "remote", "get-url", "origin"],
             capture_output=True,
             text=True,
             cwd=os.getcwd(),
+            check=False,  # Don't raise on non-zero exit
         )
         if result.returncode == 0:
             url = result.stdout.strip()
@@ -291,9 +312,9 @@ def detect_repo_from_git() -> Optional[str]:
                 else:
                     return None
                 return repo
-    except Exception:
-        pass
-    return None
+    except Exception as e:
+        logging.warning(f"Failed to detect repository from git: {e}")
+        return None
 
 
 def main():

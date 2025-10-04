@@ -874,3 +874,917 @@ blue_specs = spec_registry.get_specifications_by_color(TechnologyColor.BLUE)
 ```
 
 This API reference provides comprehensive documentation for all classes, methods, and interfaces in the Technology Card Framework.
+
+---
+
+# Agenda Card Framework API Reference
+
+## Overview
+
+This section provides a comprehensive API reference for the Agenda Card Framework, including all classes, methods, and interfaces for implementing agenda cards.
+
+## Table of Contents
+
+1. [Core Base Classes](#agenda-core-base-classes)
+2. [Registry and Management](#agenda-registry-and-management)
+3. [Effect Resolution](#agenda-effect-resolution)
+4. [Law Management](#agenda-law-management)
+5. [Planet Attachment](#agenda-planet-attachment)
+6. [Validation System](#agenda-validation-system)
+7. [Exception Classes](#agenda-exception-classes)
+8. [Data Classes](#agenda-data-classes)
+
+## Agenda Core Base Classes
+
+### BaseAgendaCard
+
+**File**: `src/ti4/core/agenda_cards/base/agenda_card.py`
+
+Abstract base class for all agenda card implementations.
+
+```python
+class BaseAgendaCard(ABC):
+    """Abstract base class for all agenda card implementations."""
+```
+
+#### Constructor
+
+```python
+def __init__(self, name: str) -> None:
+    """
+    Initialize the base agenda card.
+
+    Args:
+        name: Display name of the agenda card
+
+    Raises:
+        ValueError: If name is empty or None
+    """
+```
+
+#### Properties
+
+##### name
+```python
+@property
+def name(self) -> str:
+    """Display name of the agenda card."""
+```
+
+**Returns**: `str` - The agenda card's display name
+
+#### Methods
+
+##### get_name
+```python
+def get_name(self) -> str:
+    """Get the agenda card name."""
+```
+
+**Returns**: `str` - The agenda card's name
+
+##### get_agenda_type
+```python
+@abstractmethod
+def get_agenda_type(self) -> AgendaType:
+    """Get the agenda type (LAW or DIRECTIVE)."""
+```
+
+**Returns**: `AgendaType` - The type of agenda card (LAW or DIRECTIVE)
+
+##### get_voting_outcomes
+```python
+def get_voting_outcomes(self) -> list[str]:
+    """Get possible voting outcomes for this agenda."""
+```
+
+**Returns**: `list[str]` - List of valid voting outcomes
+**Default**: `["For", "Against"]`
+
+##### resolve_outcome
+```python
+@abstractmethod
+def resolve_outcome(self, outcome: str, vote_result: Any, game_state: Any) -> Any:
+    """Resolve the agenda based on voting outcome."""
+```
+
+**Args**:
+- `outcome`: The voting outcome to resolve
+- `vote_result`: The result of the voting process
+- `game_state`: Current game state
+
+**Returns**: `AgendaResolutionResult` - Result of the resolution
+
+##### validate_card_data
+```python
+def validate_card_data(self, outcomes: list[str], metadata: dict[str, Any]) -> bool:
+    """Validate agenda card data."""
+```
+
+**Args**:
+- `outcomes`: List of voting outcomes to validate
+- `metadata`: Card metadata to validate
+
+**Returns**: `bool` - True if data is valid
+
+### LawCard
+
+**File**: `src/ti4/core/agenda_cards/base/law_card.py`
+
+Base class for law cards with persistent effects.
+
+```python
+class LawCard(BaseAgendaCard):
+    """Base class for law cards with persistent effects."""
+```
+
+#### Methods
+
+##### get_agenda_type
+```python
+def get_agenda_type(self) -> AgendaType:
+    """Get the agenda type (always LAW for law cards)."""
+```
+
+**Returns**: `AgendaType.LAW`
+
+##### create_active_law
+```python
+@abstractmethod
+def create_active_law(
+    self, outcome: str, elected_target: str | None = None
+) -> ActiveLaw:
+    """Create an active law instance for persistent tracking."""
+```
+
+**Args**:
+- `outcome`: The voting outcome that enacted the law
+- `elected_target`: Optional elected target (for election-based laws)
+
+**Returns**: `ActiveLaw` - Active law instance for tracking
+
+##### get_law_effects
+```python
+def get_law_effects(self) -> list[str]:
+    """Get list of game mechanics this law affects."""
+```
+
+**Returns**: `list[str]` - List of affected game mechanics
+**Default**: `[]`
+
+##### conflicts_with_law
+```python
+def conflicts_with_law(self, other_law: "ActiveLaw") -> bool:
+    """Check if this law conflicts with another active law."""
+```
+
+**Args**:
+- `other_law`: Another active law to check against
+
+**Returns**: `bool` - True if laws conflict
+**Default**: `False`
+
+### DirectiveCard
+
+**File**: `src/ti4/core/agenda_cards/base/directive_card.py`
+
+Base class for directive cards with immediate effects.
+
+```python
+class DirectiveCard(BaseAgendaCard):
+    """Base class for directive cards with immediate effects."""
+```
+
+#### Methods
+
+##### get_agenda_type
+```python
+def get_agenda_type(self) -> AgendaType:
+    """Get the agenda type (always DIRECTIVE for directive cards)."""
+```
+
+**Returns**: `AgendaType.DIRECTIVE`
+
+##### execute_immediate_effect
+```python
+@abstractmethod
+def execute_immediate_effect(
+    self, outcome: str, vote_result: "VoteResult", game_state: "GameState"
+) -> None:
+    """Execute the immediate directive effect."""
+```
+
+**Args**:
+- `outcome`: The voting outcome
+- `vote_result`: The result of the voting process
+- `game_state`: Current game state
+
+##### should_discard_on_reveal
+```python
+def should_discard_on_reveal(self, game_state: "GameState") -> bool:
+    """Check if card should be discarded when revealed."""
+```
+
+**Args**:
+- `game_state`: Current game state
+
+**Returns**: `bool` - True if card should be discarded
+**Default**: `False`
+
+### PlanetAttachableCard
+
+**File**: `src/ti4/core/agenda_cards/base/planet_attachable_card.py`
+
+Base class for agenda cards that attach to planets.
+
+```python
+class PlanetAttachableCard(DirectiveCard):
+    """Base class for agenda cards that attach to planets."""
+```
+
+#### Methods
+
+##### get_attachment_type
+```python
+@abstractmethod
+def get_attachment_type(self) -> PlanetAttachmentType:
+    """Get the type of planet attachment."""
+```
+
+**Returns**: `PlanetAttachmentType` - The type of attachment
+
+##### get_planet_effects
+```python
+@abstractmethod
+def get_planet_effects(self) -> dict[str, Any]:
+    """Get the effects this attachment provides to the planet."""
+```
+
+**Returns**: `dict[str, Any]` - Dictionary of planet effects
+
+##### can_attach_to_planet
+```python
+def can_attach_to_planet(self, planet: "Planet") -> bool:
+    """Check if this card can attach to the given planet."""
+```
+
+**Args**:
+- `planet`: Planet to check attachment eligibility
+
+**Returns**: `bool` - True if attachment is allowed
+**Default**: `True`
+
+## Agenda Registry and Management
+
+### AgendaCardRegistry
+
+**File**: `src/ti4/core/agenda_cards/registry.py`
+
+Registry for managing concrete agenda card implementations.
+
+```python
+class AgendaCardRegistry:
+    """Registry for all concrete agenda card implementations."""
+```
+
+#### Constructor
+
+```python
+def __init__(self) -> None:
+    """Initialize the agenda card registry."""
+```
+
+#### Methods
+
+##### register_card
+```python
+def register_card(self, card: BaseAgendaCard) -> None:
+    """
+    Register an agenda card implementation.
+
+    Args:
+        card: The agenda card implementation to register
+
+    Raises:
+        ValueError: If card is None or already registered with this name
+    """
+```
+
+##### get_card
+```python
+def get_card(self, name: str) -> Optional[BaseAgendaCard]:
+    """
+    Get an agenda card implementation.
+
+    Args:
+        name: The name of the agenda card to get
+
+    Returns:
+        The agenda card implementation, or None if not registered
+    """
+```
+
+##### get_all_cards
+```python
+def get_all_cards(self) -> list[BaseAgendaCard]:
+    """
+    Get all registered agenda cards.
+
+    Returns:
+        List of all registered agenda card implementations
+    """
+```
+
+##### get_all_card_names
+```python
+def get_all_card_names(self) -> list[str]:
+    """
+    Get names of all registered agenda cards.
+
+    Returns:
+        List of all registered agenda card names
+    """
+```
+
+##### is_registered
+```python
+def is_registered(self, name: str) -> bool:
+    """
+    Check if an agenda card is registered.
+
+    Args:
+        name: The name of the agenda card to check
+
+    Returns:
+        True if the agenda card is registered
+    """
+```
+
+##### unregister_card
+```python
+def unregister_card(self, name: str) -> bool:
+    """
+    Unregister an agenda card.
+
+    Args:
+        name: The name of the agenda card to unregister
+
+    Returns:
+        True if the card was unregistered, False if it wasn't registered
+    """
+```
+
+##### clear
+```python
+def clear(self) -> None:
+    """Clear all registered agenda cards."""
+```
+
+### AgendaDeck
+
+**File**: `src/ti4/core/agenda_cards/deck.py`
+
+Manages the agenda deck with proper shuffling and drawing.
+
+```python
+class AgendaDeck:
+    """Manages the agenda deck with proper shuffling and drawing."""
+```
+
+#### Constructor
+
+```python
+def __init__(self, cards: list[BaseAgendaCard]) -> None:
+    """
+    Initialize the agenda deck.
+
+    Args:
+        cards: List of agenda cards to include in the deck
+    """
+```
+
+#### Methods
+
+##### shuffle
+```python
+def shuffle(self) -> None:
+    """Shuffle the deck."""
+```
+
+##### draw_top_card
+```python
+def draw_top_card(self) -> BaseAgendaCard:
+    """
+    Draw the top card, reshuffling if needed.
+
+    Returns:
+        The top agenda card from the deck
+
+    Raises:
+        AgendaDeckEmptyError: If deck and discard pile are both empty
+    """
+```
+
+##### discard_card
+```python
+def discard_card(self, card: BaseAgendaCard) -> None:
+    """
+    Add card to discard pile.
+
+    Args:
+        card: The agenda card to discard
+    """
+```
+
+##### remove_from_game
+```python
+def remove_from_game(self, card: BaseAgendaCard) -> None:
+    """
+    Permanently remove card from game.
+
+    Args:
+        card: The agenda card to remove permanently
+    """
+```
+
+##### is_empty
+```python
+def is_empty(self) -> bool:
+    """Check if the deck is empty."""
+```
+
+##### discard_pile_empty
+```python
+def discard_pile_empty(self) -> bool:
+    """Check if the discard pile is empty."""
+```
+
+## Agenda Effect Resolution
+
+### AgendaEffectResolver
+
+**File**: `src/ti4/core/agenda_cards/effect_resolver.py`
+
+Resolves agenda card effects based on voting outcomes.
+
+```python
+class AgendaEffectResolver:
+    """Resolves agenda card effects based on voting outcomes."""
+```
+
+#### Methods
+
+##### resolve_agenda_outcome
+```python
+def resolve_agenda_outcome(
+    self,
+    agenda: BaseAgendaCard,
+    vote_result: "VoteResult",
+    game_state: "GameState"
+) -> AgendaResolutionResult:
+    """
+    Resolve agenda based on voting outcome.
+
+    Args:
+        agenda: The agenda card to resolve
+        vote_result: The result of the voting process
+        game_state: Current game state
+
+    Returns:
+        Result of the agenda resolution
+    """
+```
+
+##### apply_law_effect
+```python
+def apply_law_effect(
+    self,
+    agenda: BaseAgendaCard,
+    elected_target: str | None,
+    game_state: "GameState"
+) -> None:
+    """
+    Apply persistent law effect to game state.
+
+    Args:
+        agenda: The law agenda card
+        elected_target: Optional elected target
+        game_state: Current game state
+    """
+```
+
+##### execute_directive_effect
+```python
+def execute_directive_effect(
+    self,
+    agenda: BaseAgendaCard,
+    vote_result: "VoteResult",
+    game_state: "GameState"
+) -> None:
+    """
+    Execute immediate directive effect.
+
+    Args:
+        agenda: The directive agenda card
+        vote_result: The result of the voting process
+        game_state: Current game state
+    """
+```
+
+## Agenda Law Management
+
+### LawManager
+
+**File**: `src/ti4/core/agenda_cards/law_manager.py`
+
+Manages active laws and their persistent effects.
+
+```python
+class LawManager:
+    """Manages active laws and their persistent effects."""
+```
+
+#### Constructor
+
+```python
+def __init__(self) -> None:
+    """Initialize the law manager."""
+```
+
+#### Methods
+
+##### enact_law
+```python
+def enact_law(self, active_law: ActiveLaw) -> None:
+    """
+    Enact a new law.
+
+    Args:
+        active_law: The active law to enact
+    """
+```
+
+##### get_active_laws
+```python
+def get_active_laws(self) -> list[ActiveLaw]:
+    """
+    Get all currently active laws.
+
+    Returns:
+        List of all active laws
+    """
+```
+
+##### get_laws_affecting_context
+```python
+def get_laws_affecting_context(self, context: GameContext) -> list[ActiveLaw]:
+    """
+    Get laws that affect a specific game context.
+
+    Args:
+        context: The game context to check
+
+    Returns:
+        List of laws affecting the context
+    """
+```
+
+##### remove_law
+```python
+def remove_law(self, law_name: str) -> bool:
+    """
+    Remove a law from play.
+
+    Args:
+        law_name: Name of the law to remove
+
+    Returns:
+        True if law was removed, False if not found
+    """
+```
+
+##### check_law_conflicts
+```python
+def check_law_conflicts(self, new_law: ActiveLaw) -> list[ActiveLaw]:
+    """
+    Check for laws that would be replaced by the new law.
+
+    Args:
+        new_law: The new law to check against
+
+    Returns:
+        List of conflicting laws
+    """
+```
+
+##### clear_all_laws
+```python
+def clear_all_laws(self) -> None:
+    """Clear all active laws."""
+```
+
+## Agenda Planet Attachment
+
+### PlanetAttachmentManager
+
+**File**: `src/ti4/core/agenda_cards/planet_attachment.py`
+
+Manages planet attachments from agenda cards.
+
+```python
+class PlanetAttachmentManager:
+    """Manages planet attachments from agenda cards."""
+```
+
+#### Methods
+
+##### attach_card_to_planet
+```python
+def attach_card_to_planet(
+    self, card: PlanetAttachableCard, planet: "Planet"
+) -> None:
+    """
+    Attach an agenda card to a planet.
+
+    Args:
+        card: The planet attachable card
+        planet: The planet to attach to
+    """
+```
+
+##### get_attachments_for_planet
+```python
+def get_attachments_for_planet(self, planet_name: str) -> list[PlanetAttachableCard]:
+    """
+    Get all attachments for a planet.
+
+    Args:
+        planet_name: Name of the planet
+
+    Returns:
+        List of attached cards
+    """
+```
+
+##### remove_attachment
+```python
+def remove_attachment(
+    self, planet_name: str, card_name: str
+) -> bool:
+    """
+    Remove an attachment from a planet.
+
+    Args:
+        planet_name: Name of the planet
+        card_name: Name of the card to remove
+
+    Returns:
+        True if attachment was removed
+    """
+```
+
+## Agenda Validation System
+
+### AgendaCardValidator
+
+**File**: `src/ti4/core/agenda_cards/validation.py`
+
+Validates agenda card operations and data.
+
+```python
+class AgendaCardValidator:
+    """Validates agenda card operations and data."""
+```
+
+#### Methods
+
+##### validate_voting_outcome
+```python
+def validate_voting_outcome(
+    self, card: BaseAgendaCard, outcome: str
+) -> ValidationResult:
+    """
+    Validate a voting outcome for an agenda card.
+
+    Args:
+        card: The agenda card
+        outcome: The voting outcome to validate
+
+    Returns:
+        Validation result
+    """
+```
+
+##### validate_card_resolution
+```python
+def validate_card_resolution(
+    self,
+    card: BaseAgendaCard,
+    vote_result: "VoteResult",
+    game_state: "GameState"
+) -> ValidationResult:
+    """
+    Validate agenda card resolution.
+
+    Args:
+        card: The agenda card
+        vote_result: The voting result
+        game_state: Current game state
+
+    Returns:
+        Validation result
+    """
+```
+
+## Agenda Exception Classes
+
+### AgendaCardValidationError
+
+**File**: `src/ti4/core/agenda_cards/exceptions.py`
+
+```python
+class AgendaCardValidationError(Exception):
+    """Raised when agenda card validation fails."""
+```
+
+### AgendaCardOperationError
+
+```python
+class AgendaCardOperationError(Exception):
+    """Raised when agenda card operation fails."""
+```
+
+### AgendaCardNotFoundError
+
+```python
+class AgendaCardNotFoundError(Exception):
+    """Raised when agenda card is not found in registry."""
+```
+
+### AgendaCardRegistrationError
+
+```python
+class AgendaCardRegistrationError(Exception):
+    """Raised when agenda card registration fails."""
+```
+
+### AgendaDeckEmptyError
+
+```python
+class AgendaDeckEmptyError(Exception):
+    """Raised when trying to draw from empty deck with no discard pile."""
+```
+
+## Agenda Data Classes
+
+### ActiveLaw
+
+**File**: `src/ti4/core/agenda_cards/law_manager.py`
+
+```python
+@dataclass
+class ActiveLaw:
+    """Represents a law currently in effect."""
+
+    agenda_card: BaseAgendaCard
+    enacted_round: int
+    effect_description: str
+    elected_target: str | None = None
+```
+
+#### Methods
+
+##### applies_to_context
+```python
+def applies_to_context(self, context: GameContext) -> bool:
+    """
+    Check if this law applies to the given game context.
+
+    Args:
+        context: The game context to check
+
+    Returns:
+        True if law applies to the context
+    """
+```
+
+### AgendaResolutionResult
+
+**File**: `src/ti4/core/agenda_cards/effect_resolver.py`
+
+```python
+@dataclass
+class AgendaResolutionResult:
+    """Result of agenda resolution."""
+
+    success: bool
+    law_enacted: bool = False
+    directive_executed: bool = False
+    description: str = ""
+    elected_target: str | None = None
+    errors: list[str] = field(default_factory=list)
+```
+
+### ValidationResult
+
+**File**: `src/ti4/core/agenda_cards/validation.py`
+
+```python
+@dataclass
+class ValidationResult:
+    """Result of validation operation."""
+
+    is_valid: bool
+    errors: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+```
+
+### GameContext
+
+**File**: `src/ti4/core/agenda_cards/law_manager.py`
+
+```python
+@dataclass
+class GameContext:
+    """Context information for law application."""
+
+    action_type: str
+    player_id: str | None = None
+    system_id: str | None = None
+    additional_data: dict[str, Any] = field(default_factory=dict)
+```
+
+## Usage Examples
+
+### Basic Law Card Implementation
+
+```python
+from ti4.core.agenda_cards.base.law_card import LawCard
+from ti4.core.agenda_cards.law_manager import ActiveLaw
+
+class MyLawCard(LawCard):
+    def __init__(self):
+        super().__init__("My Law Card")
+
+    def get_voting_outcomes(self) -> list[str]:
+        return ["For", "Against"]
+
+    def resolve_outcome(self, outcome, vote_result, game_state):
+        if outcome == "For":
+            return AgendaResolutionResult(
+                success=True,
+                law_enacted=True,
+                description="My law has been enacted"
+            )
+        # Handle other outcomes...
+
+    def create_active_law(self, outcome, elected_target=None):
+        return ActiveLaw(
+            agenda_card=self,
+            enacted_round=1,
+            effect_description="My law effect",
+            elected_target=elected_target
+        )
+```
+
+### Basic Directive Card Implementation
+
+```python
+from ti4.core.agenda_cards.base.directive_card import DirectiveCard
+
+class MyDirectiveCard(DirectiveCard):
+    def __init__(self):
+        super().__init__("My Directive Card")
+
+    def get_voting_outcomes(self) -> list[str]:
+        return ["For", "Against"]
+
+    def resolve_outcome(self, outcome, vote_result, game_state):
+        self.execute_immediate_effect(outcome, vote_result, game_state)
+        return AgendaResolutionResult(
+            success=True,
+            directive_executed=True,
+            description="My directive has been executed"
+        )
+
+    def execute_immediate_effect(self, outcome, vote_result, game_state):
+        # Implement immediate effect logic
+        pass
+```
+
+### Registry Usage
+
+```python
+from ti4.core.agenda_cards.registry import AgendaCardRegistry
+
+# Create registry and register cards
+registry = AgendaCardRegistry()
+registry.register_card(MyLawCard())
+registry.register_card(MyDirectiveCard())
+
+# Get cards
+law_card = registry.get_card("My Law Card")
+all_cards = registry.get_all_cards()
+```
+
+This API reference provides comprehensive documentation for all classes and methods in the Agenda Card Framework, enabling developers to implement new agenda cards and integrate with the existing system effectively.

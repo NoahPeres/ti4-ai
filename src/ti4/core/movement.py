@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from .constants import GameConstants, LocationType, Technology, UnitType
 from .galaxy import Galaxy
@@ -13,6 +13,48 @@ from .unit import Unit
 
 if TYPE_CHECKING:
     from .transport import TransportManager, TransportState
+
+
+def _check_path_requires_alpha_or_beta_wormholes(
+    galaxy: Galaxy, movement: MovementOperation
+) -> bool:
+    """Check if movement would only be possible via alpha or beta wormholes.
+
+    This implements the Enforced Travel Ban rule: "Alpha and beta wormholes
+    have no effect during movement."
+
+    Args:
+        galaxy: Galaxy instance for path finding
+        movement: The movement operation to check
+
+    Returns:
+        True if movement requires alpha or beta wormholes, False otherwise
+    """
+    path = galaxy.find_path(movement.from_system_id, movement.to_system_id)
+    if not path:
+        return False
+
+    for i in range(len(path) - 1):
+        current_id = path[i]
+        next_id = path[i + 1]
+        current_coord = galaxy.get_system_coordinate(current_id)
+        next_coord = galaxy.get_system_coordinate(next_id)
+
+        if current_coord and next_coord and current_coord.distance_to(next_coord) == 1:
+            continue  # physical adjacency, no wormhole needed
+
+        current_system = galaxy.get_system(current_id)
+        next_system = galaxy.get_system(next_id)
+        if not current_system or not next_system:
+            continue
+
+        shared = set(current_system.get_wormhole_types()).intersection(
+            next_system.get_wormhole_types()
+        )
+        if {"alpha", "beta"}.intersection(shared):
+            return True
+
+    return False
 
 
 @dataclass
@@ -136,6 +178,40 @@ class MovementValidator:
 
         # Use rule engine to validate movement
         return self._rule_engine.can_move(context)
+
+    def is_valid_movement_with_law_effects(
+        self, movement: MovementOperation, law_effects: list[Any]
+    ) -> bool:
+        """Check if a movement action is valid considering active law effects.
+
+        Args:
+            movement: The movement operation to validate
+            law_effects: List of active laws that might affect movement
+
+        Returns:
+            True if movement is valid considering law effects
+        """
+        # First check standard movement validation
+        if not self.is_valid_movement(movement):
+            return False
+
+        # Check law effects
+        for law_effect in law_effects:
+            if (
+                law_effect.agenda_card
+                and law_effect.agenda_card.get_name() == "Enforced Travel Ban"
+            ):
+                # Enforced Travel Ban: Alpha and beta wormholes have no effect during movement
+                if self._movement_requires_alpha_or_beta_wormholes(movement):
+                    return False  # Movement blocked by Enforced Travel Ban
+
+        return True
+
+    def _movement_requires_alpha_or_beta_wormholes(
+        self, movement: MovementOperation
+    ) -> bool:
+        """Check if movement would only be possible via alpha or beta wormholes."""
+        return _check_path_requires_alpha_or_beta_wormholes(self._galaxy, movement)
 
     def validate_movement_with_transport(self, movement: MovementOperation) -> bool:
         """Validate movement operation that includes transport state.
@@ -453,6 +529,49 @@ class TransportValidator:
         return transport_manager.validate_pickup_during_movement(
             pickup_system_id, starting_system_id, active_system_id, has_command_token
         )
+
+    def is_valid_movement_with_law_effects(
+        self, movement: MovementOperation, law_effects: list[Any]
+    ) -> bool:
+        """Check if a movement action is valid considering active law effects.
+
+        Args:
+            movement: The movement operation to validate
+            law_effects: List of active laws that might affect movement
+
+        Returns:
+            True if movement is valid considering law effects
+        """
+        # Create a transport operation from the movement for validation
+        transport = TransportOperation(
+            transport_ship=movement.unit,
+            ground_forces=[],
+            from_system_id=movement.from_system_id,
+            to_system_id=movement.to_system_id,
+            player_id=movement.player_id,
+        )
+
+        # First check standard transport validation
+        if not self.is_valid_transport(transport):
+            return False
+
+        # Check law effects
+        for law_effect in law_effects:
+            if (
+                law_effect.agenda_card
+                and law_effect.agenda_card.get_name() == "Enforced Travel Ban"
+            ):
+                # Enforced Travel Ban: Alpha and beta wormholes have no effect during movement
+                if self._movement_requires_alpha_or_beta_wormholes(movement):
+                    return False  # Movement blocked by Enforced Travel Ban
+
+        return True
+
+    def _movement_requires_alpha_or_beta_wormholes(
+        self, movement: MovementOperation
+    ) -> bool:
+        """Check if movement would only be possible via alpha or beta wormholes."""
+        return _check_path_requires_alpha_or_beta_wormholes(self._galaxy, movement)
 
 
 class TransportExecutor:
