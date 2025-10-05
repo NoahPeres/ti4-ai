@@ -375,6 +375,76 @@ class CombatResolver:
         )
         return self.calculate_hits(dice_results, effective_combat_value)
 
+    def _is_nebula_system(self, system: System) -> bool:
+        """Check if a system is a nebula system.
+
+        Args:
+            system: The system to check
+
+        Returns:
+            True if system is a nebula, False otherwise
+
+        Raises:
+            ValueError: If system is None
+        """
+        if system is None:
+            raise ValueError("System cannot be None")
+
+        from .constants import AnomalyType
+
+        return system.has_anomaly_type(AnomalyType.NEBULA)
+
+    def get_nebula_defender_bonus(self, system: System) -> int:
+        """Get the combat bonus for defenders in nebula systems.
+
+        Args:
+            system: The system where combat is occurring
+
+        Returns:
+            Combat bonus for defenders (+1 for nebula systems, 0 otherwise)
+
+        Raises:
+            ValueError: If system is None
+
+        LRR References:
+            - Rule 59: Nebula - covers combat bonuses for defenders in nebula systems
+        """
+        return 1 if self._is_nebula_system(system) else 0
+
+    def nebula_bonus_applies_to_space_combat(self, system: System) -> bool:
+        """Check if nebula combat bonus applies to space combat.
+
+        Args:
+            system: The system where combat is occurring
+
+        Returns:
+            True if nebula bonus applies to space combat, False otherwise
+
+        Raises:
+            ValueError: If system is None
+
+        LRR References:
+            - Rule 59: Nebula - covers combat bonuses for defenders in nebula systems
+        """
+        return self._is_nebula_system(system)
+
+    def nebula_bonus_applies_to_ground_combat(self, system: System) -> bool:
+        """Check if nebula combat bonus applies to ground combat.
+
+        Args:
+            system: The system where combat is occurring
+
+        Returns:
+            True if nebula bonus applies to ground combat, False otherwise
+
+        Raises:
+            ValueError: If system is None
+
+        LRR References:
+            - Rule 59: Nebula - covers combat bonuses for defenders in nebula systems
+        """
+        return self._is_nebula_system(system)
+
     def _perform_ability_attack(
         self,
         unit: Unit,

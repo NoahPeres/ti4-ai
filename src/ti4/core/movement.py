@@ -12,6 +12,7 @@ from .system import System
 from .unit import Unit
 
 if TYPE_CHECKING:
+    from .movement_validation import MovementValidationResult
     from .transport import TransportManager, TransportState
 
 
@@ -76,6 +77,7 @@ class MovementOperation:
     player_technologies: set[Technology] | None = None
     transport_ship: Unit | None = None  # For ground force transport (legacy)
     transport_state: TransportState | None = None  # Enhanced Rule 95 transport state
+    active_system_id: str | None = None  # For nebula movement validation
 
 
 def _is_space_location(location: str) -> bool:
@@ -258,6 +260,185 @@ class MovementValidator:
 
         # Validate standard movement rules
         return self.is_valid_movement(movement)
+
+    def validate_movement_path_through_anomalies(
+        self, movement: MovementOperation
+    ) -> bool:
+        """Validate movement path checking anomaly restrictions for all systems.
+
+        Args:
+            movement: The movement operation to validate
+
+        Returns:
+            True if movement path is valid, False if blocked by anomalies
+
+        LRR References:
+        - Rule 58: Movement integration with all anomaly types
+        - Requirement 8.1: Check anomaly restrictions for all systems in path
+        """
+        from .constants import AnomalyType
+
+        # Get the movement path
+        path = self._galaxy.find_path(movement.from_system_id, movement.to_system_id)
+        if not path:
+            return False
+
+        # Check each system in the path for anomaly restrictions
+        for system_id in path:
+            system = self._galaxy.get_system(system_id)
+            if not system:
+                continue
+
+            # Skip the starting system (movement from is allowed)
+            if system_id == movement.from_system_id:
+                continue
+
+            # Check for movement-blocking anomalies
+            anomaly_types = system.get_anomaly_types()
+            for anomaly_type in anomaly_types:
+                if anomaly_type in {AnomalyType.ASTEROID_FIELD, AnomalyType.SUPERNOVA}:
+                    return False
+                elif anomaly_type == AnomalyType.NEBULA:
+                    # Nebula blocks movement unless it's the active system
+                    active_system_id = getattr(movement, "active_system_id", None)
+                    if system_id != active_system_id:
+                        return False
+
+        return True
+
+    def get_movement_validation_error(self, movement: MovementOperation) -> str | None:
+        """Get detailed error message for movement validation failure.
+
+        Args:
+            movement: The movement operation to validate
+
+        Returns:
+            Error message if movement is invalid, None if valid
+
+        LRR References:
+        - Requirement 8.4: Specific error messages indicating which anomaly caused failure
+        """
+        from .constants import AnomalyType
+
+        # Get the movement path
+        path = self._galaxy.find_path(movement.from_system_id, movement.to_system_id)
+        if not path:
+            return "No valid path found between systems"
+
+        # Check each system in the path for anomaly restrictions
+        for system_id in path:
+            system = self._galaxy.get_system(system_id)
+            if not system:
+                continue
+
+            # Skip the starting system
+            if system_id == movement.from_system_id:
+                continue
+
+            # Check for movement-blocking anomalies
+            anomaly_types = system.get_anomaly_types()
+            for anomaly_type in anomaly_types:
+                if anomaly_type == AnomalyType.ASTEROID_FIELD:
+                    return f"Movement blocked by asteroid field in system {system_id}"
+                elif anomaly_type == AnomalyType.SUPERNOVA:
+                    return f"Movement blocked by supernova in system {system_id}"
+                elif anomaly_type == AnomalyType.NEBULA:
+                    active_system_id = getattr(movement, "active_system_id", None)
+                    if system_id != active_system_id:
+                        return f"Movement blocked by nebula in system {system_id} - nebula must be the active system"
+
+        return None
+
+    def calculate_effective_movement_range(self, movement: MovementOperation) -> int:
+        """Calculate effective movement range with anomaly effects applied.
+
+        Args:
+            movement: The movement operation to analyze
+
+        Returns:
+            Effective movement range considering anomaly effects
+
+        LRR References:
+        - Requirement 8.3: Calculate movement costs with anomaly effects applied
+        """
+        from .constants import AnomalyType
+
+        base_movement = movement.unit.get_movement()
+
+        # Get starting system to check for nebula penalty
+        from_system = self._galaxy.get_system(movement.from_system_id)
+        if from_system and from_system.has_anomaly_type(AnomalyType.NEBULA):
+            # Nebula sets move value to 1
+            return 1
+
+        # Check for gravity rift bonus when exiting from gravity rift system
+        gravity_rift_bonuses = 0
+        if from_system and from_system.has_anomaly_type(AnomalyType.GRAVITY_RIFT):
+            gravity_rift_bonuses += 1
+
+        # Check for gravity rift bonuses in intermediate systems of the path
+        path = self._galaxy.find_path(movement.from_system_id, movement.to_system_id)
+        if path and len(path) > 2:  # Only check intermediate systems
+            for system_id in path[1:-1]:  # Skip start and end systems
+                system = self._galaxy.get_system(system_id)
+                if system and system.has_anomaly_type(AnomalyType.GRAVITY_RIFT):
+                    gravity_rift_bonuses += 1
+
+        return base_movement + gravity_rift_bonuses
+
+    def validate_movement_with_anomaly_effects(
+        self, movement: MovementOperation
+    ) -> MovementValidationResult:
+        """Validate movement with comprehensive anomaly effects analysis.
+
+        Args:
+            movement: The movement operation to validate
+
+        Returns:
+            Comprehensive validation result with error details
+
+        LRR References:
+        - Requirement 8.2: Movement path includes blocked anomalies
+        """
+        from .movement_validation import MovementValidationResult
+
+        # Check if movement is valid
+        is_valid = self.validate_movement_path_through_anomalies(movement)
+
+        # Get error message if invalid
+        error_message = ""
+        blocked_systems = []
+        if not is_valid:
+            error_message = (
+                self.get_movement_validation_error(movement)
+                or "Movement blocked by anomaly"
+            )
+            # Extract blocked system from error message
+            if "system " in error_message:
+                system_part = error_message.split("system ")[1].split()[0]
+                blocked_systems.append(system_part)
+
+        # Calculate effective movement range
+        effective_range = self.calculate_effective_movement_range(movement)
+
+        # Identify anomaly effects applied
+        anomaly_effects = []
+        from_system = self._galaxy.get_system(movement.from_system_id)
+        if from_system:
+            from .constants import AnomalyType
+
+            if from_system.has_anomaly_type(AnomalyType.NEBULA):
+                anomaly_effects.append("nebula_move_penalty")
+            if from_system.has_anomaly_type(AnomalyType.GRAVITY_RIFT):
+                anomaly_effects.append("gravity_rift_exit_bonus")
+
+        return MovementValidationResult(
+            is_valid=is_valid,
+            error_message=error_message,
+            blocked_systems=blocked_systems,
+            effective_movement_range=effective_range,
+            anomaly_effects_applied=anomaly_effects,
+        )
 
 
 class MovementExecutor:

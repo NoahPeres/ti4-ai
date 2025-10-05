@@ -45,6 +45,15 @@ class WormholeType(Enum):
     DELTA = "delta"
 
 
+class AnomalyType(Enum):
+    """Enumeration of anomaly types as defined in Rule 9."""
+
+    ASTEROID_FIELD = "asteroid_field"
+    NEBULA = "nebula"
+    SUPERNOVA = "supernova"
+    GRAVITY_RIFT = "gravity_rift"
+
+
 class CircuitBreakerState(Enum):
     """Enumeration of circuit breaker states."""
 

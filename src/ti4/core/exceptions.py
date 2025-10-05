@@ -151,3 +151,28 @@ class ReinforcementError(AbilityError):
     """Raised when reinforcement requirements are not met."""
 
     pass
+
+
+# Anomaly-related exceptions
+class AnomalyMovementError(TI4Error):
+    """Raised when movement is blocked by anomaly rules."""
+
+    pass
+
+
+class InvalidAnomalyTypeError(TI4Error):
+    """Raised when an invalid anomaly type is specified."""
+
+    pass
+
+
+class GravityRiftDestructionError(TI4Error):
+    """Raised when gravity rift destruction occurs."""
+
+    pass
+
+
+class AnomalyStateConsistencyError(TI4Error):
+    """Raised when anomaly system state is inconsistent."""
+
+    pass
