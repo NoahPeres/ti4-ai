@@ -86,11 +86,20 @@ class AnomalyManager:
             Dictionary containing anomaly effects summary
 
         Raises:
-            ValueError: If system is None
+            ValueError: If system is None or has invalid anomaly types
         """
         self._validate_system(system)
 
         anomaly_types = system.get_anomaly_types()
+
+        # Validate that all anomaly types are proper AnomalyType enums
+        from .constants import AnomalyType
+
+        for anomaly_type in anomaly_types:
+            if not isinstance(anomaly_type, AnomalyType):
+                raise ValueError(
+                    f"Invalid anomaly type: {anomaly_type}. Expected AnomalyType enum."
+                )
 
         return {
             "anomaly_types": anomaly_types,
@@ -132,7 +141,12 @@ class AnomalyManager:
             True if any anomaly type blocks movement, False otherwise
         """
         return any(
-            anomaly_type.value in AnomalyEffectConstants.MOVEMENT_BLOCKING_ANOMALIES
+            (
+                anomaly_type.value
+                if hasattr(anomaly_type, "value")
+                else str(anomaly_type)
+            )
+            in AnomalyEffectConstants.MOVEMENT_BLOCKING_ANOMALIES
             for anomaly_type in anomaly_types
         )
 
@@ -247,7 +261,7 @@ class AnomalyManager:
 
     def convert_system_to_anomaly_type(
         self, system: System, anomaly_type: AnomalyType | str
-    ) -> None:
+    ) -> System:
         """Convert a system to have only the specified anomaly type.
 
         Removes all existing anomaly types and adds the specified one.
@@ -257,9 +271,15 @@ class AnomalyManager:
             system: The system to convert
             anomaly_type: The anomaly type to set
 
+        Returns:
+            The modified system (same instance)
+
         Raises:
             ValueError: If system is None or anomaly_type is invalid
         """
+        if system is None:
+            raise ValueError("System cannot be None")
+
         self._validate_system(system)
         self._validate_anomaly_type(anomaly_type)
 
@@ -268,6 +288,7 @@ class AnomalyManager:
 
         # Add new anomaly type
         system.add_anomaly_type(anomaly_type)
+        return system
 
     def is_system_blocking_movement(self, system: System) -> bool:
         """Check if a system blocks movement.
@@ -298,3 +319,87 @@ class AnomalyManager:
         """
         self._validate_system(system)
         return self._calculate_move_value_modifier(system.get_anomaly_types())
+
+    def get_combat_modifiers(self, system: System, is_defender: bool) -> dict[str, int]:
+        """Get combat modifiers for a system.
+
+        Args:
+            system: The system to check
+            is_defender: Whether the player is defending
+
+        Returns:
+            Dictionary of combat modifiers
+
+        Raises:
+            ValueError: If system is None
+        """
+        if system is None:
+            raise ValueError("System cannot be None")
+
+        self._validate_system(system)
+        combat_bonus = self._calculate_combat_bonus(system.get_anomaly_types())
+
+        modifiers = {}
+        if is_defender and combat_bonus > 0:
+            modifiers["nebula_defense_bonus"] = combat_bonus
+
+        return modifiers
+
+    def validate_movement_into_system(
+        self, unit: Any, system: System, is_active_system: bool = False
+    ) -> None:
+        """Validate movement into a system with anomalies.
+
+        Args:
+            unit: The unit attempting to move
+            system: The destination system
+            is_active_system: Whether the system is the active system
+
+        Raises:
+            AnomalyMovementError: If movement is blocked by anomalies
+            ValueError: If system is None
+        """
+        from .exceptions import AnomalyMovementError
+
+        if system is None:
+            raise ValueError("System cannot be None")
+
+        self._validate_system(system)
+
+        # Check if movement is blocked
+        if self.is_system_blocking_movement(system):
+            anomaly_types = system.get_anomaly_types()
+            blocking_types = [
+                t
+                for t in anomaly_types
+                if t.value in AnomalyEffectConstants.MOVEMENT_BLOCKING_ANOMALIES
+            ]
+
+            if blocking_types:
+                anomaly_names = [t.value.replace("_", " ") for t in blocking_types]
+                raise AnomalyMovementError(
+                    f"Movement into system {system.system_id} is blocked by {', '.join(anomaly_names)}. "
+                    f"System blocks movement due to anomaly rules."
+                )
+
+    def validate_system_state(self, system: System) -> None:
+        """Validate the internal state of a system.
+
+        Args:
+            system: The system to validate
+
+        Raises:
+            ValueError: If system state is invalid
+        """
+        if system is None:
+            raise ValueError("System cannot be None")
+
+        # Check if anomaly_types attribute exists and is valid
+        if not hasattr(system, "anomaly_types"):
+            raise ValueError("System missing anomaly_types attribute")
+
+        if system.anomaly_types is None:
+            raise ValueError("System anomaly_types cannot be None")
+
+        # Additional state validation could be added here
+        self._validate_system(system)

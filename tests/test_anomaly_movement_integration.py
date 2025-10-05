@@ -9,7 +9,6 @@ LRR References:
 - Requirements: 8.1, 8.2, 8.3, 8.4
 """
 
-
 from src.ti4.core.constants import AnomalyType, UnitType
 from src.ti4.core.galaxy import Galaxy
 from src.ti4.core.hex_coordinate import HexCoordinate
@@ -53,7 +52,7 @@ class TestAnomalyMovementPathValidation:
             unit=unit,
             from_system_id="start_system",
             to_system_id="end_system",
-            player_id="player1"
+            player_id="player1",
         )
 
         # Create validator
@@ -85,7 +84,7 @@ class TestAnomalyMovementPathValidation:
             unit=unit,
             from_system_id="system_0",
             to_system_id="system_3",
-            player_id="player1"
+            player_id="player1",
         )
 
         validator = MovementValidator(galaxy)
@@ -118,7 +117,7 @@ class TestAnomalyMovementErrorMessages:
             unit=unit,
             from_system_id="start_system",
             to_system_id="asteroid_system",
-            player_id="player1"
+            player_id="player1",
         )
 
         validator = MovementValidator(galaxy)
@@ -150,7 +149,7 @@ class TestAnomalyMovementErrorMessages:
             unit=unit,
             from_system_id="start_system",
             to_system_id="nebula_system",
-            player_id="player1"
+            player_id="player1",
         )
 
         validator = MovementValidator(galaxy)
@@ -186,7 +185,7 @@ class TestAnomalyMovementCostCalculation:
             unit=unit,
             from_system_id="gravity_rift_system",
             to_system_id="end_system",
-            player_id="player1"
+            player_id="player1",
         )
 
         validator = MovementValidator(galaxy)
@@ -216,7 +215,7 @@ class TestAnomalyMovementCostCalculation:
             unit=unit,
             from_system_id="nebula_system",
             to_system_id="end_system",
-            player_id="player1"
+            player_id="player1",
         )
 
         validator = MovementValidator(galaxy)
@@ -257,7 +256,7 @@ class TestComprehensiveAnomalyPathValidation:
             unit=unit,
             from_system_id="system_0",
             to_system_id="system_4",
-            player_id="player1"
+            player_id="player1",
         )
 
         validator = MovementValidator(galaxy)
@@ -273,14 +272,16 @@ class TestComprehensiveAnomalyPathValidation:
             from_system_id="system_0",
             to_system_id="system_4",
             player_id="player1",
-            active_system_id="system_2"  # Nebula is active
+            active_system_id="system_2",  # Nebula is active
         )
 
         result = validator.validate_movement_with_anomaly_effects(movement_with_active)
         assert result.is_valid
 
         # Test 3: Should calculate correct effective range with bonuses
-        effective_range = validator.calculate_effective_movement_range(movement_with_active)
+        effective_range = validator.calculate_effective_movement_range(
+            movement_with_active
+        )
         assert effective_range == 4  # Base 2 + 2 gravity rift bonuses
 
     def test_movement_blocked_by_multiple_blocking_anomalies(self) -> None:
@@ -304,7 +305,7 @@ class TestComprehensiveAnomalyPathValidation:
             unit=unit,
             from_system_id="system_0",
             to_system_id="system_3",
-            player_id="player1"
+            player_id="player1",
         )
 
         validator = MovementValidator(galaxy)

@@ -7,7 +7,6 @@ LRR References:
 - Rule 40: Ground Combat - integration with nebula effects
 """
 
-
 from src.ti4.core.combat import CombatResolver
 from src.ti4.core.constants import AnomalyType, UnitType
 from src.ti4.core.ground_combat import GroundCombatController

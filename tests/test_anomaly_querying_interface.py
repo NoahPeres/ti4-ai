@@ -187,7 +187,9 @@ class TestAnomalyEffectsQuerying:
         assert AnomalyType.GRAVITY_RIFT in effects["anomaly_types"]
         assert effects["blocks_movement"] is False
         assert effects["requires_active_system"] is False
-        assert effects["move_value_modifier"] == 1  # Gravity rift provides +1 move value
+        assert (
+            effects["move_value_modifier"] == 1
+        )  # Gravity rift provides +1 move value
         assert effects["combat_bonus"] == 0
 
     def test_get_anomaly_effects_multiple_anomalies(self) -> None:

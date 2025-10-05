@@ -11,17 +11,16 @@ LRR References:
 - Rule 58: MOVEMENT (compatibility with existing movement system)
 """
 
-import pytest
 from unittest.mock import Mock, patch
 
 from src.ti4.core.anomaly_manager import AnomalyManager
 from src.ti4.core.constants import AnomalyType
+from src.ti4.core.galaxy import Galaxy
+from src.ti4.core.movement_rules import MovementRuleEngine
+from src.ti4.core.planet import Planet
 from src.ti4.core.system import System
 from src.ti4.core.system_tile import SystemTile, TileType
-from src.ti4.core.movement_rules import MovementRuleEngine
 from src.ti4.core.unit import Unit, UnitType
-from src.ti4.core.planet import Planet
-from src.ti4.core.galaxy import Galaxy
 
 
 class TestExistingSystemCompatibility:
@@ -35,20 +34,20 @@ class TestExistingSystemCompatibility:
         """Test that normal systems are not affected by anomaly manager presence"""
         # Create normal system
         normal_system = System("normal_system")
-        
+
         # Add planets and other properties
         planet = Planet("test_planet", resources=2, influence=1)
         normal_system.planets = [planet]
         normal_system.wormholes = ["alpha"]
-        
+
         # Verify normal system properties
         assert not normal_system.is_anomaly()
         assert len(normal_system.planets) == 1
         assert normal_system.wormholes == ["alpha"]
-        
+
         # Anomaly manager operations should not affect normal systems
         effects = self.anomaly_manager.get_anomaly_effects_summary(normal_system)
-        
+
         # Should return "no effects" for normal system
         assert not effects["blocks_movement"]
         assert not effects["requires_active_system"]
@@ -60,22 +59,22 @@ class TestExistingSystemCompatibility:
     def test_existing_system_methods_preserved(self):
         """Test that all existing System methods continue to work"""
         system = System("test_system")
-        
+
         # Test existing methods still work
         assert system.system_id == "test_system"
         assert system.planets == []
         assert system.wormholes == []
-        
+
         # Test that we can still add planets normally
         planet = Planet("test_planet", resources=1, influence=2)
         system.planets.append(planet)
         assert len(system.planets) == 1
-        
+
         # Test that system can be converted to anomaly without losing properties
         anomaly_system = self.anomaly_manager.convert_system_to_anomaly_type(
             system, AnomalyType.NEBULA
         )
-        
+
         # Should preserve existing properties
         assert len(anomaly_system.planets) == 1
         assert anomaly_system.planets[0].name == "test_planet"
@@ -87,20 +86,22 @@ class TestExistingSystemCompatibility:
         anomaly_system = self.anomaly_manager.create_anomaly_system(
             "serialization_test", [AnomalyType.GRAVITY_RIFT, AnomalyType.NEBULA]
         )
-        
+
         # Add planets to test complex serialization
         planet = Planet("test_planet", resources=2, influence=1)
         anomaly_system.planets = [planet]
-        
+
         # Test that system can be represented as dict (common serialization pattern)
         system_dict = {
             "system_id": anomaly_system.system_id,
-            "planets": [{"name": p.name, "resources": p.resources, "influence": p.influence} 
-                       for p in anomaly_system.planets],
+            "planets": [
+                {"name": p.name, "resources": p.resources, "influence": p.influence}
+                for p in anomaly_system.planets
+            ],
             "anomaly_types": [at.value for at in anomaly_system.get_anomaly_types()],
-            "is_anomaly": anomaly_system.is_anomaly()
+            "is_anomaly": anomaly_system.is_anomaly(),
         }
-        
+
         # Verify serialization preserves all data
         assert system_dict["system_id"] == "serialization_test"
         assert len(system_dict["planets"]) == 1
@@ -122,21 +123,19 @@ class TestSystemTileCompatibility:
         """Test that existing SystemTile.is_anomaly() method still works"""
         # Create anomaly tile using existing interface
         anomaly_tile = SystemTile(
-            tile_id="existing_anomaly",
-            tile_type=TileType.ANOMALY,
-            systems=[]
+            tile_id="existing_anomaly", tile_type=TileType.ANOMALY, systems=[]
         )
-        
+
         # Existing method should still work
         assert anomaly_tile.is_anomaly()
         assert anomaly_tile.tile_type == TileType.ANOMALY
-        
+
         # Add anomaly system to tile
         anomaly_system = self.anomaly_manager.create_anomaly_system(
             "tile_system", [AnomalyType.ASTEROID_FIELD]
         )
         anomaly_tile.systems.append(anomaly_system)
-        
+
         # Tile should still be detected as anomaly
         assert anomaly_tile.is_anomaly()
         assert len(anomaly_tile.systems) == 1
@@ -146,19 +145,17 @@ class TestSystemTileCompatibility:
         """Test that normal system tiles are not affected by anomaly system"""
         # Create normal system tile
         normal_tile = SystemTile(
-            tile_id="normal_tile",
-            tile_type=TileType.SYSTEM,
-            systems=[]
+            tile_id="normal_tile", tile_type=TileType.SYSTEM, systems=[]
         )
-        
+
         # Add normal system
         normal_system = System("normal_system")
         normal_tile.systems.append(normal_system)
-        
+
         # Should not be detected as anomaly
         assert not normal_tile.is_anomaly()
         assert normal_tile.tile_type == TileType.SYSTEM
-        
+
         # Anomaly manager should not affect normal tiles
         effects = self.anomaly_manager.get_anomaly_effects_summary(normal_system)
         assert not any(effects.values()) or effects["move_value_modifier"] == 0
@@ -169,22 +166,22 @@ class TestSystemTileCompatibility:
         mixed_tile = SystemTile(
             tile_id="mixed_tile",
             tile_type=TileType.SYSTEM,  # Not marked as anomaly tile
-            systems=[]
+            systems=[],
         )
-        
+
         # Add normal system
         normal_system = System("normal_system")
         mixed_tile.systems.append(normal_system)
-        
+
         # Add anomaly system
         anomaly_system = self.anomaly_manager.create_anomaly_system(
             "anomaly_system", [AnomalyType.NEBULA]
         )
         mixed_tile.systems.append(anomaly_system)
-        
+
         # Tile should not be marked as anomaly (only individual systems are)
         assert not mixed_tile.is_anomaly()
-        
+
         # But individual systems should have correct properties
         assert not normal_system.is_anomaly()
         assert anomaly_system.is_anomaly()
@@ -203,20 +200,21 @@ class TestMovementSystemCompatibility:
         # Create normal systems
         system1 = System("system1")
         system2 = System("system2")
-        
+
         # Create unit
         cruiser = Unit(UnitType.CRUISER, player_id="player1")
-        
+
         # Create movement context for normal movement
         from src.ti4.core.movement_rules import MovementContext
+
         context = MovementContext(
             unit=cruiser,
             origin=system1,
             destination=system2,
             path=[system1, system2],
-            galaxy=Mock()
+            galaxy=Mock(),
         )
-        
+
         # Movement should work normally
         result = self.movement_engine.validate_movement(context)
         assert result.valid
@@ -231,25 +229,27 @@ class TestMovementSystemCompatibility:
             "gravity_rift", [AnomalyType.GRAVITY_RIFT]
         )
         normal_system2 = System("normal2")
-        
+
         path = [normal_system1, gravity_rift_system, normal_system2]
-        
+
         cruiser = Unit(UnitType.CRUISER, player_id="player1")
-        
+
         # Mock dice roll for gravity rift survival
-        with patch('src.ti4.core.dice.roll_die') as mock_dice:
+        with patch("src.ti4.core.dice.roll_die") as mock_dice:
             from src.ti4.core.dice import DiceRoll
+
             mock_dice.return_value = DiceRoll(6)  # Survive
-            
+
             from src.ti4.core.movement_rules import MovementContext
+
             context = MovementContext(
                 unit=cruiser,
                 origin=normal_system1,
                 destination=normal_system2,
                 path=path,
-                galaxy=Mock()
+                galaxy=Mock(),
             )
-            
+
             result = self.movement_engine.validate_movement(context)
             assert result.valid
             # Should have gravity rift effects applied
@@ -260,29 +260,33 @@ class TestMovementSystemCompatibility:
         # Create systems at different ranges
         origin = System("origin")
         destination = System("destination")
-        
+
         # Create unit with limited movement
         fighter = Unit(UnitType.FIGHTER, player_id="player1")
         # Assume fighter has move value 1
-        
+
         # Test that range limitations still apply
         from src.ti4.core.movement_rules import MovementContext
+
         context = MovementContext(
             unit=fighter,
             origin=origin,
             destination=destination,
             path=[origin, destination],
-            galaxy=Mock()
+            galaxy=Mock(),
         )
-        
+
         # Mock galaxy to return distance > move value
         context.galaxy.get_distance.return_value = 3  # Too far for fighter
-        
+
         result = self.movement_engine.validate_movement(context)
         # Should be blocked by range, not anomaly rules
         assert not result.valid
         # Error should be about range, not anomalies
-        assert "range" in result.error_message.lower() or "distance" in result.error_message.lower()
+        assert (
+            "range" in result.error_message.lower()
+            or "distance" in result.error_message.lower()
+        )
 
 
 class TestUnitSystemCompatibility:
@@ -298,12 +302,10 @@ class TestUnitSystemCompatibility:
         cruiser = Unit(UnitType.CRUISER, player_id="player1")
         original_combat_value = cruiser.combat_value
         original_move_value = cruiser.move_value
-        
+
         # Place in anomaly system
-        nebula_system = self.anomaly_manager.create_anomaly_system(
-            "nebula", [AnomalyType.NEBULA]
-        )
-        
+        self.anomaly_manager.create_anomaly_system("nebula", [AnomalyType.NEBULA])
+
         # Unit base properties should be unchanged
         assert cruiser.combat_value == original_combat_value
         assert cruiser.move_value == original_move_value
@@ -314,44 +316,45 @@ class TestUnitSystemCompatibility:
         """Test that anomaly effects on units are temporary/contextual"""
         cruiser = Unit(UnitType.CRUISER, player_id="player1")
         original_move_value = cruiser.move_value
-        
+
         # Create gravity rift system
         gravity_rift = self.anomaly_manager.create_anomaly_system(
             "gravity_rift", [AnomalyType.GRAVITY_RIFT]
         )
-        
+
         # Apply gravity rift movement bonus
         modified_move_value = self.anomaly_manager.get_system_move_value_modifier(
             gravity_rift
         )
-        
+
         # Unit's base move value should be unchanged
         assert cruiser.move_value == original_move_value
-        
+
         # Modifier should be applied contextually
         assert modified_move_value == 1  # Gravity rift gives +1
 
     def test_unit_destruction_mechanics_preserved(self):
         """Test that existing unit destruction mechanics work with anomalies"""
         cruiser = Unit(UnitType.CRUISER, player_id="player1")
-        
+
         # Test that units can still be destroyed normally
         assert cruiser.is_alive()
-        
+
         # Simulate gravity rift destruction
         gravity_rift = self.anomaly_manager.create_anomaly_system(
             "gravity_rift", [AnomalyType.GRAVITY_RIFT]
         )
-        
+
         # Mock bad dice roll
-        with patch('src.ti4.core.dice.roll_die') as mock_dice:
+        with patch("src.ti4.core.dice.roll_die") as mock_dice:
             from src.ti4.core.dice import DiceRoll
+
             mock_dice.return_value = DiceRoll(2)  # Destruction roll
-            
+
             destroyed_units = self.anomaly_manager.apply_gravity_rift_destruction(
                 [cruiser], gravity_rift
             )
-            
+
             # Unit should be in destroyed list
             assert cruiser in destroyed_units
 
@@ -367,7 +370,7 @@ class TestGalaxySystemCompatibility:
         """Test that anomaly systems integrate properly with galaxy"""
         # Create mock galaxy
         galaxy = Mock(spec=Galaxy)
-        
+
         # Create anomaly systems
         anomaly_system1 = self.anomaly_manager.create_anomaly_system(
             "anomaly1", [AnomalyType.NEBULA]
@@ -375,17 +378,14 @@ class TestGalaxySystemCompatibility:
         anomaly_system2 = self.anomaly_manager.create_anomaly_system(
             "anomaly2", [AnomalyType.GRAVITY_RIFT]
         )
-        
+
         # Add to galaxy
-        galaxy.systems = {
-            "anomaly1": anomaly_system1,
-            "anomaly2": anomaly_system2
-        }
-        
+        galaxy.systems = {"anomaly1": anomaly_system1, "anomaly2": anomaly_system2}
+
         # Test galaxy can find anomaly systems
         assert galaxy.systems["anomaly1"].is_anomaly()
         assert galaxy.systems["anomaly2"].is_anomaly()
-        
+
         # Test galaxy operations work with anomaly systems
         galaxy.get_system.return_value = anomaly_system1
         retrieved_system = galaxy.get_system("anomaly1")
@@ -397,15 +397,16 @@ class TestGalaxySystemCompatibility:
         anomaly_system = self.anomaly_manager.create_anomaly_system(
             "test_anomaly", [AnomalyType.ASTEROID_FIELD]
         )
-        
+
         # Mock game state
         from src.ti4.core.game_state import GameState
+
         game_state = Mock(spec=GameState)
-        
+
         # Test that game state can track anomaly systems
         game_state.systems = {"test_anomaly": anomaly_system}
         game_state.get_system.return_value = anomaly_system
-        
+
         retrieved_system = game_state.get_system("test_anomaly")
         assert retrieved_system.is_anomaly()
         assert retrieved_system.has_anomaly_type(AnomalyType.ASTEROID_FIELD)
@@ -416,20 +417,22 @@ class TestGalaxySystemCompatibility:
         nebula_system = self.anomaly_manager.create_anomaly_system(
             "nebula", [AnomalyType.NEBULA]
         )
-        
+
         # Mock game state with active system tracking
-        with patch('src.ti4.core.game_state.GameState.get_active_system') as mock_active:
+        with patch(
+            "src.ti4.core.game_state.GameState.get_active_system"
+        ) as mock_active:
             mock_active.return_value = nebula_system
-            
+
             # Test that nebula movement validation works with active system
-            cruiser = Unit(UnitType.CRUISER, player_id="player1")
-            
+            Unit(UnitType.CRUISER, player_id="player1")
+
             # Should allow movement when nebula is active
             can_move = self.anomaly_manager.is_system_blocking_movement(
                 nebula_system, is_active_system=True
             )
             assert not can_move  # Nebula allows movement when active
-            
+
             # Should block movement when nebula is not active
             can_move = self.anomaly_manager.is_system_blocking_movement(
                 nebula_system, is_active_system=False
@@ -450,17 +453,17 @@ class TestDataIntegrityAndValidation:
         system = self.anomaly_manager.create_anomaly_system(
             "consistency_test", [AnomalyType.NEBULA]
         )
-        
+
         # Add planets
         planet = Planet("test_planet", resources=2, influence=1)
         system.planets = [planet]
-        
+
         # Add another anomaly type
         self.anomaly_manager.add_anomaly_to_system(system, AnomalyType.GRAVITY_RIFT)
-        
+
         # Remove original anomaly type
         self.anomaly_manager.remove_anomaly_from_system(system, AnomalyType.NEBULA)
-        
+
         # Verify final state is consistent
         assert system.is_anomaly()  # Still anomaly due to gravity rift
         assert system.has_anomaly_type(AnomalyType.GRAVITY_RIFT)
@@ -474,13 +477,13 @@ class TestDataIntegrityAndValidation:
         shared_system = self.anomaly_manager.create_anomaly_system(
             "shared", [AnomalyType.NEBULA]
         )
-        
+
         # Simulate concurrent reads (should be safe)
         results = []
         for _ in range(10):
             effects = self.anomaly_manager.get_anomaly_effects_summary(shared_system)
             results.append(effects)
-        
+
         # All results should be identical
         first_result = results[0]
         for result in results[1:]:
@@ -490,24 +493,24 @@ class TestDataIntegrityAndValidation:
         """Test that anomaly operations don't create memory leaks"""
         import gc
         import weakref
-        
+
         # Create anomaly system
         system = self.anomaly_manager.create_anomaly_system(
             "memory_test", [AnomalyType.GRAVITY_RIFT]
         )
-        
+
         # Create weak reference to track cleanup
         weak_ref = weakref.ref(system)
-        
+
         # Perform operations that might create references
         for _ in range(100):
-            effects = self.anomaly_manager.get_anomaly_effects_summary(system)
-            modifiers = self.anomaly_manager.get_combat_modifiers(system, True)
-        
+            self.anomaly_manager.get_anomaly_effects_summary(system)
+            self.anomaly_manager.get_combat_modifiers(system, True)
+
         # Delete system and force garbage collection
         del system
         gc.collect()
-        
+
         # Weak reference should be None if no memory leak
         # Note: This test might be flaky depending on Python's GC behavior
         # but it's a good sanity check

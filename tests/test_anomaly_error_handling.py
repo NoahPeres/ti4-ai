@@ -62,7 +62,9 @@ class TestAnomalyTypeValidation:
 
         system = System("test_system")
 
-        with pytest.raises(InvalidAnomalyTypeError, match="Anomaly type cannot be empty"):
+        with pytest.raises(
+            InvalidAnomalyTypeError, match="Anomaly type cannot be empty"
+        ):
             system.add_anomaly_type("")
 
     def test_whitespace_only_anomaly_type_raises_error(self) -> None:
@@ -71,7 +73,9 @@ class TestAnomalyTypeValidation:
 
         system = System("test_system")
 
-        with pytest.raises(InvalidAnomalyTypeError, match="Anomaly type cannot be empty"):
+        with pytest.raises(
+            InvalidAnomalyTypeError, match="Anomaly type cannot be empty"
+        ):
             system.add_anomaly_type("   ")
 
     def test_numeric_anomaly_type_raises_error(self) -> None:
@@ -100,14 +104,18 @@ class TestSystemStateConsistency:
         """Test that empty system ID raises AnomalyStateConsistencyError."""
         from src.ti4.core.exceptions import AnomalyStateConsistencyError
 
-        with pytest.raises(AnomalyStateConsistencyError, match="System ID cannot be empty"):
+        with pytest.raises(
+            AnomalyStateConsistencyError, match="System ID cannot be empty"
+        ):
             System("")
 
     def test_none_system_id_raises_error(self) -> None:
         """Test that None system ID raises AnomalyStateConsistencyError."""
         from src.ti4.core.exceptions import AnomalyStateConsistencyError
 
-        with pytest.raises(AnomalyStateConsistencyError, match="System ID cannot be None"):
+        with pytest.raises(
+            AnomalyStateConsistencyError, match="System ID cannot be None"
+        ):
             System(None)  # type: ignore
 
     def test_system_with_corrupted_anomaly_list_raises_error(self) -> None:
@@ -120,7 +128,9 @@ class TestSystemStateConsistency:
         # Simulate corruption by directly modifying internal state
         system.anomaly_types.append(None)  # type: ignore
 
-        with pytest.raises(AnomalyStateConsistencyError, match="Corrupted anomaly types"):
+        with pytest.raises(
+            AnomalyStateConsistencyError, match="Corrupted anomaly types"
+        ):
             system.get_anomaly_types()
 
 
@@ -185,7 +195,7 @@ class TestMultipleAnomalyTypesEdgeCases:
         system = System("conflicting_system")
         # Add both movement-blocking and movement-enhancing anomalies
         system.add_anomaly_type(AnomalyType.ASTEROID_FIELD)  # Blocks movement
-        system.add_anomaly_type(AnomalyType.GRAVITY_RIFT)    # Enhances movement
+        system.add_anomaly_type(AnomalyType.GRAVITY_RIFT)  # Enhances movement
 
         manager = AnomalyManager()
         effects = manager.get_anomaly_effects_summary(system)
@@ -297,17 +307,21 @@ class TestDynamicAnomalyAssignmentEdgeCases:
 
         def add_anomalies():
             try:
-                for i in range(100):
+                for _i in range(100):
                     system.add_anomaly_type(AnomalyType.NEBULA)
-                    time.sleep(0.001)  # Small delay to increase chance of race conditions
+                    time.sleep(
+                        0.001
+                    )  # Small delay to increase chance of race conditions
             except Exception as e:
                 errors.append(e)
 
         def remove_anomalies():
             try:
-                for i in range(100):
+                for _i in range(100):
                     system.remove_anomaly_type(AnomalyType.NEBULA)
-                    time.sleep(0.001)  # Small delay to increase chance of race conditions
+                    time.sleep(
+                        0.001
+                    )  # Small delay to increase chance of race conditions
             except Exception as e:
                 errors.append(e)
 
@@ -337,7 +351,9 @@ class TestAnomalyManagerErrorHandling:
 
         manager = AnomalyManager()
 
-        with pytest.raises(AnomalyStateConsistencyError, match="System ID cannot be empty"):
+        with pytest.raises(
+            AnomalyStateConsistencyError, match="System ID cannot be empty"
+        ):
             manager.create_anomaly_system("", [AnomalyType.NEBULA])
 
     def test_add_anomaly_to_system_with_invalid_type(self) -> None:
@@ -372,7 +388,6 @@ class TestMovementRuleErrorHandling:
     def test_movement_context_with_invalid_galaxy(self) -> None:
         """Test movement validation with invalid galaxy state."""
         from src.ti4.core.constants import UnitType
-        from src.ti4.core.exceptions import AnomalyMovementError
         from src.ti4.core.galaxy import Galaxy
         from src.ti4.core.hex_coordinate import HexCoordinate
         from src.ti4.core.movement_rules import AnomalyRule, MovementContext
@@ -407,13 +422,19 @@ class TestMovementRuleErrorHandling:
         unit = Unit(unit_type=UnitType.CRUISER, owner="player1")
 
         # Test invalid roll values
-        with pytest.raises(GravityRiftDestructionError, match="Invalid dice roll value"):
+        with pytest.raises(
+            GravityRiftDestructionError, match="Invalid dice roll value"
+        ):
             anomaly_rule.check_gravity_rift_destruction(unit, 0)
 
-        with pytest.raises(GravityRiftDestructionError, match="Invalid dice roll value"):
+        with pytest.raises(
+            GravityRiftDestructionError, match="Invalid dice roll value"
+        ):
             anomaly_rule.check_gravity_rift_destruction(unit, 11)
 
-        with pytest.raises(GravityRiftDestructionError, match="Invalid dice roll value"):
+        with pytest.raises(
+            GravityRiftDestructionError, match="Invalid dice roll value"
+        ):
             anomaly_rule.check_gravity_rift_destruction(unit, -1)
 
 
@@ -427,7 +448,9 @@ class TestSystemInfoDisplayErrorHandling:
         system = System("test_system")
         system.system_id = ""  # Make system invalid
 
-        with pytest.raises(AnomalyStateConsistencyError, match="System ID cannot be empty"):
+        with pytest.raises(
+            AnomalyStateConsistencyError, match="System ID cannot be empty"
+        ):
             system.get_system_info_display()
 
     def test_system_info_display_with_corrupted_planets(self) -> None:
