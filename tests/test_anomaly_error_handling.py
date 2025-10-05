@@ -414,7 +414,6 @@ class TestMovementRuleErrorHandling:
     def test_gravity_rift_destruction_with_invalid_roll(self) -> None:
         """Test gravity rift destruction with invalid dice roll values."""
         from src.ti4.core.constants import UnitType
-        from src.ti4.core.exceptions import GravityRiftDestructionError
         from src.ti4.core.movement_rules import AnomalyRule
         from src.ti4.core.unit import Unit
 
@@ -422,19 +421,13 @@ class TestMovementRuleErrorHandling:
         unit = Unit(unit_type=UnitType.CRUISER, owner="player1")
 
         # Test invalid roll values
-        with pytest.raises(
-            GravityRiftDestructionError, match="Invalid dice roll value"
-        ):
+        with pytest.raises(ValueError, match="Invalid dice roll value"):
             anomaly_rule.check_gravity_rift_destruction(unit, 0)
 
-        with pytest.raises(
-            GravityRiftDestructionError, match="Invalid dice roll value"
-        ):
+        with pytest.raises(ValueError, match="Invalid dice roll value"):
             anomaly_rule.check_gravity_rift_destruction(unit, 11)
 
-        with pytest.raises(
-            GravityRiftDestructionError, match="Invalid dice roll value"
-        ):
+        with pytest.raises(ValueError, match="Invalid dice roll value"):
             anomaly_rule.check_gravity_rift_destruction(unit, -1)
 
 

@@ -300,7 +300,9 @@ class MovementValidator:
                     return False
                 elif anomaly_type == AnomalyType.NEBULA:
                     # Nebula blocks movement unless it's the active system
-                    active_system_id = getattr(movement, "active_system_id", None)
+                    active_system_id = getattr(
+                        movement, "active_system_id", movement.to_system_id
+                    )
                     if system_id != active_system_id:
                         return False
 
@@ -343,7 +345,9 @@ class MovementValidator:
                 elif anomaly_type == AnomalyType.SUPERNOVA:
                     return f"Movement blocked by supernova in system {system_id}"
                 elif anomaly_type == AnomalyType.NEBULA:
-                    active_system_id = getattr(movement, "active_system_id", None)
+                    active_system_id = getattr(
+                        movement, "active_system_id", movement.to_system_id
+                    )
                     if system_id != active_system_id:
                         return f"Movement blocked by nebula in system {system_id} - nebula must be the active system"
 

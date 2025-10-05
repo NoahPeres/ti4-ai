@@ -51,7 +51,9 @@ class TestAnomalyIntegrationBasic:
 
         # Test nebula effects
         nebula_effects = self.anomaly_manager.get_anomaly_effects_summary(nebula_system)
-        assert nebula_effects["blocks_movement"] is True
+        assert (
+            nebula_effects["blocks_movement"] is False
+        )  # Nebula blocks conditionally, not absolutely
         assert nebula_effects["requires_active_system"] is True
         assert nebula_effects["move_value_modifier"] == -1
         assert nebula_effects["combat_bonus"] == 1
@@ -103,8 +105,10 @@ class TestAnomalyIntegrationBasic:
         assert AnomalyType.NEBULA in effects["anomaly_types"]
         assert AnomalyType.GRAVITY_RIFT in effects["anomaly_types"]
 
-        # Should have nebula blocking behavior (most restrictive)
-        assert effects["blocks_movement"] is True
+        # Should have nebula conditional blocking behavior
+        assert (
+            effects["blocks_movement"] is False
+        )  # No absolute blockers (asteroid/supernova)
         assert effects["requires_active_system"] is True
         assert effects["combat_bonus"] == 1  # Nebula combat bonus
 
@@ -156,7 +160,9 @@ class TestAnomalyIntegrationBasic:
 
         # Effects should still work
         effects = self.anomaly_manager.get_anomaly_effects_summary(anomaly_system)
-        assert effects["blocks_movement"] is True
+        assert (
+            effects["blocks_movement"] is False
+        )  # Nebula blocks conditionally, not absolutely
         assert effects["combat_bonus"] == 1
 
     def test_movement_blocking_detection(self):
@@ -181,7 +187,9 @@ class TestAnomalyIntegrationBasic:
         assert (
             self.anomaly_manager.is_system_blocking_movement(supernova_system) is True
         )
-        assert self.anomaly_manager.is_system_blocking_movement(nebula_system) is True
+        assert (
+            self.anomaly_manager.is_system_blocking_movement(nebula_system) is False
+        )  # Nebula blocks conditionally
 
         # Test systems that don't block movement
         assert (

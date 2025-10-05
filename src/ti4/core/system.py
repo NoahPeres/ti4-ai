@@ -420,6 +420,9 @@ class System:
                     effects.append("Movement blocked (requires active system)")
                 else:
                     effects.append("Movement completely blocked")
+            elif anomaly_effects.get("requires_active_system", False):
+                # Systems that require active system but don't absolutely block (like nebula)
+                effects.append("Movement blocked (requires active system)")
 
             # Format move value effects
             move_modifier = anomaly_effects.get("move_value_modifier", 0)

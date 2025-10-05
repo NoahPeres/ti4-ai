@@ -23,7 +23,7 @@ class AnomalyEffectConstants:
     """Constants for anomaly effects and calculations."""
 
     # Movement blocking anomaly types
-    MOVEMENT_BLOCKING_ANOMALIES = frozenset(["asteroid_field", "supernova", "nebula"])
+    MOVEMENT_BLOCKING_ANOMALIES = frozenset(["asteroid_field", "supernova"])
 
     # Effect values
     NEBULA_MOVE_VALUE_MODIFIER = -1  # Simplified representation of "move value = 1"
@@ -109,6 +109,8 @@ class AnomalyManager:
             ),
             "move_value_modifier": self._calculate_move_value_modifier(anomaly_types),
             "combat_bonus": self._calculate_combat_bonus(anomaly_types),
+            "destruction_risk": self._has_destruction_risk(anomaly_types),
+            "applicable_anomaly_types": [t.value for t in anomaly_types],
         }
 
     def _validate_system(self, system: System) -> None:
@@ -196,6 +198,19 @@ class AnomalyManager:
             return AnomalyEffectConstants.NEBULA_COMBAT_BONUS
 
         return AnomalyEffectConstants.DEFAULT_COMBAT_BONUS
+
+    def _has_destruction_risk(self, anomaly_types: list[AnomalyType]) -> bool:
+        """Check if any anomaly types pose destruction risk.
+
+        Args:
+            anomaly_types: List of anomaly types to analyze
+
+        Returns:
+            True if any anomaly type poses destruction risk
+        """
+        from .constants import AnomalyType
+
+        return AnomalyType.GRAVITY_RIFT in anomaly_types
 
     def add_anomaly_to_system(
         self, system: System, anomaly_type: AnomalyType | str
@@ -366,21 +381,24 @@ class AnomalyManager:
 
         self._validate_system(system)
 
-        # Check if movement is blocked
-        if self.is_system_blocking_movement(system):
-            anomaly_types = system.get_anomaly_types()
-            blocking_types = [
-                t
-                for t in anomaly_types
-                if t.value in AnomalyEffectConstants.MOVEMENT_BLOCKING_ANOMALIES
-            ]
+        # Check if movement is blocked, considering active system rules
+        anomaly_types = system.get_anomaly_types()
+        blocking_types = []
 
-            if blocking_types:
-                anomaly_names = [t.value.replace("_", " ") for t in blocking_types]
-                raise AnomalyMovementError(
-                    f"Movement into system {system.system_id} is blocked by {', '.join(anomaly_names)}. "
-                    f"System blocks movement due to anomaly rules."
-                )
+        for anomaly_type in anomaly_types:
+            # Nebula only blocks movement if it's NOT the active system
+            if anomaly_type.value == "nebula" and is_active_system:
+                continue
+            # Other blocking anomalies always block
+            if anomaly_type.value in AnomalyEffectConstants.MOVEMENT_BLOCKING_ANOMALIES:
+                blocking_types.append(anomaly_type)
+
+        if blocking_types:
+            anomaly_names = [t.value.replace("_", " ") for t in blocking_types]
+            raise AnomalyMovementError(
+                f"Movement into system {system.system_id} is blocked by {', '.join(anomaly_names)}. "
+                f"System blocks movement due to anomaly rules."
+            )
 
     def validate_system_state(self, system: System) -> None:
         """Validate the internal state of a system.

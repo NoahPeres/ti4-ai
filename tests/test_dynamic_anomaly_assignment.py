@@ -13,6 +13,7 @@ LRR References:
 import pytest
 
 from src.ti4.core.constants import AnomalyType
+from src.ti4.core.exceptions import InvalidAnomalyTypeError
 from src.ti4.core.planet import Planet
 from src.ti4.core.system import System
 
@@ -333,26 +334,32 @@ class TestDynamicAnomalyEdgeCases:
         """Test that invalid anomaly types raise appropriate errors."""
         system = System("test_system")
 
-        with pytest.raises(ValueError, match="Invalid anomaly type"):
+        with pytest.raises(InvalidAnomalyTypeError, match="Invalid anomaly type"):
             system.add_anomaly_type("invalid_anomaly")
 
-        with pytest.raises(ValueError, match="Invalid anomaly type"):
+        with pytest.raises(InvalidAnomalyTypeError, match="Invalid anomaly type"):
             system.remove_anomaly_type("invalid_anomaly")
 
-        with pytest.raises(ValueError, match="Invalid anomaly type"):
+        with pytest.raises(InvalidAnomalyTypeError, match="Invalid anomaly type"):
             system.has_anomaly_type("invalid_anomaly")
 
     def test_none_anomaly_type_raises_error(self) -> None:
         """Test that None anomaly type raises appropriate errors."""
         system = System("test_system")
 
-        with pytest.raises(ValueError, match="Anomaly type cannot be None"):
+        with pytest.raises(
+            InvalidAnomalyTypeError, match="Anomaly type cannot be None"
+        ):
             system.add_anomaly_type(None)  # type: ignore
 
-        with pytest.raises(ValueError, match="Anomaly type cannot be None"):
+        with pytest.raises(
+            InvalidAnomalyTypeError, match="Anomaly type cannot be None"
+        ):
             system.remove_anomaly_type(None)  # type: ignore
 
-        with pytest.raises(ValueError, match="Anomaly type cannot be None"):
+        with pytest.raises(
+            InvalidAnomalyTypeError, match="Anomaly type cannot be None"
+        ):
             system.has_anomaly_type(None)  # type: ignore
 
 

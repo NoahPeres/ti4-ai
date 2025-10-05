@@ -312,10 +312,8 @@ class AnomalyRule(MovementRule):
         LRR References:
         - Rule 41: Gravity Rift - Destruction on rolls 1-3, survival on 4-10
         """
-        from .exceptions import GravityRiftDestructionError
-
         if not 1 <= roll_value <= 10:
-            raise GravityRiftDestructionError(
+            raise ValueError(
                 f"Invalid dice roll value: {roll_value}. Must be between 1 and 10."
             )
 

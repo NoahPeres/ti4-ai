@@ -12,6 +12,7 @@ LRR References:
 import pytest
 
 from src.ti4.core.constants import AnomalyType
+from src.ti4.core.exceptions import AnomalyStateConsistencyError
 from src.ti4.core.planet import Planet
 from src.ti4.core.system import System
 
@@ -169,7 +170,9 @@ class TestAnomalyEffectsQuerying:
         effects = manager.get_anomaly_effects_summary(system)
 
         assert AnomalyType.NEBULA in effects["anomaly_types"]
-        assert effects["blocks_movement"] is True
+        assert (
+            effects["blocks_movement"] is False
+        )  # Nebula blocks conditionally, not absolutely
         assert effects["requires_active_system"] is True
         assert effects["move_value_modifier"] == -1  # Nebula reduces move value
         assert effects["combat_bonus"] == 1  # Nebula provides +1 combat bonus
@@ -206,8 +209,8 @@ class TestAnomalyEffectsQuerying:
         assert len(effects["anomaly_types"]) == 2
         assert AnomalyType.NEBULA in effects["anomaly_types"]
         assert AnomalyType.GRAVITY_RIFT in effects["anomaly_types"]
-        # Nebula effects should take precedence for movement blocking
-        assert effects["blocks_movement"] is True
+        # No absolute movement blockers (asteroid/supernova)
+        assert effects["blocks_movement"] is False
         assert effects["requires_active_system"] is True
         # Nebula move value modifier should take precedence
         assert effects["move_value_modifier"] == -1
@@ -229,7 +232,9 @@ class TestAnomalyEffectsQuerying:
 
         # Anomaly effects should still apply even with planets
         assert AnomalyType.NEBULA in effects["anomaly_types"]
-        assert effects["blocks_movement"] is True
+        assert (
+            effects["blocks_movement"] is False
+        )  # Nebula blocks conditionally, not absolutely
         assert effects["combat_bonus"] == 1
         # System should still have the planet
         assert len(system.planets) == 1
@@ -321,7 +326,7 @@ class TestAnomalyQueryingErrorHandling:
 
         manager = AnomalyManager()
 
-        with pytest.raises(ValueError, match="System cannot be None"):
+        with pytest.raises(AnomalyStateConsistencyError, match="System cannot be None"):
             manager.get_anomaly_effects_summary(None)  # type: ignore
 
     def test_system_display_info_handles_empty_system(self) -> None:
@@ -337,7 +342,7 @@ class TestAnomalyQueryingErrorHandling:
 
     def test_system_display_info_validates_empty_system_id(self) -> None:
         """Test that display info validates system ID is not empty."""
-        system = System("")  # Empty system ID
-
-        with pytest.raises(ValueError, match="System ID cannot be empty"):
-            system.get_system_info_display()
+        with pytest.raises(
+            AnomalyStateConsistencyError, match="System ID cannot be empty"
+        ):
+            System("")  # Empty system ID
