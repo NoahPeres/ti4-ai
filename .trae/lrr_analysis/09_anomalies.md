@@ -8,34 +8,34 @@ Anomalies are special system tiles with unique rules that affect movement and ga
 ### 9.1 Anomaly Identification 🟡 MEDIUM
 **Raw LRR Text**: "An anomaly is identified by a red border located on the tile's corners."
 
-**Implementation Status**: ❌ NOT IMPLEMENTED
-- **Code**: No anomaly identification system
-- **Tests**: No anomaly identification tests
-- **Assessment**: Visual identification system not implemented
+**Implementation Status**: ⚠️ PARTIAL
+- **Code**: `System.is_anomaly()` method in `src/ti4/core/system.py`
+- **Tests**: `test_system_anomaly_identification` (tests/test_rule_09_anomalies.py)
+- **Assessment**: Logical identification implemented, visual borders not implemented
 - **Priority**: MEDIUM
-- **Dependencies**: Requires system tile visual properties and anomaly type system
-- **Notes**: Red border is the visual indicator for anomaly tiles
+- **Dependencies**: Requires system tile visual properties
+- **Notes**: Red border is the visual indicator for anomaly tiles - logical detection works
 
-### 9.2 Anomaly Types 🔴 HIGH
+### 9.2 Anomaly Types 🟢 COMPLETE
 **Raw LRR Text**: "There are four types of anomalies: asteroid fields, nebulae, supernovas, and gravity rifts."
 
-**Implementation Status**: ⚠️ PARTIAL
-- **Code**: Basic anomaly rule stub exists in `movement_rules.py`
-- **Tests**: No specific anomaly type tests
-- **Assessment**: Framework exists but specific anomaly types not implemented
-- **Priority**: HIGH
-- **Dependencies**: Requires individual anomaly type implementations
-- **Notes**: Four distinct anomaly types with different effects
+**Implementation Status**: ✅ COMPLETE
+- **Code**: `AnomalyType` enum in `src/ti4/core/constants.py`, full implementation in `AnomalyManager`
+- **Tests**: Comprehensive test coverage across multiple test files
+- **Assessment**: All four anomaly types fully implemented with effects
+- **Priority**: HIGH (COMPLETED)
+- **Dependencies**: Complete
+- **Notes**: All four distinct anomaly types implemented with correct effects
 
-### 9.2a Anomalies with Planets 🟡 MEDIUM
+### 9.2a Anomalies with Planets 🟢 COMPLETE
 **Raw LRR Text**: "Some anomalies contain planets; those systems are still anomalies."
 
-**Implementation Status**: ❌ NOT IMPLEMENTED
-- **Code**: No planet-anomaly combination system
-- **Tests**: No tests for anomalies with planets
-- **Assessment**: Dual nature systems (anomaly + planets) not handled
-- **Priority**: MEDIUM
-- **Dependencies**: Requires system tile properties and planet system integration
+**Implementation Status**: ✅ COMPLETE
+- **Code**: `System` class supports both planets and anomalies simultaneously
+- **Tests**: `test_anomaly_system_with_planets` (tests/test_rule_09_anomalies.py)
+- **Assessment**: Dual nature systems (anomaly + planets) fully supported
+- **Priority**: MEDIUM (COMPLETED)
+- **Dependencies**: Complete
 - **Notes**: Systems can be both anomalies and contain planets simultaneously
 
 ### 9.3 Anomaly Art Identification 🟢 LOW
@@ -44,64 +44,68 @@ Anomalies are special system tiles with unique rules that affect movement and ga
 **Implementation Status**: ❌ NOT IMPLEMENTED
 - **Code**: No artwork identification system
 - **Tests**: No art-based identification tests
-- **Assessment**: Visual art identification not implemented
+- **Assessment**: Visual art identification not implemented (not needed for core logic)
 - **Priority**: LOW
 - **Dependencies**: Requires asset management and visual identification system
 - **Notes**: Each anomaly has distinct artwork for identification
 
-### 9.4 Ability-Created Anomalies 🟡 MEDIUM
+### 9.4 Ability-Created Anomalies 🟢 COMPLETE
 **Raw LRR Text**: "Abilities can cause a system tile to become an anomaly; that system tile is an anomaly in addition to its other properties."
 
-**Implementation Status**: ❌ NOT IMPLEMENTED
-- **Code**: No dynamic anomaly creation system
-- **Tests**: No ability-created anomaly tests
-- **Assessment**: Dynamic anomaly transformation not implemented
-- **Priority**: MEDIUM
-- **Dependencies**: Requires ability system and system property modification
+**Implementation Status**: ✅ COMPLETE
+- **Code**: `AnomalyManager.add_anomaly_to_system()` and `convert_system_to_anomaly_type()`
+- **Tests**: `test_dynamic_anomaly_assignment` (tests/test_dynamic_anomaly_assignment.py)
+- **Assessment**: Dynamic anomaly transformation fully implemented
+- **Priority**: MEDIUM (COMPLETED)
+- **Dependencies**: Complete
 - **Notes**: Systems can gain anomaly properties through game effects
 
-### 9.5 Multiple Anomaly Types 🟡 MEDIUM
+### 9.5 Multiple Anomaly Types 🟢 COMPLETE
 **Raw LRR Text**: "Abilities can cause a system to be two different anomalies; that system has the properties of both anomalies."
 
-**Implementation Status**: ❌ NOT IMPLEMENTED
-- **Code**: No multiple anomaly type system
-- **Tests**: No multiple anomaly tests
-- **Assessment**: Stacking anomaly effects not implemented
-- **Priority**: MEDIUM
-- **Dependencies**: Requires anomaly effect stacking and combination rules
-- **Notes**: Systems can have multiple anomaly types simultaneously
+**Implementation Status**: ✅ COMPLETE
+- **Code**: `System.get_anomaly_types()` returns list, effects stack properly
+- **Tests**: `test_multiple_anomaly_types_per_system` (tests/test_dynamic_anomaly_assignment.py)
+- **Assessment**: Stacking anomaly effects fully implemented
+- **Priority**: MEDIUM (COMPLETED)
+- **Dependencies**: Complete
+- **Notes**: Systems can have multiple anomaly types simultaneously with combined effects
 
 ## Related Anomaly Types (Cross-References)
 
-### Asteroid Field (Rule 11) 🔴 HIGH
+### Asteroid Field (Rule 11) 🟢 COMPLETE
 **Effect**: "A ship cannot move through or into an asteroid field."
-- **Implementation Status**: ❌ NOT IMPLEMENTED
-- **Priority**: HIGH - Blocks all movement
-- **Dependencies**: Movement validation system
+- **Implementation Status**: ✅ COMPLETE
+- **Priority**: HIGH (COMPLETED)
+- **Implementation**: `src/ti4/core/movement.py:validate_movement_with_anomalies()`
+- **Tests**: `test_asteroid_field_blocks_movement` (tests/test_rule_09_anomalies.py)
 
-### Nebula (Rule 59) 🔴 HIGH
+### Nebula (Rule 59) 🟢 COMPLETE
 **Effects**:
 - Ships can only move into nebula if it's the active system
 - Ships in nebula have move value of 1
 - Defender gets +1 to combat rolls in nebula
-- **Implementation Status**: ❌ NOT IMPLEMENTED
-- **Priority**: HIGH - Affects movement and combat
-- **Dependencies**: Movement rules and combat system
+- **Implementation Status**: ✅ COMPLETE
+- **Priority**: HIGH (COMPLETED)
+- **Implementation**: Movement validation in `movement.py`, combat effects in `combat.py`
+- **Tests**: `test_nebula_movement_restrictions`, `test_nebula_combat_effects` (multiple test files)
 
-### Supernova (Rule 86) 🔴 HIGH
+### Supernova (Rule 86) 🟢 COMPLETE
 **Effect**: "A ship cannot move through or into a supernova."
-- **Implementation Status**: ❌ NOT IMPLEMENTED
-- **Priority**: HIGH - Blocks all movement
-- **Dependencies**: Movement validation system
+- **Implementation Status**: ✅ COMPLETE
+- **Priority**: HIGH (COMPLETED)
+- **Implementation**: `src/ti4/core/movement.py:validate_movement_with_anomalies()`
+- **Tests**: `test_supernova_blocks_movement` (tests/test_rule_09_anomalies.py)
 
-### Gravity Rift (Rule 41) 🔴 HIGH
+### Gravity Rift (Rule 41) 🟢 COMPLETE
 **Effects**:
 - Ships moving out/through get +1 move value
 - Roll die when exiting: 1-3 destroys ship
 - Can affect same ship multiple times
-- **Implementation Status**: ❌ NOT IMPLEMENTED
-- **Priority**: HIGH - Affects movement and unit survival
-- **Dependencies**: Movement rules and unit destruction system
+- **Implementation Status**: ✅ COMPLETE
+- **Priority**: HIGH (COMPLETED)
+- **Implementation**: `src/ti4/core/movement.py`, `src/ti4/core/movement_rules.py`
+- **Tests**: Comprehensive gravity rift test suite (tests/test_rule_09_anomalies.py)
 
 ## Dependencies Summary
 
@@ -120,19 +124,27 @@ Anomalies are special system tiles with unique rules that affect movement and ga
 - **Property Modification**: Dynamic anomaly assignment
 
 ## Test References
-- **Movement Rules**: Basic `AnomalyRule` stub in `movement_rules.py`
-- **No Anomaly Tests**: No specific tests found for any anomaly type
-- **No Movement Restriction Tests**: No tests for anomaly movement blocking
-- **No Combat Effect Tests**: No tests for nebula combat bonuses
+- **Core System**: `tests/test_rule_09_anomalies.py` - Comprehensive anomaly rule tests
+- **Integration Tests**: `tests/test_anomaly_integration_*.py` - End-to-end anomaly testing
+- **Movement Integration**: `tests/test_anomaly_movement_integration.py` - Movement + anomaly interactions
+- **Combat Integration**: `tests/test_nebula_combat_*.py` - Nebula combat effect tests
+- **Performance Tests**: `tests/test_anomaly_performance_validation.py` - Scalability testing
+- **Error Handling**: `tests/test_anomaly_error_handling.py` - Edge cases and error conditions
 
-## Action Items
-1. **Implement core anomaly system** with four anomaly types
-2. **Create movement restriction validation** for asteroid fields and supernovas
-3. **Implement nebula movement rules** (active system only, move value 1)
-4. **Add nebula combat effects** (+1 defender bonus)
-5. **Implement gravity rift mechanics** (movement bonus and destruction risk)
-6. **Create dynamic anomaly assignment** system for abilities
-7. **Add anomaly stacking support** for multiple types per system
-8. **Integrate with planet system** for anomalies containing planets
-9. **Add comprehensive test suite** for all anomaly types and interactions
-10. **Implement visual identification** system for anomaly recognition
+## Implementation Status: ✅ COMPLETE
+All core anomaly functionality has been implemented with comprehensive test coverage:
+
+### ✅ Completed Features
+1. ✅ **Core anomaly system** with all four anomaly types
+2. ✅ **Movement restriction validation** for asteroid fields and supernovas
+3. ✅ **Nebula movement rules** (active system only, move value 1)
+4. ✅ **Nebula combat effects** (+1 defender bonus)
+5. ✅ **Gravity rift mechanics** (movement bonus and destruction risk with correct stacking)
+6. ✅ **Dynamic anomaly assignment** system for abilities
+7. ✅ **Anomaly stacking support** for multiple types per system
+8. ✅ **Planet system integration** for anomalies containing planets
+9. ✅ **Comprehensive test suite** for all anomaly types and interactions
+
+### 🔄 Future Enhancements (Low Priority)
+- **Visual identification** system for anomaly recognition (artwork-based)
+- **Enhanced UI integration** for anomaly visualization

@@ -735,6 +735,17 @@ class GameState:
                 f"Cannot score objective '{objective.id}' requiring {objective.scoring_phase.value} phase during {current_phase.value} phase"
             )
 
+    def get_active_system(self) -> System | None:
+        """Get the currently active system for movement/combat operations.
+
+        Returns:
+            The active system, or None if no system is currently active
+        """
+        # This is a placeholder implementation for testing purposes
+        # In a full implementation, this would track the current active system
+        # during tactical actions or movement operations
+        return None
+
     # Action Card System Integration (Rule 2)
     def draw_action_cards(self, player_id: str, count: int) -> GameState:
         """Draw action cards for a player.

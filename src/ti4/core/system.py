@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from .unit import Unit
 
 if TYPE_CHECKING:
-    from .constants import WormholeType
+    from .constants import AnomalyType, WormholeType
     from .fleet import Fleet
     from .planet import Planet
 
@@ -16,12 +16,22 @@ class System:
     """Represents a star system containing planets."""
 
     def __init__(self, system_id: str) -> None:
+        from .exceptions import AnomalyStateConsistencyError
+
+        if system_id is None:
+            raise AnomalyStateConsistencyError("System ID cannot be None")
+        if not system_id or (isinstance(system_id, str) and system_id.isspace()):
+            raise AnomalyStateConsistencyError("System ID cannot be empty")
+
         self.system_id = system_id
         self.planets: list[Planet] = []
         self.space_units: list[Unit] = []  # Units in the space area of the system
         self.wormholes: list[str] = []  # List of wormhole types in this system
         self.fleets: list[Fleet] = []  # Fleets in this system
         self.command_tokens: dict[str, bool] = {}  # Player ID -> has command token
+        self.anomaly_types: list[
+            AnomalyType
+        ] = []  # List of anomaly types in this system
 
     def place_command_token(self, player_id: str) -> None:
         """Place a command token for a player in this system (Rule 20.4)."""
@@ -188,3 +198,251 @@ class System:
                 if unit.unit_type in GameConstants.GROUND_FORCE_TYPES
             ]
         return []
+
+    def _normalize_anomaly_type(self, anomaly_type: AnomalyType | str) -> AnomalyType:
+        """Convert anomaly type to enum, with validation.
+
+        Args:
+            anomaly_type: Anomaly type as enum or string
+
+        Returns:
+            AnomalyType enum
+
+        Raises:
+            InvalidAnomalyTypeError: If anomaly_type is None, empty, or invalid
+        """
+        from .exceptions import InvalidAnomalyTypeError
+
+        if anomaly_type is None:
+            raise InvalidAnomalyTypeError("Anomaly type cannot be None")
+
+        from .constants import AnomalyType as AnomalyTypeEnum
+
+        if isinstance(anomaly_type, str):
+            # Check for empty or whitespace-only strings
+            if not anomaly_type or anomaly_type.isspace():
+                raise InvalidAnomalyTypeError("Anomaly type cannot be empty")
+
+            try:
+                return AnomalyTypeEnum(anomaly_type)
+            except ValueError as e:
+                raise InvalidAnomalyTypeError(
+                    f"Invalid anomaly type: {anomaly_type}"
+                ) from e
+
+        return anomaly_type
+
+    def add_anomaly_type(self, anomaly_type: AnomalyType | str) -> None:
+        """Add an anomaly type to this system.
+
+        Implements Rule 9: ANOMALIES - Systems can have anomaly properties.
+        Multiple anomaly types can exist on the same system (Rule 9.5).
+
+        Args:
+            anomaly_type: The anomaly type to add (enum or string)
+
+        Raises:
+            ValueError: If anomaly_type is None or invalid
+
+        LRR References:
+            - Rule 9: ANOMALIES - Core anomaly system
+            - Rule 9.5: Multiple anomaly types on same system
+        """
+        normalized_type = self._normalize_anomaly_type(anomaly_type)
+
+        if normalized_type not in self.anomaly_types:
+            self.anomaly_types.append(normalized_type)
+
+    def remove_anomaly_type(self, anomaly_type: AnomalyType | str) -> None:
+        """Remove an anomaly type from this system.
+
+        Args:
+            anomaly_type: The anomaly type to remove (enum or string)
+
+        Raises:
+            ValueError: If anomaly_type is None or invalid
+
+        Note:
+            Does not raise error if anomaly type is not present.
+        """
+        normalized_type = self._normalize_anomaly_type(anomaly_type)
+
+        if normalized_type in self.anomaly_types:
+            self.anomaly_types.remove(normalized_type)
+
+    def has_anomaly_type(self, anomaly_type: AnomalyType | str) -> bool:
+        """Check if this system has a specific anomaly type.
+
+        Args:
+            anomaly_type: The anomaly type to check for (enum or string)
+
+        Returns:
+            True if system has the specified anomaly type, False otherwise
+
+        Raises:
+            ValueError: If anomaly_type is None or invalid
+        """
+        normalized_type = self._normalize_anomaly_type(anomaly_type)
+        return normalized_type in self.anomaly_types
+
+    def get_anomaly_types(self) -> list[AnomalyType]:
+        """Get all anomaly types present in this system.
+
+        Returns:
+            Copy of anomaly types list to prevent external modification
+
+        Raises:
+            AnomalyStateConsistencyError: If anomaly types list is corrupted
+
+        LRR References:
+            - Rule 9.1: Anomaly identification
+            - Rule 9.5: Multiple anomaly types
+        """
+        from .exceptions import AnomalyStateConsistencyError
+
+        # Validate anomaly types list for corruption
+        if any(anomaly_type is None for anomaly_type in self.anomaly_types):
+            raise AnomalyStateConsistencyError(
+                "Corrupted anomaly types: None values found"
+            )
+
+        return self.anomaly_types.copy()
+
+    def is_anomaly(self) -> bool:
+        """Check if this system is an anomaly (has any anomaly types).
+
+        Returns:
+            True if system has any anomaly types, False otherwise
+
+        LRR References:
+            - Rule 9: ANOMALIES - Core anomaly identification
+            - Rule 88.4: Red-backed anomaly tiles
+        """
+        return len(self.anomaly_types) > 0
+
+    def get_system_info_display(self) -> dict[str, Any]:
+        """Get formatted system information for display purposes.
+
+        Provides comprehensive system information including anomaly status,
+        effects summary, and other system properties for user interfaces.
+
+        Returns:
+            Dictionary containing formatted system information
+
+        Raises:
+            ValueError: If system is in an invalid state
+
+        LRR References:
+            - Rule 9.1: Anomaly identification
+            - Rule 9.3: Art identification (display requirements)
+        """
+
+        # Validate system state
+        from .exceptions import AnomalyStateConsistencyError
+
+        if not self.system_id:
+            raise AnomalyStateConsistencyError("System ID cannot be empty")
+
+        # Basic system information
+        info: dict[str, Any] = {
+            "system_id": self.system_id,
+            "is_anomaly": self.is_anomaly(),
+            "anomaly_status": self._format_anomaly_status(),
+            "planets": self._format_planet_info(),
+            "effects_summary": self._format_effects_summary(),
+        }
+
+        return info
+
+    def _format_anomaly_status(self) -> str:
+        """Format anomaly status for display.
+
+        Returns:
+            Human-readable string describing anomaly status
+        """
+        if not self.is_anomaly():
+            return "Normal System"
+
+        anomaly_names = []
+        for anomaly_type in self.anomaly_types:
+            # Handle corrupted anomaly types gracefully
+            if anomaly_type is None:
+                continue
+            # Convert enum values to display names
+            display_name = anomaly_type.value.replace("_", " ").title()
+            anomaly_names.append(display_name)
+
+        if len(anomaly_names) == 1:
+            return f"Anomaly: {anomaly_names[0]}"
+        else:
+            return f"Multiple Anomalies: {', '.join(anomaly_names)}"
+
+    def _format_planet_info(self) -> list[dict[str, Any]]:
+        """Format planet information for display.
+
+        Returns:
+            List of dictionaries containing planet information
+        """
+
+        planet_info: list[dict[str, Any]] = []
+        for planet in self.planets:
+            if planet is not None:  # Defensive programming
+                planet_info.append(
+                    {
+                        "name": getattr(planet, "name", "Unknown Planet"),
+                        "resources": getattr(planet, "resources", 0),
+                        "influence": getattr(planet, "influence", 0),
+                    }
+                )
+        return planet_info
+
+    def _format_effects_summary(self) -> list[str]:
+        """Format anomaly effects summary for display.
+
+        Returns:
+            List of human-readable effect descriptions
+        """
+        if not self.is_anomaly():
+            return []
+
+        effects = []
+
+        try:
+            # Import AnomalyManager to get effects
+            from .anomaly_manager import AnomalyManager
+
+            manager = AnomalyManager()
+            anomaly_effects = manager.get_anomaly_effects_summary(self)
+
+            # Format movement effects
+            if anomaly_effects.get("blocks_movement", False):
+                if anomaly_effects.get("requires_active_system", False):
+                    effects.append("Movement blocked (requires active system)")
+                else:
+                    effects.append("Movement completely blocked")
+            elif anomaly_effects.get("requires_active_system", False):
+                # Systems that require active system but don't absolutely block (like nebula)
+                effects.append("Movement blocked (requires active system)")
+
+            # Format move value effects
+            move_modifier = anomaly_effects.get("move_value_modifier", 0)
+            if move_modifier < 0:
+                effects.append("Move value reduced to 1")
+            elif move_modifier > 0:
+                effects.append(f"Move value bonus: +{move_modifier}")
+
+            # Format combat effects
+            combat_bonus = anomaly_effects.get("combat_bonus", 0)
+            if combat_bonus > 0:
+                effects.append(f"Combat bonus: +{combat_bonus} for defenders")
+
+            # Add specific anomaly type effects
+            for anomaly_type in self.anomaly_types:
+                if anomaly_type.value == "gravity_rift":
+                    effects.append("Destruction risk when exiting (roll 1-3)")
+
+        except Exception:
+            # Fallback to basic anomaly type listing if effects calculation fails
+            effects.append("Anomaly effects available (calculation error)")
+
+        return effects

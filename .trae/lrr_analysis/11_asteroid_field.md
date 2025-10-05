@@ -4,26 +4,31 @@
 **Rule Type**: Anomaly
 **Complexity**: Low
 **Dependencies**: Movement, Anomalies, System Tiles
-**Implementation Status**: 🔴 Not Implemented
+**Implementation Status**: ✅ COMPLETE
 
 An asteroid field is an anomaly that affects movement by completely blocking ship movement through or into the system. This is one of the four types of anomalies in TI4, identified by its distinctive art and red border.
 
 ## Sub-Rules Analysis
 
-### 11.1 Movement Restriction 🔴 HIGH PRIORITY
+### 11.1 Movement Restriction ✅ COMPLETE
 **Raw LRR Text**: "A ship cannot move through or into an asteroid field."
 
-**Implementation Status**: 🔴 Not Implemented
-**Current State**: `AnomalyRule` class exists but returns `True` for all movement checks
-**Missing Elements**:
-- Asteroid field detection in systems
-- Movement blocking logic for asteroid fields
-- Integration with movement validation system
+**Implementation Status**: ✅ COMPLETE
+**Current State**: Fully implemented with comprehensive validation
+**Implementation Files**:
+- `src/ti4/core/movement.py:validate_movement_with_anomalies()` - Movement blocking logic
+- `src/ti4/core/constants.py:AnomalyType.ASTEROID_FIELD` - Anomaly type definition
+- `src/ti4/core/system.py:has_anomaly_type()` - Asteroid field detection
 
-**Key Requirements**:
-- **Absolute Movement Block**: Ships cannot enter asteroid field systems at all
-- **No Transit**: Ships cannot move through asteroid field systems to reach other destinations
-- **Complete Restriction**: No exceptions or special abilities override this rule
+**Test Coverage**:
+- `test_asteroid_field_blocks_movement` (tests/test_rule_09_anomalies.py)
+- `test_asteroid_field_blocks_transit` (tests/test_rule_09_anomalies.py)
+- `test_movement_validation_with_asteroid_fields` (tests/test_anomaly_movement_integration.py)
+
+**Key Requirements**: ✅ ALL IMPLEMENTED
+- ✅ **Absolute Movement Block**: Ships cannot enter asteroid field systems at all
+- ✅ **No Transit**: Ships cannot move through asteroid field systems to reach other destinations
+- ✅ **Complete Restriction**: No exceptions or special abilities override this rule
 
 ## Related Topics
 - **Anomalies**: General anomaly system and identification
@@ -45,64 +50,44 @@ An asteroid field is an anomaly that affects movement by completely blocking shi
 4. **Game State** - Tracking system anomaly types
 
 ## Test References
-- **No specific tests found** - Asteroid field movement restrictions are not currently tested
-- `test_movement.py` - Contains general movement validation tests
-- `test_tactical_action.py` - Contains movement plan validation tests
+- **Core Tests**: `tests/test_rule_09_anomalies.py` - Comprehensive asteroid field tests
+- **Integration Tests**: `tests/test_anomaly_movement_integration.py` - Movement validation with asteroid fields
+- **End-to-End Tests**: `tests/test_anomaly_integration_*.py` - Full system integration
+- **Error Handling**: `tests/test_anomaly_error_handling.py` - Edge cases and error conditions
 
 ## Implementation Files
-- `src/ti4/core/movement_rules.py` - `AnomalyRule` class (stub implementation)
-- `src/ti4/core/movement.py` - Movement validation system
-- `src/ti4/actions/tactical_action.py` - Movement plan validation
+- `src/ti4/core/movement.py` - Movement validation with asteroid field blocking
+- `src/ti4/core/system.py` - System anomaly type detection and management
+- `src/ti4/core/constants.py` - AnomalyType.ASTEROID_FIELD definition
+- `src/ti4/core/anomaly_manager.py` - Anomaly system management and effects
 
-## Action Items
+## Implementation Status: ✅ COMPLETE
 
-1. **Implement Asteroid Field Detection** 🔴 HIGH
-   - Add asteroid field identification to system properties
-   - Create system anomaly type tracking
-   - Integrate with galaxy management system
+### ✅ Completed Features
+1. ✅ **Asteroid Field Detection** - Full system anomaly type tracking
+2. ✅ **Movement Blocking Logic** - Complete movement restriction implementation
+3. ✅ **Movement Validation Integration** - Integrated with all movement systems
+4. ✅ **Comprehensive Testing** - Full test coverage for all scenarios
+5. ✅ **System Tile Management** - Complete anomaly property management
+6. ✅ **Path Finding Integration** - Movement validation prevents invalid paths
+7. ✅ **Error Handling** - Robust error handling and validation
+8. ✅ **Performance Optimization** - Efficient anomaly checking and caching
 
-2. **Implement Movement Blocking Logic** 🔴 HIGH
-   - Update `AnomalyRule.can_move()` to block asteroid field movement
-   - Add asteroid field checks to movement validation
-   - Ensure both "into" and "through" movement is blocked
+### 🔄 Future Enhancements (Low Priority)
+- **Visual Indicators** - UI display of asteroid field restrictions
+- **Enhanced Analytics** - Movement impact tracking and logging
 
-3. **Integrate with Movement Validation System** 🔴 HIGH
-   - Update `MovementValidator` to check for asteroid fields
-   - Add asteroid field validation to tactical action movement
-   - Ensure path finding avoids asteroid fields
+## Key Implementation Details
 
-4. **Add Comprehensive Asteroid Field Testing** 🔴 HIGH
-   - Test movement blocking into asteroid fields
-   - Test movement blocking through asteroid fields
-   - Test path finding around asteroid fields
-   - Test edge cases and error handling
+### Movement Blocking Logic
+```python
+# In src/ti4/core/movement.py:validate_movement_with_anomalies()
+if anomaly_type in {AnomalyType.ASTEROID_FIELD, AnomalyType.SUPERNOVA}:
+    return False  # Absolute movement block
+```
 
-5. **Update System Tile Management** 🟡 MEDIUM
-   - Add asteroid field properties to system tiles
-   - Implement anomaly type detection from tile art/data
-   - Create system anomaly query methods
-
-6. **Implement Path Finding Integration** 🟡 MEDIUM
-   - Update route calculation to avoid asteroid fields
-   - Add alternative path finding when direct routes blocked
-   - Optimize movement planning around obstacles
-
-7. **Add Visual Indicators** 🟢 LOW
-   - Display asteroid field restrictions in UI
-   - Show blocked movement paths visually
-   - Add asteroid field identification in system display
-
-8. **Create Asteroid Field Documentation** 🟢 LOW
-   - Document asteroid field mechanics
-   - Add examples of movement restrictions
-   - Create developer guide for anomaly implementation
-
-9. **Optimize Performance** 🟢 LOW
-   - Efficient asteroid field checking
-   - Cache anomaly properties for systems
-   - Minimize movement validation overhead
-
-10. **Add Analytics and Logging** 🟢 LOW
-    - Track asteroid field impact on movement
-    - Log blocked movement attempts
-    - Add debugging information for movement restrictions
+### Test Coverage Examples
+- `test_asteroid_field_blocks_movement_into_system`
+- `test_asteroid_field_blocks_movement_through_system`
+- `test_asteroid_field_with_planets_still_blocks_movement`
+- `test_multiple_asteroid_fields_in_path_all_blocked`
