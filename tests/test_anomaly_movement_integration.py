@@ -150,6 +150,7 @@ class TestAnomalyMovementErrorMessages:
             from_system_id="start_system",
             to_system_id="nebula_system",
             player_id="player1",
+            active_system_id="different_system",  # Set different active system to trigger error
         )
 
         validator = MovementValidator(galaxy)

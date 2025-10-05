@@ -1076,15 +1076,18 @@ class TestGravityRiftMovementBonuses:
         unit = Unit(unit_type=UnitType.CRUISER, owner="player1")
         anomaly_rule = AnomalyRule()
 
-        # Test invalid roll values
-        with pytest.raises(ValueError, match="Invalid dice roll value: 0"):
-            anomaly_rule.check_gravity_rift_destruction(unit, 0)
+        # Test invalid roll values (after normalization)
+        # Note: 0 is now normalized to 10, so it's valid
 
         with pytest.raises(ValueError, match="Invalid dice roll value: 11"):
             anomaly_rule.check_gravity_rift_destruction(unit, 11)
 
         with pytest.raises(ValueError, match="Invalid dice roll value: -1"):
             anomaly_rule.check_gravity_rift_destruction(unit, -1)
+
+        # Test that 0 is now normalized and doesn't raise an error
+        result = anomaly_rule.check_gravity_rift_destruction(unit, 0)
+        assert result is False  # 0 -> 10, which is > 3, so ship survives
 
 
 class TestNonAnomalyMovementAllowed:

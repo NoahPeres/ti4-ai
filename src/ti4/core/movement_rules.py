@@ -312,12 +312,15 @@ class AnomalyRule(MovementRule):
         LRR References:
         - Rule 41: Gravity Rift - Destruction on rolls 1-3, survival on 4-10
         """
-        if not 1 <= roll_value <= 10:
+        # Normalize roll_value from 0-9 range to 1-10 range
+        normalized_roll = roll_value if roll_value != 0 else 10
+
+        if not 1 <= normalized_roll <= 10:
             raise ValueError(
-                f"Invalid dice roll value: {roll_value}. Must be between 1 and 10."
+                f"Invalid dice roll value: {normalized_roll}. Must be between 1 and 10."
             )
 
-        return roll_value <= 3
+        return normalized_roll <= 3
 
     def apply_gravity_rift_destruction(
         self, context: MovementContext

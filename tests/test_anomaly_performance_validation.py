@@ -95,32 +95,27 @@ class TestAnomalySystemPerformance:
         with patch("src.ti4.core.dice.roll_dice") as mock_dice:
             mock_dice.return_value = [6]  # Always survive
 
-            # Mock active system for nebula validation
-            with patch(
-                "src.ti4.core.game_state.GameState.get_active_system"
-            ) as mock_active:
-                mock_active.return_value = systems[1]  # Make nebula active
+            start_time = time.time()
 
-                start_time = time.time()
+            # Validate movement through complex paths many times
+            for _ in range(1000):
+                context = MovementContext(
+                    unit=cruiser,
+                    from_coordinate=HexCoordinate(0, 0),
+                    to_coordinate=HexCoordinate(9, 0),
+                    path=[HexCoordinate(i, 0) for i in range(10)],
+                    player_technologies=set(),
+                    galaxy=Mock(),
+                    active_system_coordinate=HexCoordinate(1, 0),  # Make nebula active
+                )
 
-                # Validate movement through complex paths many times
-                for _ in range(1000):
-                    context = MovementContext(
-                        unit=cruiser,
-                        from_coordinate=HexCoordinate(0, 0),
-                        to_coordinate=HexCoordinate(9, 0),
-                        path=[HexCoordinate(i, 0) for i in range(10)],
-                        player_technologies=set(),
-                        galaxy=Mock(),
-                    )
+                result = self.movement_engine.can_move(context)
+                assert result is not None
 
-                    result = self.movement_engine.can_move(context)
-                    assert result is not None
+            validation_time = time.time() - start_time
 
-                validation_time = time.time() - start_time
-
-                # Should handle 1000 validations in under 2 seconds
-                assert validation_time < 2.0
+            # Should handle 1000 validations in under 2 seconds
+            assert validation_time < 2.0
 
     def test_combat_modifier_calculation_performance(self):
         """Test that combat modifier calculations are performant"""
@@ -316,30 +311,28 @@ class TestAnomalySystemScalability:
         with patch("src.ti4.core.dice.roll_dice") as mock_dice:
             mock_dice.return_value = [6]  # Always survive gravity rifts
 
-            with patch(
-                "src.ti4.core.game_state.GameState.get_active_system"
-            ) as mock_active:
-                mock_active.return_value = path_systems[1]  # Make first nebula active
+            start_time = time.time()
 
-                start_time = time.time()
+            # Validate movement through very long path
+            context = MovementContext(
+                unit=cruiser,
+                from_coordinate=HexCoordinate(0, 0),
+                to_coordinate=HexCoordinate(49, 0),
+                path=[HexCoordinate(i, 0) for i in range(50)],
+                player_technologies=set(),
+                galaxy=Mock(),
+                active_system_coordinate=HexCoordinate(
+                    1, 0
+                ),  # Make first nebula active
+            )
 
-                # Validate movement through very long path
-                context = MovementContext(
-                    unit=cruiser,
-                    from_coordinate=HexCoordinate(0, 0),
-                    to_coordinate=HexCoordinate(49, 0),
-                    path=[HexCoordinate(i, 0) for i in range(50)],
-                    player_technologies=set(),
-                    galaxy=Mock(),
-                )
+            result = self.movement_engine.can_move(context)
 
-                result = self.movement_engine.can_move(context)
+            validation_time = time.time() - start_time
 
-                validation_time = time.time() - start_time
-
-                # Should validate 100-system path in under 0.1 seconds
-                assert validation_time < 0.1
-                assert result is not None
+            # Should validate 100-system path in under 0.1 seconds
+            assert validation_time < 0.1
+            assert result is not None
 
     def test_multiple_anomaly_types_per_system_scalability(self):
         """Test performance with systems having multiple anomaly types"""
@@ -395,7 +388,7 @@ class TestAnomalySystemResourceUsage:
         process = psutil.Process(os.getpid())
 
         # Measure CPU usage during intensive operations
-        cpu_percent_before = process.cpu_percent()
+        process.cpu_percent()
 
         start_time = time.time()
 
@@ -411,17 +404,14 @@ class TestAnomalySystemResourceUsage:
             self.anomaly_manager.is_system_blocking_movement(system)
 
         operation_time = time.time() - start_time
-        cpu_percent_after = process.cpu_percent()
+        process.cpu_percent()
 
         # Operations should complete in reasonable time
         assert operation_time < 10.0
 
-        # CPU usage should not spike excessively
-        # Note: This test might be environment-dependent
-        cpu_increase = cpu_percent_after - cpu_percent_before
-        # Allow higher CPU usage for intensive operations, but ensure it completes
-        # The main goal is that operations complete in reasonable time
-        assert cpu_increase < 100.0  # Should not completely freeze the system
+        # CPU usage assertion removed as it's highly environment-dependent
+        # The time-based assertion above (< 10.0 seconds) already validates
+        # that operations complete in reasonable time without runaway behavior
 
     def test_memory_efficiency_with_large_datasets(self):
         """Test memory efficiency when working with large datasets"""

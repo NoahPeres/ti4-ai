@@ -391,12 +391,11 @@ class TestGalaxySystemCompatibility:
         from src.ti4.core.game_state import GameState
 
         game_state = Mock(spec=GameState)
-        game_state.get_system = Mock(return_value=anomaly_system)
 
         # Test that game state can track anomaly systems
         game_state.systems = {"test_anomaly": anomaly_system}
 
-        retrieved_system = game_state.get_system("test_anomaly")
+        retrieved_system = game_state.systems["test_anomaly"]
         assert retrieved_system.is_anomaly()
         assert retrieved_system.has_anomaly_type(AnomalyType.ASTEROID_FIELD)
 

@@ -420,9 +420,8 @@ class TestMovementRuleErrorHandling:
         anomaly_rule = AnomalyRule()
         unit = Unit(unit_type=UnitType.CRUISER, owner="player1")
 
-        # Test invalid roll values
-        with pytest.raises(ValueError, match="Invalid dice roll value"):
-            anomaly_rule.check_gravity_rift_destruction(unit, 0)
+        # Test invalid roll values (after normalization)
+        # Note: 0 is now normalized to 10, so it's valid
 
         with pytest.raises(ValueError, match="Invalid dice roll value"):
             anomaly_rule.check_gravity_rift_destruction(unit, 11)

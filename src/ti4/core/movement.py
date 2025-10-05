@@ -278,6 +278,8 @@ class MovementValidator:
         """
         from .constants import AnomalyType
 
+        active_system_id = movement.active_system_id or movement.to_system_id
+
         # Get the movement path
         path = self._galaxy.find_path(movement.from_system_id, movement.to_system_id)
         if not path:
@@ -300,9 +302,6 @@ class MovementValidator:
                     return False
                 elif anomaly_type == AnomalyType.NEBULA:
                     # Nebula blocks movement unless it's the active system
-                    active_system_id = getattr(
-                        movement, "active_system_id", movement.to_system_id
-                    )
                     if system_id != active_system_id:
                         return False
 
@@ -321,6 +320,8 @@ class MovementValidator:
         - Requirement 8.4: Specific error messages indicating which anomaly caused failure
         """
         from .constants import AnomalyType
+
+        active_system_id = movement.active_system_id or movement.to_system_id
 
         # Get the movement path
         path = self._galaxy.find_path(movement.from_system_id, movement.to_system_id)
@@ -345,9 +346,6 @@ class MovementValidator:
                 elif anomaly_type == AnomalyType.SUPERNOVA:
                     return f"Movement blocked by supernova in system {system_id}"
                 elif anomaly_type == AnomalyType.NEBULA:
-                    active_system_id = getattr(
-                        movement, "active_system_id", movement.to_system_id
-                    )
                     if system_id != active_system_id:
                         return f"Movement blocked by nebula in system {system_id} - nebula must be the active system"
 
