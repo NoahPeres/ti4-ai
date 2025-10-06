@@ -98,7 +98,11 @@ class PromissoryNoteManager:
         LRR Reference: Rule 69.3 - Promissory notes returned after abilities completely resolved
         """
         # Handle Alliance note revocation before general return processing
-        if note.note_type == PromissoryNoteType.ALLIANCE and game_state is not None:
+        if note.note_type == PromissoryNoteType.ALLIANCE:
+            if game_state is None:
+                raise ValueError(
+                    "game_state is required to revoke Alliance note commander access"
+                )
             self._alliance_manager.revoke_commander_access(note, game_state)
 
         # Remove note from player's hand

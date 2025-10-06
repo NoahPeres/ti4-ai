@@ -432,6 +432,10 @@ class BaseLeader(ABC):
             from .placeholder_leaders import SimpleResourceAgent
 
             leader = SimpleResourceAgent(faction=faction, player_id=player_id)
+        elif leader_name == "Conditional Target Agent":
+            from .placeholder_leaders import ConditionalTargetAgent
+
+            leader = ConditionalTargetAgent(faction=faction, player_id=player_id)
         elif leader_name == "Unlockable Commander":
             from .placeholder_leaders import UnlockableCommander
 
