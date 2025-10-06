@@ -1509,23 +1509,23 @@ class LeaderAbilityValidator:
 
         Returns:
             None if sequence timing is valid, error message if invalid
+
+        Note:
+            Sequence timing validation (before_action/after_action) is not yet implemented
+            and requires additional game state tracking. Currently returns None (no validation).
         """
         # Validate timing relative to other actions
         before_action = kwargs.get("before_action")
         after_action = kwargs.get("after_action")
 
         if before_action:
-            # Check if the specified action hasn't occurred yet
-            # This would require game state tracking of action sequence
+            # TODO: Implement action sequence tracking
             pass
 
         if after_action:
-            # Check if the specified action has already occurred
-            # This would require game state tracking of action sequence
+            # TODO: Implement action sequence tracking
             pass
 
-        # For now, return None as sequence timing validation would require
-        # more detailed game state tracking
         return None
 
     @staticmethod

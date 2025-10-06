@@ -168,35 +168,6 @@ class PromissoryNoteManager:
         self._available_notes -= notes_to_remove
 
         # Handle Alliance note revocation for eliminated player
-        # Revoke all Alliance-based commander access involving the eliminated player
-        # This includes both notes issued by the eliminated player and notes held by them
-
-        # Find all Alliance notes involving the eliminated player and revoke access
-        alliance_notes_to_revoke = []
-
-        # Check notes in other players' hands that were issued by the eliminated player
-        for _player_id, hand in self._player_hands.items():
-            for note in hand:
-                if (
-                    note.note_type == PromissoryNoteType.ALLIANCE
-                    and note.issuing_player == eliminated_player
-                ):
-                    alliance_notes_to_revoke.append(note)
-
-        # Check notes in the eliminated player's hand
-        if eliminated_player in self._player_hands:
-            for note in self._player_hands[eliminated_player]:
-                if note.note_type == PromissoryNoteType.ALLIANCE:
-                    alliance_notes_to_revoke.append(note)
-
-        # Check available notes that were issued by the eliminated player
-        for note in self._available_notes:
-            if (
-                note.note_type == PromissoryNoteType.ALLIANCE
-                and note.issuing_player == eliminated_player
-            ):
-                alliance_notes_to_revoke.append(note)
-
         # Revoke Alliance access for all notes involving the eliminated player
         self._alliance_manager.handle_player_elimination(eliminated_player)
 
