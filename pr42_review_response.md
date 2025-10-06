@@ -1,88 +1,102 @@
 # PR 42 Review Response
 
-## Review Summary
-CodeRabbit identified **2 actionable comments** and **1 nitpick comment** in PR 42. I have addressed all critical issues and provided reasoning for the nitpick.
+## Summary
+This document addresses the feedback from CodeRabbit's review of PR 42 (Leaders implementation).
 
-## Actionable Comments Addressed
+## Review Comments Addressed
 
-### 1. ✅ **FIXED**: ConditionalTargetAgent Deserialization Issue
-**File**: `src/ti4/core/leaders.py` (line 448)
-**Issue**: Missing deserialization support for `ConditionalTargetAgent` causing silent downgrades to base `Agent` class.
+### 1. Duplicate Comments (Positive Acknowledgments)
+All three duplicate comments were positive acknowledgments of fixes from previous reviews:
+- ✅ Alliance note revocation properly enforced
+- ✅ Dead code removed
+- ✅ ConditionalTargetAgent deserialization restored
 
-**Root Cause**: The `BaseLeader.from_serialized_state` method only handled `"Simple Resource Agent"`, `"Unlockable Commander"`, and `"Powerful Hero"` but was missing the `"Conditional Target Agent"` case.
+These indicate that previous issues have been successfully resolved.
 
-**Fix Applied**:
+### 2. Nitpick Comment: LeaderStateError Consistency
+
+**Issue**: `Agent.ready()` uses generic `ValueError` while `Agent.exhaust()` uses `LeaderStateError.for_invalid_transition()` for consistency.
+
+**Action Taken**: ✅ **IMPLEMENTED**
+- Updated `Agent.ready()` to use `LeaderStateError.for_invalid_transition()` instead of `ValueError`
+- This provides consistency with `Agent.exhaust()` and better error context
+- Updated docstring to reflect the change from `ValueError` to `LeaderStateError`
+
+**Code Changes**:
 ```python
-elif leader_name == "Conditional Target Agent":
-    from .placeholder_leaders import ConditionalTargetAgent
+# Before:
+raise ValueError(
+    f"Cannot ready agent in {status_str} state. "
+    "Agent must be exhausted to be readied."
+)
 
-    leader = ConditionalTargetAgent(faction=faction, player_id=player_id)
+# After:
+raise LeaderStateError.for_invalid_transition(
+    self, "ready", f"already_{status_str}"
+)
 ```
 
 **Impact**:
-- Prevents loss of conditional targeting logic during save/load cycles
-- Maintains proper class hierarchy for complex placeholder leaders
-- Fixes broken persistence-based tests
+- Better error consistency across the leader system
+- More descriptive error messages with proper context
+- Maintains backward compatibility for error handling patterns
 
-**Verification**: Created and ran comprehensive deserialization tests confirming all placeholder leader types serialize/deserialize correctly.
+### 3. Actionable Comment: Validate receiving_player existence
 
-### 2. ✅ **FIXED**: Alliance Note Revocation Validation
-**File**: `src/ti4/core/promissory_notes.py` (line 50)
-**Issue**: Silent skipping of Alliance commander access revocation when `game_state` is `None`, violating Rules 69.3/51.8.
+**Issue**: The method validates that `issuing_player` exists in `game_state` but doesn't verify that `receiving_player` also exists before granting commander access.
 
-**Root Cause**: The code used `if note.note_type == PromissoryNoteType.ALLIANCE and game_state is not None:` which silently skipped revocation when `game_state` was missing.
+**Action Taken**: ✅ **IMPLEMENTED**
+- Added validation to ensure `receiving_player` exists in `game_state.players`
+- Optimized the player lookup to find both players in a single loop
+- Added clear error message when receiving player is not found
 
-**Fix Applied**:
+**Code Changes**:
 ```python
-if note.note_type == PromissoryNoteType.ALLIANCE:
-    if game_state is None:
-        raise ValueError(
-            "game_state is required to revoke Alliance note commander access"
-        )
-    self._alliance_manager.revoke_commander_access(note, game_state)
+# Before: Only validated issuing_player
+issuing_player = None
+for player in game_state.players:
+    if player.id == alliance_note.issuing_player:
+        issuing_player = player
+        break
+
+# After: Validates both players
+issuing_player = None
+receiving_player = None
+for player in game_state.players:
+    if player.id == alliance_note.issuing_player:
+        issuing_player = player
+    if player.id == alliance_note.receiving_player:
+        receiving_player = player
+
+if not receiving_player:
+    raise ValueError(
+        f"Receiving player {alliance_note.receiving_player} not found in game state"
+    )
 ```
 
 **Impact**:
-- Prevents stale Alliance commander sharing from remaining active
-- Enforces proper API contract for Alliance note handling
-- Fails fast with clear error message when required parameter is missing
+- Prevents runtime errors when trying to grant access to non-existent players
+- Provides clear error messages for debugging
+- Ensures data integrity in the alliance sharing system
+- More robust error handling for edge cases
 
-**Verification**: Created and ran tests confirming Alliance notes require `game_state` while other note types work without it.
+## Verification
 
-## Nitpick Comment Considered
-
-### 3. ❌ **NOT IMPLEMENTED**: State Management Consistency
-**File**: `src/ti4/core/status_phase.py` (lines 83-115)
-**Issue**: `_ready_all_agents` mutates agents in place and returns original `game_state`, differing from other methods that create new state objects.
-
-**Decision**: **Not implementing this change** for the following reasons:
-
-1. **Functional Correctness**: The current implementation works correctly as acknowledged by the reviewer
-2. **Performance Considerations**: The suggested deep copying approach could have performance implications
-3. **Design Consistency**: Agents are designed as mutable objects within the frozen GameState
-4. **Simplicity**: Current approach is more direct and easier to understand
-5. **Nitpick Classification**: This is marked as a nitpick, not a critical issue
-
-**Reasoning**: The immutability is maintained at the GameState level, and agents are intentionally mutable objects. The current pattern is simpler and more performant while maintaining correctness.
-
-## Quality Assurance
-
-### Tests Run
-- ✅ `uv run pytest tests/test_leader_persistence.py -v` (15/15 passed)
-- ✅ `uv run pytest tests/test_alliance_promissory_note_lifecycle.py -v` (8/8 passed)
-- ✅ `uv run pytest tests/test_placeholder_leaders.py -v` (38/38 passed)
-- ✅ Custom validation tests for both fixes
+### Tests Passed
+- ✅ All existing alliance promissory note tests pass
+- ✅ All leader manager tests pass
+- ✅ Type checking passes with strict mode
+- ✅ Created and verified custom tests for both changes
 
 ### Quality Gates
-- ✅ `make type-check` - Production code passes strict mypy checking
-- ✅ All pre-commit hooks pass
-- ✅ No regressions in existing functionality
+- ✅ `make type-check` - Production code passes strict type checking
+- ✅ All relevant test suites pass
+- ✅ No regressions introduced
 
-## Summary
+## Summary of Changes
 
-**Fixed Issues**: 2/2 actionable comments addressed
-**Nitpick Reasoning**: 1/1 nitpick considered with clear justification
-**Quality Impact**: All fixes maintain backward compatibility while preventing critical edge cases
-**Test Coverage**: Comprehensive validation of both fixes with no regressions
+1. **Enhanced Error Consistency**: `Agent.ready()` now uses `LeaderStateError` for consistency with other leader state transitions
+2. **Improved Validation**: Alliance note activation now validates both issuing and receiving players exist in game state
+3. **Better Error Messages**: Both changes provide clearer, more descriptive error messages
 
-The changes ensure proper deserialization of complex placeholder leaders and enforce correct Alliance note handling while maintaining the existing API and performance characteristics.
+Both changes improve code quality, consistency, and robustness without breaking existing functionality.

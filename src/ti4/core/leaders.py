@@ -537,13 +537,12 @@ class Agent(BaseLeader):
         """Ready the agent (change state from exhausted to readied).
 
         Raises:
-            ValueError: If agent is not in exhausted state
+            LeaderStateError: If agent is not in exhausted state
         """
         if self.ready_status != LeaderReadyStatus.EXHAUSTED:
             status_str = self.ready_status.value if self.ready_status else "None"
-            raise ValueError(
-                f"Cannot ready agent in {status_str} state. "
-                "Agent must be exhausted to be readied."
+            raise LeaderStateError.for_invalid_transition(
+                self, "ready", f"already_{status_str}"
             )
         self.ready_status = LeaderReadyStatus.READIED
 

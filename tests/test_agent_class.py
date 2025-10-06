@@ -166,5 +166,7 @@ def test_agent_ready_when_already_readied():
 
     agent = Agent(faction=Faction.SOL, player_id="test_player")
 
-    with pytest.raises(ValueError, match="Cannot ready agent in readied state"):
+    from src.ti4.core.leaders import LeaderStateError
+
+    with pytest.raises(LeaderStateError, match="Cannot ready Agent"):
         agent.ready()

@@ -197,16 +197,23 @@ class PromissoryNoteManager:
         if not alliance_note.issuing_player:
             raise ValueError("Alliance note must have an issuing player")
 
-        # Check that the commander is unlocked before granting access
+        # Check that both players exist in the game state
         issuing_player = None
+        receiving_player = None
         for player in game_state.players:
             if player.id == alliance_note.issuing_player:
                 issuing_player = player
-                break
+            if player.id == alliance_note.receiving_player:
+                receiving_player = player
 
         if not issuing_player:
             raise ValueError(
                 f"Issuing player {alliance_note.issuing_player} not found in game state"
+            )
+
+        if not receiving_player:
+            raise ValueError(
+                f"Receiving player {alliance_note.receiving_player} not found in game state"
             )
 
         commander = issuing_player.leader_sheet.commander
