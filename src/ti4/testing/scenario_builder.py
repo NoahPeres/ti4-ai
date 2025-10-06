@@ -42,10 +42,13 @@ class GameScenarioBuilder:
         Returns:
             Self for fluent interface
         """
-        self._players = [
-            Player(id=player_id, faction=faction)
-            for player_id, faction in player_configs
-        ]
+        from ti4.core.leaders import initialize_player_leaders
+
+        self._players = []
+        for player_id, faction in player_configs:
+            player = Player(id=player_id, faction=faction)
+            initialize_player_leaders(player)
+            self._players.append(player)
         return self
 
     def with_galaxy(self, galaxy_config: str) -> "GameScenarioBuilder":

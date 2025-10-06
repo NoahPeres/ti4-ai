@@ -61,7 +61,7 @@ def test_builder_validates_configuration_consistency() -> None:
         builder.build()
 
     # Test invalid player config
-    with pytest.raises(ValueError, match="Player ID cannot be empty"):
+    with pytest.raises(ValueError, match="player_id cannot be empty or None"):
         builder.with_players(("", Faction.SOL)).build()
 
     # Test that we can't pass invalid faction types (this would be caught at type checking level)

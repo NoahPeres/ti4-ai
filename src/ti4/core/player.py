@@ -9,9 +9,11 @@ from .command_sheet import CommandSheet, PoolType
 from .constants import Faction, UnitType
 from .exceptions import DeployError, ReinforcementError
 from .faction_data import FactionData
+from .leaders import LeaderSheet
 
 if TYPE_CHECKING:
     from .exploration import ExplorationCard
+    from .leaders import BaseLeader
     from .reinforcements import Reinforcements
     from .system import System
 
@@ -37,10 +39,42 @@ class Player:
     relics: list[str] = field(
         default_factory=list, init=False
     )  # Rule 35: Relics drawn from relic deck
+    leader_sheet: LeaderSheet = field(init=False)  # Rule 51: Leaders
+
+    def __post_init__(self) -> None:
+        """Initialize leader sheet after Player creation."""
+        object.__setattr__(self, "leader_sheet", LeaderSheet(player_id=self.id))
 
     def is_valid(self) -> bool:
         """Validate the player data."""
         return True
+
+    def get_leaders(self) -> list[BaseLeader]:
+        """Get all leaders for this player.
+
+        Returns:
+            List of all leaders on the player's leader sheet
+
+        LRR References:
+        - Rule 51: LEADERS
+        - Requirements 5.1, 5.2, 5.3, 5.4, 5.5
+        """
+        return self.leader_sheet.get_all_leaders()
+
+    def get_leader_by_name(self, name: str) -> BaseLeader | None:
+        """Get a leader by its name.
+
+        Args:
+            name: The name of the leader to find
+
+        Returns:
+            The leader with the specified name, or None if not found
+
+        LRR References:
+        - Rule 51: LEADERS
+        - Requirements 5.1, 5.2, 5.3, 5.4, 5.5
+        """
+        return self.leader_sheet.get_leader_by_name(name)
 
     def gain_command_token(self, pool: PoolType) -> bool:
         """Gain a command token in the specified pool (Rule 20.2, 20.3).
