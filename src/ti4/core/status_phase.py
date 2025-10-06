@@ -33,6 +33,9 @@ class StatusPhaseManager:
         # Ready all player cards (planets, technologies)
         new_state = self._ready_all_player_cards(new_state)
 
+        # Ready all agent leaders
+        new_state = self._ready_all_agents(new_state)
+
         return new_state
 
     def _ready_all_strategy_cards(self, game_state: "GameState") -> "GameState":
@@ -76,3 +79,37 @@ class StatusPhaseManager:
         )
 
         return new_state
+
+    def _ready_all_agents(self, game_state: "GameState") -> "GameState":
+        """Ready all exhausted agent leaders for all players.
+
+        LRR Reference: Rule 51 - LEADERS, Agent mechanics
+        During the status phase "Ready Cards" step, exhausted agents become readied.
+
+        Args:
+            game_state: Current game state
+
+        Returns:
+            New game state with all agents readied
+
+        Raises:
+            ValueError: If game_state is None
+        """
+        if game_state is None:
+            raise ValueError("game_state cannot be None")
+
+        # Import here to avoid circular imports
+        from .leaders import Agent, LeaderReadyStatus
+
+        # Ready agents for all players
+        for player in game_state.players:
+            # Defensive programming: check for None values
+            if player is None or player.leader_sheet is None:
+                continue
+
+            agent = player.leader_sheet.agent
+            if agent is not None and isinstance(agent, Agent):
+                if agent.ready_status == LeaderReadyStatus.EXHAUSTED:
+                    agent.ready()
+
+        return game_state

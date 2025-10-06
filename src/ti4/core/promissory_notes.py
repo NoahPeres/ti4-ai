@@ -6,10 +6,11 @@ Handles promissory note management, ownership, resolution, and lifecycle.
 
 from typing import TYPE_CHECKING
 
-from .transactions import PromissoryNote
+from .transactions import PromissoryNote, PromissoryNoteType
 
 if TYPE_CHECKING:
-    pass
+    from .alliance_sharing import AllianceAbilityManager
+    from .game_state import GameState
 
 
 class PromissoryNoteManager:
@@ -31,6 +32,11 @@ class PromissoryNoteManager:
 
         # Rule 69.4: Track returned notes that can be reused
         self._available_notes: set[PromissoryNote] = set()
+
+        # Alliance ability manager for handling commander sharing
+        from .alliance_sharing import AllianceAbilityManager
+
+        self._alliance_manager = AllianceAbilityManager()
 
     def can_player_play_note(self, note: PromissoryNote, player_id: str) -> bool:
         """Check if a player can play a promissory note according to Rule 69.2.
@@ -76,15 +82,29 @@ class PromissoryNoteManager:
         """
         return self._player_hands.get(player_id, [])
 
-    def return_note_after_use(self, note: PromissoryNote, player_id: str) -> None:
+    def return_note_after_use(
+        self,
+        note: PromissoryNote,
+        player_id: str,
+        game_state: "GameState | None" = None,
+    ) -> None:
         """Return a promissory note after its ability is resolved.
 
         Args:
             note: The promissory note to return
             player_id: The player returning the note
+            game_state: Current game state (required for Alliance note revocation)
 
         LRR Reference: Rule 69.3 - Promissory notes returned after abilities completely resolved
         """
+        # Handle Alliance note revocation before general return processing
+        if note.note_type == PromissoryNoteType.ALLIANCE:
+            if game_state is None:
+                raise ValueError(
+                    "game_state is required to revoke Alliance note commander access"
+                )
+            self._alliance_manager.revoke_commander_access(note, game_state)
+
         # Remove note from player's hand
         if player_id in self._player_hands and note in self._player_hands[player_id]:
             self._player_hands[player_id].remove(note)
@@ -146,6 +166,79 @@ class PromissoryNoteManager:
             if note.issuing_player == eliminated_player
         }
         self._available_notes -= notes_to_remove
+
+        # Handle Alliance note revocation for eliminated player
+        # Revoke Alliance access for all notes involving the eliminated player
+        self._alliance_manager.handle_player_elimination(eliminated_player)
+
+    def activate_alliance_note(
+        self, alliance_note: PromissoryNote, game_state: "GameState"
+    ) -> None:
+        """Activate an Alliance promissory note to grant commander ability access.
+
+        Args:
+            alliance_note: The Alliance promissory note to activate
+            game_state: Current game state
+
+        Raises:
+            ValueError: If the note is not an Alliance note or commander is locked
+
+        LRR Reference: Rule 51.8 - Alliance promissory note allows sharing commander abilities
+        """
+        # Validate that this is an Alliance note
+        if alliance_note.note_type != PromissoryNoteType.ALLIANCE:
+            raise ValueError(
+                "Only Alliance promissory notes can be activated for commander sharing"
+            )
+
+        if not alliance_note.receiving_player:
+            raise ValueError("Alliance note must have a receiving player")
+
+        if not alliance_note.issuing_player:
+            raise ValueError("Alliance note must have an issuing player")
+
+        # Check that both players exist in the game state
+        issuing_player = None
+        receiving_player = None
+        for player in game_state.players:
+            if player.id == alliance_note.issuing_player:
+                issuing_player = player
+            if player.id == alliance_note.receiving_player:
+                receiving_player = player
+
+        if not issuing_player:
+            raise ValueError(
+                f"Issuing player {alliance_note.issuing_player} not found in game state"
+            )
+
+        if not receiving_player:
+            raise ValueError(
+                f"Receiving player {alliance_note.receiving_player} not found in game state"
+            )
+
+        commander = issuing_player.leader_sheet.commander
+        if not commander:
+            raise ValueError(
+                f"Commander not found for player {alliance_note.issuing_player}"
+            )
+
+        from .leaders import LeaderLockStatus
+
+        if commander.lock_status != LeaderLockStatus.UNLOCKED:
+            raise ValueError(
+                "Commander must be unlocked to share via Alliance promissory note"
+            )
+
+        # Grant commander access through Alliance manager
+        self._alliance_manager.grant_commander_access(alliance_note, game_state)
+
+    def get_alliance_manager(self) -> "AllianceAbilityManager":
+        """Get the Alliance ability manager for direct access.
+
+        Returns:
+            The Alliance ability manager instance
+        """
+        return self._alliance_manager
 
     def __eq__(self, other: object) -> bool:
         """Check equality with another PromissoryNoteManager."""

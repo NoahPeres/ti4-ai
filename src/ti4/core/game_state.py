@@ -996,17 +996,28 @@ class GameState:
         return self.update_agenda_deck_state(deck_state)
 
     def serialize_for_persistence(self) -> dict[str, Any]:
-        """Serialize game state for persistence including agenda card data."""
+        """Serialize game state for persistence including agenda card data and players."""
         # Get active laws from law manager
         active_laws_data = []
         if self.law_manager is not None:
             for law in self.law_manager.get_active_laws():
                 active_laws_data.append(law.to_dict())
 
+        # Serialize players with their leader sheets
+        players_data = []
+        for player in self.players:
+            player_data = {
+                "id": player.id,
+                "faction": player.faction.value,
+                "leader_sheet": player.leader_sheet.serialize_for_persistence(),
+            }
+            players_data.append(player_data)
+
         return {
             "game_id": self.game_id,
             "agenda_deck_state": self.agenda_deck_state.copy(),
             "active_laws": active_laws_data,
+            "players": players_data,
         }
 
     @classmethod
@@ -1041,6 +1052,33 @@ class GameState:
 
                 # Enact the law
                 game_state.law_manager.enact_law(active_law)
+
+        # Restore players with their leader sheets
+        if "players" in serialized_data:
+            from .constants import Faction
+            from .leaders import LeaderSheet
+            from .player import Player
+
+            restored_players = []
+            for player_data in serialized_data["players"]:
+                # Create faction enum
+                faction = Faction(player_data["faction"])
+
+                # Create player
+                player = Player(id=player_data["id"], faction=faction)
+
+                # Restore leader sheet
+                if "leader_sheet" in player_data:
+                    leader_sheet = LeaderSheet.from_serialized_data(
+                        player_data["leader_sheet"]
+                    )
+                    # Replace the player's leader sheet
+                    object.__setattr__(player, "leader_sheet", leader_sheet)
+
+                restored_players.append(player)
+
+            # Update game state with restored players
+            game_state = game_state._create_new_state(players=restored_players)
 
         return game_state
 
