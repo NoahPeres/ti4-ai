@@ -19,7 +19,6 @@ class TestAntiFighterBarrageHitAssignment:
 
     def test_validate_afb_hit_assignments_valid_assignments(self) -> None:
         """Test validation of valid AFB hit assignments."""
-        # RED: This method doesn't exist yet
         resolver = CombatResolver()
 
         # Create fighter targets
@@ -40,7 +39,6 @@ class TestAntiFighterBarrageHitAssignment:
 
     def test_validate_afb_hit_assignments_invalid_assignments(self) -> None:
         """Test validation rejects invalid AFB hit assignments."""
-        # RED: This method doesn't exist yet
         resolver = CombatResolver()
 
         fighter1 = Unit(UnitType.FIGHTER, "player2", unit_id="fighter1")
@@ -75,7 +73,6 @@ class TestAntiFighterBarrageHitAssignment:
 
     def test_assign_afb_hits_to_fighters(self) -> None:
         """Test assigning AFB hits to specific fighters."""
-        # RED: This method doesn't exist yet
         resolver = CombatResolver()
 
         fighter1 = Unit(UnitType.FIGHTER, "player2", unit_id="fighter1")
@@ -95,7 +92,6 @@ class TestAntiFighterBarrageHitAssignment:
 
     def test_assign_afb_hits_empty_assignments(self) -> None:
         """Test assigning AFB hits with empty assignments."""
-        # RED: This method doesn't exist yet
         resolver = CombatResolver()
 
         fighter1 = Unit(UnitType.FIGHTER, "player2", unit_id="fighter1")
@@ -107,7 +103,6 @@ class TestAntiFighterBarrageHitAssignment:
 
     def test_handle_excess_afb_hits(self) -> None:
         """Test that excess AFB hits beyond available fighters have no effect."""
-        # RED: This method doesn't exist yet
         resolver = CombatResolver()
 
         # Only 2 fighters available
@@ -128,7 +123,6 @@ class TestAntiFighterBarrageHitAssignment:
 
     def test_afb_hit_assignment_with_no_fighters(self) -> None:
         """Test AFB hit assignment when no fighters are present."""
-        # RED: This method doesn't exist yet
         resolver = CombatResolver()
 
         # No fighters available
@@ -144,7 +138,6 @@ class TestAntiFighterBarrageHitAssignment:
 
     def test_afb_hit_assignment_validation_with_mixed_units(self) -> None:
         """Test that AFB hit assignment only works with fighters."""
-        # RED: This method doesn't exist yet
         resolver = CombatResolver()
 
         # Mix of fighters and non-fighters
@@ -171,7 +164,6 @@ class TestAntiFighterBarrageFighterDestruction:
 
     def test_destroy_fighters_from_afb_hits(self) -> None:
         """Test that fighters are properly destroyed from AFB hits."""
-        # RED: This method doesn't exist yet
         resolver = CombatResolver()
 
         fighter1 = Unit(UnitType.FIGHTER, "player2", unit_id="fighter1")
@@ -188,7 +180,6 @@ class TestAntiFighterBarrageFighterDestruction:
 
     def test_partial_fighter_destruction(self) -> None:
         """Test partial destruction of fighters from AFB hits."""
-        # RED: This method doesn't exist yet
         resolver = CombatResolver()
 
         fighter1 = Unit(UnitType.FIGHTER, "player2", unit_id="fighter1")
@@ -207,7 +198,6 @@ class TestAntiFighterBarrageFighterDestruction:
 
     def test_fighter_destruction_preserves_other_units(self) -> None:
         """Test that AFB fighter destruction doesn't affect other unit types."""
-        # RED: This method doesn't exist yet
         resolver = CombatResolver()
 
         fighter1 = Unit(UnitType.FIGHTER, "player2", unit_id="fighter1")
@@ -231,7 +221,6 @@ class TestAntiFighterBarrageExcessHitHandling:
 
     def test_excess_hits_beyond_available_fighters(self) -> None:
         """Test that excess hits beyond available fighters have no effect."""
-        # RED: This method doesn't exist yet
         resolver = CombatResolver()
 
         # Only 1 fighter available
@@ -250,7 +239,6 @@ class TestAntiFighterBarrageExcessHitHandling:
 
     def test_zero_hits_no_destruction(self) -> None:
         """Test that zero hits result in no fighter destruction."""
-        # RED: This method doesn't exist yet
         resolver = CombatResolver()
 
         fighter1 = Unit(UnitType.FIGHTER, "player2", unit_id="fighter1")
@@ -267,7 +255,6 @@ class TestAntiFighterBarrageExcessHitHandling:
 
     def test_hits_equal_to_fighter_count(self) -> None:
         """Test hits exactly equal to the number of available fighters."""
-        # RED: This method doesn't exist yet
         resolver = CombatResolver()
 
         fighter1 = Unit(UnitType.FIGHTER, "player2", unit_id="fighter1")

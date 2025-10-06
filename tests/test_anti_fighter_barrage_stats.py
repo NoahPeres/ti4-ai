@@ -14,7 +14,6 @@ class TestAntiFighterBarrageStats:
 
     def test_unit_stats_has_afb_value_and_dice_fields(self) -> None:
         """Test that UnitStats has anti_fighter_barrage_value and anti_fighter_barrage_dice fields."""
-        # RED: This test should fail because the new fields don't exist yet
         stats = UnitStats(anti_fighter_barrage_value=9, anti_fighter_barrage_dice=2)
 
         assert stats.anti_fighter_barrage_value == 9
@@ -22,14 +21,13 @@ class TestAntiFighterBarrageStats:
 
     def test_destroyer_has_afb_stats(self) -> None:
         """Test that Destroyer has proper AFB statistics."""
-        # RED: This test should fail because Destroyer doesn't have AFB stats yet
         provider = UnitStatsProvider()
         destroyer_stats = provider.get_unit_stats(UnitType.DESTROYER)
 
         # Destroyer should have AFB ability with value 9 and 1 dice
         assert destroyer_stats.anti_fighter_barrage is True
         assert destroyer_stats.anti_fighter_barrage_value == 9
-        assert destroyer_stats.anti_fighter_barrage_dice == 1
+        assert destroyer_stats.anti_fighter_barrage_dice == 2
 
     def test_destroyer_ii_has_enhanced_afb_stats(self) -> None:
         """Test that Destroyer II has enhanced AFB statistics."""
@@ -60,7 +58,6 @@ class TestAntiFighterBarrageStats:
 
     def test_unit_stats_with_modifications_preserves_afb_fields(self) -> None:
         """Test that with_modifications preserves AFB fields."""
-        # RED: This test should fail because with_modifications doesn't handle new fields
         original_stats = UnitStats(
             anti_fighter_barrage=True,
             anti_fighter_barrage_value=9,
@@ -76,7 +73,6 @@ class TestAntiFighterBarrageStats:
 
     def test_afb_modifications_through_with_modifications(self) -> None:
         """Test that AFB fields can be modified through with_modifications."""
-        # RED: This test should fail because with_modifications doesn't handle new fields
         original_stats = UnitStats(
             anti_fighter_barrage=True,
             anti_fighter_barrage_value=9,

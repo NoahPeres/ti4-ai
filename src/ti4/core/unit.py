@@ -110,7 +110,7 @@ class Unit:
             raise AttributeError(
                 f"Unit {self.unit_type} does not have anti-fighter barrage ability"
             )
-        # Default to 1 dice if AFB ability is present but dice count is 0
+        # Default to 1 die if AFB ability is present but dice count is 0 (common for base units)
         return (
             stats.anti_fighter_barrage_dice
             if stats.anti_fighter_barrage_dice > 0

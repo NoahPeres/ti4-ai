@@ -18,7 +18,6 @@ class TestAntiFighterBarrageSpaceCombatIntegration:
 
     def test_afb_occurs_as_first_step_of_space_combat(self) -> None:
         """Test that AFB occurs as the first step of space combat during tactical actions."""
-        # RED: This method doesn't exist yet
         resolver = CombatResolver()
         system = System("test_system")
 
@@ -47,7 +46,6 @@ class TestAntiFighterBarrageSpaceCombatIntegration:
 
     def test_afb_timing_restrictions_first_round_only(self) -> None:
         """Test that AFB only occurs during the first round of space combat."""
-        # RED: This method doesn't exist yet
         resolver = CombatResolver()
         system = System("test_system")
 
@@ -75,7 +73,6 @@ class TestAntiFighterBarrageSpaceCombatIntegration:
 
     def test_afb_occurs_before_regular_combat_rolls(self) -> None:
         """Test that AFB occurs before regular combat rolls but after combat setup."""
-        # RED: This method doesn't exist yet
         resolver = CombatResolver()
         system = System("test_system")
 
@@ -114,7 +111,6 @@ class TestAntiFighterBarrageSpaceCombatIntegration:
 
     def test_afb_integration_with_tactical_action_combat_flow(self) -> None:
         """Test AFB integration with existing tactical action combat flow."""
-        # RED: This method doesn't exist yet
         resolver = CombatResolver()
         system = System("test_system")
 
@@ -145,7 +141,6 @@ class TestAntiFighterBarrageSpaceCombatIntegration:
 
     def test_afb_with_no_valid_targets_still_executes(self) -> None:
         """Test that AFB executes even when no valid targets are present."""
-        # RED: This method doesn't exist yet
         resolver = CombatResolver()
         system = System("test_system")
 
@@ -169,7 +164,6 @@ class TestAntiFighterBarrageSpaceCombatIntegration:
 
     def test_afb_simultaneous_resolution_both_players(self) -> None:
         """Test that AFB is resolved simultaneously for both players."""
-        # RED: This method doesn't exist yet
         resolver = CombatResolver()
         system = System("test_system")
 
@@ -210,7 +204,6 @@ class TestAntiFighterBarrageResult:
 
     def test_afb_result_contains_required_fields(self) -> None:
         """Test that AFB result contains all required fields."""
-        # RED: This class doesn't exist yet
         from ti4.core.combat import AntiFighterBarrageResult
 
         result = AntiFighterBarrageResult(
@@ -231,7 +224,6 @@ class TestSpaceCombatWithAFBResult:
 
     def test_space_combat_result_includes_afb_data(self) -> None:
         """Test that space combat result includes AFB phase data."""
-        # RED: This enhanced result class doesn't exist yet
         from ti4.core.combat import SpaceCombatResult
 
         result = SpaceCombatResult(
@@ -254,7 +246,6 @@ class TestAntiFighterBarrageTimingValidation:
 
     def test_afb_only_in_space_combat_context(self) -> None:
         """Test that AFB is only usable in space combat context."""
-        # RED: This validation doesn't exist yet
         resolver = CombatResolver()
 
         # Should be valid in space combat
@@ -266,7 +257,6 @@ class TestAntiFighterBarrageTimingValidation:
 
     def test_afb_round_restriction_validation(self) -> None:
         """Test that AFB is restricted to first round only."""
-        # RED: This validation doesn't exist yet
         resolver = CombatResolver()
 
         # Should be valid in round 1

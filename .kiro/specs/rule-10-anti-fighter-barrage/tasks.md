@@ -49,3 +49,12 @@
   - Ensure AFB integrates properly with existing combat mechanics
   - Add AFB result tracking and integration with combat outcomes
   - _Requirements: 1.4, 3.2, 4.3_
+
+## Assumptions
+
+- **Dice Mechanics**: AFB uses standard d10 dice with the same mechanics as regular combat
+- **Default Dice Count**: Units with AFB ability but 0 dice count default to rolling 1 die
+- **Hit Assignment**: For simulation purposes, hits are assigned to fighters in order (first available fighters are destroyed)
+- **Timing**: AFB occurs as the first step of space combat, before regular combat rolls
+- **Context Validation**: AFB is restricted to space combat context only
+- **Target Validation**: AFB can only target fighter units, not other ship types

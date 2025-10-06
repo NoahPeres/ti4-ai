@@ -108,7 +108,7 @@ class UnitStatsProvider:
             capacity=0,
             anti_fighter_barrage=True,
             anti_fighter_barrage_value=9,
-            anti_fighter_barrage_dice=1,
+            anti_fighter_barrage_dice=2,
         ),
         UnitType.DESTROYER_II: UnitStats(
             cost=1,

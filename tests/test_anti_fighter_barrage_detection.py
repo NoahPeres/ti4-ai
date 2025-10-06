@@ -16,7 +16,7 @@ class TestAntiFighterBarrageDetection:
 
     def test_unit_can_detect_afb_capability(self) -> None:
         """Test that Unit class can properly detect AFB capability using new stats."""
-        # RED: Test AFB capability detection
+
         destroyer = Unit(UnitType.DESTROYER, "player1")
         fighter = Unit(UnitType.FIGHTER, "player1")
 
@@ -25,7 +25,6 @@ class TestAntiFighterBarrageDetection:
 
     def test_unit_get_afb_value_method(self) -> None:
         """Test that Unit class can retrieve AFB value."""
-        # RED: This method doesn't exist yet
         destroyer = Unit(UnitType.DESTROYER, "player1")
         destroyer_ii = Unit(UnitType.DESTROYER_II, "player1")
 
@@ -34,16 +33,14 @@ class TestAntiFighterBarrageDetection:
 
     def test_unit_get_afb_dice_count_method(self) -> None:
         """Test that Unit class can retrieve AFB dice count."""
-        # RED: This method doesn't exist yet
         destroyer = Unit(UnitType.DESTROYER, "player1")
         destroyer_ii = Unit(UnitType.DESTROYER_II, "player1")
 
-        assert destroyer.get_anti_fighter_barrage_dice_count() == 1
+        assert destroyer.get_anti_fighter_barrage_dice_count() == 2
         assert destroyer_ii.get_anti_fighter_barrage_dice_count() == 3
 
     def test_non_afb_unit_raises_error_for_afb_values(self) -> None:
         """Test that non-AFB units raise errors when accessing AFB values."""
-        # RED: These methods don't exist yet
         fighter = Unit(UnitType.FIGHTER, "player1")
 
         with pytest.raises(
@@ -62,7 +59,6 @@ class TestAntiFighterBarrageValidation:
 
     def test_validate_afb_context_space_combat_only(self) -> None:
         """Test that AFB validation ensures it's only used in space combat."""
-        # RED: This validation method doesn't exist yet
         destroyer = Unit(UnitType.DESTROYER, "player1")
 
         # Should pass for space combat context
@@ -74,14 +70,12 @@ class TestAntiFighterBarrageValidation:
 
     def test_validate_afb_context_non_afb_unit(self) -> None:
         """Test that non-AFB units fail AFB context validation."""
-        # RED: This validation method doesn't exist yet
         fighter = Unit(UnitType.FIGHTER, "player1")
 
         assert fighter.validate_anti_fighter_barrage_context("space_combat") is False
 
     def test_can_perform_anti_fighter_barrage_method(self) -> None:
         """Test comprehensive AFB capability check."""
-        # RED: This method doesn't exist yet
         destroyer = Unit(UnitType.DESTROYER, "player1")
         fighter = Unit(UnitType.FIGHTER, "player1")
 
@@ -100,7 +94,6 @@ class TestAntiFighterBarrageTargetFiltering:
 
     def test_is_valid_afb_target_fighters_only(self) -> None:
         """Test that AFB can only target fighters."""
-        # RED: This method doesn't exist yet
         fighter = Unit(UnitType.FIGHTER, "player2")
         destroyer = Unit(UnitType.DESTROYER, "player2")
         cruiser = Unit(UnitType.CRUISER, "player2")
@@ -111,7 +104,6 @@ class TestAntiFighterBarrageTargetFiltering:
 
     def test_filter_afb_targets_from_unit_list(self) -> None:
         """Test filtering AFB targets from a list of units."""
-        # RED: This static method doesn't exist yet
         units = [
             Unit(UnitType.FIGHTER, "player2"),
             Unit(UnitType.DESTROYER, "player2"),
@@ -126,7 +118,6 @@ class TestAntiFighterBarrageTargetFiltering:
 
     def test_filter_enemy_afb_targets(self) -> None:
         """Test filtering AFB targets to only include enemy units."""
-        # RED: This static method doesn't exist yet
         units = [
             Unit(UnitType.FIGHTER, "player1"),  # Same player
             Unit(UnitType.FIGHTER, "player2"),  # Enemy
@@ -142,13 +133,11 @@ class TestAntiFighterBarrageTargetFiltering:
 
     def test_filter_afb_targets_empty_list(self) -> None:
         """Test AFB target filtering with empty unit list."""
-        # RED: This method doesn't exist yet
         afb_targets = Unit.filter_afb_targets([])
         assert afb_targets == []
 
     def test_filter_afb_targets_no_fighters(self) -> None:
         """Test AFB target filtering when no fighters are present."""
-        # RED: This method doesn't exist yet
         units = [
             Unit(UnitType.DESTROYER, "player2"),
             Unit(UnitType.CRUISER, "player2"),

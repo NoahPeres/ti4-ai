@@ -1247,7 +1247,21 @@ class CombatResolver:
                 self._simulate_afb_hit_assignment(attacker_fighters, defender_hits)
             )
 
-        remaining_fighters = [f for f in all_fighters if f not in destroyed_fighters]
+        # Remove destroyed fighters from the system immediately
+        for destroyed in destroyed_fighters:
+            try:
+                system.remove_unit_from_space(destroyed)
+            except ValueError:
+                logger.warning(
+                    "Destroyed fighter %s was not present in system %s during AFB cleanup",
+                    destroyed.id,
+                    system.system_id,
+                )
+
+        # Derive remaining fighters from the updated system state
+        remaining_fighters = [
+            unit for unit in system.space_units if unit.unit_type == UnitType.FIGHTER
+        ]
 
         return AntiFighterBarrageResult(
             attacker_hits=attacker_hits,

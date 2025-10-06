@@ -17,7 +17,6 @@ class TestAntiFighterBarrageResolution:
 
     def test_afb_dice_rolling_uses_unit_specific_values(self) -> None:
         """Test that AFB dice rolling uses unit-specific AFB values and dice counts."""
-        # RED: This enhanced method doesn't exist yet
         resolver = CombatResolver()
         destroyer = Unit(UnitType.DESTROYER, "player1")
         destroyer_ii = Unit(UnitType.DESTROYER_II, "player1")
@@ -25,12 +24,12 @@ class TestAntiFighterBarrageResolution:
 
         # Mock dice rolls for predictable results
         with patch("random.randint") as mock_randint:
-            # Destroyer: AFB value 9, 1 dice - roll 9 (hit)
+            # Destroyer: AFB value 9, 2 dice - roll 9 (2 hits)
             mock_randint.return_value = 9
             hits = resolver.perform_anti_fighter_barrage_enhanced(
                 destroyer, target_fighters
             )
-            assert hits == 1
+            assert hits == 2
             mock_randint.assert_called_with(1, 10)  # Standard 10-sided dice
 
             # Destroyer II: AFB value 6, 3 dice - roll 6, 7, 5 (2 hits)
@@ -40,12 +39,11 @@ class TestAntiFighterBarrageResolution:
             )
             assert hits == 2
             assert (
-                mock_randint.call_count == 4
-            )  # 1 from destroyer + 3 from destroyer_ii
+                mock_randint.call_count == 5
+            )  # 2 from destroyer + 3 from destroyer_ii
 
     def test_afb_hit_calculation_treats_rolls_as_combat_rolls(self) -> None:
         """Test that AFB hit calculation treats AFB rolls as combat rolls."""
-        # RED: This enhanced method doesn't exist yet
         resolver = CombatResolver()
         destroyer = Unit(UnitType.DESTROYER, "player1")
         target_fighters = [Unit(UnitType.FIGHTER, "player2")]
@@ -59,23 +57,22 @@ class TestAntiFighterBarrageResolution:
             )
             assert hits == 0
 
-            # Roll 9 - hit
+            # Roll 9 - 2 hits (Destroyer has 2 dice)
             mock_randint.return_value = 9
             hits = resolver.perform_anti_fighter_barrage_enhanced(
                 destroyer, target_fighters
             )
-            assert hits == 1
+            assert hits == 2
 
-            # Roll 10 - hit
+            # Roll 10 - 2 hits (Destroyer has 2 dice)
             mock_randint.return_value = 10
             hits = resolver.perform_anti_fighter_barrage_enhanced(
                 destroyer, target_fighters
             )
-            assert hits == 1
+            assert hits == 2
 
     def test_afb_with_combat_roll_modifiers(self) -> None:
         """Test that AFB integrates with combat roll modifiers and effects."""
-        # RED: This enhanced method with modifiers doesn't exist yet
         resolver = CombatResolver()
         destroyer = Unit(UnitType.DESTROYER, "player1")
         target_fighters = [Unit(UnitType.FIGHTER, "player2")]
@@ -87,7 +84,7 @@ class TestAntiFighterBarrageResolution:
             hits = resolver.perform_anti_fighter_barrage_with_modifiers(
                 destroyer, target_fighters, modifier=1
             )
-            assert hits == 1
+            assert hits == 2  # Destroyer has 2 dice
 
             # Roll 7 with +1 modifier should miss (effective combat value is 8)
             mock_randint.return_value = 7
@@ -98,7 +95,6 @@ class TestAntiFighterBarrageResolution:
 
     def test_afb_with_negative_modifiers(self) -> None:
         """Test AFB with negative modifiers (makes it harder to hit)."""
-        # RED: This enhanced method with modifiers doesn't exist yet
         resolver = CombatResolver()
         destroyer = Unit(UnitType.DESTROYER, "player1")
         target_fighters = [Unit(UnitType.FIGHTER, "player2")]
@@ -117,11 +113,10 @@ class TestAntiFighterBarrageResolution:
             hits = resolver.perform_anti_fighter_barrage_with_modifiers(
                 destroyer, target_fighters, modifier=-1
             )
-            assert hits == 1
+            assert hits == 2  # Destroyer has 2 dice
 
     def test_afb_no_targets_returns_zero_hits(self) -> None:
         """Test that AFB returns zero hits when no valid targets are present."""
-        # RED: This enhanced method doesn't exist yet
         resolver = CombatResolver()
         destroyer = Unit(UnitType.DESTROYER, "player1")
 
@@ -141,7 +136,6 @@ class TestAntiFighterBarrageResolution:
 
     def test_afb_multiple_dice_resolution(self) -> None:
         """Test AFB resolution with multiple dice (Destroyer II)."""
-        # RED: This enhanced method doesn't exist yet
         resolver = CombatResolver()
         destroyer_ii = Unit(UnitType.DESTROYER_II, "player1")
         target_fighters = [Unit(UnitType.FIGHTER, "player2")]
@@ -172,7 +166,6 @@ class TestAntiFighterBarrageResolution:
 
     def test_non_afb_unit_returns_zero_hits(self) -> None:
         """Test that units without AFB ability return zero hits."""
-        # RED: This enhanced method doesn't exist yet
         resolver = CombatResolver()
         fighter = Unit(UnitType.FIGHTER, "player1")
         cruiser = Unit(UnitType.CRUISER, "player1")

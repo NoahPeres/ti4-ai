@@ -42,31 +42,25 @@ class UnitStats:
 
 ### 2. Anti-Fighter Barrage Manager
 
-**File**: `src/ti4/core/anti_fighter_barrage.py` (new)
+**File**: `src/ti4/core/combat.py` (enhanced)
+
+Anti-fighter barrage functionality is integrated directly into the existing `CombatResolver` class rather than creating a separate manager. This approach maintains consistency with existing combat mechanics and reduces architectural complexity.
 
 ```python
-class AntiFighterBarrageManager:
-    """Manages anti-fighter barrage mechanics and resolution."""
+class CombatResolver:
+    """Enhanced with anti-fighter barrage capabilities."""
 
-    def __init__(self, combat_resolver: CombatResolver) -> None:
-        self.combat_resolver = combat_resolver
-
-    def can_perform_barrage(self, unit: Unit) -> bool:
-        """Check if unit can perform anti-fighter barrage."""
-
-    def get_barrage_targets(self, system: System, attacking_player: str) -> list[Unit]:
-        """Get valid fighter targets for anti-fighter barrage."""
-
-    def perform_barrage_attack(self, unit: Unit) -> int:
+    def perform_anti_fighter_barrage_enhanced(self, unit: Unit, target_units: list[Unit]) -> int:
         """Perform anti-fighter barrage attack and return hits."""
 
-    def assign_barrage_hits(self, hits: int, fighters: list[Unit],
-                           assignments: list[str]) -> list[Unit]:
-        """Assign AFB hits to fighters and return destroyed units."""
+    def resolve_anti_fighter_barrage_phase(self, system: System, attacker_id: str, defender_id: str) -> AntiFighterBarrageResult:
+        """Resolve complete AFB phase with hit assignment."""
 
-    def validate_hit_assignments(self, hits: int, fighters: list[Unit],
-                                assignments: list[str]) -> bool:
-        """Validate player's hit assignment choices."""
+    def validate_afb_context(self, context: str | None) -> bool:
+        """Validate AFB can only be used in space combat."""
+
+    def assign_afb_hits_to_fighters(self, fighters: list[Unit], hits: int) -> list[Unit]:
+        """Assign AFB hits to fighters and return destroyed units."""
 ```
 
 ### 3. Enhanced Combat Resolver
