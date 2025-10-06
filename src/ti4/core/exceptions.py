@@ -176,3 +176,16 @@ class AnomalyStateConsistencyError(TI4Error):
     """Raised when anomaly system state is inconsistent."""
 
     pass
+
+
+# Combat-related exceptions
+class InvalidCombatStateError(TI4Error):
+    """Raised when combat state is invalid or inconsistent."""
+
+    pass
+
+
+class InvalidGameStateError(TI4Error):
+    """Raised when game state is invalid or corrupted."""
+
+    pass

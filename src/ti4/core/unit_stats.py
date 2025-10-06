@@ -26,6 +26,8 @@ class UnitStats:
     # === UNIT ABILITIES ===
     sustain_damage: bool = False
     anti_fighter_barrage: bool = False
+    anti_fighter_barrage_value: Optional[int] = None
+    anti_fighter_barrage_dice: int = 0
     bombardment: bool = False
     bombardment_value: Optional[int] = None
     bombardment_dice: int = 0
@@ -52,6 +54,12 @@ class UnitStats:
             sustain_damage=kwargs.get("sustain_damage", self.sustain_damage),
             anti_fighter_barrage=kwargs.get(
                 "anti_fighter_barrage", self.anti_fighter_barrage
+            ),
+            anti_fighter_barrage_value=kwargs.get(
+                "anti_fighter_barrage_value", self.anti_fighter_barrage_value
+            ),
+            anti_fighter_barrage_dice=kwargs.get(
+                "anti_fighter_barrage_dice", self.anti_fighter_barrage_dice
             ),
             bombardment=kwargs.get("bombardment", self.bombardment),
             bombardment_value=kwargs.get("bombardment_value", self.bombardment_value),
@@ -99,6 +107,18 @@ class UnitStatsProvider:
             movement=2,
             capacity=0,
             anti_fighter_barrage=True,
+            anti_fighter_barrage_value=9,
+            anti_fighter_barrage_dice=1,
+        ),
+        UnitType.DESTROYER_II: UnitStats(
+            cost=1,
+            combat_value=8,
+            combat_dice=1,
+            movement=2,
+            capacity=0,
+            anti_fighter_barrage=True,
+            anti_fighter_barrage_value=6,
+            anti_fighter_barrage_dice=3,
         ),
         UnitType.FIGHTER: UnitStats(
             cost=0.5, combat_value=9, combat_dice=1, movement=0, capacity=0
@@ -225,6 +245,14 @@ class UnitStatsProvider:
             sustain_damage=base.sustain_damage or modifications.sustain_damage,
             anti_fighter_barrage=base.anti_fighter_barrage
             or modifications.anti_fighter_barrage,
+            anti_fighter_barrage_value=modifications.anti_fighter_barrage_value
+            if modifications.anti_fighter_barrage_value is not None
+            else base.anti_fighter_barrage_value,
+            anti_fighter_barrage_dice=max(
+                0,
+                base.anti_fighter_barrage_dice
+                + modifications.anti_fighter_barrage_dice,
+            ),
             bombardment=base.bombardment or modifications.bombardment,
             bombardment_value=modifications.bombardment_value
             if modifications.bombardment_value is not None
