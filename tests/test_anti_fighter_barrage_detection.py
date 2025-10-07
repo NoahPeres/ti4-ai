@@ -93,28 +93,41 @@ class TestAntiFighterBarrageTargetFiltering:
     """Test Anti-Fighter Barrage target filtering functionality."""
 
     def test_is_valid_afb_target_fighters_only(self) -> None:
-        """Test that AFB can only target fighters."""
+        """Test that AFB can only target fighter-type units."""
         fighter = Unit(UnitType.FIGHTER, "player2")
+        fighter_ii = Unit(UnitType.FIGHTER_II, "player2")
         destroyer = Unit(UnitType.DESTROYER, "player2")
         cruiser = Unit(UnitType.CRUISER, "player2")
 
         assert fighter.is_valid_afb_target() is True
+        assert fighter_ii.is_valid_afb_target() is True
         assert destroyer.is_valid_afb_target() is False
         assert cruiser.is_valid_afb_target() is False
+
+    def test_is_fighter_type_categorization(self) -> None:
+        """Test that fighter type categorization works correctly."""
+        fighter = Unit(UnitType.FIGHTER, "player1")
+        fighter_ii = Unit(UnitType.FIGHTER_II, "player1")
+        destroyer = Unit(UnitType.DESTROYER, "player1")
+
+        assert fighter.is_fighter_type() is True
+        assert fighter_ii.is_fighter_type() is True
+        assert destroyer.is_fighter_type() is False
 
     def test_filter_afb_targets_from_unit_list(self) -> None:
         """Test filtering AFB targets from a list of units."""
         units = [
             Unit(UnitType.FIGHTER, "player2"),
             Unit(UnitType.DESTROYER, "player2"),
+            Unit(UnitType.FIGHTER_II, "player2"),
             Unit(UnitType.FIGHTER, "player2"),
             Unit(UnitType.CRUISER, "player2"),
         ]
 
         afb_targets = Unit.filter_afb_targets(units)
 
-        assert len(afb_targets) == 2
-        assert all(unit.unit_type == UnitType.FIGHTER for unit in afb_targets)
+        assert len(afb_targets) == 3
+        assert all(unit.is_fighter_type() for unit in afb_targets)
 
     def test_filter_enemy_afb_targets(self) -> None:
         """Test filtering AFB targets to only include enemy units."""

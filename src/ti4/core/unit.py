@@ -6,6 +6,11 @@ from typing import Any, Optional
 from .constants import Faction, Technology, UnitType
 from .unit_stats import UnitStats, UnitStatsProvider
 
+# Unit categorization for game mechanics
+FIGHTER_TYPE_UNITS = {UnitType.FIGHTER, UnitType.FIGHTER_II}
+# Future expansion: Add faction-specific fighters here
+# FIGHTER_TYPE_UNITS.update({UnitType.FACTION_FIGHTER_VARIANT, ...})
+
 
 class Unit:
     """Represents a game unit with type and owner."""
@@ -131,10 +136,14 @@ class Unit:
             and self.validate_anti_fighter_barrage_context(context)
         )
 
+    def is_fighter_type(self) -> bool:
+        """Check if this unit is a fighter-type unit (including upgrades and faction variants)."""
+        return self.unit_type in FIGHTER_TYPE_UNITS
+
     def is_valid_afb_target(self) -> bool:
         """Check if this unit is a valid target for anti-fighter barrage."""
-        # AFB can only target fighters
-        return self.unit_type == UnitType.FIGHTER
+        # AFB can only target fighter-type units (including upgraded variants and future faction-specific fighters)
+        return self.is_fighter_type()
 
     @staticmethod
     def filter_afb_targets(units: list["Unit"]) -> list["Unit"]:

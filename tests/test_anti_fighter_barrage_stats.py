@@ -24,7 +24,7 @@ class TestAntiFighterBarrageStats:
         provider = UnitStatsProvider()
         destroyer_stats = provider.get_unit_stats(UnitType.DESTROYER)
 
-        # Destroyer should have AFB ability with value 9 and 1 dice
+        # Destroyer should have AFB ability with value 9 and 2 dice
         assert destroyer_stats.anti_fighter_barrage is True
         assert destroyer_stats.anti_fighter_barrage_value == 9
         assert destroyer_stats.anti_fighter_barrage_dice == 2

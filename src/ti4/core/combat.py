@@ -559,25 +559,12 @@ class CombatResolver:
         LRR References:
             - Rule 10: Anti-Fighter Barrage - covers AFB validation requirements
         """
-        if not unit.has_anti_fighter_barrage():
+        try:
+            return self._validate_and_prepare_afb_with_error_handling(
+                unit, target_units
+            )
+        except Exception:
             return None
-
-        # Filter targets to only include fighters
-        fighter_targets = Unit.filter_afb_targets(target_units)
-        if not fighter_targets:
-            return None
-
-        # Get unit stats and validate AFB capability
-        stats = unit.get_stats()
-        if stats.anti_fighter_barrage_value is None:
-            return None
-
-        # Get AFB-specific dice count
-        dice_count = stats.anti_fighter_barrage_dice
-        if dice_count <= 0:
-            return None
-
-        return dice_count, stats.anti_fighter_barrage_value
 
     def perform_anti_fighter_barrage_with_modifiers(
         self, unit: Unit, target_units: list[Unit], modifier: int = 0
@@ -722,9 +709,11 @@ class CombatResolver:
             # This allows tests to mock the behavior
             assignments = [f.id for f in fighters[:hits]]
             destroyed = self.assign_afb_hits_to_fighters(fighters, assignments)
-        except (AttributeError, ValueError):
-            # Fallback: just destroy up to the number of hits
+        except AttributeError:
+            # Fallback for testing when assign_afb_hits_to_fighters is not available
+            # This is expected during unit testing of this method
             destroyed = fighters[:hits]
+        # Let ValueError propagate - it indicates invalid input that should be visible
 
         return destroyed
 
