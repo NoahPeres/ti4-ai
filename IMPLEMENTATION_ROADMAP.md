@@ -111,13 +111,13 @@ Political & Economic Systems (Phase 2)
 - Rule 17: CAPTURE - Unit capture mechanics and faction sheet management
 - Rule 29: DEFENDER - Combat role identification for space/ground combat
 - Rule 30: DEPLOY - Unit deployment abilities with timing restrictions
-- Rule 31: DESTROYED - Unit destruction vs removal mechanics ✅ VERIFIED
+
 - Rule 37: FLEET POOL - Fleet command token mechanics and ship limits
 - Rule 60: NEIGHBORS - System neighbor determination with wormhole support
 - Rule 76: SHIPS - Ship unit mechanics, fleet pool limits, and attributes
-- Rule 77: SPACE CANNON - PDS and defensive unit abilities ✅ VERIFIED
-- Rule 87: SUSTAIN DAMAGE - Unit damage mechanics ✅ VERIFIED
-- Rule 101: WORMHOLES - Special adjacency mechanics for wormhole systems ✅ VERIFIED
+
+
+
 
 #### Core Game Layer (18/101)
 - Rule 1: ABILITIES - Core ability system with timing windows and precedence
@@ -307,7 +307,6 @@ The following rules require implementation to achieve full TI4 compliance:
 - Rule 63 PDS - Planetary Defense System
 - Rule 64 PLANETS - Planet management system
 - Rule 65 PLANETARY SHIELD - Planetary defense
-- Rule 66 POLITICS - Politics strategy card
 - Rule 68 PRODUCTION - Advanced production rules
 - Rule 70 PURGE - Card purging mechanics
 - Rule 71 READIED - Card readying mechanics

@@ -6,14 +6,14 @@ unified resource management system.
 
 from unittest.mock import Mock
 
-from ti4.core.constants import Faction
-from ti4.core.player import Player
-from ti4.core.resource_management import (
+from src.ti4.core.constants import Faction
+from src.ti4.core.player import Player
+from src.ti4.core.resource_management import (
     ResourceManager,
     SpendingPlan,
     SpendingResult,
 )
-from ti4.core.strategy_cards.cards.leadership import LeadershipStrategyCard
+from src.ti4.core.strategy_cards.cards.leadership import LeadershipStrategyCard
 
 
 class TestLeadershipResourceIntegrationSimple:

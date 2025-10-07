@@ -10,7 +10,7 @@ The design builds upon existing systems including `Planet`, `Player`, `UnitStats
 
 ### High-Level Architecture
 
-```
+```text
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   Game Client   │    │   Resource      │    │   Game State    │
 │                 │───▶│   Manager       │───▶│   Management    │

@@ -140,7 +140,7 @@ class TestRule26BackwardCompatibilityValidation:
         # Test spending resources directly (old way)
         resources_spent = planet.spend_resources(2)
         assert resources_spent == 2
-        assert planet.is_exhausted
+        assert planet.is_exhausted()
 
     def test_cost_validator_integration_optional(self):
         """Verify that CostValidator integration is optional for existing systems."""

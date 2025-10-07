@@ -800,8 +800,10 @@ class ResourceManager:
         planets_to_exhaust = {}
         remaining = amount
 
-        # Use planets first
-        for planet_name, planet_resources in sources.planets.items():
+        # Use planets first (sorted by value for determinism and efficiency)
+        for planet_name, planet_resources in sorted(
+            sources.planets.items(), key=lambda kv: kv[1]
+        ):
             if remaining <= 0:
                 break
             if remaining >= planet_resources:
@@ -838,8 +840,10 @@ class ResourceManager:
         planets_to_exhaust = {}
         remaining = amount
 
-        # Use planets first
-        for planet_name, planet_influence in sources.planets.items():
+        # Use planets first (sorted by value for determinism and efficiency)
+        for planet_name, planet_influence in sorted(
+            sources.planets.items(), key=lambda kv: kv[1]
+        ):
             if remaining <= 0:
                 break
             if remaining >= planet_influence:

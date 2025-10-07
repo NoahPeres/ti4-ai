@@ -272,6 +272,11 @@ class ProductionManager:
                 "ResourceManager and CostValidator required for enhanced production validation"
             )
 
+        if quantity <= 0:
+            return ProductionValidationResult(
+                is_valid=False, error_message="Quantity must be a positive integer"
+            )
+
         try:
             # Get production cost with all modifiers
             production_cost = self.cost_validator.get_production_cost(
@@ -324,6 +329,11 @@ class ProductionManager:
         if not self.resource_manager or not self.cost_validator:
             raise ValueError(
                 "ResourceManager and CostValidator required for enhanced production execution"
+            )
+
+        if quantity <= 0:
+            return ProductionExecutionResult(
+                success=False, units_placed=0, error_message="Quantity must be positive"
             )
 
         try:

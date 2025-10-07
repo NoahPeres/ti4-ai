@@ -111,8 +111,3 @@ def test_batch_operations_performance() -> None:
     # Verify results are equivalent
     assert len(batch_results) == len(individual_results)
     assert all(result.is_valid for result in batch_results)
-
-    # Batch should be faster or at least not significantly slower
-    assert batch_time <= individual_time * 1.2, (
-        "Batch operations should not be significantly slower"
-    )

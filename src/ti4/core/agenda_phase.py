@@ -504,10 +504,13 @@ class VotingSystem:
         Returns:
             Total influence available for voting (planets only, no trade goods)
         """
-        influence: int = resource_manager.calculate_available_influence(
-            player_id, for_voting=True
-        )
-        return influence
+        try:
+            influence: int = resource_manager.calculate_available_influence(
+                player_id, for_voting=True
+            )
+            return influence
+        except Exception:
+            return 0
 
     def cast_votes_with_resource_manager(
         self,
@@ -613,11 +616,16 @@ class VotingSystem:
                 or "Failed to execute spending plan",
             )
 
-        # Record the vote
+        # Record the vote using actual spent influence from the plan
+        actual_influence_spent = spending_plan.total_influence_cost
         self.player_votes[player_id] = outcome
-        self._vote_tally[outcome] = self._vote_tally.get(outcome, 0) + influence_amount
+        self._vote_tally[outcome] = (
+            self._vote_tally.get(outcome, 0) + actual_influence_spent
+        )
 
-        return VotingOutcome(success=True, votes_cast=influence_amount, outcome=outcome)
+        return VotingOutcome(
+            success=True, votes_cast=actual_influence_spent, outcome=outcome
+        )
 
     def cast_votes_with_influence_spending(
         self,

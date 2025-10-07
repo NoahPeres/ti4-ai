@@ -2000,6 +2000,11 @@ class GameState:
         # Update planet control mapping
         new_planet_control_mapping = self.planet_control_mapping.copy()
         new_planet_control_mapping[planet.name] = player_id
+        # Keep Planet.controlled_by in sync
+        try:
+            planet.set_control(player_id)
+        except Exception:
+            planet.controlled_by = player_id
 
         # Update player planets list
         new_player_planets = {
@@ -2082,6 +2087,14 @@ class GameState:
         # Update planet control mapping
         new_planet_control_mapping = self.planet_control_mapping.copy()
         new_planet_control_mapping[planet.name] = None
+        # Keep Planet.controlled_by in sync
+        try:
+            planet.controlled_by = None
+        except Exception as e:
+            # Log but don't fail - planet control sync is not critical
+            import logging
+
+            logging.debug(f"Failed to sync planet.controlled_by: {e}")
 
         # Update player planets list
         new_player_planets = {
