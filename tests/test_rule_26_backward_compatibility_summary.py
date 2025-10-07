@@ -85,9 +85,9 @@ class TestRule26BackwardCompatibilitySummary:
 
         # Test that AgendaPhase class exists and can be instantiated
         # The specific methods may vary, but the class should be available
-        assert (
-            str(type(agenda_phase)) == "<class 'src.ti4.core.agenda_phase.AgendaPhase'>"
-        )
+        from src.ti4.core.agenda_phase import AgendaPhase as AgendaPhaseType
+
+        assert isinstance(agenda_phase, AgendaPhaseType)
 
     def test_strategy_card_system_backward_compatibility(self):
         """Verify that strategy card system maintains backward compatibility."""
@@ -244,26 +244,27 @@ class TestRule26BackwardCompatibilityValidationResults:
             f"Backward compatibility validation failed: {passed_validations}/{total_validations} passed"
         )
 
-    def test_existing_tests_still_pass(self):
-        """Verify that existing test suites continue to pass."""
-        # This test documents that the following existing test suites pass:
-        # - tests/test_rule_68_production.py (27 tests)
-        # - tests/test_rule_08_agenda_phase.py (20 tests)
-        # - tests/test_rule_83_strategy_card_coordinator.py (8 tests)
-
-        # These tests were run and all passed, confirming backward compatibility
-        existing_test_results = {
-            "rule_68_production": 27,
-            "rule_08_agenda_phase": 20,
-            "rule_83_strategy_card_coordinator": 8,
-        }
-
-        total_existing_tests = sum(existing_test_results.values())
-        assert total_existing_tests == 55, (
-            f"Expected 55 existing tests, found {total_existing_tests}"
-        )
-
-        # All existing tests pass - this confirms backward compatibility
-        assert True, (
-            "All existing tests continue to pass with new resource management system"
-        )
+    # @pytest.mark.skip(reason="Documentation-only; avoids hardcoded external suite counts")
+    # def test_existing_tests_still_pass(self):
+    #     """Verify that existing test suites continue to pass."""
+    #     # This test documents that the following existing test suites pass:
+    #     # - tests/test_rule_68_production.py (27 tests)
+    #     # - tests/test_rule_08_agenda_phase.py (20 tests)
+    #     # - tests/test_rule_83_strategy_card_coordinator.py (8 tests)
+    #
+    #     # These tests were run and all passed, confirming backward compatibility
+    #     existing_test_results = {
+    #         "rule_68_production": 27,
+    #         "rule_08_agenda_phase": 20,
+    #         "rule_83_strategy_card_coordinator": 8,
+    #     }
+    #
+    #     total_existing_tests = sum(existing_test_results.values())
+    #     assert total_existing_tests == 55, (
+    #         f"Expected 55 existing tests, found {total_existing_tests}"
+    #     )
+    #
+    #     # All existing tests pass - this confirms backward compatibility
+    #     assert True, (
+    #         "All existing tests continue to pass with new resource management system"
+    #     )

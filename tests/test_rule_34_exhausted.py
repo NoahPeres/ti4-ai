@@ -29,7 +29,9 @@ class TestRule34GeneralExhaustedMechanics:
         """
         # RED: This will fail until we implement exhausted state for planets
         planet = Planet("Test Planet", resources=3, influence=2)
-        planet.set_control("player1")  # Planet must be controlled to spend resources
+        planet.set_control(
+            MockPlayer.PLAYER_1.value
+        )  # Planet must be controlled to spend resources
 
         # Planet should start readied
         assert not planet.is_exhausted()
@@ -49,7 +51,9 @@ class TestRule34GeneralExhaustedMechanics:
         """
         # RED: This will fail until we implement exhausted state for planets
         planet = Planet("Test Planet", resources=3, influence=2)
-        planet.set_control("player1")  # Planet must be controlled to spend influence
+        planet.set_control(
+            MockPlayer.PLAYER_1.value
+        )  # Planet must be controlled to spend influence
 
         # Planet should start readied
         assert not planet.is_exhausted()
@@ -232,7 +236,7 @@ class TestRule34PlanetCardExhaustion:
         """
         # RED: This will fail until we implement resource spending
         planet = Planet("Test Planet", resources=3, influence=2)
-        planet.set_control("player1")
+        planet.set_control(MockPlayer.PLAYER_1.value)
 
         # Should start readied
         assert not planet.is_exhausted()
@@ -250,7 +254,7 @@ class TestRule34PlanetCardExhaustion:
         """
         # RED: This will fail until we implement influence spending
         planet = Planet("Test Planet", resources=3, influence=2)
-        planet.set_control("player1")
+        planet.set_control(MockPlayer.PLAYER_1.value)
 
         # Should start readied
         assert not planet.is_exhausted()
@@ -268,7 +272,7 @@ class TestRule34PlanetCardExhaustion:
         """
         # RED: This will fail until we implement exhausted state validation
         planet = Planet("Test Planet", resources=3, influence=2)
-        planet.set_control("player1")
+        planet.set_control(MockPlayer.PLAYER_1.value)
 
         # Exhaust the planet
         planet.exhaust()

@@ -37,8 +37,7 @@ The design builds upon existing systems including `Planet`, `Player`, `UnitStats
 1. **ResourceManager**: Central manager for resource/influence calculations and spending
 2. **CostValidator**: Validates unit costs and resource availability
 3. **SpendingPlan**: Represents a plan for spending resources/influence from specific sources
-4. **ResourceCalculator**: Calculates available resources/influence from controlled planets
-5. **Enhanced ProductionManager**: Integrates cost validation with production
+4. **Enhanced ProductionManager**: Integrates cost validation with production
 
 ## Components and Interfaces
 
@@ -208,7 +207,7 @@ class ProductionManager:
         quantity: int,
         spending_plan: SpendingPlan,
         placement_location: ProductionLocation
-    ) -> ProductionResult:
+    ) -> ProductionExecutionResult:
         """Execute production with cost payment and unit placement."""
 ```
 

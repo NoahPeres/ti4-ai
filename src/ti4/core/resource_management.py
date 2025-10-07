@@ -751,6 +751,28 @@ class ResourceManager:
                 error_message=str(e),
             )
 
+    def rollback_spending(
+        self, player_id: str, spending_result: SpendingResult
+    ) -> None:
+        """Rollback a previously successful spending_result by readying planets and refunding trade goods.
+
+        Args:
+            player_id: The player to rollback for
+            spending_result: The SpendingResult returned by execute_spending_plan
+        """
+        if not spending_result or not spending_result.success:
+            return
+        # Ready exhausted planets
+        for planet_name in spending_result.planets_exhausted:
+            planet = self._get_player_planet(player_id, planet_name)
+            if planet and planet.is_exhausted():
+                planet.ready()
+        # Refund trade goods
+        if spending_result.trade_goods_spent > 0:
+            player = self._get_player(player_id)
+            if player:
+                player.gain_trade_goods(spending_result.trade_goods_spent)
+
     def _get_player(self, player_id: str) -> Player | None:
         """Get player by ID from game state."""
         for player in self.game_state.players:
@@ -1174,7 +1196,7 @@ class CacheStatistics:
 
     @property
     def cache_hit_rate(self) -> float:
-        """Calculate cache hit rate as a percentage."""
+        """Calculate cache hit rate as a fraction between 0 and 1."""
         if self.total_requests == 0:
             return 0.0
         return self.cache_hits / self.total_requests

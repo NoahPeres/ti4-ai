@@ -540,6 +540,13 @@ class VotingSystem:
                     error_message=f"Invalid outcome '{outcome}' for agenda",
                 )
 
+        # Validate influence amount
+        if influence_amount <= 0:
+            return VotingOutcome(
+                success=False,
+                error_message="Influence amount must be a positive integer",
+            )
+
         # Enforce one vote action per player per agenda
         if player_id in self.player_votes:
             previous_outcome = self.player_votes[player_id]
@@ -557,27 +564,36 @@ class VotingSystem:
             )
 
         # Check if player can afford the influence (for voting, no trade goods)
-        if not resource_manager.can_afford_spending(
-            player_id,
-            resource_amount=0,
-            influence_amount=influence_amount,
-            for_voting=True,
-        ):
-            available = resource_manager.calculate_available_influence(
-                player_id, for_voting=True
-            )
-            return VotingOutcome(
-                success=False,
-                error_message=f"Insufficient influence for voting: need {influence_amount}, have {available} (trade goods cannot be used for voting per Rule 47.3)",
-            )
+        try:
+            if not resource_manager.can_afford_spending(
+                player_id,
+                resource_amount=0,
+                influence_amount=influence_amount,
+                for_voting=True,
+            ):
+                available = resource_manager.calculate_available_influence(
+                    player_id, for_voting=True
+                )
+                return VotingOutcome(
+                    success=False,
+                    error_message=(
+                        f"Insufficient influence for voting: need {influence_amount}, "
+                        f"have {available} (trade goods cannot be used for voting per Rule 47.3)"
+                    ),
+                )
+        except Exception as e:
+            return VotingOutcome(success=False, error_message=str(e))
 
         # Create and execute spending plan
-        spending_plan = resource_manager.create_spending_plan(
-            player_id,
-            resource_amount=0,
-            influence_amount=influence_amount,
-            for_voting=True,
-        )
+        try:
+            spending_plan = resource_manager.create_spending_plan(
+                player_id,
+                resource_amount=0,
+                influence_amount=influence_amount,
+                for_voting=True,
+            )
+        except Exception as e:
+            return VotingOutcome(success=False, error_message=str(e))
 
         if not spending_plan.is_valid:
             return VotingOutcome(
@@ -586,7 +602,10 @@ class VotingSystem:
             )
 
         # Execute the spending plan
-        spending_result = resource_manager.execute_spending_plan(spending_plan)
+        try:
+            spending_result = resource_manager.execute_spending_plan(spending_plan)
+        except Exception as e:
+            return VotingOutcome(success=False, error_message=str(e))
         if not spending_result.success:
             return VotingOutcome(
                 success=False,
@@ -811,6 +830,7 @@ class AgendaPhase:
 
         # Get voting order (speaker votes last)
         voting_system.get_voting_order(players, speaker_system)
+        # TODO: use voting_order when orchestration is implemented
 
         # Start voting process (triggers before_players_vote timing window)
         self.start_voting(agenda)
@@ -903,6 +923,7 @@ class AgendaPhase:
 
         # Get voting order (speaker votes last)
         voting_system.get_voting_order(players, speaker_system)
+        # TODO: use voting_order when orchestration is implemented
 
         # Start voting process (triggers before_players_vote timing window)
         self.start_voting(agenda)

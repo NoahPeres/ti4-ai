@@ -28,9 +28,9 @@ class TestLeadershipResourceIntegrationSimple:
         """Helper to create a test player with empty command pools for testing."""
         player = Player(id=player_id, faction=Faction.SOL)
         # Reset command pools to 0 for testing Leadership card gains
-        object.__setattr__(player.command_sheet, "tactic_pool", 0)
-        object.__setattr__(player.command_sheet, "fleet_pool", 0)
-        object.__setattr__(player.command_sheet, "strategy_pool", 0)
+        player.command_sheet.tactic_pool = 0
+        player.command_sheet.fleet_pool = 0
+        player.command_sheet.strategy_pool = 0
         return player
 
     def test_leadership_primary_accepts_resource_manager_parameters(self) -> None:

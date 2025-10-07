@@ -8,7 +8,7 @@
 **Dependencies**: Planets, Exhausted, Trade Goods, Production
 
 ## Raw LRR Text
-```
+```text
 75 RESOURCES
 Resources represent a planet's material value and industry. Many game effects, such as producing units, require players to spend resources.
 

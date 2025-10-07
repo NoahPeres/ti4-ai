@@ -384,4 +384,4 @@ The following rules require implementation to achieve full TI4 compliance:
 
 ---
 
-This roadmap provides a clear, strategic path from our current 36.6% coverage to full 101 rule implementation, prioritizing combat completion, political systems, and advanced mechanics in logical dependency order.
+This roadmap provides a clear, strategic path from our current 41.6% coverage to full 101 rule implementation, prioritizing combat completion, political systems, and advanced mechanics in logical dependency order.

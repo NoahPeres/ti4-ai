@@ -186,7 +186,6 @@ class TestResourceManagerErrorHandling:
 
     def test_execute_spending_plan_with_detailed_rollback_logging(self) -> None:
         """Test that spending plan execution logs rollback operations."""
-        # This test will fail initially - we need to implement logging
         game_state = GameState()
         player = Player(id="player1", faction=Faction.SOL)
         planet = Planet("Test Planet", resources=3, influence=2)
@@ -276,7 +275,6 @@ class TestCostValidatorErrorHandling:
 
     def test_validate_production_cost_with_detailed_error_context(self) -> None:
         """Test that cost validation provides detailed error context."""
-        # This test will fail initially - we need enhanced error messages
         game_state = GameState()
         player = Player(id="player1", faction=Faction.SOL)
 
@@ -502,7 +500,6 @@ class TestLoggingAndDebugging:
 
     def test_resource_operation_logging(self) -> None:
         """Test that resource operations are properly logged."""
-        # This test will fail initially - we need to implement logging
         game_state = GameState()
         player = Player(id="player1", faction=Faction.SOL)
         planet = Planet("Test Planet", resources=5, influence=3)

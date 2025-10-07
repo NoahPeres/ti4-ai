@@ -116,12 +116,3 @@ def test_batch_operations_performance() -> None:
     assert batch_time <= individual_time * 1.2, (
         "Batch operations should not be significantly slower"
     )
-
-
-if __name__ == "__main__":
-    print("Running performance benchmarks...")
-    print("\n=== Caching Performance ===")
-    test_caching_performance_improvement()
-    print("\n=== Batch Operations Performance ===")
-    test_batch_operations_performance()
-    print("\nBenchmarks completed successfully!")

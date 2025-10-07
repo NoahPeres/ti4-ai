@@ -327,9 +327,17 @@ class ProductionManager:
             )
 
         try:
+            # Compute units and pre-validate placement before spending
+            units_to_place = self._calculate_units_to_place(unit_type, quantity)
+            if not placement_location.can_place_unit(unit_type, units_to_place):
+                return ProductionExecutionResult(
+                    success=False,
+                    units_placed=0,
+                    error_message=placement_location.get_placement_error(),
+                )
+
             # Execute spending plan (pay costs)
             spending_result = self.resource_manager.execute_spending_plan(spending_plan)
-
             if not spending_result.success:
                 return ProductionExecutionResult(
                     success=False,
@@ -338,24 +346,12 @@ class ProductionManager:
                     error_message=spending_result.error_message,
                 )
 
-            # Attempt unit placement
-            units_to_place = self._calculate_units_to_place(unit_type, quantity)
-
-            if not placement_location.can_place_unit(unit_type, units_to_place):
-                # Rollback spending if placement fails
-                self._rollback_spending(spending_result)
-                return ProductionExecutionResult(
-                    success=False,
-                    units_placed=0,
-                    error_message=placement_location.get_placement_error(),
-                )
-
             # Place units
             placement_success = placement_location.place_unit(unit_type, units_to_place)
 
             if not placement_success:
                 # Rollback spending if placement fails
-                self._rollback_spending(spending_result)
+                self._rollback_spending(player_id, spending_result)
                 return ProductionExecutionResult(
                     success=False,
                     units_placed=0,
@@ -378,8 +374,8 @@ class ProductionManager:
 
     def _calculate_units_to_place(self, unit_type: UnitType, quantity: int) -> int:
         """Calculate the actual number of units to place considering dual production."""
-        # For dual production units, if quantity=2, we produce 2 units for cost of 1
-        # If quantity=1, we still produce 2 units for cost of 1 (but pay full cost)
+        # For dual production units, if quantity==2, produce 2 units for the cost of 1.
+        # If quantity==1, produce 1 unit.
         if self._is_dual_production_unit(unit_type) and quantity == 2:
             return 2  # Dual production: 2 units for cost of 1
         else:
@@ -389,9 +385,9 @@ class ProductionManager:
         """Check if unit type supports dual production."""
         return unit_type in {UnitType.FIGHTER, UnitType.INFANTRY}
 
-    def _rollback_spending(self, spending_result: SpendingResult) -> None:
+    def _rollback_spending(
+        self, player_id: str, spending_result: SpendingResult
+    ) -> None:
         """Rollback spending by readying planets and restoring trade goods."""
-        # For now, rollback is handled by the ResourceManager's atomic operations
-        # In a real implementation, this would need more sophisticated rollback logic
-        # The ResourceManager already handles rollback in its execute_spending_plan method
-        pass
+        if self.resource_manager:
+            self.resource_manager.rollback_spending(player_id, spending_result)

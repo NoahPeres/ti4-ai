@@ -54,7 +54,7 @@ class TestRule26BackwardCompatibilityValidation:
 
         game_state = GameState()
         player = Player(id="test_player", faction=Faction.SOL)
-        game_state = game_state = game_state.add_player(player)
+        game_state = game_state.add_player(player)
 
         # Add planets for voting
         planet1 = Planet(name="planet1", resources=2, influence=3)
@@ -83,7 +83,7 @@ class TestRule26BackwardCompatibilityValidation:
 
         game_state = GameState()
         player = Player(id="test_player", faction=Faction.SOL)
-        game_state = game_state = game_state.add_player(player)
+        game_state = game_state.add_player(player)
 
         # Create strategy card coordinator
         coordinator = StrategyCardCoordinator(game_state)
@@ -126,7 +126,7 @@ class TestRule26BackwardCompatibilityValidation:
 
         game_state = GameState()
         player = Player(id="test_player", faction=Faction.SOL)
-        game_state = game_state = game_state.add_player(player)
+        game_state = game_state.add_player(player)
 
         # Add planets
         planet = Planet(name="test_planet", resources=3, influence=2)
@@ -285,9 +285,14 @@ class TestRule26BackwardCompatibilityValidation:
         # Test that planet validation still works
         planet = Planet(name="test_planet", resources=3, influence=2)
 
-        # Should not be able to spend from uncontrolled planet
-        assert not planet.can_spend_resources()  # No controller set
-        assert not planet.can_spend_influence()  # No controller set
+        # Planet can spend when not exhausted (control validation is handled by GameState)
+        assert planet.can_spend_resources()  # Not exhausted
+        assert planet.can_spend_influence()  # Not exhausted
+
+        # Should not be able to spend from exhausted planet
+        planet.exhaust()
+        assert not planet.can_spend_resources()  # Exhausted
+        assert not planet.can_spend_influence()  # Exhausted
 
     def test_performance_characteristics_maintained(self):
         """Verify that performance characteristics are maintained."""

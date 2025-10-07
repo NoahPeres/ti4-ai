@@ -2275,7 +2275,14 @@ class GameState:
             planet.set_control(player_id)
             new_player_planets[player_id].append(planet)
 
-        return self._create_new_state(player_planets=new_player_planets)
+        # Keep mapping in sync with Planet.controlled_by
+        new_planet_control_mapping = self.planet_control_mapping.copy()
+        new_planet_control_mapping[planet.name] = player_id
+
+        return self._create_new_state(
+            player_planets=new_player_planets,
+            planet_control_mapping=new_planet_control_mapping,
+        )
 
     def get_secret_objective_deck(self) -> list[Objective]:
         """Get the secret objective deck.

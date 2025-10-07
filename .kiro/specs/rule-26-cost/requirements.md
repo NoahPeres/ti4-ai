@@ -55,8 +55,8 @@ The implementation will build upon existing systems including `UnitStats`, `Prod
 1. WHEN the Construction strategy card is played THEN the system SHALL allow structure placement without resource cost validation
 2. WHEN structures are placed via Construction THEN the system SHALL not exhaust planets or consume trade goods
 3. WHEN structures are placed via other means THEN the system SHALL follow normal cost rules if applicable
-4. WHEN validating structure placement THEN the system SHALL check that the unit has no cost attribute (Rule 26.3)
-5. WHEN attempting to produce units without cost THEN the system SHALL reject the production (Rule 26.3)
+4. WHEN validating structure placement via Construction THEN the system SHALL bypass resource cost validation (ignore unit cost during this action) (Rule 26.3)
+5. WHEN attempting to produce structures or other non-producible units via normal production THEN the system SHALL reject the attempt with a clear error (Rule 26.3)
 
 ### Requirement 5: Planet-Based Influence System (Rule 47: INFLUENCE)
 
@@ -81,6 +81,7 @@ The implementation will build upon existing systems including `UnitStats`, `Prod
 3. WHEN the total spending equals or exceeds the required amount THEN the system SHALL accept the payment
 4. WHEN the specified planets and trade goods are insufficient THEN the system SHALL reject the payment with a clear error
 5. WHEN payment is accepted THEN the system SHALL exhaust the specified planets and consume the specified trade goods
+6. WHEN the same planet is selected for both resources and influence in a single spending operation THEN it SHALL be exhausted only once
 
 ### Requirement 7: Production Cost Validation Integration
 
@@ -105,6 +106,7 @@ The implementation will build upon existing systems including `UnitStats`, `Prod
 3. WHEN multiple technologies affect the same unit THEN the system SHALL apply all relevant cost modifications
 4. WHEN faction abilities modify costs THEN the system SHALL integrate faction-specific cost changes
 5. WHEN cost modifications result in negative costs THEN the system SHALL treat the minimum cost as zero
+6. WHEN costs include fractional values (e.g., 0.5), THEN the system SHALL define a rounding/precision policy (e.g., accumulate fractional costs and only round the total at execution), and apply it consistently across validation and spending
 
 ### Requirement 9: Agenda Phase Voting Integration
 
