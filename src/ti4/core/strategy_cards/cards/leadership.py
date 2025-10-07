@@ -14,6 +14,7 @@ from ..strategic_action import StrategyCardType
 
 if TYPE_CHECKING:
     from ...game_state import GameState
+    from ...resource_management import ResourceManager
 
 
 class LeadershipStrategyCard(BaseStrategyCard):
@@ -62,7 +63,13 @@ class LeadershipStrategyCard(BaseStrategyCard):
         Args:
             player_id: The active player executing the primary ability
             game_state: Optional game state for full integration
-            **kwargs: Additional parameters (player, token_distribution, planets_to_exhaust, trade_goods_to_spend)
+            **kwargs: Additional parameters including:
+                - player: Player object (required)
+                - token_distribution: Dict specifying token allocation (required)
+                - planets_to_exhaust: List of planet names (backward compatibility)
+                - trade_goods_to_spend: Number of trade goods (backward compatibility)
+                - resource_manager: ResourceManager instance (new interface)
+                - influence_to_spend: Amount of influence to spend (new interface)
 
         Returns:
             Result of the primary ability execution
@@ -70,6 +77,12 @@ class LeadershipStrategyCard(BaseStrategyCard):
         # Extract required parameters
         player = kwargs.get("player")
         token_distribution = kwargs.get("token_distribution", {})
+
+        # Support both old and new interfaces
+        resource_manager = kwargs.get("resource_manager")
+        influence_to_spend = kwargs.get("influence_to_spend")
+
+        # Backward compatibility parameters
         planets_to_exhaust = kwargs.get("planets_to_exhaust", [])
         trade_goods_to_spend = kwargs.get("trade_goods_to_spend", 0)
 
@@ -93,30 +106,24 @@ class LeadershipStrategyCard(BaseStrategyCard):
             # Rule 52.2: Gain 3 base command tokens
             base_tokens = 3
 
-            # Validate planet exhaustion choices and calculate influence
-            total_influence = 0
-            if planets_to_exhaust and game_state:
-                validation_result = self._validate_planets_for_exhaustion(
-                    planets_to_exhaust, game_state, player
-                )
-                if not validation_result["valid"]:
-                    return StrategyCardAbilityResult(
-                        success=False,
-                        player_id=player_id,
-                        error_message=validation_result["error"],
-                    )
-                total_influence = validation_result["total_influence"]
-
-            # Add trade goods to influence total (1 trade good = 1 influence)
-            trade_goods_to_spend = max(0, int(trade_goods_to_spend))
-            if trade_goods_to_spend > player.get_trade_goods():
+            # Handle influence spending - support both new and old interfaces
+            influence_result = self._handle_influence_spending(
+                player_id,
+                player,
+                game_state,
+                resource_manager,
+                influence_to_spend,
+                planets_to_exhaust,
+                trade_goods_to_spend,
+            )
+            if not influence_result["success"]:
                 return StrategyCardAbilityResult(
                     success=False,
                     player_id=player_id,
-                    error_message=f"Insufficient trade goods: cannot spend {trade_goods_to_spend}, player only has {player.get_trade_goods()}",
+                    error_message=influence_result["error_message"],
                 )
 
-            total_influence += trade_goods_to_spend
+            total_influence = influence_result["total_influence"]
 
             # Calculate tokens: 3 base + 1 per 3 influence spent
             reinforcements = player.reinforcements
@@ -155,21 +162,24 @@ class LeadershipStrategyCard(BaseStrategyCard):
                 )
 
             # All validation passed - now perform state mutations
-            if trade_goods_to_spend > 0:
-                if not player.spend_trade_goods(trade_goods_to_spend):
-                    return StrategyCardAbilityResult(
-                        success=False,
-                        player_id=player_id,
-                        error_message=f"Failed to spend {trade_goods_to_spend} trade goods",
-                    )
-            if planets_to_exhaust:
-                if game_state is None:
-                    return StrategyCardAbilityResult(
-                        success=False,
-                        player_id=player_id,
-                        error_message="game_state is required to exhaust planets",
-                    )
-                self._exhaust_planets(planets_to_exhaust, game_state, player_id)
+            # Note: If using ResourceManager, spending was already executed above
+            if resource_manager is None or influence_to_spend is None:
+                # Only execute old interface spending if not using ResourceManager
+                if trade_goods_to_spend > 0:
+                    if not player.spend_trade_goods(trade_goods_to_spend):
+                        return StrategyCardAbilityResult(
+                            success=False,
+                            player_id=player_id,
+                            error_message=f"Failed to spend {trade_goods_to_spend} trade goods",
+                        )
+                if planets_to_exhaust:
+                    if game_state is None:
+                        return StrategyCardAbilityResult(
+                            success=False,
+                            player_id=player_id,
+                            error_message="game_state is required to exhaust planets",
+                        )
+                    self._exhaust_planets(planets_to_exhaust, game_state, player_id)
 
             # Distribute tokens using Player.gain_command_token
             tokens_distributed = 0
@@ -239,6 +249,12 @@ class LeadershipStrategyCard(BaseStrategyCard):
         # Extract required parameters
         player = kwargs.get("player")
         token_distribution = kwargs.get("token_distribution", {})
+
+        # Support both old and new interfaces
+        resource_manager = kwargs.get("resource_manager")
+        influence_to_spend = kwargs.get("influence_to_spend")
+
+        # Backward compatibility parameters
         planets_to_exhaust = kwargs.get("planets_to_exhaust", [])
         trade_goods_to_spend = kwargs.get("trade_goods_to_spend", 0)
 
@@ -261,30 +277,24 @@ class LeadershipStrategyCard(BaseStrategyCard):
             # Rule 52.3: Only influence conversion, no base tokens
             # Rule 20.5a: Leadership secondary ability doesn't cost command token
 
-            # Validate planet exhaustion choices and calculate influence
-            total_influence = 0
-            if planets_to_exhaust and game_state:
-                validation_result = self._validate_planets_for_exhaustion(
-                    planets_to_exhaust, game_state, player
-                )
-                if not validation_result["valid"]:
-                    return StrategyCardAbilityResult(
-                        success=False,
-                        player_id=player_id,
-                        error_message=validation_result["error"],
-                    )
-                total_influence = validation_result["total_influence"]
-
-            # Add trade goods to influence total (1 trade good = 1 influence)
-            trade_goods_to_spend = max(0, int(trade_goods_to_spend))
-            if trade_goods_to_spend > player.get_trade_goods():
+            # Handle influence spending - support both new and old interfaces
+            influence_result = self._handle_influence_spending(
+                player_id,
+                player,
+                game_state,
+                resource_manager,
+                influence_to_spend,
+                planets_to_exhaust,
+                trade_goods_to_spend,
+            )
+            if not influence_result["success"]:
                 return StrategyCardAbilityResult(
                     success=False,
                     player_id=player_id,
-                    error_message=f"Insufficient trade goods: cannot spend {trade_goods_to_spend}, player only has {player.get_trade_goods()}",
+                    error_message=influence_result["error_message"],
                 )
 
-            total_influence += trade_goods_to_spend
+            total_influence = influence_result["total_influence"]
 
             # Calculate tokens from influence (1 per 3 influence)
             reinforcements = player.reinforcements
@@ -319,21 +329,24 @@ class LeadershipStrategyCard(BaseStrategyCard):
                 )
 
             # All validation passed - now perform state mutations
-            if trade_goods_to_spend > 0:
-                if not player.spend_trade_goods(trade_goods_to_spend):
-                    return StrategyCardAbilityResult(
-                        success=False,
-                        player_id=player_id,
-                        error_message=f"Failed to spend {trade_goods_to_spend} trade goods",
-                    )
-            if planets_to_exhaust:
-                if game_state is None:
-                    return StrategyCardAbilityResult(
-                        success=False,
-                        player_id=player_id,
-                        error_message="game_state is required to exhaust planets",
-                    )
-                self._exhaust_planets(planets_to_exhaust, game_state, player_id)
+            # Note: If using ResourceManager, spending was already executed above
+            if resource_manager is None or influence_to_spend is None:
+                # Only execute old interface spending if not using ResourceManager
+                if trade_goods_to_spend > 0:
+                    if not player.spend_trade_goods(trade_goods_to_spend):
+                        return StrategyCardAbilityResult(
+                            success=False,
+                            player_id=player_id,
+                            error_message=f"Failed to spend {trade_goods_to_spend} trade goods",
+                        )
+                if planets_to_exhaust:
+                    if game_state is None:
+                        return StrategyCardAbilityResult(
+                            success=False,
+                            player_id=player_id,
+                            error_message="game_state is required to exhaust planets",
+                        )
+                    self._exhaust_planets(planets_to_exhaust, game_state, player_id)
 
             # Distribute tokens using Player.gain_command_token
             tokens_distributed = 0
@@ -450,6 +463,111 @@ class LeadershipStrategyCard(BaseStrategyCard):
             total_influence += influence_int
 
         return {"valid": True, "total_influence": total_influence, "error": ""}
+
+    def _handle_influence_spending(
+        self,
+        player_id: str,
+        player: Any,
+        game_state: Optional["GameState"],
+        resource_manager: Optional["ResourceManager"],
+        influence_to_spend: Optional[int],
+        planets_to_exhaust: list[str],
+        trade_goods_to_spend: int,
+    ) -> dict[str, Any]:
+        """Handle influence spending using either new ResourceManager or old interface.
+
+        Args:
+            player_id: The player ID
+            player: The player object
+            game_state: Optional game state
+            resource_manager: Optional ResourceManager instance
+            influence_to_spend: Amount of influence to spend (new interface)
+            planets_to_exhaust: List of planet names (old interface)
+            trade_goods_to_spend: Number of trade goods (old interface)
+
+        Returns:
+            Dict with success, total_influence, spending_result, and error_message keys
+        """
+        if resource_manager is not None and influence_to_spend is not None:
+            # New interface: use ResourceManager for influence validation and spending
+            if not resource_manager.can_afford_spending(
+                player_id, influence_amount=influence_to_spend, for_voting=False
+            ):
+                available_influence = resource_manager.calculate_available_influence(
+                    player_id, for_voting=False
+                )
+                return {
+                    "success": False,
+                    "error_message": f"Insufficient influence: need {influence_to_spend}, have {available_influence}",
+                    "total_influence": 0,
+                    "spending_result": None,
+                }
+
+            # Create and execute spending plan
+            spending_plan = resource_manager.create_spending_plan(
+                player_id, influence_amount=influence_to_spend, for_voting=False
+            )
+            if not spending_plan.is_valid:
+                return {
+                    "success": False,
+                    "error_message": spending_plan.error_message
+                    or "Invalid spending plan",
+                    "total_influence": 0,
+                    "spending_result": None,
+                }
+
+            spending_result = resource_manager.execute_spending_plan(spending_plan)
+            if not spending_result.success:
+                return {
+                    "success": False,
+                    "error_message": spending_result.error_message
+                    or "Failed to execute spending plan",
+                    "total_influence": 0,
+                    "spending_result": None,
+                }
+
+            return {
+                "success": True,
+                "total_influence": influence_to_spend,
+                "spending_result": spending_result,
+                "error_message": None,
+            }
+
+        else:
+            # Backward compatibility: use old planet exhaustion interface
+            total_influence = 0
+
+            if planets_to_exhaust and game_state:
+                validation_result = self._validate_planets_for_exhaustion(
+                    planets_to_exhaust, game_state, player
+                )
+                if not validation_result["valid"]:
+                    return {
+                        "success": False,
+                        "error_message": validation_result["error"],
+                        "total_influence": 0,
+                        "spending_result": None,
+                    }
+                total_influence = validation_result["total_influence"]
+
+            # Add trade goods to influence total (1 trade good = 1 influence)
+            trade_goods_to_spend = max(0, int(trade_goods_to_spend))
+            if trade_goods_to_spend > player.get_trade_goods():
+                return {
+                    "success": False,
+                    "error_message": f"Insufficient trade goods: cannot spend {trade_goods_to_spend}, player only has {player.get_trade_goods()}",
+                    "total_influence": 0,
+                    "spending_result": None,
+                }
+
+            total_influence += trade_goods_to_spend
+
+            return {
+                "success": True,
+                "total_influence": total_influence,
+                "spending_result": None,
+                "error_message": None,
+            }
 
     def _exhaust_planets(
         self, planets_to_exhaust: list[str], game_state: "GameState", player_id: str

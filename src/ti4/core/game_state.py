@@ -1525,6 +1525,13 @@ class GameState:
     # According to Rules 47 and 75, influence and resources are planet stats, not player stats
     # Players spend influence/resources by exhausting planet cards, not from player pools
 
+    def get_player(self, player_id: str) -> Player | None:
+        """Get a player by ID."""
+        for player in self.players:
+            if player.id == player_id:
+                return player
+        return None
+
     def add_player(self, player: Player) -> GameState:
         """Add a player to the game."""
         new_players = self.players.copy()
@@ -2264,6 +2271,8 @@ class GameState:
 
         # Only add if not already present (by name)
         if all(p.name != planet.name for p in new_player_planets[player_id]):
+            # Set control when adding planet to player
+            planet.set_control(player_id)
             new_player_planets[player_id].append(planet)
 
         return self._create_new_state(player_planets=new_player_planets)

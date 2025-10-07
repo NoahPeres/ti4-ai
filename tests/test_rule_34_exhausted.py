@@ -29,6 +29,7 @@ class TestRule34GeneralExhaustedMechanics:
         """
         # RED: This will fail until we implement exhausted state for planets
         planet = Planet("Test Planet", resources=3, influence=2)
+        planet.set_control("player1")  # Planet must be controlled to spend resources
 
         # Planet should start readied
         assert not planet.is_exhausted()
@@ -48,6 +49,7 @@ class TestRule34GeneralExhaustedMechanics:
         """
         # RED: This will fail until we implement exhausted state for planets
         planet = Planet("Test Planet", resources=3, influence=2)
+        planet.set_control("player1")  # Planet must be controlled to spend influence
 
         # Planet should start readied
         assert not planet.is_exhausted()
@@ -144,6 +146,8 @@ class TestRule34StatusPhaseReadyCards:
         # Add planets to player
         planet1 = Planet("Planet 1", resources=3, influence=2)
         planet2 = Planet("Planet 2", resources=2, influence=3)
+        planet1.set_control(MockPlayer.PLAYER_1.value)
+        planet2.set_control(MockPlayer.PLAYER_1.value)
 
         # Exhaust both planets
         planet1.exhaust()
@@ -182,6 +186,7 @@ class TestRule34StatusPhaseReadyCards:
 
         # Exhaust planet card
         planet = Planet("Test Planet", resources=3, influence=2)
+        planet.set_control(MockPlayer.PLAYER_1.value)
         planet.exhaust()
         game_state = game_state.add_player_planet(MockPlayer.PLAYER_1.value, planet)
 
@@ -227,6 +232,7 @@ class TestRule34PlanetCardExhaustion:
         """
         # RED: This will fail until we implement resource spending
         planet = Planet("Test Planet", resources=3, influence=2)
+        planet.set_control("player1")
 
         # Should start readied
         assert not planet.is_exhausted()
@@ -244,6 +250,7 @@ class TestRule34PlanetCardExhaustion:
         """
         # RED: This will fail until we implement influence spending
         planet = Planet("Test Planet", resources=3, influence=2)
+        planet.set_control("player1")
 
         # Should start readied
         assert not planet.is_exhausted()
@@ -261,6 +268,7 @@ class TestRule34PlanetCardExhaustion:
         """
         # RED: This will fail until we implement exhausted state validation
         planet = Planet("Test Planet", resources=3, influence=2)
+        planet.set_control("player1")
 
         # Exhaust the planet
         planet.exhaust()
@@ -377,6 +385,7 @@ class TestRule34IntegrationWithExistingSystems:
 
         # Exhaust planet
         planet = Planet("Test Planet", resources=3, influence=2)
+        planet.set_control(MockPlayer.PLAYER_1.value)
         planet.exhaust()
         game_state = game_state.add_player_planet(MockPlayer.PLAYER_1.value, planet)
 

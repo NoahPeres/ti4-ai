@@ -57,11 +57,11 @@ class Planet:
 
     def can_spend_resources(self) -> bool:
         """Check if this planet can spend resources."""
-        return not self._exhausted
+        return self.controlled_by is not None and not self._exhausted
 
     def can_spend_influence(self) -> bool:
         """Check if this planet can spend influence."""
-        return not self._exhausted
+        return self.controlled_by is not None and not self._exhausted
 
     @property
     def resources(self) -> int:

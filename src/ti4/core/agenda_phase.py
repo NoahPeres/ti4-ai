@@ -489,6 +489,133 @@ class VotingSystem:
             elected_target=chosen_player,
         )
 
+    def calculate_available_influence_for_voting(
+        self, player_id: str, resource_manager: Any
+    ) -> int:
+        """Calculate available influence for voting using ResourceManager.
+
+        Integrates with ResourceManager to get influence calculations that
+        exclude trade goods per Rule 47.3.
+
+        Args:
+            player_id: The player ID
+            resource_manager: ResourceManager instance
+
+        Returns:
+            Total influence available for voting (planets only, no trade goods)
+        """
+        influence: int = resource_manager.calculate_available_influence(
+            player_id, for_voting=True
+        )
+        return influence
+
+    def cast_votes_with_resource_manager(
+        self,
+        player_id: str,
+        influence_amount: int,
+        outcome: str,
+        resource_manager: Any,
+        agenda: AgendaCard | Any | None = None,
+    ) -> VotingOutcome:
+        """Cast votes using ResourceManager for influence spending.
+
+        This method integrates with ResourceManager to handle planet exhaustion
+        and enforce Rule 47.3 (no trade goods for voting).
+
+        Args:
+            player_id: The player ID
+            influence_amount: Amount of influence to spend
+            outcome: Voting outcome ("For", "Against", etc.)
+            resource_manager: ResourceManager instance
+            agenda: Optional agenda card for outcome validation
+
+        Returns:
+            VotingOutcome indicating success/failure and votes cast
+        """
+        # Validate agenda outcomes if provided
+        if agenda:
+            if not self.validate_outcome_against_card(outcome, agenda):
+                return VotingOutcome(
+                    success=False,
+                    error_message=f"Invalid outcome '{outcome}' for agenda",
+                )
+
+        # Enforce one vote action per player per agenda
+        if player_id in self.player_votes:
+            previous_outcome = self.player_votes[player_id]
+            if previous_outcome != outcome:
+                return VotingOutcome(
+                    success=False,
+                    error_message=(
+                        f"Player {player_id} cannot cast votes for multiple outcomes "
+                        f"(previously voted '{previous_outcome}', now attempting '{outcome}')"
+                    ),
+                )
+            return VotingOutcome(
+                success=False,
+                error_message=f"Player {player_id} has already voted for this agenda",
+            )
+
+        # Check if player can afford the influence (for voting, no trade goods)
+        if not resource_manager.can_afford_spending(
+            player_id,
+            resource_amount=0,
+            influence_amount=influence_amount,
+            for_voting=True,
+        ):
+            available = resource_manager.calculate_available_influence(
+                player_id, for_voting=True
+            )
+            return VotingOutcome(
+                success=False,
+                error_message=f"Insufficient influence for voting: need {influence_amount}, have {available} (trade goods cannot be used for voting per Rule 47.3)",
+            )
+
+        # Create and execute spending plan
+        spending_plan = resource_manager.create_spending_plan(
+            player_id,
+            resource_amount=0,
+            influence_amount=influence_amount,
+            for_voting=True,
+        )
+
+        if not spending_plan.is_valid:
+            return VotingOutcome(
+                success=False,
+                error_message=spending_plan.error_message or "Invalid spending plan",
+            )
+
+        # Execute the spending plan
+        spending_result = resource_manager.execute_spending_plan(spending_plan)
+        if not spending_result.success:
+            return VotingOutcome(
+                success=False,
+                error_message=spending_result.error_message
+                or "Failed to execute spending plan",
+            )
+
+        # Record the vote
+        self.player_votes[player_id] = outcome
+        self._vote_tally[outcome] = self._vote_tally.get(outcome, 0) + influence_amount
+
+        return VotingOutcome(success=True, votes_cast=influence_amount, outcome=outcome)
+
+    def cast_votes_with_influence_spending(
+        self,
+        player_id: str,
+        influence_amount: int,
+        outcome: str,
+        resource_manager: Any,
+        agenda: AgendaCard | Any | None = None,
+    ) -> VotingOutcome:
+        """Cast votes with influence spending (alias for cast_votes_with_resource_manager).
+
+        This is an alias method for backward compatibility and clearer naming.
+        """
+        return self.cast_votes_with_resource_manager(
+            player_id, influence_amount, outcome, resource_manager, agenda
+        )
+
 
 class AgendaPhase:
     """Main controller for the agenda phase."""

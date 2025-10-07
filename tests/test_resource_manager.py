@@ -1,458 +1,713 @@
-"""Tests for ResourceManager class for Rule 28 deals resource management.
+"""Tests for ResourceManager core functionality.
 
-This module tests the ResourceManager class that handles resource transfers
-between players for component transactions.
-
-Requirements: 3.1, 3.2, 3.3, 3.4, 3.5
+Tests the ResourceManager class for Rule 26: COST, Rule 75: RESOURCES, and Rule 47: INFLUENCE.
 """
 
-from unittest.mock import Mock
-
-import pytest
-
-from ti4.core.transactions import PromissoryNote, PromissoryNoteType
-
-
-class TestResourceManagerCreation:
-    """Test ResourceManager class creation and initialization."""
-
-    def test_resource_manager_creation(self) -> None:
-        """Test that ResourceManager can be created with game state.
-
-        Requirements: 3.1, 3.2
-        """
-        # RED: This will fail until we create ResourceManager
-        from ti4.core.deals import ResourceManager
-
-        mock_game_state = Mock()
-        resource_manager = ResourceManager(game_state=mock_game_state)
-
-        assert resource_manager is not None
-        assert resource_manager._game_state is mock_game_state
-
-
-class TestResourceTracking:
-    """Test resource tracking methods."""
-
-    def test_get_trade_goods(self) -> None:
-        """Test getting player's current trade goods count.
-
-        Requirements: 3.1
-        """
-        from ti4.core.deals import ResourceManager
-
-        mock_game_state = Mock()
-        mock_player = Mock()
-        mock_player.id = "player1"
-        mock_player.get_trade_goods.return_value = 5
-        mock_game_state.players = [mock_player]
-
-        resource_manager = ResourceManager(game_state=mock_game_state)
-        trade_goods = resource_manager.get_trade_goods("player1")
-
-        assert trade_goods == 5
-        mock_player.get_trade_goods.assert_called_once()
-
-    def test_get_commodities(self) -> None:
-        """Test getting player's current commodity count.
-
-        Requirements: 3.1
-        """
-        from ti4.core.deals import ResourceManager
-
-        mock_game_state = Mock()
-        mock_player = Mock()
-        mock_player.id = "player1"
-        mock_player.get_commodities.return_value = 3
-        mock_game_state.players = [mock_player]
-
-        resource_manager = ResourceManager(game_state=mock_game_state)
-        commodities = resource_manager.get_commodities("player1")
-
-        assert commodities == 3
-        mock_player.get_commodities.assert_called_once()
-
-    def test_get_promissory_notes(self) -> None:
-        """Test getting player's owned promissory notes.
-
-        Requirements: 3.1
-        """
-        from ti4.core.deals import ResourceManager
-
-        mock_game_state = Mock()
-        mock_promissory_manager = Mock()
-        test_note = PromissoryNote(
-            note_type=PromissoryNoteType.TRADE_AGREEMENT, issuing_player="player2"
-        )
-        mock_promissory_manager.get_player_hand.return_value = [test_note]
-        mock_game_state.promissory_note_manager = mock_promissory_manager
-
-        resource_manager = ResourceManager(game_state=mock_game_state)
-        notes = resource_manager.get_promissory_notes("player1")
-
-        assert notes == [test_note]
-        mock_promissory_manager.get_player_hand.assert_called_once_with("player1")
-
-
-class TestTradeGoodsTransfer:
-    """Test trade goods transfer between players."""
-
-    def test_transfer_trade_goods_success(self) -> None:
-        """Test successful trade goods transfer between players.
-
-        Requirements: 3.2, 3.3
-        """
-        from ti4.core.deals import ResourceManager
-
-        mock_game_state = Mock()
-        mock_player1 = Mock()
-        mock_player1.id = "player1"
-        mock_player1.get_trade_goods.return_value = 5
-        mock_player1.spend_trade_goods.return_value = True
-
-        mock_player2 = Mock()
-        mock_player2.id = "player2"
-
-        mock_game_state.players = [mock_player1, mock_player2]
-
-        resource_manager = ResourceManager(game_state=mock_game_state)
-        resource_manager.transfer_trade_goods("player1", "player2", 3)
-
-        mock_player1.spend_trade_goods.assert_called_once_with(3)
-        mock_player2.gain_trade_goods.assert_called_once_with(3)
-
-    def test_transfer_trade_goods_insufficient_funds(self) -> None:
-        """Test trade goods transfer with insufficient funds.
-
-        Requirements: 3.2, 3.3
-        """
-        from ti4.core.deals import ResourceManager
-
-        mock_game_state = Mock()
-        mock_player1 = Mock()
-        mock_player1.id = "player1"
-        mock_player1.get_trade_goods.return_value = 2
-        mock_player1.spend_trade_goods.return_value = False
-
-        mock_player2 = Mock()
-        mock_player2.id = "player2"
-
-        mock_game_state.players = [mock_player1, mock_player2]
-
-        resource_manager = ResourceManager(game_state=mock_game_state)
-
-        with pytest.raises(ValueError, match="Insufficient trade goods"):
-            resource_manager.transfer_trade_goods("player1", "player2", 5)
-
-        mock_player1.spend_trade_goods.assert_called_once_with(5)
-        mock_player2.gain_trade_goods.assert_not_called()
-
-    def test_transfer_trade_goods_validation(self) -> None:
-        """Test trade goods transfer input validation.
-
-        Requirements: 3.2, 3.3
-        """
-        from ti4.core.deals import ResourceManager
-
-        mock_game_state = Mock()
-        resource_manager = ResourceManager(game_state=mock_game_state)
-
-        # Test empty from_player
-        with pytest.raises(ValueError, match="From player ID cannot be empty"):
-            resource_manager.transfer_trade_goods("", "player2", 3)
-
-        # Test empty to_player
-        with pytest.raises(ValueError, match="To player ID cannot be empty"):
-            resource_manager.transfer_trade_goods("player1", "   ", 3)
-
-        # Test same player
-        with pytest.raises(ValueError, match="Cannot transfer to the same player"):
-            resource_manager.transfer_trade_goods("player1", "player1", 3)
-
-        # Test negative amount
-        with pytest.raises(ValueError, match="Amount cannot be negative"):
-            resource_manager.transfer_trade_goods("player1", "player2", -1)
-
-    def test_transfer_trade_goods_zero_amount_noop(self) -> None:
-        """Test that zero amount trade goods transfer is a no-op.
-
-        Requirements: 4.1, 4.4
-        """
-        from ti4.core.deals import ResourceManager
-
-        mock_game_state = Mock()
-        mock_player1 = Mock()
-        mock_player1.id = "player1"
-        mock_player2 = Mock()
-        mock_player2.id = "player2"
-        mock_game_state.players = [mock_player1, mock_player2]
-
-        resource_manager = ResourceManager(game_state=mock_game_state)
-
-        # Should not raise an exception and should not call any player methods
-        resource_manager.transfer_trade_goods("player1", "player2", 0)
-
-        # Verify no player methods were called (no-op behavior)
-        mock_player1.spend_trade_goods.assert_not_called()
-        mock_player2.gain_trade_goods.assert_not_called()
-
-
-class TestCommodityTransfer:
-    """Test commodity transfer and conversion between players."""
-
-    def test_transfer_commodities_success(self) -> None:
-        """Test successful commodity transfer with conversion to trade goods.
-
-        Requirements: 3.4, 3.5
-        """
-        from ti4.core.deals import ResourceManager
-
-        mock_game_state = Mock()
-        mock_player1 = Mock()
-        mock_player1.id = "player1"
-        mock_player1.get_commodities.return_value = 4
-
-        mock_player2 = Mock()
-        mock_player2.id = "player2"
-
-        mock_game_state.players = [mock_player1, mock_player2]
-
-        resource_manager = ResourceManager(game_state=mock_game_state)
-        resource_manager.transfer_commodities("player1", "player2", 2)
-
-        # Player1 should give commodities to player2 (which converts to trade goods)
-        mock_player1.give_commodities_to_player.assert_called_once_with(mock_player2, 2)
-
-    def test_transfer_commodities_insufficient_commodities(self) -> None:
-        """Test commodity transfer with insufficient commodities.
-
-        Requirements: 3.4, 3.5
-        """
-        from ti4.core.deals import ResourceManager
-
-        mock_game_state = Mock()
-        mock_player1 = Mock()
-        mock_player1.id = "player1"
-        mock_player1.get_commodities.return_value = 1
-        mock_player1.give_commodities_to_player.side_effect = ValueError(
-            "Player only has 1 commodities, cannot give 3"
+from src.ti4.core.constants import Faction
+from src.ti4.core.game_state import GameState
+from src.ti4.core.planet import Planet
+from src.ti4.core.player import Player
+from src.ti4.core.resource_management import (
+    InfluenceSources,
+    ResourceSources,
+    SpendingPlan,
+)
+
+
+class TestResourceManagerCalculations:
+    """Test ResourceManager resource and influence calculations."""
+
+    def test_calculate_available_resources_with_planets_and_trade_goods(self) -> None:
+        """Test calculating available resources from controlled planets and trade goods."""
+        # This test should fail initially - ResourceManager doesn't exist yet
+        from src.ti4.core.resource_management import ResourceManager
+
+        # Create game state with player and planets
+        game_state = GameState()
+        player = Player(id="player1", faction=Faction.SOL)
+
+        # Create planets with different resource values
+        jord = Planet("Jord", resources=4, influence=2)
+        muaat = Planet("Muaat", resources=2, influence=1)
+
+        # Set up game state
+        game_state = game_state.add_player(player)
+        game_state = game_state.add_player_planet(player.id, jord)
+        game_state = game_state.add_player_planet(player.id, muaat)
+
+        # Give player some trade goods
+        player.gain_trade_goods(3)
+
+        # Create ResourceManager and test calculation
+        resource_manager = ResourceManager(game_state)
+        available_resources = resource_manager.calculate_available_resources(player.id)
+
+        # Should be 4 (Jord) + 2 (Muaat) + 3 (trade goods) = 9
+        assert available_resources == 9
+
+    def test_calculate_available_resources_excludes_exhausted_planets(self) -> None:
+        """Test that exhausted planets don't contribute to available resources."""
+        from src.ti4.core.resource_management import ResourceManager
+
+        # Create game state with player and planets
+        game_state = GameState()
+        player = Player(id="player1", faction=Faction.SOL)
+
+        # Create planets
+        jord = Planet("Jord", resources=4, influence=2)
+        muaat = Planet("Muaat", resources=2, influence=1)
+
+        # Exhaust one planet
+        jord.exhaust()
+
+        # Set up game state
+        game_state = game_state.add_player(player)
+        game_state = game_state.add_player_planet(player.id, jord)
+        game_state = game_state.add_player_planet(player.id, muaat)
+
+        # Give player some trade goods
+        player.gain_trade_goods(1)
+
+        # Create ResourceManager and test calculation
+        resource_manager = ResourceManager(game_state)
+        available_resources = resource_manager.calculate_available_resources(player.id)
+
+        # Should be 0 (Jord exhausted) + 2 (Muaat) + 1 (trade goods) = 3
+        assert available_resources == 3
+
+    def test_calculate_available_influence_normal_mode(self) -> None:
+        """Test calculating available influence in normal mode (trade goods allowed)."""
+        from src.ti4.core.resource_management import ResourceManager
+
+        # Create game state with player and planets
+        game_state = GameState()
+        player = Player(id="player1", faction=Faction.SOL)
+
+        # Create planets with different influence values
+        mecatol = Planet("Mecatol Rex", resources=1, influence=6)
+        jord = Planet("Jord", resources=4, influence=2)
+
+        # Set up game state
+        game_state = game_state.add_player(player)
+        game_state = game_state.add_player_planet(player.id, mecatol)
+        game_state = game_state.add_player_planet(player.id, jord)
+
+        # Give player some trade goods
+        player.gain_trade_goods(2)
+
+        # Create ResourceManager and test calculation
+        resource_manager = ResourceManager(game_state)
+        available_influence = resource_manager.calculate_available_influence(
+            player.id, for_voting=False
         )
 
-        mock_player2 = Mock()
-        mock_player2.id = "player2"
+        # Should be 6 (Mecatol) + 2 (Jord) + 2 (trade goods) = 10
+        assert available_influence == 10
 
-        mock_game_state.players = [mock_player1, mock_player2]
+    def test_calculate_available_influence_voting_mode_excludes_trade_goods(
+        self,
+    ) -> None:
+        """Test that trade goods are excluded when calculating influence for voting (Rule 47.3)."""
+        from src.ti4.core.resource_management import ResourceManager
 
-        resource_manager = ResourceManager(game_state=mock_game_state)
+        # Create game state with player and planets
+        game_state = GameState()
+        player = Player(id="player1", faction=Faction.SOL)
 
-        with pytest.raises(ValueError, match="Insufficient commodities"):
-            resource_manager.transfer_commodities("player1", "player2", 3)
+        # Create planets with different influence values
+        mecatol = Planet("Mecatol Rex", resources=1, influence=6)
+        jord = Planet("Jord", resources=4, influence=2)
 
-    def test_transfer_commodities_validation(self) -> None:
-        """Test commodity transfer input validation.
+        # Set up game state
+        game_state = game_state.add_player(player)
+        game_state = game_state.add_player_planet(player.id, mecatol)
+        game_state = game_state.add_player_planet(player.id, jord)
 
-        Requirements: 3.4, 3.5
-        """
-        from ti4.core.deals import ResourceManager
+        # Give player some trade goods
+        player.gain_trade_goods(5)
 
-        mock_game_state = Mock()
-        resource_manager = ResourceManager(game_state=mock_game_state)
-
-        # Test empty from_player
-        with pytest.raises(ValueError, match="From player ID cannot be empty"):
-            resource_manager.transfer_commodities("", "player2", 2)
-
-        # Test empty to_player
-        with pytest.raises(ValueError, match="To player ID cannot be empty"):
-            resource_manager.transfer_commodities("player1", "   ", 2)
-
-        # Test same player
-        with pytest.raises(ValueError, match="Cannot transfer to the same player"):
-            resource_manager.transfer_commodities("player1", "player1", 2)
-
-        # Test negative amount
-        with pytest.raises(ValueError, match="Amount cannot be negative"):
-            resource_manager.transfer_commodities("player1", "player2", -1)
-
-    def test_transfer_commodities_zero_amount_noop(self) -> None:
-        """Test that zero amount commodity transfer is a no-op.
-
-        Requirements: 4.2, 4.4
-        """
-        from ti4.core.deals import ResourceManager
-
-        mock_game_state = Mock()
-        mock_player1 = Mock()
-        mock_player1.id = "player1"
-        mock_player2 = Mock()
-        mock_player2.id = "player2"
-        mock_game_state.players = [mock_player1, mock_player2]
-
-        resource_manager = ResourceManager(game_state=mock_game_state)
-
-        # Should not raise an exception and should not call any player methods
-        resource_manager.transfer_commodities("player1", "player2", 0)
-
-        # Verify no player methods were called (no-op behavior)
-        mock_player1.give_commodities_to_player.assert_not_called()
-
-
-class TestPromissoryNoteTransfer:
-    """Test promissory note transfer between players."""
-
-    def test_transfer_promissory_note_success(self) -> None:
-        """Test successful promissory note transfer.
-
-        Requirements: 3.2
-        """
-        from ti4.core.deals import ResourceManager
-
-        mock_game_state = Mock()
-        mock_promissory_manager = Mock()
-        mock_game_state.promissory_note_manager = mock_promissory_manager
-
-        test_note = PromissoryNote(
-            note_type=PromissoryNoteType.TRADE_AGREEMENT, issuing_player="player2"
+        # Create ResourceManager and test calculation
+        resource_manager = ResourceManager(game_state)
+        available_influence = resource_manager.calculate_available_influence(
+            player.id, for_voting=True
         )
 
-        # Mock the player hand to contain the test note
-        mock_player_hand = [test_note]
-        mock_promissory_manager.get_player_hand.return_value = mock_player_hand
+        # Should be 6 (Mecatol) + 2 (Jord) + 0 (no trade goods for voting) = 8
+        assert available_influence == 8
 
-        resource_manager = ResourceManager(game_state=mock_game_state)
-        resource_manager.transfer_promissory_note("player1", "player2", test_note)
 
-        # Verify the note was checked in player1's hand
-        mock_promissory_manager.get_player_hand.assert_called_once_with("player1")
-        # Verify the note was added to player2's hand
-        mock_promissory_manager.add_note_to_hand.assert_called_once_with(
-            test_note, "player2"
+class TestResourceManagerDetailedBreakdowns:
+    """Test ResourceManager detailed source breakdown methods."""
+
+    def test_get_resource_sources_breakdown(self) -> None:
+        """Test getting detailed breakdown of resource sources."""
+        from src.ti4.core.resource_management import ResourceManager
+
+        # Create game state with player and planets
+        game_state = GameState()
+        player = Player(id="player1", faction=Faction.SOL)
+
+        # Create planets
+        jord = Planet("Jord", resources=4, influence=2)
+        muaat = Planet("Muaat", resources=2, influence=1)
+        exhausted_planet = Planet("Exhausted", resources=3, influence=1)
+        exhausted_planet.exhaust()
+
+        # Set up game state
+        game_state = game_state.add_player(player)
+        game_state = game_state.add_player_planet(player.id, jord)
+        game_state = game_state.add_player_planet(player.id, muaat)
+        game_state = game_state.add_player_planet(player.id, exhausted_planet)
+
+        # Give player some trade goods
+        player.gain_trade_goods(3)
+
+        # Create ResourceManager and test breakdown
+        resource_manager = ResourceManager(game_state)
+        sources = resource_manager.get_resource_sources(player.id)
+
+        # Check the breakdown
+        assert isinstance(sources, ResourceSources)
+        assert sources.planets == {"Jord": 4, "Muaat": 2}  # Exhausted planet excluded
+        assert sources.trade_goods == 3
+        assert sources.total_available == 9
+        assert set(sources.get_planet_names()) == {"Jord", "Muaat"}
+
+    def test_get_influence_sources_breakdown_normal_mode(self) -> None:
+        """Test getting detailed breakdown of influence sources in normal mode."""
+        from src.ti4.core.resource_management import ResourceManager
+
+        # Create game state with player and planets
+        game_state = GameState()
+        player = Player(id="player1", faction=Faction.SOL)
+
+        # Create planets
+        mecatol = Planet("Mecatol Rex", resources=1, influence=6)
+        jord = Planet("Jord", resources=4, influence=2)
+
+        # Set up game state
+        game_state = game_state.add_player(player)
+        game_state = game_state.add_player_planet(player.id, mecatol)
+        game_state = game_state.add_player_planet(player.id, jord)
+
+        # Give player some trade goods
+        player.gain_trade_goods(2)
+
+        # Create ResourceManager and test breakdown
+        resource_manager = ResourceManager(game_state)
+        sources = resource_manager.get_influence_sources(player.id, for_voting=False)
+
+        # Check the breakdown
+        assert isinstance(sources, InfluenceSources)
+        assert sources.planets == {"Mecatol Rex": 6, "Jord": 2}
+        assert sources.trade_goods == 2
+        assert sources.total_available == 10
+        assert sources.for_voting is False
+        assert set(sources.get_planet_names()) == {"Mecatol Rex", "Jord"}
+
+    def test_get_influence_sources_breakdown_voting_mode(self) -> None:
+        """Test getting detailed breakdown of influence sources in voting mode."""
+        from src.ti4.core.resource_management import ResourceManager
+
+        # Create game state with player and planets
+        game_state = GameState()
+        player = Player(id="player1", faction=Faction.SOL)
+
+        # Create planets
+        mecatol = Planet("Mecatol Rex", resources=1, influence=6)
+        jord = Planet("Jord", resources=4, influence=2)
+
+        # Set up game state
+        game_state = game_state.add_player(player)
+        game_state = game_state.add_player_planet(player.id, mecatol)
+        game_state = game_state.add_player_planet(player.id, jord)
+
+        # Give player some trade goods
+        player.gain_trade_goods(5)
+
+        # Create ResourceManager and test breakdown
+        resource_manager = ResourceManager(game_state)
+        sources = resource_manager.get_influence_sources(player.id, for_voting=True)
+
+        # Check the breakdown
+        assert isinstance(sources, InfluenceSources)
+        assert sources.planets == {"Mecatol Rex": 6, "Jord": 2}
+        assert sources.trade_goods == 0  # No trade goods for voting
+        assert sources.total_available == 8
+        assert sources.for_voting is True
+
+
+class TestResourceManagerSpendingPlans:
+    """Test ResourceManager spending plan creation and validation."""
+
+    def test_create_spending_plan_resources_only(self) -> None:
+        """Test creating a spending plan for resources only."""
+        from src.ti4.core.resource_management import ResourceManager
+
+        # Create game state with player and planets
+        game_state = GameState()
+        player = Player(id="player1", faction=Faction.SOL)
+
+        # Create planets
+        jord = Planet("Jord", resources=4, influence=2)
+        muaat = Planet("Muaat", resources=2, influence=1)
+
+        # Set up game state
+        game_state = game_state.add_player(player)
+        game_state = game_state.add_player_planet(player.id, jord)
+        game_state = game_state.add_player_planet(player.id, muaat)
+
+        # Give player some trade goods
+        player.gain_trade_goods(1)
+
+        # Create ResourceManager and test spending plan
+        resource_manager = ResourceManager(game_state)
+        plan = resource_manager.create_spending_plan(player.id, resource_amount=5)
+
+        # Check the plan
+        assert isinstance(plan, SpendingPlan)
+        assert plan.player_id == "player1"
+        assert plan.total_resource_cost == 5
+        assert plan.total_influence_cost == 0
+        assert plan.is_valid is True
+        assert plan.error_message is None
+
+        # Check resource spending details
+        # Should use planets first - when you exhaust a planet, you get all its resources
+        # So we'll use both planets (4+2=6 resources) even though we only need 5
+        assert plan.resource_spending.total_resources >= 5
+        assert plan.resource_spending.planets_to_exhaust == {"Jord": 4, "Muaat": 2}
+        assert (
+            plan.resource_spending.trade_goods_to_spend == 0
+        )  # Don't need trade goods
+
+    def test_create_spending_plan_insufficient_resources(self) -> None:
+        """Test creating a spending plan when resources are insufficient."""
+        from src.ti4.core.resource_management import ResourceManager
+
+        # Create game state with player and planets
+        game_state = GameState()
+        player = Player(id="player1", faction=Faction.SOL)
+
+        # Create planet with limited resources
+        small_planet = Planet("Small", resources=1, influence=1)
+
+        # Set up game state
+        game_state = game_state.add_player(player)
+        game_state = game_state.add_player_planet(player.id, small_planet)
+
+        # No trade goods
+
+        # Create ResourceManager and test spending plan
+        resource_manager = ResourceManager(game_state)
+        plan = resource_manager.create_spending_plan(player.id, resource_amount=5)
+
+        # Check the plan
+        assert isinstance(plan, SpendingPlan)
+        assert plan.player_id == "player1"
+        assert plan.total_resource_cost == 5
+        assert plan.is_valid is False
+        assert plan.error_message is not None
+        assert "insufficient" in plan.error_message.lower()
+
+    def test_can_afford_spending_check(self) -> None:
+        """Test quick affordability check method."""
+        from src.ti4.core.resource_management import ResourceManager
+
+        # Create game state with player and planets
+        game_state = GameState()
+        player = Player(id="player1", faction=Faction.SOL)
+
+        # Create planets
+        jord = Planet("Jord", resources=4, influence=2)
+
+        # Set up game state
+        game_state = game_state.add_player(player)
+        game_state = game_state.add_player_planet(player.id, jord)
+
+        # Give player some trade goods
+        player.gain_trade_goods(2)
+
+        # Create ResourceManager and test affordability
+        resource_manager = ResourceManager(game_state)
+
+        # Should be able to afford 6 resources (4 + 2)
+        assert (
+            resource_manager.can_afford_spending(player.id, resource_amount=6) is True
         )
 
-    def test_transfer_promissory_note_validation(self) -> None:
-        """Test promissory note transfer input validation.
-
-        Requirements: 3.2
-        """
-        from ti4.core.deals import ResourceManager
-
-        mock_game_state = Mock()
-        resource_manager = ResourceManager(game_state=mock_game_state)
-
-        test_note = PromissoryNote(
-            note_type=PromissoryNoteType.TRADE_AGREEMENT, issuing_player="player2"
+        # Should not be able to afford 7 resources
+        assert (
+            resource_manager.can_afford_spending(player.id, resource_amount=7) is False
         )
 
-        # Test empty from_player
-        with pytest.raises(ValueError, match="From player ID cannot be empty"):
-            resource_manager.transfer_promissory_note("", "player2", test_note)
-
-        # Test empty to_player
-        with pytest.raises(ValueError, match="To player ID cannot be empty"):
-            resource_manager.transfer_promissory_note("player1", "   ", test_note)
-
-        # Test same player
-        with pytest.raises(ValueError, match="Cannot transfer to the same player"):
-            resource_manager.transfer_promissory_note("player1", "player1", test_note)
-
-        # Test None note
-        with pytest.raises(ValueError, match="Promissory note cannot be None"):
-            resource_manager.transfer_promissory_note("player1", "player2", None)
-
-    def test_transfer_promissory_note_not_owned(self) -> None:
-        """Test promissory note transfer when player doesn't own the note.
-
-        Requirements: 3.2
-        """
-        from ti4.core.deals import ResourceManager
-
-        mock_game_state = Mock()
-        mock_promissory_manager = Mock()
-        mock_game_state.promissory_note_manager = mock_promissory_manager
-
-        test_note = PromissoryNote(
-            note_type=PromissoryNoteType.TRADE_AGREEMENT, issuing_player="player2"
+        # Should be able to afford 2 influence (from Jord)
+        assert (
+            resource_manager.can_afford_spending(player.id, influence_amount=2) is True
         )
 
-        # Mock the player hand to NOT contain the test note
-        mock_promissory_manager.get_player_hand.return_value = []
+        # Should be able to afford 4 influence in normal mode (2 + 2 trade goods)
+        assert (
+            resource_manager.can_afford_spending(
+                player.id, influence_amount=4, for_voting=False
+            )
+            is True
+        )
 
-        resource_manager = ResourceManager(game_state=mock_game_state)
+        # Should not be able to afford 4 influence in voting mode (no trade goods)
+        assert (
+            resource_manager.can_afford_spending(
+                player.id, influence_amount=4, for_voting=True
+            )
+            is False
+        )
 
-        with pytest.raises(
-            ValueError,
-            match="Player player1 does not own the specified promissory note",
-        ):
-            resource_manager.transfer_promissory_note("player1", "player2", test_note)
+
+class TestResourceManagerEdgeCases:
+    """Test ResourceManager edge cases and error conditions."""
+
+    def test_player_with_no_planets(self) -> None:
+        """Test resource calculations for player with no controlled planets."""
+        from src.ti4.core.resource_management import ResourceManager
+
+        # Create game state with player but no planets
+        game_state = GameState()
+        player = Player(id="player1", faction=Faction.SOL)
+
+        # Set up game state
+        game_state = game_state.add_player(player)
+
+        # Give player some trade goods
+        player.gain_trade_goods(3)
+
+        # Create ResourceManager and test calculations
+        resource_manager = ResourceManager(game_state)
+
+        # Should only have trade goods
+        assert resource_manager.calculate_available_resources(player.id) == 3
+        assert (
+            resource_manager.calculate_available_influence(player.id, for_voting=False)
+            == 3
+        )
+        assert (
+            resource_manager.calculate_available_influence(player.id, for_voting=True)
+            == 0
+        )
+
+        # Check sources
+        resource_sources = resource_manager.get_resource_sources(player.id)
+        assert resource_sources.planets == {}
+        assert resource_sources.trade_goods == 3
+        assert resource_sources.total_available == 3
+
+    def test_player_with_no_trade_goods(self) -> None:
+        """Test resource calculations for player with no trade goods."""
+        from src.ti4.core.resource_management import ResourceManager
+
+        # Create game state with player and planets
+        game_state = GameState()
+        player = Player(id="player1", faction=Faction.SOL)
+
+        # Create planets
+        jord = Planet("Jord", resources=4, influence=2)
+
+        # Set up game state
+        game_state = game_state.add_player(player)
+        game_state = game_state.add_player_planet(player.id, jord)
+
+        # No trade goods
+
+        # Create ResourceManager and test calculations
+        resource_manager = ResourceManager(game_state)
+
+        # Should only have planet resources/influence
+        assert resource_manager.calculate_available_resources(player.id) == 4
+        assert (
+            resource_manager.calculate_available_influence(player.id, for_voting=False)
+            == 2
+        )
+        assert (
+            resource_manager.calculate_available_influence(player.id, for_voting=True)
+            == 2
+        )
+
+        # Check sources
+        resource_sources = resource_manager.get_resource_sources(player.id)
+        assert resource_sources.planets == {"Jord": 4}
+        assert resource_sources.trade_goods == 0
+        assert resource_sources.total_available == 4
+
+    def test_nonexistent_player(self) -> None:
+        """Test resource calculations for nonexistent player."""
+        import pytest
+
+        from src.ti4.core.resource_management import (
+            ResourceManager,
+            ResourceOperationError,
+        )
+
+        # Create empty game state
+        game_state = GameState()
+
+        # Create ResourceManager and test calculations
+        resource_manager = ResourceManager(game_state)
+
+        # Should raise ResourceOperationError for all calculations
+        with pytest.raises(ResourceOperationError):
+            resource_manager.calculate_available_resources("nonexistent")
+
+        with pytest.raises(ResourceOperationError):
+            resource_manager.calculate_available_influence(
+                "nonexistent", for_voting=False
+            )
+
+        with pytest.raises(ResourceOperationError):
+            resource_manager.calculate_available_influence(
+                "nonexistent", for_voting=True
+            )
+
+        # Should raise ResourceOperationError for source queries
+        with pytest.raises(ResourceOperationError):
+            resource_manager.get_resource_sources("nonexistent")
+
+        with pytest.raises(ResourceOperationError):
+            resource_manager.get_influence_sources("nonexistent")
+
+        # Should raise ResourceOperationError for affordability checks
+        with pytest.raises(ResourceOperationError):
+            resource_manager.can_afford_spending("nonexistent", resource_amount=1)
+
+        with pytest.raises(ResourceOperationError):
+            resource_manager.can_afford_spending("nonexistent", influence_amount=1)
 
 
-class TestResourceManagerHelperMethods:
-    """Test ResourceManager helper methods."""
+class TestSpendingPlanAdvancedScenarios:
+    """Test advanced spending plan scenarios and edge cases."""
 
-    def test_find_player_success(self) -> None:
-        """Test finding a player by ID.
+    def test_create_spending_plan_influence_only(self) -> None:
+        """Test creating a spending plan for influence only."""
+        from src.ti4.core.resource_management import ResourceManager
 
-        Requirements: 3.1
-        """
-        from ti4.core.deals import ResourceManager
+        # Create game state with player and planets
+        game_state = GameState()
+        player = Player(id="player1", faction=Faction.SOL)
 
-        mock_game_state = Mock()
-        mock_player1 = Mock()
-        mock_player1.id = "player1"
-        mock_player2 = Mock()
-        mock_player2.id = "player2"
-        mock_game_state.players = [mock_player1, mock_player2]
+        # Create planets with high influence
+        mecatol = Planet("Mecatol Rex", resources=1, influence=6)
+        jord = Planet("Jord", resources=4, influence=2)
 
-        resource_manager = ResourceManager(game_state=mock_game_state)
-        found_player = resource_manager._find_player("player2")
+        # Set up game state
+        game_state = game_state.add_player(player)
+        game_state = game_state.add_player_planet(player.id, mecatol)
+        game_state = game_state.add_player_planet(player.id, jord)
 
-        assert found_player is mock_player2
+        # Give player some trade goods
+        player.gain_trade_goods(2)
 
-    def test_find_player_not_found(self) -> None:
-        """Test finding a non-existent player.
+        # Create ResourceManager and test spending plan
+        resource_manager = ResourceManager(game_state)
+        plan = resource_manager.create_spending_plan(player.id, influence_amount=7)
 
-        Requirements: 3.1
-        """
-        from ti4.core.deals import ResourceManager
+        # Check the plan
+        assert isinstance(plan, SpendingPlan)
+        assert plan.player_id == "player1"
+        assert plan.total_resource_cost == 0
+        assert plan.total_influence_cost == 7
+        assert plan.is_valid is True
+        assert plan.error_message is None
 
-        mock_game_state = Mock()
-        mock_player1 = Mock()
-        mock_player1.id = "player1"
-        mock_game_state.players = [mock_player1]
+        # Check influence spending details
+        # Should use planets first - when you exhaust a planet, you get all its influence
+        # So we'll use both planets (6+2=8 influence) even though we only need 7
+        assert plan.influence_spending.total_influence >= 7
+        assert plan.influence_spending.planets_to_exhaust == {
+            "Mecatol Rex": 6,
+            "Jord": 2,
+        }
+        assert (
+            plan.influence_spending.trade_goods_to_spend == 0
+        )  # Don't need trade goods
 
-        resource_manager = ResourceManager(game_state=mock_game_state)
-        found_player = resource_manager._find_player("player_nonexistent")
+    def test_create_spending_plan_both_resources_and_influence(self) -> None:
+        """Test creating a spending plan for both resources and influence."""
+        from src.ti4.core.resource_management import ResourceManager
 
-        assert found_player is None
+        # Create game state with player and planets
+        game_state = GameState()
+        player = Player(id="player1", faction=Faction.SOL)
 
-    def test_validate_transfer_inputs(self) -> None:
-        """Test input validation for transfer operations.
+        # Create planets with balanced resources/influence
+        balanced_planet = Planet("Balanced", resources=3, influence=3)
+        resource_planet = Planet("Resource Rich", resources=5, influence=1)
+        influence_planet = Planet("Influence Rich", resources=1, influence=5)
 
-        Requirements: 3.2, 3.3, 3.4, 3.5
-        """
-        from ti4.core.deals import ResourceManager
+        # Set up game state
+        game_state = game_state.add_player(player)
+        game_state = game_state.add_player_planet(player.id, balanced_planet)
+        game_state = game_state.add_player_planet(player.id, resource_planet)
+        game_state = game_state.add_player_planet(player.id, influence_planet)
 
-        mock_game_state = Mock()
-        resource_manager = ResourceManager(game_state=mock_game_state)
+        # Give player some trade goods
+        player.gain_trade_goods(2)
 
-        # Test valid inputs
-        resource_manager._validate_transfer_inputs("player1", "player2", 5)
+        # Create ResourceManager and test spending plan
+        resource_manager = ResourceManager(game_state)
+        plan = resource_manager.create_spending_plan(
+            player.id, resource_amount=4, influence_amount=4
+        )
 
-        # Test empty from_player
-        with pytest.raises(ValueError, match="From player ID cannot be empty"):
-            resource_manager._validate_transfer_inputs("", "player2", 5)
+        # Check the plan
+        assert isinstance(plan, SpendingPlan)
+        assert plan.player_id == "player1"
+        assert plan.total_resource_cost == 4
+        assert plan.total_influence_cost == 4
+        assert plan.is_valid is True
+        assert plan.error_message is None
 
-        # Test empty to_player
-        with pytest.raises(ValueError, match="To player ID cannot be empty"):
-            resource_manager._validate_transfer_inputs("player1", "   ", 5)
+        # Should have sufficient resources and influence
+        assert plan.resource_spending.total_resources >= 4
+        assert plan.influence_spending.total_influence >= 4
 
-        # Test same player
-        with pytest.raises(ValueError, match="Cannot transfer to the same player"):
-            resource_manager._validate_transfer_inputs("player1", "player1", 5)
+    def test_create_spending_plan_voting_mode_excludes_trade_goods(self) -> None:
+        """Test that voting mode spending plans exclude trade goods from influence."""
+        from src.ti4.core.resource_management import ResourceManager
 
-        # Test negative amount
-        with pytest.raises(ValueError, match="Amount cannot be negative"):
-            resource_manager._validate_transfer_inputs("player1", "player2", -1)
+        # Create game state with player and planets
+        game_state = GameState()
+        player = Player(id="player1", faction=Faction.SOL)
 
-        # Test zero amount - should now be allowed
-        resource_manager._validate_transfer_inputs("player1", "player2", 0)
+        # Create planet with limited influence
+        small_planet = Planet("Small", resources=2, influence=3)
+
+        # Set up game state
+        game_state = game_state.add_player(player)
+        game_state = game_state.add_player_planet(player.id, small_planet)
+
+        # Give player lots of trade goods
+        player.gain_trade_goods(10)
+
+        # Create ResourceManager and test spending plan for voting
+        resource_manager = ResourceManager(game_state)
+        plan = resource_manager.create_spending_plan(
+            player.id, influence_amount=5, for_voting=True
+        )
+
+        # Check the plan - should fail because trade goods can't be used for voting
+        assert isinstance(plan, SpendingPlan)
+        assert plan.player_id == "player1"
+        assert plan.total_influence_cost == 5
+        assert plan.is_valid is False  # Can't afford 5 influence without trade goods
+        assert plan.error_message is not None
+        assert "insufficient" in plan.error_message.lower()
+
+        # Check that trade goods weren't used
+        assert plan.influence_spending.trade_goods_to_spend == 0
+
+    def test_create_spending_plan_with_trade_goods_only(self) -> None:
+        """Test creating a spending plan using only trade goods."""
+        from src.ti4.core.resource_management import ResourceManager
+
+        # Create game state with player but no planets
+        game_state = GameState()
+        player = Player(id="player1", faction=Faction.SOL)
+
+        # Set up game state
+        game_state = game_state.add_player(player)
+
+        # Give player trade goods
+        player.gain_trade_goods(5)
+
+        # Create ResourceManager and test spending plan
+        resource_manager = ResourceManager(game_state)
+        plan = resource_manager.create_spending_plan(
+            player.id, resource_amount=3, influence_amount=2
+        )
+
+        # Check the plan
+        assert isinstance(plan, SpendingPlan)
+        assert plan.player_id == "player1"
+        assert plan.total_resource_cost == 3
+        assert plan.total_influence_cost == 2
+        assert plan.is_valid is True
+        assert plan.error_message is None
+
+        # Should use trade goods for both
+        assert plan.resource_spending.trade_goods_to_spend == 3
+        assert plan.influence_spending.trade_goods_to_spend == 2
+        assert plan.resource_spending.planets_to_exhaust == {}
+        assert plan.influence_spending.planets_to_exhaust == {}
+
+    def test_spending_plan_helper_methods(self) -> None:
+        """Test SpendingPlan helper methods."""
+        from src.ti4.core.resource_management import ResourceManager
+
+        # Create game state with player and planets
+        game_state = GameState()
+        player = Player(id="player1", faction=Faction.SOL)
+
+        # Create planets
+        planet1 = Planet("Planet1", resources=3, influence=2)
+        planet2 = Planet("Planet2", resources=2, influence=4)
+
+        # Set up game state
+        game_state = game_state.add_player(player)
+        game_state = game_state.add_player_planet(player.id, planet1)
+        game_state = game_state.add_player_planet(player.id, planet2)
+
+        # Give player trade goods
+        player.gain_trade_goods(3)
+
+        # Create ResourceManager and test spending plan
+        resource_manager = ResourceManager(game_state)
+        plan = resource_manager.create_spending_plan(
+            player.id, resource_amount=4, influence_amount=3
+        )
+
+        # Test helper methods
+        planets_to_exhaust = plan.get_total_planets_to_exhaust()
+        trade_goods_to_spend = plan.get_total_trade_goods_to_spend()
+
+        # Should have some planets to exhaust
+        assert len(planets_to_exhaust) > 0
+        assert isinstance(planets_to_exhaust, set)
+
+        # Should have some trade goods to spend (or 0)
+        assert isinstance(trade_goods_to_spend, int)
+        assert trade_goods_to_spend >= 0
+
+    def test_zero_amount_spending_plan(self) -> None:
+        """Test creating a spending plan with zero amounts."""
+        from src.ti4.core.resource_management import ResourceManager
+
+        # Create game state with player and planets
+        game_state = GameState()
+        player = Player(id="player1", faction=Faction.SOL)
+
+        # Create planet
+        planet = Planet("Planet", resources=3, influence=2)
+
+        # Set up game state
+        game_state = game_state.add_player(player)
+        game_state = game_state.add_player_planet(player.id, planet)
+
+        # Create ResourceManager and test spending plan
+        resource_manager = ResourceManager(game_state)
+        plan = resource_manager.create_spending_plan(
+            player.id, resource_amount=0, influence_amount=0
+        )
+
+        # Check the plan
+        assert isinstance(plan, SpendingPlan)
+        assert plan.player_id == "player1"
+        assert plan.total_resource_cost == 0
+        assert plan.total_influence_cost == 0
+        assert plan.is_valid is True
+        assert plan.error_message is None
+
+        # Should not exhaust any planets or spend trade goods
+        assert plan.resource_spending.planets_to_exhaust == {}
+        assert plan.resource_spending.trade_goods_to_spend == 0
+        assert plan.influence_spending.planets_to_exhaust == {}
+        assert plan.influence_spending.trade_goods_to_spend == 0
+        assert plan.get_total_planets_to_exhaust() == set()
+        assert plan.get_total_trade_goods_to_spend() == 0
