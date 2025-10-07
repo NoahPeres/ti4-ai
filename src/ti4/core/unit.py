@@ -6,6 +6,11 @@ from typing import Any, Optional
 from .constants import Faction, Technology, UnitType
 from .unit_stats import UnitStats, UnitStatsProvider
 
+# Unit categorization for game mechanics
+FIGHTER_TYPE_UNITS = {UnitType.FIGHTER, UnitType.FIGHTER_II}
+# Future expansion: Add faction-specific fighters here
+# FIGHTER_TYPE_UNITS.update({UnitType.FACTION_FIGHTER_VARIANT, ...})
+
 
 class Unit:
     """Represents a game unit with type and owner."""
@@ -93,6 +98,66 @@ class Unit:
     def has_anti_fighter_barrage(self) -> bool:
         """Check if this unit has anti-fighter barrage ability."""
         return self.get_stats().anti_fighter_barrage
+
+    def get_anti_fighter_barrage_value(self) -> int:
+        """Get the anti-fighter barrage value of this unit."""
+        stats = self.get_stats()
+        if not stats.anti_fighter_barrage or stats.anti_fighter_barrage_value is None:
+            raise AttributeError(
+                f"Unit {self.unit_type} does not have anti-fighter barrage ability"
+            )
+        return stats.anti_fighter_barrage_value
+
+    def get_anti_fighter_barrage_dice_count(self) -> int:
+        """Get the number of anti-fighter barrage dice this unit rolls."""
+        stats = self.get_stats()
+        if not stats.anti_fighter_barrage:
+            raise AttributeError(
+                f"Unit {self.unit_type} does not have anti-fighter barrage ability"
+            )
+        # Default to 1 die if present but dice count is 0; raise on negative for consistency with Combat
+        if stats.anti_fighter_barrage_dice < 0:
+            raise ValueError("AFB dice count cannot be negative")
+        return stats.anti_fighter_barrage_dice or 1
+
+    def validate_anti_fighter_barrage_context(self, context: str) -> bool:
+        """Validate that AFB is being used in the appropriate context."""
+        if not self.has_anti_fighter_barrage():
+            return False
+        # AFB can only be used in space combat
+        return isinstance(context, str) and context.strip().lower() == "space_combat"
+
+    def can_perform_anti_fighter_barrage(self, context: str) -> bool:
+        """Check if this unit can perform anti-fighter barrage in the given context."""
+        return (
+            self.has_anti_fighter_barrage()
+            and self.validate_anti_fighter_barrage_context(context)
+        )
+
+    def is_fighter_type(self) -> bool:
+        """Check if this unit is a fighter-type unit (including upgrades and faction variants)."""
+        return self.unit_type in FIGHTER_TYPE_UNITS
+
+    def is_valid_afb_target(self) -> bool:
+        """Check if this unit is a valid target for anti-fighter barrage."""
+        # AFB can only target fighter-type units (including upgraded variants and future faction-specific fighters)
+        return self.is_fighter_type()
+
+    @staticmethod
+    def filter_afb_targets(units: list["Unit"]) -> list["Unit"]:
+        """Filter a list of units to only include valid AFB targets (fighters)."""
+        return [unit for unit in units if unit.is_valid_afb_target()]
+
+    @staticmethod
+    def filter_enemy_afb_targets(
+        units: list["Unit"], attacking_player: str
+    ) -> list["Unit"]:
+        """Filter a list of units to only include enemy fighters that can be targeted by AFB."""
+        return [
+            unit
+            for unit in units
+            if unit.is_valid_afb_target() and unit.owner != attacking_player
+        ]
 
     def has_space_cannon(self) -> bool:
         """Check if this unit has space cannon ability."""
