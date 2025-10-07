@@ -60,6 +60,9 @@ class TestLeadershipResourceIntegrationSimple:
         mock_resource_manager.can_afford_spending.assert_called_once_with(
             "test_player", influence_amount=3, for_voting=False
         )
+        mock_resource_manager.calculate_available_influence.assert_called_once_with(
+            "test_player", for_voting=False
+        )
 
     def test_leadership_primary_executes_spending_plan_when_valid(self) -> None:
         """Test that Leadership primary ability executes spending plan when valid."""

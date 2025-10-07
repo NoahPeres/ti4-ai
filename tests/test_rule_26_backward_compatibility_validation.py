@@ -177,10 +177,6 @@ class TestRule26BackwardCompatibilityValidation:
         game_state = game_state.add_player_planet("test_player", planet1)
         game_state = game_state.add_player_planet("test_player", planet2)
 
-        # Give player some trade goods - need to create new player with trade goods
-        Player(id="test_player", faction=Faction.SOL)
-        # Note: Player is frozen, so we can't modify trade_goods directly
-
         # Create ResourceManager with existing game state
         resource_manager = ResourceManager(game_state)
 

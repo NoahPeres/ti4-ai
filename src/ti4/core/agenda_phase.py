@@ -14,9 +14,12 @@ Key Components:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import TYPE_CHECKING, Any, Callable
 
-from ti4.core.constants import AgendaType
+from .constants import AgendaType
+
+if TYPE_CHECKING:
+    from .resource_management import ResourceManager
 
 # Voting orchestration imports removed - will be re-implemented via TDD
 
@@ -490,7 +493,7 @@ class VotingSystem:
         )
 
     def calculate_available_influence_for_voting(
-        self, player_id: str, resource_manager: Any
+        self, player_id: str, resource_manager: ResourceManager
     ) -> int:
         """Calculate available influence for voting using ResourceManager.
 
@@ -517,7 +520,7 @@ class VotingSystem:
         player_id: str,
         influence_amount: int,
         outcome: str,
-        resource_manager: Any,
+        resource_manager: ResourceManager,
         agenda: AgendaCard | Any | None = None,
     ) -> VotingOutcome:
         """Cast votes using ResourceManager for influence spending.
@@ -616,8 +619,12 @@ class VotingSystem:
                 or "Failed to execute spending plan",
             )
 
-        # Record the vote using actual spent influence from the plan
-        actual_influence_spent = spending_plan.total_influence_cost
+        # Use actual plan influence (may exceed requested if exact match is impossible)
+        actual_influence_spent = getattr(
+            spending_plan.influence_spending,
+            "total_influence",
+            spending_plan.total_influence_cost,
+        )
         self.player_votes[player_id] = outcome
         self._vote_tally[outcome] = (
             self._vote_tally.get(outcome, 0) + actual_influence_spent
@@ -632,7 +639,7 @@ class VotingSystem:
         player_id: str,
         influence_amount: int,
         outcome: str,
-        resource_manager: Any,
+        resource_manager: ResourceManager,
         agenda: AgendaCard | Any | None = None,
     ) -> VotingOutcome:
         """Cast votes with influence spending (alias for cast_votes_with_resource_manager).
@@ -1050,8 +1057,8 @@ class AgendaPhase:
                     getattr(game_state, "law_manager", None) if game_state else None
                 )
                 if law_manager:
-                    from ti4.core.agenda_cards.base.agenda_card import BaseAgendaCard
-                    from ti4.core.agenda_cards.law_manager import ActiveLaw
+                    from .agenda_cards.base.agenda_card import BaseAgendaCard
+                    from .agenda_cards.law_manager import ActiveLaw
 
                     # Only create ActiveLaw for proper BaseAgendaCard instances
                     # Legacy AgendaCard dataclass instances are not supported
@@ -1111,11 +1118,11 @@ class AgendaPhase:
                     getattr(game_state, "law_manager", None) if game_state else None
                 )
                 if law_manager:
-                    from ti4.core.agenda_cards.base.agenda_card import BaseAgendaCard
+                    from .agenda_cards.base.agenda_card import BaseAgendaCard
 
                     try:
                         # Check if this is a LawCard that has create_active_law method
-                        from ti4.core.agenda_cards.base.law_card import LawCard
+                        from .agenda_cards.base.law_card import LawCard
 
                         if isinstance(agenda, LawCard) and hasattr(
                             agenda, "create_active_law"
@@ -1125,7 +1132,7 @@ class AgendaPhase:
                                 elected_target=elected_target,
                             )
                         else:
-                            from ti4.core.agenda_cards.law_manager import ActiveLaw
+                            from .agenda_cards.law_manager import ActiveLaw
 
                             # Only create ActiveLaw if agenda is a BaseAgendaCard
                             if isinstance(agenda, BaseAgendaCard):

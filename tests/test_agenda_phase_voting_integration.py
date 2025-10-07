@@ -140,7 +140,9 @@ class TestAgendaPhaseVotingIntegration:
 
         # Assert
         assert result.success
-        assert result.votes_cast == 8
+        assert (
+            result.votes_cast == 10
+        )  # Actual influence spent (both planets exhausted)
 
         # Verify planets are exhausted after voting
         assert planet1.is_exhausted()  # Should be exhausted
@@ -228,13 +230,15 @@ class TestAgendaPhaseVotingIntegration:
 
         # Assert
         assert result1.success
-        assert result1.votes_cast == 8
+        assert (
+            result1.votes_cast == 10
+        )  # Actual influence spent (both planets exhausted)
         assert result2.success
         assert result2.votes_cast == 1
 
         # Check vote tally
         tally = voting_system.get_vote_tally()
-        assert tally["For"] == 8
+        assert tally["For"] == 10  # Actual influence spent (both planets exhausted)
         assert tally["Against"] == 1
 
         # Verify planets are exhausted correctly
