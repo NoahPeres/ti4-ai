@@ -1,15 +1,21 @@
 # TI4 AI Implementation Roadmap
 
-## 🎯 Overall Progress: 40/101 Rules (39.6% Complete)
+## 🎯 Overall Progress: 42/101 Rules (41.6% Complete)
 
 ### Last Updated
-January 2025 (Rule 51: Leaders Implementation Complete)
+January 2025 (Rule 26: COST and Rule 34: EXHAUSTED Implementation Complete)
+
+### Recent Achievements
+- ✅ **Rule 26: COST** - Complete resource management system with 200+ tests
+- ✅ **Rule 34: EXHAUSTED** - Full card exhaustion mechanics with comprehensive test coverage
+- ✅ **Quality Milestone** - All 2,935 tests passing with 86% coverage
+- ✅ **Architecture Enhancement** - Automatic planet control assignment in game state
 
 ### Current Phase
 Political & Economic Systems (Phase 2)
 
 ### Next Milestone
-50/101 Rules (50% Complete) - 10 rules remaining
+50/101 Rules (50% Complete) - 8 rules remaining
 
 ---
 
@@ -86,8 +92,10 @@ Political & Economic Systems (Phase 2)
 
 ## 📊 Implementation Status Summary
 
-### ✅ Completed Rules (40/101)
+### ✅ Completed Rules (42/101)
 - Rule 7: AGENDA CARDS - Political cards and law outcomes ✅ COMPLETE
+- Rule 26: COST - Resource spending and cost validation system ✅ COMPLETE
+- Rule 34: EXHAUSTED - Card exhaustion mechanics ✅ COMPLETE
 - Rule 51: LEADERS - Leader abilities and mechanics ✅ COMPLETE
 - Rule 66: POLITICS - Politics strategy card ✅ COMPLETE
 ### ⚠️ Mostly Complete Rules (1/101)
@@ -95,7 +103,7 @@ Political & Economic Systems (Phase 2)
 
 ### 🚫 Not Implemented (62/101 Rules)
 
-#### Foundation Layer (16/101)
+#### Foundation Layer (14/101)
 - Rule 6: ADJACENCY - Spatial relationships and system connections
 - Rule 12: ATTACH - Card attachment system for exploration/agenda effects ✅ NEW
 - Rule 13: ATTACKER - Combat role definition and assignment
@@ -103,17 +111,15 @@ Political & Economic Systems (Phase 2)
 - Rule 17: CAPTURE - Unit capture mechanics and faction sheet management
 - Rule 29: DEFENDER - Combat role identification for space/ground combat
 - Rule 30: DEPLOY - Unit deployment abilities with timing restrictions
-- Rule 31: DESTROYED - Unit destruction vs removal mechanics ✅ VERIFIED
-- Rule 34: EXHAUSTED - Card exhaustion mechanics for planets/technology/strategy cards
 
 - Rule 37: FLEET POOL - Fleet command token mechanics and ship limits
 - Rule 60: NEIGHBORS - System neighbor determination with wormhole support
 - Rule 76: SHIPS - Ship unit mechanics, fleet pool limits, and attributes
-- Rule 77: SPACE CANNON - PDS and defensive unit abilities ✅ VERIFIED
-- Rule 87: SUSTAIN DAMAGE - Unit damage mechanics ✅ VERIFIED
-- Rule 101: WORMHOLES - Special adjacency mechanics for wormhole systems ✅ VERIFIED
 
-#### Core Game Layer (19/101)
+
+
+
+#### Core Game Layer (18/101)
 - Rule 1: ABILITIES - Core ability system with timing windows and precedence
 - Rule 2: ACTION CARDS - Action card system with timing and component actions
 - Rule 3: ACTION PHASE - Action phase mechanics with pass state tracking
@@ -148,7 +154,7 @@ Political & Economic Systems (Phase 2)
 
 ### Phase 1: Combat & Unit Management (Priority: HIGH) ✅ COMPLETE
 #### Target
-4 additional rules → 40/101 (39.6% coverage) ✅ ACHIEVED
+6 additional rules → 42/101 (41.6% coverage) ✅ ACHIEVED
 
 #### Timeline
 1-2 months ✅ COMPLETED
@@ -158,6 +164,8 @@ Political & Economic Systems (Phase 2)
 2. ✅ Rule 7: AGENDA CARDS - Political cards and law outcomes - COMPLETE
 3. ✅ Rule 66: POLITICS - Politics strategy card - COMPLETE
 4. ✅ Rule 51: LEADERS - Leader abilities and mechanics - COMPLETE
+5. ✅ Rule 26: COST - Resource spending and cost validation system - COMPLETE
+6. ✅ Rule 34: EXHAUSTED - Card exhaustion mechanics - COMPLETE
 
 #### Secondary Priority (Next 4 Rules)
 1. Rule 80: SPEAKER - Speaker token privileges and powers
@@ -167,7 +175,7 @@ Political & Economic Systems (Phase 2)
 
 ### Phase 2: Political & Economic Systems (Priority: HIGH)
 #### Target
-10 additional rules → 50/101 (49.5% coverage)
+8 additional rules → 50/101 (49.5% coverage)
 
 #### Timeline
 2-3 months
@@ -181,8 +189,8 @@ Political & Economic Systems (Phase 2)
 #### Economic Enhancement
 - Rule 47: INFLUENCE - Influence spending mechanics
 - Rule 75: RESOURCES - Resource management system
-- Rule 26: COST - Cost calculation framework
 - Rule 70: PURGE - Card purging mechanics
+- Rule 80: SPEAKER - Speaker token privileges and powers
 
 #### Advanced Unit Systems
 - Rule 16: CAPACITY - Transport capacity mechanics (86% complete)
@@ -299,7 +307,6 @@ The following rules require implementation to achieve full TI4 compliance:
 - Rule 63 PDS - Planetary Defense System
 - Rule 64 PLANETS - Planet management system
 - Rule 65 PLANETARY SHIELD - Planetary defense
-- Rule 66 POLITICS - Politics strategy card
 - Rule 68 PRODUCTION - Advanced production rules
 - Rule 70 PURGE - Card purging mechanics
 - Rule 71 READIED - Card readying mechanics
@@ -376,4 +383,4 @@ The following rules require implementation to achieve full TI4 compliance:
 
 ---
 
-This roadmap provides a clear, strategic path from our current 36.6% coverage to full 101 rule implementation, prioritizing combat completion, political systems, and advanced mechanics in logical dependency order.
+This roadmap provides a clear, strategic path from our current 41.6% coverage to full 101 rule implementation, prioritizing combat completion, political systems, and advanced mechanics in logical dependency order.

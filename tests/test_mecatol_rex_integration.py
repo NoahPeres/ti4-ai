@@ -92,6 +92,9 @@ class TestMecatolRexIntegration:
         assert mecatol_rex.resources == 1
         assert mecatol_rex.influence == 6
 
+        # Set control to test spending capabilities
+        mecatol_rex.set_control("player1")
+
         # Verify it can be used for resource/influence spending
         assert mecatol_rex.can_spend_resources()
         assert mecatol_rex.can_spend_influence()

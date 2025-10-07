@@ -1525,6 +1525,13 @@ class GameState:
     # According to Rules 47 and 75, influence and resources are planet stats, not player stats
     # Players spend influence/resources by exhausting planet cards, not from player pools
 
+    def get_player(self, player_id: str) -> Player | None:
+        """Get a player by ID."""
+        for player in self.players:
+            if player.id == player_id:
+                return player
+        return None
+
     def add_player(self, player: Player) -> GameState:
         """Add a player to the game."""
         new_players = self.players.copy()
@@ -1993,6 +2000,11 @@ class GameState:
         # Update planet control mapping
         new_planet_control_mapping = self.planet_control_mapping.copy()
         new_planet_control_mapping[planet.name] = player_id
+        # Keep Planet.controlled_by in sync
+        try:
+            planet.set_control(player_id)
+        except Exception:
+            planet.controlled_by = player_id
 
         # Update player planets list
         new_player_planets = {
@@ -2075,6 +2087,14 @@ class GameState:
         # Update planet control mapping
         new_planet_control_mapping = self.planet_control_mapping.copy()
         new_planet_control_mapping[planet.name] = None
+        # Keep Planet.controlled_by in sync
+        try:
+            planet.controlled_by = None
+        except Exception as e:
+            # Log but don't fail - planet control sync is not critical
+            import logging
+
+            logging.debug(f"Failed to sync planet.controlled_by: {e}")
 
         # Update player planets list
         new_player_planets = {
@@ -2264,9 +2284,18 @@ class GameState:
 
         # Only add if not already present (by name)
         if all(p.name != planet.name for p in new_player_planets[player_id]):
+            # Set control when adding planet to player
+            planet.set_control(player_id)
             new_player_planets[player_id].append(planet)
 
-        return self._create_new_state(player_planets=new_player_planets)
+        # Keep mapping in sync with Planet.controlled_by
+        new_planet_control_mapping = self.planet_control_mapping.copy()
+        new_planet_control_mapping[planet.name] = player_id
+
+        return self._create_new_state(
+            player_planets=new_player_planets,
+            planet_control_mapping=new_planet_control_mapping,
+        )
 
     def get_secret_objective_deck(self) -> list[Objective]:
         """Get the secret objective deck.

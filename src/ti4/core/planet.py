@@ -56,11 +56,17 @@ class Planet:
         self._exhausted = False
 
     def can_spend_resources(self) -> bool:
-        """Check if this planet can spend resources."""
+        """Check if this planet can spend resources.
+
+        Note: Control validation is handled by GameState elsewhere.
+        """
         return not self._exhausted
 
     def can_spend_influence(self) -> bool:
-        """Check if this planet can spend influence."""
+        """Check if this planet can spend influence.
+
+        Note: Control validation is handled by GameState elsewhere.
+        """
         return not self._exhausted
 
     @property

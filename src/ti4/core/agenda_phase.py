@@ -14,9 +14,12 @@ Key Components:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import TYPE_CHECKING, Any, Callable
 
-from ti4.core.constants import AgendaType
+from .constants import AgendaType
+
+if TYPE_CHECKING:
+    from .resource_management import ResourceManager
 
 # Voting orchestration imports removed - will be re-implemented via TDD
 
@@ -489,6 +492,164 @@ class VotingSystem:
             elected_target=chosen_player,
         )
 
+    def calculate_available_influence_for_voting(
+        self, player_id: str, resource_manager: ResourceManager
+    ) -> int:
+        """Calculate available influence for voting using ResourceManager.
+
+        Integrates with ResourceManager to get influence calculations that
+        exclude trade goods per Rule 47.3.
+
+        Args:
+            player_id: The player ID
+            resource_manager: ResourceManager instance
+
+        Returns:
+            Total influence available for voting (planets only, no trade goods)
+        """
+        try:
+            influence: int = resource_manager.calculate_available_influence(
+                player_id, for_voting=True
+            )
+            return influence
+        except Exception:
+            return 0
+
+    def cast_votes_with_resource_manager(
+        self,
+        player_id: str,
+        influence_amount: int,
+        outcome: str,
+        resource_manager: ResourceManager,
+        agenda: AgendaCard | Any | None = None,
+    ) -> VotingOutcome:
+        """Cast votes using ResourceManager for influence spending.
+
+        This method integrates with ResourceManager to handle planet exhaustion
+        and enforce Rule 47.3 (no trade goods for voting).
+
+        Args:
+            player_id: The player ID
+            influence_amount: Amount of influence to spend
+            outcome: Voting outcome ("For", "Against", etc.)
+            resource_manager: ResourceManager instance
+            agenda: Optional agenda card for outcome validation
+
+        Returns:
+            VotingOutcome indicating success/failure and votes cast
+        """
+        # Validate agenda outcomes if provided
+        if agenda:
+            if not self.validate_outcome_against_card(outcome, agenda):
+                return VotingOutcome(
+                    success=False,
+                    error_message=f"Invalid outcome '{outcome}' for agenda",
+                )
+
+        # Validate influence amount
+        if influence_amount <= 0:
+            return VotingOutcome(
+                success=False,
+                error_message="Influence amount must be a positive integer",
+            )
+
+        # Enforce one vote action per player per agenda
+        if player_id in self.player_votes:
+            previous_outcome = self.player_votes[player_id]
+            if previous_outcome != outcome:
+                return VotingOutcome(
+                    success=False,
+                    error_message=(
+                        f"Player {player_id} cannot cast votes for multiple outcomes "
+                        f"(previously voted '{previous_outcome}', now attempting '{outcome}')"
+                    ),
+                )
+            return VotingOutcome(
+                success=False,
+                error_message=f"Player {player_id} has already voted for this agenda",
+            )
+
+        # Check if player can afford the influence (for voting, no trade goods)
+        try:
+            if not resource_manager.can_afford_spending(
+                player_id,
+                resource_amount=0,
+                influence_amount=influence_amount,
+                for_voting=True,
+            ):
+                available = resource_manager.calculate_available_influence(
+                    player_id, for_voting=True
+                )
+                return VotingOutcome(
+                    success=False,
+                    error_message=(
+                        f"Insufficient influence for voting: need {influence_amount}, "
+                        f"have {available} (trade goods cannot be used for voting per Rule 47.3)"
+                    ),
+                )
+        except Exception as e:
+            return VotingOutcome(success=False, error_message=str(e))
+
+        # Create and execute spending plan
+        try:
+            spending_plan = resource_manager.create_spending_plan(
+                player_id,
+                resource_amount=0,
+                influence_amount=influence_amount,
+                for_voting=True,
+            )
+        except Exception as e:
+            return VotingOutcome(success=False, error_message=str(e))
+
+        if not spending_plan.is_valid:
+            return VotingOutcome(
+                success=False,
+                error_message=spending_plan.error_message or "Invalid spending plan",
+            )
+
+        # Execute the spending plan
+        try:
+            spending_result = resource_manager.execute_spending_plan(spending_plan)
+        except Exception as e:
+            return VotingOutcome(success=False, error_message=str(e))
+        if not spending_result.success:
+            return VotingOutcome(
+                success=False,
+                error_message=spending_result.error_message
+                or "Failed to execute spending plan",
+            )
+
+        # Use actual plan influence (may exceed requested if exact match is impossible)
+        actual_influence_spent = getattr(
+            spending_plan.influence_spending,
+            "total_influence",
+            spending_plan.total_influence_cost,
+        )
+        self.player_votes[player_id] = outcome
+        self._vote_tally[outcome] = (
+            self._vote_tally.get(outcome, 0) + actual_influence_spent
+        )
+
+        return VotingOutcome(
+            success=True, votes_cast=actual_influence_spent, outcome=outcome
+        )
+
+    def cast_votes_with_influence_spending(
+        self,
+        player_id: str,
+        influence_amount: int,
+        outcome: str,
+        resource_manager: ResourceManager,
+        agenda: AgendaCard | Any | None = None,
+    ) -> VotingOutcome:
+        """Cast votes with influence spending (alias for cast_votes_with_resource_manager).
+
+        This is an alias method for backward compatibility and clearer naming.
+        """
+        return self.cast_votes_with_resource_manager(
+            player_id, influence_amount, outcome, resource_manager, agenda
+        )
+
 
 class AgendaPhase:
     """Main controller for the agenda phase."""
@@ -684,6 +845,7 @@ class AgendaPhase:
 
         # Get voting order (speaker votes last)
         voting_system.get_voting_order(players, speaker_system)
+        # TODO: use voting_order when orchestration is implemented
 
         # Start voting process (triggers before_players_vote timing window)
         self.start_voting(agenda)
@@ -776,6 +938,7 @@ class AgendaPhase:
 
         # Get voting order (speaker votes last)
         voting_system.get_voting_order(players, speaker_system)
+        # TODO: use voting_order when orchestration is implemented
 
         # Start voting process (triggers before_players_vote timing window)
         self.start_voting(agenda)
@@ -894,8 +1057,8 @@ class AgendaPhase:
                     getattr(game_state, "law_manager", None) if game_state else None
                 )
                 if law_manager:
-                    from ti4.core.agenda_cards.base.agenda_card import BaseAgendaCard
-                    from ti4.core.agenda_cards.law_manager import ActiveLaw
+                    from .agenda_cards.base.agenda_card import BaseAgendaCard
+                    from .agenda_cards.law_manager import ActiveLaw
 
                     # Only create ActiveLaw for proper BaseAgendaCard instances
                     # Legacy AgendaCard dataclass instances are not supported
@@ -955,11 +1118,11 @@ class AgendaPhase:
                     getattr(game_state, "law_manager", None) if game_state else None
                 )
                 if law_manager:
-                    from ti4.core.agenda_cards.base.agenda_card import BaseAgendaCard
+                    from .agenda_cards.base.agenda_card import BaseAgendaCard
 
                     try:
                         # Check if this is a LawCard that has create_active_law method
-                        from ti4.core.agenda_cards.base.law_card import LawCard
+                        from .agenda_cards.base.law_card import LawCard
 
                         if isinstance(agenda, LawCard) and hasattr(
                             agenda, "create_active_law"
@@ -969,7 +1132,7 @@ class AgendaPhase:
                                 elected_target=elected_target,
                             )
                         else:
-                            from ti4.core.agenda_cards.law_manager import ActiveLaw
+                            from .agenda_cards.law_manager import ActiveLaw
 
                             # Only create ActiveLaw if agenda is a BaseAgendaCard
                             if isinstance(agenda, BaseAgendaCard):
