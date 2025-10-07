@@ -141,7 +141,7 @@ class TestAntiFighterBarrageTargetFiltering:
         enemy_afb_targets = Unit.filter_enemy_afb_targets(units, "player1")
 
         assert len(enemy_afb_targets) == 2
-        assert all(unit.unit_type == UnitType.FIGHTER for unit in enemy_afb_targets)
+        assert all(unit.is_fighter_type() for unit in enemy_afb_targets)
         assert all(unit.owner == "player2" for unit in enemy_afb_targets)
 
     def test_filter_afb_targets_empty_list(self) -> None:

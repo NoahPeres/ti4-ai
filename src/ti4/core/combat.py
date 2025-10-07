@@ -7,7 +7,8 @@ import random
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Callable
 
-from .constants import GameConstants, UnitType
+from .constants import GameConstants
+from .exceptions import InvalidGameStateError
 from .system import System
 from .unit import Unit
 from .unit_stats import UnitStatsProvider
@@ -506,7 +507,8 @@ class CombatResolver:
         """
 
         def filter_fighters(units: list[Unit]) -> list[Unit]:
-            return [u for u in units if u.unit_type == UnitType.FIGHTER]
+            # Include all fighter-type units (FIGHTER, FIGHTER_II, future variants)
+            return Unit.filter_afb_targets(units)
 
         return self._perform_ability_attack(
             unit, target_units, lambda u: u.has_anti_fighter_barrage(), filter_fighters
@@ -563,7 +565,8 @@ class CombatResolver:
             return self._validate_and_prepare_afb_with_error_handling(
                 unit, target_units
             )
-        except Exception:
+        except (ValueError, InvalidGameStateError) as e:
+            logger.debug("AFB validation failed: %s", e)
             return None
 
     def perform_anti_fighter_barrage_with_modifiers(
@@ -1214,10 +1217,8 @@ class CombatResolver:
                 defender_hits += hits
 
         # Collect all fighters for hit assignment
-        all_fighters = []
-        for unit in system.space_units:
-            if unit.unit_type == UnitType.FIGHTER:
-                all_fighters.append(unit)
+        # Collect all fighter-type units eligible for AFB
+        all_fighters = Unit.filter_afb_targets(system.space_units)
 
         # For now, simulate hit assignment - in a full implementation this would involve player choices
         destroyed_fighters = []
@@ -1248,9 +1249,7 @@ class CombatResolver:
                 )
 
         # Derive remaining fighters from the updated system state
-        remaining_fighters = [
-            unit for unit in system.space_units if unit.unit_type == UnitType.FIGHTER
-        ]
+        remaining_fighters = Unit.filter_afb_targets(system.space_units)
 
         return AntiFighterBarrageResult(
             attacker_hits=attacker_hits,

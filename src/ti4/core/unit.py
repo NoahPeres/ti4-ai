@@ -115,19 +115,17 @@ class Unit:
             raise AttributeError(
                 f"Unit {self.unit_type} does not have anti-fighter barrage ability"
             )
-        # Default to 1 die if AFB ability is present but dice count is 0 (common for base units)
-        return (
-            stats.anti_fighter_barrage_dice
-            if stats.anti_fighter_barrage_dice > 0
-            else 1
-        )
+        # Default to 1 die if present but dice count is 0; raise on negative for consistency with Combat
+        if stats.anti_fighter_barrage_dice < 0:
+            raise ValueError("AFB dice count cannot be negative")
+        return stats.anti_fighter_barrage_dice or 1
 
     def validate_anti_fighter_barrage_context(self, context: str) -> bool:
         """Validate that AFB is being used in the appropriate context."""
         if not self.has_anti_fighter_barrage():
             return False
         # AFB can only be used in space combat
-        return context == "space_combat"
+        return isinstance(context, str) and context.strip().lower() == "space_combat"
 
     def can_perform_anti_fighter_barrage(self, context: str) -> bool:
         """Check if this unit can perform anti-fighter barrage in the given context."""
