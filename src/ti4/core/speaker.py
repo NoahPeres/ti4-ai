@@ -205,11 +205,14 @@ class SpeakerManager:
 
         return self._assign_speaker_internal(game_state, new_speaker_id, "New speaker")
 
-    def assign_random_speaker(self, game_state: GameState) -> GameState:
+    def assign_random_speaker(
+        self, game_state: GameState, seed: int | None = None
+    ) -> GameState:
         """Assign a random player as speaker during setup (Rule 80.5).
 
         Args:
             game_state: Current game state
+            seed: Optional random seed for deterministic behavior
 
         Returns:
             Updated game state with random speaker assigned
@@ -222,5 +225,6 @@ class SpeakerManager:
 
         import random
 
-        random_player = random.choice(game_state.players)
+        rng = random.Random(seed) if seed is not None else random
+        random_player = rng.choice(game_state.players)
         return self.assign_speaker(game_state, random_player.id)

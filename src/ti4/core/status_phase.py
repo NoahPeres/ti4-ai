@@ -115,9 +115,10 @@ class StatusPhaseManager:
         return game_state
 
     def speaker_reveal_objective(self, game_state: "GameState") -> "GameState":
-        """Speaker reveals a public objective during status phase (Rule 80.4).
+        """Speaker reveals a public objective during status phase.
 
         The speaker reveals a new public objective during each status phase.
+        This is part of Rule 80 (Speaker) objective management responsibilities.
 
         Args:
             game_state: Current game state
@@ -130,9 +131,10 @@ class StatusPhaseManager:
         return game_state
 
     def speaker_setup_objectives(self, game_state: "GameState") -> "GameState":
-        """Speaker prepares objectives during setup (Rule 80.3).
+        """Speaker prepares objectives during setup.
 
         The speaker prepares public objectives during game setup.
+        This is part of Rule 80 (Speaker) objective management responsibilities.
 
         Args:
             game_state: Current game state

@@ -363,7 +363,8 @@ class TestRule80Speaker:
         assert result_success.success
 
     def test_setup_objective_preparation_integration(self) -> None:
-        """Test Rule 80.3: Speaker prepares objectives during setup."""
+        """Test Rule 80: Speaker prepares objectives during setup."""
+        # TODO: Enhance test to verify actual objective preparation when implemented
         # Arrange
         from src.ti4.core.constants import Faction
         from src.ti4.core.status_phase import StatusPhaseManager
@@ -382,7 +383,8 @@ class TestRule80Speaker:
         assert new_state is not None
 
     def test_status_phase_objective_revealing_integration(self) -> None:
-        """Test Rule 80.4: Speaker reveals public objective during status phase."""
+        """Test Rule 80: Speaker reveals public objective during status phase."""
+        # TODO: Enhance test to verify actual objective revealing when implemented
         # Arrange
         from src.ti4.core.constants import Faction
         from src.ti4.core.status_phase import StatusPhaseManager
