@@ -49,18 +49,38 @@ class TestPoliticsPrimaryAbility:
         # Mock game state with players and current speaker
         class MockGameState:
             def __init__(self):
-                self.players = ["player1", "player2", "player3"]
-                self.current_speaker = "player1"
+                # Create mock Player objects with id attribute
+                class MockPlayer:
+                    def __init__(self, player_id: str):
+                        self.id = player_id
+
+                self.players = [
+                    MockPlayer("player1"),
+                    MockPlayer("player2"),
+                    MockPlayer("player3"),
+                ]
+                self.speaker_id = "player1"  # Use speaker_id instead of current_speaker
                 self.speaker_changed = False
                 self.new_speaker = None
 
             def set_speaker(self, player_id: str) -> bool:
-                if player_id in self.players:
-                    self.current_speaker = player_id
+                player_ids = [p.id for p in self.players]
+                if player_id in player_ids:
+                    self.speaker_id = player_id  # Update speaker_id
                     self.speaker_changed = True
                     self.new_speaker = player_id
                     return True
                 return False
+
+            def _create_new_state(self, **kwargs):
+                """Mock _create_new_state method that returns self with updated attributes."""
+                for key, value in kwargs.items():
+                    setattr(self, key, value)
+                    # Track speaker changes for test assertions
+                    if key == "speaker_id":
+                        self.speaker_changed = True
+                        self.new_speaker = value
+                return self
 
         game_state = MockGameState()
 
@@ -80,6 +100,17 @@ class TestPoliticsPrimaryAbility:
 
         class MockGameState:
             def __init__(self):
+                # Create mock Player objects with id attribute
+                class MockPlayer:
+                    def __init__(self, player_id: str):
+                        self.id = player_id
+
+                self.players = [
+                    MockPlayer("player1"),
+                    MockPlayer("player2"),
+                    MockPlayer("player3"),
+                ]
+                self.speaker_id = "player1"  # Add speaker_id attribute
                 self.action_cards_drawn = 0
                 self.cards_drawn_by_player = {}
 
@@ -89,6 +120,12 @@ class TestPoliticsPrimaryAbility:
                     self.cards_drawn_by_player[player_id] = 0
                 self.cards_drawn_by_player[player_id] += count
                 return [f"action_card_{i}" for i in range(count)]
+
+            def _create_new_state(self, **kwargs):
+                """Mock _create_new_state method that returns self with updated attributes."""
+                for key, value in kwargs.items():
+                    setattr(self, key, value)
+                return self
 
         game_state = MockGameState()
 
@@ -124,7 +161,24 @@ class TestPoliticsPrimaryAbility:
 
         class MockGameState:
             def __init__(self):
+                # Create mock Player objects with id attribute
+                class MockPlayer:
+                    def __init__(self, player_id: str):
+                        self.id = player_id
+
+                self.players = [
+                    MockPlayer("player1"),
+                    MockPlayer("player2"),
+                    MockPlayer("player3"),
+                ]
+                self.speaker_id = "player1"  # Add speaker_id attribute
                 self.agenda_deck = MockAgendaDeck()
+
+            def _create_new_state(self, **kwargs):
+                """Mock _create_new_state method that returns self with updated attributes."""
+                for key, value in kwargs.items():
+                    setattr(self, key, value)
+                return self
 
         game_state = MockGameState()
 
@@ -146,9 +200,18 @@ class TestPoliticsPrimaryAbility:
 
         class MockGameState:
             def __init__(self):
+                # Create mock Player objects with id attribute
+                class MockPlayer:
+                    def __init__(self, player_id: str):
+                        self.id = player_id
+
+                self.players = [
+                    MockPlayer("player1"),
+                    MockPlayer("player2"),
+                    MockPlayer("player3"),
+                ]
+                self.speaker_id = "player1"  # Use speaker_id instead of current_speaker
                 self.execution_order = []
-                self.players = ["player1", "player2", "player3"]
-                self.current_speaker = "player1"
 
             def set_speaker(self, player_id: str) -> bool:
                 self.execution_order.append("set_speaker")
@@ -161,6 +224,12 @@ class TestPoliticsPrimaryAbility:
             def get_agenda_deck(self):
                 return MockAgendaDeck()
 
+            def _create_new_state(self, **kwargs):
+                """Mock _create_new_state method that returns self with updated attributes."""
+                for key, value in kwargs.items():
+                    setattr(self, key, value)
+                return self
+
         class MockAgendaDeck:
             def look_at_top_cards(self, count: int) -> list[str]:
                 return ["agenda1", "agenda2"]
@@ -172,8 +241,10 @@ class TestPoliticsPrimaryAbility:
         )
 
         assert result.success is True
-        # Verify execution order: speaker, action cards, agenda cards
-        assert game_state.execution_order == ["set_speaker", "draw_action_cards"]
+        # Verify execution order: speaker (via _create_new_state), action cards, agenda cards
+        # Note: The actual implementation uses SpeakerManager which calls _create_new_state directly
+        # rather than set_speaker, so we only expect draw_action_cards to be tracked
+        assert game_state.execution_order == ["draw_action_cards"]
 
     def test_primary_ability_invalid_speaker_choice(self) -> None:
         """Test primary ability with invalid speaker choice."""
@@ -182,10 +253,27 @@ class TestPoliticsPrimaryAbility:
 
         class MockGameState:
             def __init__(self):
-                self.players = ["player1", "player2", "player3"]
+                # Create mock Player objects with id attribute
+                class MockPlayer:
+                    def __init__(self, player_id: str):
+                        self.id = player_id
+
+                self.players = [
+                    MockPlayer("player1"),
+                    MockPlayer("player2"),
+                    MockPlayer("player3"),
+                ]
+                self.speaker_id = "player1"  # Add speaker_id attribute
 
             def set_speaker(self, player_id: str) -> bool:
-                return player_id in self.players
+                player_ids = [p.id for p in self.players]
+                return player_id in player_ids
+
+            def _create_new_state(self, **kwargs):
+                """Mock _create_new_state method that returns self with updated attributes."""
+                for key, value in kwargs.items():
+                    setattr(self, key, value)
+                return self
 
         game_state = MockGameState()
 
@@ -194,7 +282,8 @@ class TestPoliticsPrimaryAbility:
         )
 
         assert result.success is False
-        assert "invalid speaker" in result.error_message.lower()
+        # The actual error message from SpeakerManager validation
+        assert "does not exist" in result.error_message.lower()
 
 
 class TestPoliticsSecondaryAbility:
@@ -376,14 +465,26 @@ class TestPoliticsCardIntegration:
 
         class MockGameState:
             def __init__(self):
+                # Create mock Player objects with id attribute
+                class MockPlayer:
+                    def __init__(self, player_id: str):
+                        self.id = player_id
+
+                self.players = [MockPlayer("player1"), MockPlayer("player2")]
+                self.speaker_id = "player1"  # Add speaker_id attribute
                 self.agenda_phase = MockAgendaPhase()
-                self.players = ["player1", "player2"]
 
             def set_speaker(self, player_id: str) -> bool:
                 return True
 
             def draw_action_cards(self, player_id: str, count: int) -> list[str]:
                 return ["card1", "card2"]
+
+            def _create_new_state(self, **kwargs):
+                """Mock _create_new_state method that returns self with updated attributes."""
+                for key, value in kwargs.items():
+                    setattr(self, key, value)
+                return self
 
         game_state = MockGameState()
 
@@ -409,17 +510,36 @@ class TestPoliticsCardIntegration:
 
         class MockGameState:
             def __init__(self):
+                # Create mock Player objects with id attribute
+                class MockPlayer:
+                    def __init__(self, player_id: str):
+                        self.id = player_id
+
+                self.players = [
+                    MockPlayer("player1"),
+                    MockPlayer("player2"),
+                    MockPlayer("player3"),
+                ]
+                self.speaker_id = "player1"  # Use speaker_id instead of current_speaker
                 self.speaker_system = MockSpeakerSystem()
-                self.current_speaker = "player1"
-                self.players = ["player1", "player2", "player3"]
 
             def set_speaker(self, player_id: str) -> bool:
-                old_speaker = self.current_speaker
-                self.current_speaker = player_id
+                old_speaker = self.speaker_id
+                self.speaker_id = player_id  # Update speaker_id
                 return self.speaker_system.change_speaker(old_speaker, player_id)
 
             def draw_action_cards(self, player_id: str, count: int) -> list[str]:
                 return ["card1", "card2"]
+
+            def _create_new_state(self, **kwargs):
+                """Mock _create_new_state method that returns self with updated attributes."""
+                for key, value in kwargs.items():
+                    # Simulate speaker system integration when speaker_id changes
+                    if key == "speaker_id":
+                        old_speaker = self.speaker_id
+                        self.speaker_system.change_speaker(old_speaker, value)
+                    setattr(self, key, value)
+                return self
 
         game_state = MockGameState()
 

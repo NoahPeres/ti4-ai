@@ -113,3 +113,35 @@ class StatusPhaseManager:
                     agent.ready()
 
         return game_state
+
+    def speaker_reveal_objective(self, game_state: "GameState") -> "GameState":
+        """Speaker reveals a public objective during status phase.
+
+        The speaker reveals a new public objective during each status phase.
+        This is part of Rule 80 (Speaker) objective management responsibilities.
+
+        Args:
+            game_state: Current game state
+
+        Returns:
+            Updated game state with objective revealed by speaker
+        """
+        # TODO: Implement objective revealing logic
+        # This should integrate with the objective system
+        return game_state
+
+    def speaker_setup_objectives(self, game_state: "GameState") -> "GameState":
+        """Speaker prepares objectives during setup.
+
+        The speaker prepares public objectives during game setup.
+        This is part of Rule 80 (Speaker) objective management responsibilities.
+
+        Args:
+            game_state: Current game state
+
+        Returns:
+            Updated game state with objectives prepared by speaker
+        """
+        # TODO: Implement objective setup logic
+        # This should integrate with the objective system
+        return game_state

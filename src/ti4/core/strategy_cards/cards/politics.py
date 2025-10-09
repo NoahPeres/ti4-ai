@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, Any, Optional
 from ...action_cards import ActionCardManager
 from ...agenda_phase import SpeakerSystem
 from ...command_tokens import CommandTokenManager
+from ...speaker import SpeakerManager
 from ..base_strategy_card import BaseStrategyCard, StrategyCardAbilityResult
 from ..strategic_action import StrategyCardType
 
@@ -30,6 +31,7 @@ class PoliticsStrategyCard(BaseStrategyCard):
         self._action_card_manager = ActionCardManager()
         self._speaker_system = SpeakerSystem()
         self._command_token_manager = CommandTokenManager()
+        self._speaker_manager = SpeakerManager()
 
     def get_card_type(self) -> StrategyCardType:
         """Get the strategy card type.
@@ -192,6 +194,9 @@ class PoliticsStrategyCard(BaseStrategyCard):
     ) -> tuple[StrategyCardAbilityResult, "GameState"]:
         """Execute the choose speaker step of the primary ability.
 
+        LRR Rule 80.6: Politics strategy card allows choosing any player OTHER than
+        the current speaker to gain the speaker token.
+
         Args:
             game_state: The current game state
             chosen_speaker: The player to become the new speaker
@@ -199,31 +204,17 @@ class PoliticsStrategyCard(BaseStrategyCard):
         Returns:
             Tuple of (result, updated_game_state)
         """
-        # Try GameState's integrated speaker system first, fallback to duck typing
-        if hasattr(game_state, "set_speaker"):
-            try:
-                result = game_state.set_speaker(chosen_speaker)
-                # Handle both new interface (returns GameState) and old interface (returns bool)
-                if isinstance(result, bool):
-                    # Old interface - boolean return
-                    if not result:
-                        return StrategyCardAbilityResult(
-                            success=False,
-                            error_message=f"Invalid speaker choice: {chosen_speaker}",
-                        ), game_state
-                else:
-                    # New interface - returns GameState
-                    game_state = result
-            except ValueError:
-                return StrategyCardAbilityResult(
-                    success=False,
-                    error_message=f"Invalid speaker choice: {chosen_speaker}",
-                ), game_state
-        else:
-            # Fallback for mock objects in tests
-            return StrategyCardAbilityResult(success=True), game_state
-
-        return StrategyCardAbilityResult(success=True), game_state
+        try:
+            # Use SpeakerManager for Rule 80.6 validation and assignment
+            new_game_state = self._speaker_manager.politics_card_choose_speaker(
+                game_state, chosen_speaker
+            )
+            return StrategyCardAbilityResult(success=True), new_game_state
+        except ValueError as e:
+            return StrategyCardAbilityResult(
+                success=False,
+                error_message=str(e),
+            ), game_state
 
     def _execute_draw_action_cards(
         self, game_state: "GameState", player_id: str, count: int

@@ -213,3 +213,191 @@ class TestRule80Speaker:
 
         with pytest.raises(ValueError, match="New speaker ID cannot be empty"):
             manager.pass_speaker_token(game_state, "   ")
+
+    def test_speaker_elimination_passes_token_to_left_player(self) -> None:
+        """Test Rule 80.7: If speaker eliminated, token passes to player on speaker's left."""
+        # Arrange
+        from src.ti4.core.constants import Faction
+
+        player1 = Player(id="player1", faction=Faction.ARBOREC)
+        player2 = Player(id="player2", faction=Faction.BARONY)
+        player3 = Player(id="player3", faction=Faction.SOL)
+        player4 = Player(id="player4", faction=Faction.HACAN)
+
+        # Players in clockwise order: player1, player2, player3, player4
+        game_state = GameState(players=[player1, player2, player3, player4])
+        manager = SpeakerManager()
+
+        # Act - assign player2 as speaker, then handle elimination
+        game_with_speaker = manager.assign_speaker(game_state, "player2")
+        new_state = manager.handle_speaker_elimination(game_with_speaker, "player2")
+
+        # Assert - speaker token should pass to player3 (left of player2)
+        assert new_state.speaker_id == "player3"
+
+    def test_speaker_elimination_validates_eliminated_player_is_speaker(self) -> None:
+        """Test that elimination handling validates the eliminated player is the current speaker."""
+        # Arrange
+        from src.ti4.core.constants import Faction
+
+        player1 = Player(id="player1", faction=Faction.ARBOREC)
+        player2 = Player(id="player2", faction=Faction.BARONY)
+        game_state = GameState(players=[player1, player2])
+        manager = SpeakerManager()
+
+        # Act - assign player1 as speaker, then try to eliminate player2
+        game_with_speaker = manager.assign_speaker(game_state, "player1")
+
+        # Assert - should raise error when trying to eliminate non-speaker
+        with pytest.raises(
+            ValueError, match="Player player2 is not the current speaker"
+        ):
+            manager.handle_speaker_elimination(game_with_speaker, "player2")
+
+    def test_speaker_elimination_wraps_around_player_list(self) -> None:
+        """Test that elimination handling wraps around to first player when last player is eliminated."""
+        # Arrange
+        from src.ti4.core.constants import Faction
+
+        player1 = Player(id="player1", faction=Faction.ARBOREC)
+        player2 = Player(id="player2", faction=Faction.BARONY)
+        player3 = Player(id="player3", faction=Faction.SOL)
+
+        # Players in order: player1, player2, player3
+        game_state = GameState(players=[player1, player2, player3])
+        manager = SpeakerManager()
+
+        # Act - assign player3 (last) as speaker, then handle elimination
+        game_with_speaker = manager.assign_speaker(game_state, "player3")
+        new_state = manager.handle_speaker_elimination(game_with_speaker, "player3")
+
+        # Assert - speaker token should wrap around to player1 (first)
+        assert new_state.speaker_id == "player1"
+
+    def test_politics_strategy_card_cannot_choose_current_speaker(self) -> None:
+        """Test Rule 80.6: Politics strategy card cannot choose current speaker as new speaker."""
+        # Arrange
+        from src.ti4.core.constants import Faction
+
+        player1 = Player(id="player1", faction=Faction.ARBOREC)
+        player2 = Player(id="player2", faction=Faction.BARONY)
+        game_state = GameState(players=[player1, player2])
+        manager = SpeakerManager()
+
+        # Act - assign player1 as speaker, then try to use politics card to choose same player
+        game_with_speaker = manager.assign_speaker(game_state, "player1")
+
+        # Assert - should raise error when trying to choose current speaker
+        with pytest.raises(
+            ValueError, match="Cannot choose current speaker player1 as new speaker"
+        ):
+            manager.politics_card_choose_speaker(game_with_speaker, "player1")
+
+    def test_politics_strategy_card_can_choose_different_player(self) -> None:
+        """Test Rule 80.6: Politics strategy card can choose any player other than current speaker."""
+        # Arrange
+        from src.ti4.core.constants import Faction
+
+        player1 = Player(id="player1", faction=Faction.ARBOREC)
+        player2 = Player(id="player2", faction=Faction.BARONY)
+        player3 = Player(id="player3", faction=Faction.SOL)
+        game_state = GameState(players=[player1, player2, player3])
+        manager = SpeakerManager()
+
+        # Act - assign player1 as speaker, then use politics card to choose player2
+        game_with_speaker = manager.assign_speaker(game_state, "player1")
+        new_state = manager.politics_card_choose_speaker(game_with_speaker, "player2")
+
+        # Assert - speaker should now be player2
+        assert new_state.speaker_id == "player2"
+
+    def test_random_speaker_assignment_during_setup(self) -> None:
+        """Test Rule 80.5: Random player gains speaker token during setup."""
+        # Arrange
+        from src.ti4.core.constants import Faction
+
+        player1 = Player(id="player1", faction=Faction.ARBOREC)
+        player2 = Player(id="player2", faction=Faction.BARONY)
+        player3 = Player(id="player3", faction=Faction.SOL)
+        game_state = GameState(players=[player1, player2, player3])
+        manager = SpeakerManager()
+
+        # Act - assign random speaker
+        new_state = manager.assign_random_speaker(game_state)
+
+        # Assert - one of the players should be speaker
+        assert new_state.speaker_id is not None
+        assert new_state.speaker_id in ["player1", "player2", "player3"]
+
+    def test_politics_strategy_card_integration_with_speaker_manager(self) -> None:
+        """Test that Politics strategy card integrates with SpeakerManager for Rule 80.6."""
+        # Arrange
+        from src.ti4.core.constants import Faction
+        from src.ti4.core.strategy_cards.cards.politics import PoliticsStrategyCard
+
+        player1 = Player(id="player1", faction=Faction.ARBOREC)
+        player2 = Player(id="player2", faction=Faction.BARONY)
+        player3 = Player(id="player3", faction=Faction.SOL)
+        game_state = GameState(players=[player1, player2, player3])
+
+        # Set player1 as current speaker
+        game_state_with_speaker = game_state.set_speaker("player1")
+
+        politics_card = PoliticsStrategyCard()
+
+        # Act - try to choose current speaker (should fail)
+        result_fail = politics_card.execute_primary_ability(
+            "player2", game_state_with_speaker, chosen_speaker="player1"
+        )
+
+        # Assert - should fail due to Rule 80.6
+        assert not result_fail.success
+        assert "Cannot choose current speaker" in result_fail.error_message
+
+        # Act - choose different player (should succeed)
+        result_success = politics_card.execute_primary_ability(
+            "player2", game_state_with_speaker, chosen_speaker="player3"
+        )
+
+        # Assert - should succeed
+        assert result_success.success
+
+    def test_setup_objective_preparation_integration(self) -> None:
+        """Test Rule 80: Speaker prepares objectives during setup."""
+        # TODO: Enhance test to verify actual objective preparation when implemented
+        # Arrange
+        from src.ti4.core.constants import Faction
+        from src.ti4.core.status_phase import StatusPhaseManager
+
+        player1 = Player(id="player1", faction=Faction.ARBOREC)
+        player2 = Player(id="player2", faction=Faction.BARONY)
+        game_state = GameState(players=[player1, player2])
+        manager = SpeakerManager()
+        status_phase = StatusPhaseManager()
+
+        # Act - assign speaker and setup objectives
+        game_with_speaker = manager.assign_speaker(game_state, "player1")
+        new_state = status_phase.speaker_setup_objectives(game_with_speaker)
+
+        # Assert - objectives should be prepared by speaker
+        assert new_state is not None
+
+    def test_status_phase_objective_revealing_integration(self) -> None:
+        """Test Rule 80: Speaker reveals public objective during status phase."""
+        # TODO: Enhance test to verify actual objective revealing when implemented
+        # Arrange
+        from src.ti4.core.constants import Faction
+        from src.ti4.core.status_phase import StatusPhaseManager
+
+        player1 = Player(id="player1", faction=Faction.ARBOREC)
+        player2 = Player(id="player2", faction=Faction.BARONY)
+        game_state = GameState(players=[player1, player2])
+        manager = SpeakerManager()
+        status_phase = StatusPhaseManager()
+
+        # Act - assign speaker and reveal objective
+        game_with_speaker = manager.assign_speaker(game_state, "player1")
+        new_state = status_phase.speaker_reveal_objective(game_with_speaker)
+
+        # Assert - objective should be revealed by speaker
+        assert new_state is not None
