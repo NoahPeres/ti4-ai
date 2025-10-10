@@ -323,7 +323,11 @@ class PublicObjectiveManager:
             stage_ii_objectives = stage_ii_objectives[: config.stage_ii_count]
 
         except (FileNotFoundError, ValueError):
-            # If factory fails, use empty lists for testing
+            # Log the failure before falling back
+            logging.error(
+                "Failed to load objectives from factory, using empty lists",
+                exc_info=True,
+            )
             stage_i_objectives = []
             stage_ii_objectives = []
 
@@ -525,13 +529,17 @@ class ObjectiveCardFactory:
     @staticmethod
     def _get_csv_path() -> str:
         """Get the path to the objective cards CSV file."""
-        # Get project root by navigating up from src/ti4/core/
+        # Get project root by finding a known marker file
         module_path = Path(__file__).resolve()
-        project_root = module_path.parent.parent.parent.parent
-        csv_path = (
-            project_root / "docs" / "component_details" / "TI4_objective_cards.csv"
-        )
-        return str(csv_path)
+        current = module_path
+        while current.parent != current:
+            if (current / "pyproject.toml").exists() or (current / "setup.py").exists():
+                csv_path = (
+                    current / "docs" / "component_details" / "TI4_objective_cards.csv"
+                )
+                return str(csv_path)
+            current = current.parent
+        raise FileNotFoundError("Could not locate project root")
 
     @staticmethod
     def _load_csv_data(csv_path: str) -> list[dict[str, str]]:
@@ -578,7 +586,8 @@ class ObjectiveCardFactory:
         obj_type = ObjectiveCardFactory._parse_type(row["Type"])
 
         # Process condition text
-        condition = row["Condition"].replace("§", ",")  # Restore commas
+        # Restore commas that were encoded as § in CSV to avoid delimiter conflicts
+        condition = row["Condition"].replace("§", ",")
         category = ObjectiveCardFactory._determine_category(condition)
         dependencies = ObjectiveCardFactory._determine_dependencies(category)
 
@@ -605,7 +614,12 @@ class ObjectiveCardFactory:
 
     @staticmethod
     def _create_objective_id(name: str) -> str:
-        """Create a standardized objective ID from the name."""
+        """Create a standardized objective ID from the name.
+
+        Note: This simple transformation could theoretically produce duplicate IDs
+        for different names (e.g., "Test-One" and "Test One" both become "test_one").
+        Consider adding uniqueness validation if this becomes an issue.
+        """
         if not name or not name.strip():
             raise ValueError("Objective name cannot be empty")
         return name.lower().replace(" ", "_").replace("'", "").replace("-", "_")
@@ -661,7 +675,11 @@ class ObjectiveCardFactory:
 
     @staticmethod
     def _determine_category(condition: str) -> ObjectiveCategory:
-        """Determine objective category based on condition text."""
+        """Determine objective category based on condition text.
+
+        Note: This could be refactored to use a keyword mapping approach
+        for better maintainability and testability in the future.
+        """
         condition_lower = condition.lower()
 
         if any(keyword in condition_lower for keyword in ["control", "planet"]):
@@ -902,8 +920,10 @@ class ConcreteObjectiveRequirements:
 
         TODO: Implement actual validation logic. Currently returns True for testing.
         """
-        # Placeholder implementation - returns True for testing
-        return True
+        # Placeholder implementation - raise error to prevent misuse
+        raise NotImplementedError(
+            "Validator for 'Raise a Fleet' objective is not yet implemented"
+        )
 
     def validate_command_an_armada(
         self, player_id: str, game_state: "GameState"
@@ -919,8 +939,10 @@ class ConcreteObjectiveRequirements:
 
         TODO: Implement actual validation logic. Currently returns True for testing.
         """
-        # Placeholder implementation - returns True for testing
-        return True
+        # Placeholder implementation - raise error to prevent misuse
+        raise NotImplementedError(
+            "Validator for 'Command an Armada' objective is not yet implemented"
+        )
 
     def validate_destroy_their_greatest_ship(
         self, player_id: str, game_state: "GameState"
@@ -936,8 +958,10 @@ class ConcreteObjectiveRequirements:
 
         TODO: Implement actual validation logic. Currently returns True for testing.
         """
-        # Placeholder implementation - returns True for testing
-        return True
+        # Placeholder implementation - raise error to prevent misuse
+        raise NotImplementedError(
+            "Validator for 'Destroy Their Greatest Ship' objective is not yet implemented"
+        )
 
     def validate_spark_a_rebellion(
         self, player_id: str, game_state: "GameState"
@@ -953,8 +977,10 @@ class ConcreteObjectiveRequirements:
 
         TODO: Implement actual validation logic. Currently returns True for testing.
         """
-        # Placeholder implementation - returns True for testing
-        return True
+        # Placeholder implementation - raise error to prevent misuse
+        raise NotImplementedError(
+            "Validator for 'Spark a Rebellion' objective is not yet implemented"
+        )
 
     def validate_unveil_flagship(self, player_id: str, game_state: "GameState") -> bool:
         """Win a space combat in a system that contains your flagship.
@@ -968,8 +994,10 @@ class ConcreteObjectiveRequirements:
 
         TODO: Implement actual validation logic. Currently returns True for testing.
         """
-        # Placeholder implementation - returns True for testing
-        return True
+        # Placeholder implementation - raise error to prevent misuse
+        raise NotImplementedError(
+            "Validator for 'Unveil Flagship' objective is not yet implemented"
+        )
 
     def validate_form_a_spy_network(
         self, player_id: str, game_state: "GameState"
@@ -985,8 +1013,10 @@ class ConcreteObjectiveRequirements:
 
         TODO: Implement actual validation logic. Currently returns True for testing.
         """
-        # Placeholder implementation - returns True for testing
-        return True
+        # Placeholder implementation - raise error to prevent misuse
+        raise NotImplementedError(
+            "Validator for 'Form a Spy Network' objective is not yet implemented"
+        )
 
     def validate_prove_endurance(self, player_id: str, game_state: "GameState") -> bool:
         """Be the last player to pass during a game round.
@@ -1000,8 +1030,10 @@ class ConcreteObjectiveRequirements:
 
         TODO: Implement actual validation logic. Currently returns True for testing.
         """
-        # Placeholder implementation - returns True for testing
-        return True
+        # Placeholder implementation - raise error to prevent misuse
+        raise NotImplementedError(
+            "Validator for 'Prove Endurance' objective is not yet implemented"
+        )
 
 
 class VictoryPointScoreboard:
@@ -1139,8 +1171,8 @@ class VictoryPointScoreboard:
             return winners[0]
 
         # Handle tie-breaking using initiative order
-        if hasattr(game_state, "_sort_players_by_initiative_order"):
-            initiative_order = game_state._sort_players_by_initiative_order(winners)
+        if hasattr(game_state, "get_players_by_initiative"):
+            initiative_order = game_state.get_players_by_initiative(winners)
             for player_id in initiative_order:
                 if player_id in winners:
                     return player_id
@@ -1165,8 +1197,8 @@ class VictoryPointScoreboard:
         # Get initiative order for tie-breaking
         initiative_order = []
         all_players = list(game_state.victory_points.keys())
-        if hasattr(game_state, "_sort_players_by_initiative_order"):
-            initiative_order = game_state._sort_players_by_initiative_order(all_players)
+        if hasattr(game_state, "get_players_by_initiative"):
+            initiative_order = game_state.get_players_by_initiative(all_players)
 
         # Create standings for each player
         for player_id, points in game_state.victory_points.items():
@@ -1239,8 +1271,15 @@ class ObjectiveEligibilityTracker:
         # Update cache
         self._eligibility_cache[player_id] = eligibility
 
-        # Update game state hash for cache invalidation
-        self._last_game_state_hash = str(hash(str(game_state)))
+        # Track game state version for cache invalidation using stable attributes
+        # Use a composite key of relevant state that affects objective eligibility
+        state_key_parts = [
+            str(getattr(game_state, "victory_points", {})),
+            str(getattr(game_state, "completed_objectives", {})),
+            str(getattr(game_state, "phase", "unknown")),
+            str(getattr(game_state, "round_number", 0)),
+        ]
+        self._last_game_state_hash = "|".join(state_key_parts)
 
         return eligibility
 

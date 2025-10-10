@@ -6,15 +6,21 @@ Simple utility to query and analyze TI4 objective cards data.
 """
 
 import csv
+import sys
 from collections import defaultdict
+from pathlib import Path
 
 
 def load_objectives() -> list[dict[str, str]]:
     """Load objective cards from CSV file."""
     objectives = []
-    csv_path = "docs/component_details/TI4_objective_cards.csv"
+    # Get script directory and construct path relative to repo root
+    script_dir = Path(__file__).parent
+    csv_path = (
+        script_dir.parent / "docs" / "component_details" / "TI4_objective_cards.csv"
+    )
     try:
-        with open(csv_path) as f:
+        with open(csv_path, encoding="utf-8") as f:
             reader = csv.DictReader(f)
             required_columns = {
                 "Name",
@@ -38,13 +44,9 @@ def load_objectives() -> list[dict[str, str]]:
     except FileNotFoundError:
         print(f"Error: CSV file not found at {csv_path}")
         print("Please ensure you're running this script from the repository root.")
-        import sys
-
         sys.exit(1)
     except ValueError as e:
         print(f"Error: Invalid CSV format - {e}")
-        import sys
-
         sys.exit(1)
     return objectives
 

@@ -408,6 +408,17 @@ class GameState:
 
         return result
 
+    def get_players_by_initiative(self, player_ids: list[str]) -> list[str]:
+        """Get players sorted by initiative order (public API).
+
+        Args:
+            player_ids: List of player IDs to sort
+
+        Returns:
+            Player IDs sorted by initiative order
+        """
+        return self._sort_players_by_initiative_order(player_ids)
+
     def is_objective_completed(self, player_id: str, objective: ObjectiveCard) -> bool:
         """Check if a player has completed a specific objective."""
         player_objectives = self.completed_objectives.get(player_id, [])
