@@ -1,6 +1,7 @@
 """Objective card system for TI4."""
 
 import csv
+import logging
 import os
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -11,6 +12,15 @@ if TYPE_CHECKING:
     from .constants import Expansion
     from .game_phase import GamePhase
     from .game_state import GameState
+
+logger = logging.getLogger(__name__)
+
+
+def _default_expansions() -> list["Expansion"]:
+    """Factory function for default expansion list to avoid circular imports."""
+    from .constants import Expansion
+
+    return [Expansion.BASE]
 
 
 # Custom Exception Types for Objective System
@@ -235,7 +245,7 @@ class ObjectiveSetupConfiguration:
 
     stage_i_count: int = 5
     stage_ii_count: int = 5
-    include_expansions: list["Expansion"] = field(default_factory=lambda: None)  # type: ignore
+    include_expansions: list["Expansion"] = field(default_factory=_default_expansions)
     random_seed: Optional[int] = None
 
     def __post_init__(self) -> None:
@@ -244,14 +254,7 @@ class ObjectiveSetupConfiguration:
             raise ValueError("Stage I count must be positive")
         if self.stage_ii_count <= 0:
             raise ValueError("Stage II count must be positive")
-
-        # Handle default value for include_expansions
-        if self.include_expansions is None:
-            # Import here to avoid circular imports
-            from .constants import Expansion
-
-            object.__setattr__(self, "include_expansions", [Expansion.BASE])
-        elif len(self.include_expansions) == 0:
+        if len(self.include_expansions) == 0:
             raise ValueError("Must include at least one expansion")
 
 
@@ -554,8 +557,8 @@ class ObjectiveCardFactory:
                 objectives[objective.id] = objective
             except Exception as e:
                 # Log error but continue processing other objectives
-                print(
-                    f"Warning: Failed to create objective from row {row.get('Name', 'Unknown')}: {e}"
+                logger.warning(
+                    f"Failed to create objective from row {row.get('Name', 'Unknown')}: {e}"
                 )
                 continue
 
@@ -618,7 +621,7 @@ class ObjectiveCardFactory:
 
         expansion = expansion_mapping.get(expansion_str)
         if expansion is None:
-            print(f"Warning: Unknown expansion '{expansion_str}', defaulting to Base")
+            logger.warning(f"Unknown expansion '{expansion_str}', defaulting to Base")
             return Expansion.BASE
         return expansion
 
@@ -635,7 +638,7 @@ class ObjectiveCardFactory:
 
         phase = phase_mapping.get(phase_str)
         if phase is None:
-            print(f"Warning: Unknown phase '{phase_str}', defaulting to Status")
+            logger.warning(f"Unknown phase '{phase_str}', defaulting to Status")
             return GamePhase.STATUS
         return phase
 
@@ -650,7 +653,7 @@ class ObjectiveCardFactory:
 
         obj_type = type_mapping.get(type_str)
         if obj_type is None:
-            print(f"Warning: Unknown type '{type_str}', defaulting to Secret")
+            logger.warning(f"Unknown type '{type_str}', defaulting to Secret")
             return ObjectiveType.SECRET
         return obj_type
 
@@ -894,6 +897,8 @@ class ConcreteObjectiveRequirements:
 
         Returns:
             True if player has 5 non-fighter ships in the same system
+
+        TODO: Implement actual validation logic. Currently returns True for testing.
         """
         # Placeholder implementation - returns True for testing
         return True
@@ -909,6 +914,8 @@ class ConcreteObjectiveRequirements:
 
         Returns:
             True if player has 8 non-fighter ships in the same system
+
+        TODO: Implement actual validation logic. Currently returns True for testing.
         """
         # Placeholder implementation - returns True for testing
         return True
@@ -924,6 +931,8 @@ class ConcreteObjectiveRequirements:
 
         Returns:
             True if player destroyed a war sun or flagship this turn
+
+        TODO: Implement actual validation logic. Currently returns True for testing.
         """
         # Placeholder implementation - returns True for testing
         return True
@@ -939,6 +948,8 @@ class ConcreteObjectiveRequirements:
 
         Returns:
             True if player won combat against the victory point leader
+
+        TODO: Implement actual validation logic. Currently returns True for testing.
         """
         # Placeholder implementation - returns True for testing
         return True
@@ -952,6 +963,8 @@ class ConcreteObjectiveRequirements:
 
         Returns:
             True if player won space combat with their flagship present
+
+        TODO: Implement actual validation logic. Currently returns True for testing.
         """
         # Placeholder implementation - returns True for testing
         return True
@@ -967,6 +980,8 @@ class ConcreteObjectiveRequirements:
 
         Returns:
             True if player discarded 5 action cards this turn
+
+        TODO: Implement actual validation logic. Currently returns True for testing.
         """
         # Placeholder implementation - returns True for testing
         return True
@@ -980,6 +995,8 @@ class ConcreteObjectiveRequirements:
 
         Returns:
             True if player was the last to pass this round
+
+        TODO: Implement actual validation logic. Currently returns True for testing.
         """
         # Placeholder implementation - returns True for testing
         return True
@@ -998,13 +1015,16 @@ class VictoryPointScoreboard:
 
     def score_objective(
         self, player_id: str, objective: ObjectiveCard, game_state: "GameState"
-    ) -> None:
+    ) -> "GameState":
         """Score an objective and update victory points.
 
         Args:
             player_id: ID of the player scoring the objective
             objective: The objective being scored
             game_state: Current game state
+
+        Returns:
+            New GameState with updated victory points
 
         Raises:
             ValueError: If player_id is empty
@@ -1042,16 +1062,15 @@ class VictoryPointScoreboard:
                     f"Player {player_id} cannot score public objectives: Home system validation failed"
                 ) from e
 
-        # Update victory points (need to modify the frozen GameState properly)
-        current_points = game_state.victory_points.get(player_id, 0)
-        new_victory_points = game_state.victory_points.copy()
-        new_victory_points[player_id] = current_points + objective.points
-
-        # Update the game state victory points
-        object.__setattr__(game_state, "victory_points", new_victory_points)
+        # Create new GameState with updated victory points using proper immutable pattern
+        updated_game_state = game_state.award_victory_points(
+            player_id, objective.points
+        )
 
         # Place control token (track scored objective)
         self.place_control_token(player_id, objective)
+
+        return updated_game_state
 
     def place_control_token(self, player_id: str, objective: ObjectiveCard) -> None:
         """Place player's control token on objective card.

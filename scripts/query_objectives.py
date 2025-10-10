@@ -90,20 +90,14 @@ def list_objectives_by_type(obj_type: str, expansion: str = None):
 if __name__ == "__main__":
     import sys
 
-    if len(sys.argv) == 1 or (len(sys.argv) == 2 and sys.argv[1] in ["-h", "--help"]):
-        if len(sys.argv) == 2:
-            print("Usage:")
-            print("  python scripts/query_objectives.py                    # Summary")
-            print(
-                "  python scripts/query_objectives.py 'Stage I'          # All Stage I"
-            )
-            print(
-                "  python scripts/query_objectives.py 'Stage I' Base     # Base Stage I"
-            )
-            print(
-                "  python scripts/query_objectives.py Secret             # All Secret"
-            )
-            sys.exit(0)
+    if len(sys.argv) == 2 and sys.argv[1] in ["-h", "--help"]:
+        print("Usage:")
+        print("  python scripts/query_objectives.py                    # Summary")
+        print("  python scripts/query_objectives.py 'Stage I'          # All Stage I")
+        print("  python scripts/query_objectives.py 'Stage I' Base     # Base Stage I")
+        print("  python scripts/query_objectives.py Secret             # All Secret")
+        sys.exit(0)
+    elif len(sys.argv) == 1:
         print_summary()
     elif len(sys.argv) == 2:
         obj_type = sys.argv[1]
