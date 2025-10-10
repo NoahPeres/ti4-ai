@@ -2,10 +2,10 @@
 
 import csv
 import logging
-import os
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
+from pathlib import Path
 from typing import TYPE_CHECKING, Callable, Literal, Optional
 
 if TYPE_CHECKING:
@@ -395,7 +395,10 @@ class PublicObjectiveManager:
         Returns:
             The revealed Stage I objective card
         """
-        assert self._reveal_state is not None  # Should be checked by caller
+        if self._reveal_state is None:
+            raise ValueError(
+                "Reveal state must be initialized before revealing objectives"
+            )
         objective_to_reveal = self._reveal_state.remaining_stage_i[0]
         new_revealed_stage_i = self._reveal_state.revealed_stage_i + [
             objective_to_reveal
@@ -424,7 +427,10 @@ class PublicObjectiveManager:
         Returns:
             The revealed Stage II objective card
         """
-        assert self._reveal_state is not None  # Should be checked by caller
+        if self._reveal_state is None:
+            raise ValueError(
+                "Reveal state must be initialized before revealing objectives"
+            )
         objective_to_reveal = self._reveal_state.remaining_stage_ii[0]
         new_revealed_stage_ii = self._reveal_state.revealed_stage_ii + [
             objective_to_reveal
@@ -519,17 +525,13 @@ class ObjectiveCardFactory:
     @staticmethod
     def _get_csv_path() -> str:
         """Get the path to the objective cards CSV file."""
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        # Navigate from src/ti4/core/ to project root, then to docs/component_details/
-        return os.path.join(
-            current_dir,
-            "..",
-            "..",
-            "..",
-            "docs",
-            "component_details",
-            "TI4_objective_cards.csv",
+        # Get project root by navigating up from src/ti4/core/
+        module_path = Path(__file__).resolve()
+        project_root = module_path.parent.parent.parent.parent
+        csv_path = (
+            project_root / "docs" / "component_details" / "TI4_objective_cards.csv"
         )
+        return str(csv_path)
 
     @staticmethod
     def _load_csv_data(csv_path: str) -> list[dict[str, str]]:

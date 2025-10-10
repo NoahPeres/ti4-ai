@@ -16,7 +16,21 @@ def load_objectives() -> list[dict[str, str]]:
     try:
         with open(csv_path) as f:
             reader = csv.DictReader(f)
+            required_columns = {
+                "Name",
+                "Condition",
+                "Points",
+                "Expansion",
+                "Type",
+                "Phase",
+            }
+
             for row in reader:
+                # Validate required columns on first row
+                if not objectives and not required_columns.issubset(row.keys()):
+                    missing = required_columns - set(row.keys())
+                    raise ValueError(f"CSV missing required columns: {missing}")
+
                 # Restore commas in condition text
                 if "Condition" in row:
                     row["Condition"] = row["Condition"].replace("§", ",")
@@ -24,6 +38,11 @@ def load_objectives() -> list[dict[str, str]]:
     except FileNotFoundError:
         print(f"Error: CSV file not found at {csv_path}")
         print("Please ensure you're running this script from the repository root.")
+        import sys
+
+        sys.exit(1)
+    except ValueError as e:
+        print(f"Error: Invalid CSV format - {e}")
         import sys
 
         sys.exit(1)
