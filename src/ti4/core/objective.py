@@ -67,7 +67,7 @@ class ObjectiveType(Enum):
 
     PUBLIC_STAGE_I = "public_stage_i"
     PUBLIC_STAGE_II = "public_stage_ii"
-    SECRET = "secret"
+    SECRET = "secret"  # nosec B105 - enum label, not a password
 
 
 class ObjectiveCategory(Enum):
@@ -324,7 +324,7 @@ class PublicObjectiveManager:
 
         except (FileNotFoundError, ValueError):
             # Log the failure before falling back
-            logging.error(
+            logger.error(
                 "Failed to load objectives from factory, using empty lists",
                 exc_info=True,
             )
@@ -545,8 +545,13 @@ class ObjectiveCardFactory:
     def _load_csv_data(csv_path: str) -> list[dict[str, str]]:
         """Load and validate CSV data from file."""
         data = []
-        with open(csv_path, encoding="utf-8") as f:
+        with open(csv_path, encoding="utf-8", newline="") as f:
             reader = csv.DictReader(f)
+            required = {"Name", "Condition", "Points", "Expansion", "Type", "Phase"}
+            header = set(reader.fieldnames or [])
+            if not required.issubset(header):
+                missing = required - header
+                raise ValueError(f"CSV missing required columns: {missing}")
             for row in reader:
                 # Skip empty rows
                 if not row.get("Name", "").strip():
@@ -632,6 +637,8 @@ class ObjectiveCardFactory:
         expansion_mapping = {
             "Base": Expansion.BASE,
             "Prophecy of Kings": Expansion.PROPHECY_OF_KINGS,
+            "Codex I": Expansion.CODEX_I,
+            "Codex II": Expansion.CODEX_II,
             "Codex III": Expansion.CODEX_III,
         }
 

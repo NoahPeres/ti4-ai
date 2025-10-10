@@ -9,11 +9,8 @@ from typing import TYPE_CHECKING, Any
 
 from .constants import Expansion
 from .game_phase import GamePhase
-from .home_system_control_validator import (
-    HomeSystemControlError,
-    HomeSystemControlValidator,
-)
-from .objective import ObjectiveCategory
+from .home_system_control_validator import HomeSystemControlValidator
+from .objective import HomeSystemControlError, ObjectiveCategory, ObjectiveType
 from .player import Player
 from .promissory_notes import PromissoryNoteManager
 
@@ -622,7 +619,8 @@ class GameState:
         )
 
         if (
-            objective.type.value.startswith("public")
+            objective.type
+            in (ObjectiveType.PUBLIC_STAGE_I, ObjectiveType.PUBLIC_STAGE_II)
             and player_scoring.get("public", 0) >= 1
         ):
             raise ValueError(
@@ -630,7 +628,7 @@ class GameState:
             )
 
         if (
-            objective.type.value.startswith("secret")
+            objective.type == ObjectiveType.SECRET
             and player_scoring.get("secret", 0) >= 1
         ):
             raise ValueError(
@@ -649,7 +647,10 @@ class GameState:
             if player_id not in new_status_phase_scoring:
                 new_status_phase_scoring[player_id] = {"public": 0, "secret": 0}
 
-            if objective.type.value.startswith("public"):
+            if objective.type in (
+                ObjectiveType.PUBLIC_STAGE_I,
+                ObjectiveType.PUBLIC_STAGE_II,
+            ):
                 new_status_phase_scoring[player_id]["public"] += 1
             else:
                 new_status_phase_scoring[player_id]["secret"] += 1
@@ -662,6 +663,11 @@ class GameState:
         self, player_id: str, objective: ObjectiveCard
     ) -> GameState:
         """Assign a secret objective to a player (Rule 61.19)."""
+        if objective.type != ObjectiveType.SECRET:
+            raise ValueError(
+                "Only secret objectives can be assigned to a player's secret objective hand"
+            )
+
         # Check if player already has this secret objective
         player_secrets = self.player_secret_objectives.get(player_id, [])
         if any(obj.id == objective.id for obj in player_secrets):
@@ -736,11 +742,14 @@ class GameState:
             raise ValueError(f"Player {player_id} does not exist in the game")
 
         # Rule 61.19-61.20: Secret objective ownership validation
-        if objective.type.value.startswith("secret"):
+        if objective.type == ObjectiveType.SECRET:
             self._validate_secret_objective_ownership(player_id, objective)
 
         # Rule 61.16: Home system control validation for public objectives
-        if objective.type.value.startswith("public"):
+        if objective.type in (
+            ObjectiveType.PUBLIC_STAGE_I,
+            ObjectiveType.PUBLIC_STAGE_II,
+        ):
             try:
                 self._validate_home_system_control_for_public_objective(player_id)
             except ValueError as e:
@@ -1165,7 +1174,7 @@ class GameState:
         }
 
         if (
-            objective.type.value.startswith("secret")
+            objective.type == ObjectiveType.SECRET
             and player_id in new_player_secret_objectives
         ):
             new_player_secret_objectives[player_id] = [
@@ -1180,7 +1189,10 @@ class GameState:
         self, player_id: str, objective: ObjectiveCard
     ) -> bool:
         """Check if a player can see an objective (public objectives and completed objectives are visible)."""
-        if objective.type.value.startswith("public"):
+        if objective.type in (
+            ObjectiveType.PUBLIC_STAGE_I,
+            ObjectiveType.PUBLIC_STAGE_II,
+        ):
             return True
 
         # Check if objective is completed by any player (completed secret objectives are revealed)

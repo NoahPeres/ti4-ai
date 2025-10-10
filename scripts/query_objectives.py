@@ -14,13 +14,19 @@ from pathlib import Path
 def load_objectives() -> list[dict[str, str]]:
     """Load objective cards from CSV file."""
     objectives = []
-    # Get script directory and construct path relative to repo root
-    script_dir = Path(__file__).parent
-    csv_path = (
-        script_dir.parent / "docs" / "component_details" / "TI4_objective_cards.csv"
-    )
+    # Walk up to repo root (looking for docs/component_details) instead of assuming a fixed parent
+    current = Path(__file__).resolve()
+    csv_path = None
+    while current.parent != current:
+        candidate = current / "docs" / "component_details" / "TI4_objective_cards.csv"
+        if candidate.exists():
+            csv_path = candidate
+            break
+        current = current.parent
+    if csv_path is None:
+        raise FileNotFoundError("Could not locate TI4_objective_cards.csv")
     try:
-        with open(csv_path, encoding="utf-8") as f:
+        with open(csv_path, encoding="utf-8", newline="") as f:
             reader = csv.DictReader(f)
             required_columns = {
                 "Name",
@@ -30,23 +36,26 @@ def load_objectives() -> list[dict[str, str]]:
                 "Type",
                 "Phase",
             }
+            # Validate required columns from header
+            header = set(reader.fieldnames or [])
+            if not required_columns.issubset(header):
+                missing = required_columns - header
+                raise ValueError(f"CSV missing required columns: {missing}")
 
             for row in reader:
-                # Validate required columns on first row
-                if not objectives and not required_columns.issubset(row.keys()):
-                    missing = required_columns - set(row.keys())
-                    raise ValueError(f"CSV missing required columns: {missing}")
-
                 # Restore commas in condition text
-                if "Condition" in row:
+                if "Condition" in row and row["Condition"] is not None:
                     row["Condition"] = row["Condition"].replace("§", ",")
                 objectives.append(row)
     except FileNotFoundError:
-        print(f"Error: CSV file not found at {csv_path}")
-        print("Please ensure you're running this script from the repository root.")
+        print(f"Error: CSV file not found at {csv_path}", file=sys.stderr)
+        print(
+            "Please ensure you're running this script from the repository root.",
+            file=sys.stderr,
+        )
         sys.exit(1)
     except ValueError as e:
-        print(f"Error: Invalid CSV format - {e}")
+        print(f"Error: Invalid CSV format - {e}", file=sys.stderr)
         sys.exit(1)
     return objectives
 
@@ -109,8 +118,6 @@ def list_objectives_by_type(obj_type: str, expansion: str = None):
 
 
 if __name__ == "__main__":
-    import sys
-
     if len(sys.argv) == 2 and sys.argv[1] in ["-h", "--help"]:
         print("Usage:")
         print("  python scripts/query_objectives.py                    # Summary")
