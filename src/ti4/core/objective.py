@@ -1235,13 +1235,13 @@ class ObjectiveEligibilityTracker:
         Returns:
             List of objectives that became newly eligible
         """
-        # Get current eligibility
+        # Preserve the previous eligibility snapshot before refreshing the cache
+        previous_eligibility = self._eligibility_cache.get(player_id, {}).copy()
+
+        # Refresh eligibility and cache with the latest data
         current_eligibility = self.check_all_objective_eligibility(
             player_id, game_state
         )
-
-        # Get previous eligibility from cache
-        previous_eligibility = self._eligibility_cache.get(player_id, {})
 
         # Find newly eligible objectives
         newly_eligible = []

@@ -23,10 +23,26 @@ def update_objective_constructor(content):
 
 def update_imports(content):
     """Update imports to include ObjectiveTestHelpers."""
-    if "from ti4.core.objective import Objective" in content:
+    # Handle single Objective import
+    if "from ti4.core.objective import Objective\n" in content:
         content = content.replace(
-            "from ti4.core.objective import Objective",
-            "from ti4.core.objective import ObjectiveCard\nfrom tests.test_rule_61_test_helpers import ObjectiveTestHelpers",
+            "from ti4.core.objective import Objective\n",
+            "from ti4.core.objective import ObjectiveCard\nfrom tests.test_rule_61_test_helpers import ObjectiveTestHelpers\n",
+        )
+    # Handle Objective in multi-import line
+    elif ", Objective" in content or "Objective," in content:
+        # Add ObjectiveTestHelpers import separately if Objective is in a multi-import
+        if (
+            "from tests.test_rule_61_test_helpers import ObjectiveTestHelpers"
+            not in content
+        ):
+            content = content.replace(
+                "from ti4.core.objective import",
+                "from tests.test_rule_61_test_helpers import ObjectiveTestHelpers\nfrom ti4.core.objective import",
+                1,
+            )
+        content = content.replace("Objective,", "ObjectiveCard,").replace(
+            ", Objective", ", ObjectiveCard"
         )
     return content
 

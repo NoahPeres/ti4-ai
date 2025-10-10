@@ -12,13 +12,21 @@ from collections import defaultdict
 def load_objectives() -> list[dict[str, str]]:
     """Load objective cards from CSV file."""
     objectives = []
-    with open("docs/component_details/TI4_objective_cards.csv") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            # Restore commas in condition text
-            if "Condition" in row:
-                row["Condition"] = row["Condition"].replace("§", ",")
-            objectives.append(row)
+    csv_path = "docs/component_details/TI4_objective_cards.csv"
+    try:
+        with open(csv_path) as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                # Restore commas in condition text
+                if "Condition" in row:
+                    row["Condition"] = row["Condition"].replace("§", ",")
+                objectives.append(row)
+    except FileNotFoundError:
+        print(f"Error: CSV file not found at {csv_path}")
+        print("Please ensure you're running this script from the repository root.")
+        import sys
+
+        sys.exit(1)
     return objectives
 
 
@@ -82,7 +90,20 @@ def list_objectives_by_type(obj_type: str, expansion: str = None):
 if __name__ == "__main__":
     import sys
 
-    if len(sys.argv) == 1:
+    if len(sys.argv) == 1 or (len(sys.argv) == 2 and sys.argv[1] in ["-h", "--help"]):
+        if len(sys.argv) == 2:
+            print("Usage:")
+            print("  python scripts/query_objectives.py                    # Summary")
+            print(
+                "  python scripts/query_objectives.py 'Stage I'          # All Stage I"
+            )
+            print(
+                "  python scripts/query_objectives.py 'Stage I' Base     # Base Stage I"
+            )
+            print(
+                "  python scripts/query_objectives.py Secret             # All Secret"
+            )
+            sys.exit(0)
         print_summary()
     elif len(sys.argv) == 2:
         obj_type = sys.argv[1]

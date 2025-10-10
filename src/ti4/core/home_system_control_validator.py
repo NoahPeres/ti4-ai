@@ -13,6 +13,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+from .objective import HomeSystemControlError
+
+__all__ = ["HomeSystemControlError", "ValidationResult", "HomeSystemControlValidator"]
+
 if TYPE_CHECKING:
     from .game_state import GameState
     from .planet import Planet
@@ -29,12 +33,6 @@ class ValidationResult:
 
     is_valid: bool
     error_message: str | None
-
-
-class HomeSystemControlError(Exception):
-    """Exception raised when home system control validation fails."""
-
-    pass
 
 
 class HomeSystemControlValidator:

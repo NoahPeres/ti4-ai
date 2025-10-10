@@ -8,13 +8,13 @@ LRR References:
 - Requirements 2.1, 2.2, 2.3, 2.4, 2.5
 """
 
-from src.ti4.core.constants import Faction
-from src.ti4.core.galaxy import Galaxy
-from src.ti4.core.game_state import GameState
-from src.ti4.core.home_system_control_validator import HomeSystemControlValidator
-from src.ti4.core.planet import Planet
-from src.ti4.core.player import Player
-from src.ti4.core.system import System
+from ti4.core.constants import Faction
+from ti4.core.galaxy import Galaxy
+from ti4.core.game_state import GameState
+from ti4.core.home_system_control_validator import HomeSystemControlValidator
+from ti4.core.planet import Planet
+from ti4.core.player import Player
+from ti4.core.system import System
 
 
 class TestHomeSystemControlIntegration:

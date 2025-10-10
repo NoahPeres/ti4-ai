@@ -143,7 +143,7 @@ def sanitize_csv_file(file_path: str, separator: str = "§") -> dict[str, Any]:
                 sample = info["sample_values"][0]
                 print(f"    Sample: {sample[:80]}...")
 
-    if not problematic_fields:
+    if not problematic_fields and not analysis["has_quoted_commas"]:
         print("  No problematic fields found - file is already clean")
         return {
             "file_path": file_path,
@@ -151,6 +151,17 @@ def sanitize_csv_file(file_path: str, separator: str = "§") -> dict[str, Any]:
             "changes_made": False,
             "problematic_fields": [],
         }
+
+    # If we have quoted commas but no problematic fields from our known list,
+    # populate problematic_fields from all fields that have commas in quotes
+    if not problematic_fields and analysis["has_quoted_commas"]:
+        for field_name, info in analysis["field_analysis"].items():
+            if info["has_commas_in_quotes"]:
+                problematic_fields.append(field_name)
+                print(f"  - {field_name}: Contains commas in quoted text")
+                if info["sample_values"]:
+                    sample = info["sample_values"][0]
+                    print(f"    Sample: {sample[:80]}...")
 
     # Create backup
     backup_path = create_backup(file_path)
