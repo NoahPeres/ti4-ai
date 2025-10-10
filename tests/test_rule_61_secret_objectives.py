@@ -10,10 +10,10 @@ Tests the implementation of:
 
 import pytest
 
+from tests.test_rule_61_test_helpers import ObjectiveTestHelpers
 from ti4.core.constants import Faction
 from ti4.core.game_phase import GamePhase
 from ti4.core.game_state import GameState
-from ti4.core.objective import Objective
 from ti4.core.player import Player
 
 
@@ -28,8 +28,8 @@ class TestSecretObjectiveOwnership:
             .add_player(Player("player2", Faction.XXCHA))
         )
 
-        secret_obj = Objective(
-            "sec1", "Secret 1", "Player 1's secret", 1, False, GamePhase.STATUS
+        secret_obj = ObjectiveTestHelpers.create_secret_objective(
+            "sec1", "Secret 1", GamePhase.STATUS, 1
         )
 
         # Give secret objective to player1
@@ -56,11 +56,11 @@ class TestSecretObjectiveOwnership:
             .add_player(Player("player2", Faction.XXCHA))
         )
 
-        secret_obj1 = Objective(
-            "sec1", "Secret 1", "Player 1's secret", 1, False, GamePhase.STATUS
+        secret_obj1 = ObjectiveTestHelpers.create_secret_objective(
+            "sec1", "Secret 1", GamePhase.STATUS, 1
         )
-        secret_obj2 = Objective(
-            "sec2", "Secret 2", "Player 2's secret", 1, False, GamePhase.STATUS
+        secret_obj2 = ObjectiveTestHelpers.create_secret_objective(
+            "sec2", "Secret 2", GamePhase.STATUS, 1
         )
 
         # Assign secret objectives to different players
@@ -84,13 +84,8 @@ class TestSecretObjectiveOwnership:
         game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         secret_objectives = [
-            Objective(
-                f"sec{i}",
-                f"Secret {i}",
-                f"Secret objective {i}",
-                1,
-                False,
-                GamePhase.STATUS,
+            ObjectiveTestHelpers.create_secret_objective(
+                f"sec{i}", f"Secret {i}", GamePhase.STATUS, 1
             )
             for i in range(1, 5)  # Create 4 secret objectives
         ]
@@ -116,8 +111,8 @@ class TestSecretObjectiveOwnership:
         """Test that scoring a secret objective removes it from player's hand."""
         game_state = GameState().add_player(Player("player1", Faction.SOL))
 
-        secret_obj = Objective(
-            "sec1", "Secret 1", "Player's secret", 1, False, GamePhase.STATUS
+        secret_obj = ObjectiveTestHelpers.create_secret_objective(
+            "sec1", "Secret 1", GamePhase.STATUS, 1
         )
 
         # Assign secret objective to player
@@ -141,8 +136,8 @@ class TestImperialStrategyCardSecretObjectives:
         game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         # Create secret objective deck
-        secret_obj = Objective(
-            "sec1", "Secret 1", "New secret", 1, False, GamePhase.STATUS
+        secret_obj = ObjectiveTestHelpers.create_secret_objective(
+            "sec1", "Secret 1", GamePhase.STATUS, 1
         )
         state_with_deck = game_state.add_secret_objective_to_deck(secret_obj)
 
@@ -162,8 +157,8 @@ class TestImperialStrategyCardSecretObjectives:
 
         # Give player 3 secret objectives (at limit)
         secret_objectives = [
-            Objective(
-                f"sec{i}", f"Secret {i}", f"Secret {i}", 1, False, GamePhase.STATUS
+            ObjectiveTestHelpers.create_secret_objective(
+                f"sec{i}", f"Secret {i}", GamePhase.STATUS, 1
             )
             for i in range(1, 4)
         ]
@@ -173,8 +168,8 @@ class TestImperialStrategyCardSecretObjectives:
             current_state = current_state.assign_secret_objective("player1", obj)
 
         # Add another secret to deck
-        new_secret = Objective(
-            "sec4", "Secret 4", "New secret", 1, False, GamePhase.STATUS
+        new_secret = ObjectiveTestHelpers.create_secret_objective(
+            "sec4", "Secret 4", GamePhase.STATUS, 1
         )
         state_with_deck = current_state.add_secret_objective_to_deck(new_secret)
 
@@ -202,8 +197,8 @@ class TestSecretObjectiveDeck:
         game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         secret_objectives = [
-            Objective(
-                f"sec{i}", f"Secret {i}", f"Secret {i}", 1, False, GamePhase.STATUS
+            ObjectiveTestHelpers.create_secret_objective(
+                f"sec{i}", f"Secret {i}", GamePhase.STATUS, 1
             )
             for i in range(1, 4)
         ]
@@ -226,8 +221,8 @@ class TestSecretObjectiveDeck:
         game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         secret_objectives = [
-            Objective(
-                f"sec{i}", f"Secret {i}", f"Secret {i}", 1, False, GamePhase.STATUS
+            ObjectiveTestHelpers.create_secret_objective(
+                f"sec{i}", f"Secret {i}", GamePhase.STATUS, 1
             )
             for i in range(1, 6)
         ]
@@ -251,8 +246,8 @@ class TestSecretObjectiveGameIntegration:
         """Test that secret objectives persist across game phases."""
         game_state = GameState().add_player(Player("player1", Faction.SOL))
 
-        secret_obj = Objective(
-            "sec1", "Secret 1", "Persistent secret", 1, False, GamePhase.STATUS
+        secret_obj = ObjectiveTestHelpers.create_secret_objective(
+            "sec1", "Secret 1", GamePhase.STATUS, 1
         )
 
         # Assign secret objective in setup phase
@@ -271,8 +266,8 @@ class TestSecretObjectiveGameIntegration:
         game_state = GameState().add_player(Player("player1", Faction.SOL))
 
         # Create high-value secret objective
-        secret_obj = Objective(
-            "sec1", "Secret 1", "High value secret", 3, False, GamePhase.STATUS
+        secret_obj = ObjectiveTestHelpers.create_secret_objective(
+            "sec1", "Secret 1", GamePhase.STATUS, 3
         )
 
         # Assign and score secret objective
@@ -287,8 +282,8 @@ class TestSecretObjectiveGameIntegration:
         """Test that secret objectives are revealed to all players when scored."""
         game_state = GameState().add_player(Player("player1", Faction.SOL))
 
-        secret_obj = Objective(
-            "sec1", "Secret 1", "Revealed secret", 1, False, GamePhase.STATUS
+        secret_obj = ObjectiveTestHelpers.create_secret_objective(
+            "sec1", "Secret 1", GamePhase.STATUS, 1
         )
 
         # Assign secret objective to player1
@@ -312,8 +307,8 @@ class TestSecretObjectiveEdgeCases:
         """Test that players cannot receive duplicate secret objectives."""
         game_state = GameState().add_player(Player("player1", Faction.SOL))
 
-        secret_obj = Objective(
-            "sec1", "Secret 1", "Unique secret", 1, False, GamePhase.STATUS
+        secret_obj = ObjectiveTestHelpers.create_secret_objective(
+            "sec1", "Secret 1", GamePhase.STATUS, 1
         )
 
         # Assign secret objective first time - should succeed
@@ -327,8 +322,8 @@ class TestSecretObjectiveEdgeCases:
         """Test that secret objectives are removed when player is eliminated."""
         game_state = GameState().add_player(Player("player1", Faction.SOL))
 
-        secret_obj = Objective(
-            "sec1", "Secret 1", "Lost secret", 1, False, GamePhase.STATUS
+        secret_obj = ObjectiveTestHelpers.create_secret_objective(
+            "sec1", "Secret 1", GamePhase.STATUS, 1
         )
 
         # Assign secret objective to player
@@ -350,11 +345,11 @@ class TestSecretObjectiveEdgeCases:
         )
 
         # Create identical secret objectives (different instances)
-        secret_obj1 = Objective(
-            "sec1a", "Control Planets", "Control 6 planets", 1, False, GamePhase.STATUS
+        secret_obj1 = ObjectiveTestHelpers.create_secret_objective(
+            "sec1a", "Control Planets", GamePhase.STATUS, 1
         )
-        secret_obj2 = Objective(
-            "sec1b", "Control Planets", "Control 6 planets", 1, False, GamePhase.STATUS
+        secret_obj2 = ObjectiveTestHelpers.create_secret_objective(
+            "sec1b", "Control Planets", GamePhase.STATUS, 1
         )
 
         # Assign to different players

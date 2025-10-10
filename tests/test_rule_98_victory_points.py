@@ -2,9 +2,9 @@
 
 import pytest
 
+from tests.test_rule_61_test_helpers import ObjectiveTestHelpers
 from ti4.core.game_phase import GamePhase
 from ti4.core.game_state import GameState
-from ti4.core.objective import Objective
 from ti4.core.player import Player
 
 
@@ -32,29 +32,14 @@ class TestRule98VictoryPoints:
         state3 = state2.award_victory_points("player3", 8)
 
         # Create objectives that would give 2 points each
-        objective_a = Objective(
-            id="obj_a",
-            name="Objective A",
-            description="Test objective A",
-            points=2,
-            is_public=True,
-            scoring_phase=GamePhase.STATUS,
+        objective_a = ObjectiveTestHelpers.create_public_objective(
+            "obj_a", "Objective A", GamePhase.STATUS, 2
         )
-        objective_b = Objective(
-            id="obj_b",
-            name="Objective B",
-            description="Test objective B",
-            points=2,
-            is_public=True,
-            scoring_phase=GamePhase.STATUS,
+        objective_b = ObjectiveTestHelpers.create_public_objective(
+            "obj_b", "Objective B", GamePhase.STATUS, 2
         )
-        objective_c = Objective(
-            id="obj_c",
-            name="Objective C",
-            description="Test objective C",
-            points=2,
-            is_public=True,
-            scoring_phase=GamePhase.STATUS,
+        objective_c = ObjectiveTestHelpers.create_public_objective(
+            "obj_c", "Objective C", GamePhase.STATUS, 2
         )
 
         # Simulate simultaneous scoring that would give all players 10 points
@@ -105,13 +90,8 @@ class TestRule98VictoryPoints:
         game_state = GameState(players=[player])
 
         # Create a 2-point objective
-        objective = Objective(
-            id="test_objective",
-            name="Test Objective",
-            description="A test objective worth 2 points",
-            points=2,
-            is_public=True,
-            scoring_phase=GamePhase.ACTION,
+        objective = ObjectiveTestHelpers.create_public_objective(
+            "test_objective", "Test Objective", GamePhase.ACTION, 2
         )
 
         # Award 9 points first (should be allowed)

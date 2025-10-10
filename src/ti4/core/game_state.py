@@ -7,7 +7,13 @@ import uuid
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
+from .constants import Expansion
 from .game_phase import GamePhase
+from .home_system_control_validator import (
+    HomeSystemControlError,
+    HomeSystemControlValidator,
+)
+from .objective import ObjectiveCategory
 from .player import Player
 from .promissory_notes import PromissoryNoteManager
 
@@ -15,7 +21,7 @@ if TYPE_CHECKING:
     from .agenda_cards.law_manager import LawManager
     from .deals import ComponentTransaction, TransactionHistoryEntry
     from .galaxy import Galaxy
-    from .objective import Objective
+    from .objective import Objective, ObjectiveCard, ObjectiveType
     from .planet import Planet
     from .planet_card import PlanetCard
     from .strategic_action import StrategyCardType
@@ -70,15 +76,15 @@ class GameState:
     )  # combat_id -> [objective_ids]
 
     # Secret objective system (Rule 61.19-61.20)
-    player_secret_objectives: dict[str, list[Objective]] = field(
+    player_secret_objectives: dict[str, list[ObjectiveCard]] = field(
         default_factory=dict, hash=False
     )  # player_id -> [secret_objectives]
-    secret_objective_deck: list[Objective] = field(
+    secret_objective_deck: list[ObjectiveCard] = field(
         default_factory=list, hash=False
     )  # Deck of unassigned secret objectives
 
     # Public objective system (Rule 61)
-    public_objectives: list[Objective] = field(
+    public_objectives: list[ObjectiveCard] = field(
         default_factory=list, hash=False
     )  # List of public objectives
     # player_influence field removed - incorrect implementation
@@ -402,12 +408,12 @@ class GameState:
 
         return result
 
-    def is_objective_completed(self, player_id: str, objective: Objective) -> bool:
+    def is_objective_completed(self, player_id: str, objective: ObjectiveCard) -> bool:
         """Check if a player has completed a specific objective."""
         player_objectives = self.completed_objectives.get(player_id, [])
         return objective.id in player_objectives
 
-    def complete_objective(self, player_id: str, objective: Objective) -> GameState:
+    def complete_objective(self, player_id: str, objective: ObjectiveCard) -> GameState:
         """Mark an objective as completed for a player, returning a new GameState."""
         new_completed_objectives = {
             pid: objectives.copy()
@@ -550,7 +556,7 @@ class GameState:
         return True
 
     def score_objective_during_combat(
-        self, player_id: str, objective: Objective, combat_id: str
+        self, player_id: str, objective: ObjectiveCard, combat_id: str
     ) -> GameState:
         """Score an objective during combat with combat-specific limits."""
         # Rule 61.7: Players can only score one objective during or after each combat
@@ -561,9 +567,9 @@ class GameState:
             raise ValueError(f"Already scored an objective during combat '{combat_id}'")
 
         # Must be action phase objective
-        if objective.scoring_phase != GamePhase.ACTION:
+        if objective.phase != GamePhase.ACTION:
             raise ValueError(
-                f"Cannot score {objective.scoring_phase.value} phase objective during combat"
+                f"Cannot score {objective.phase.value} phase objective during combat"
             )
 
         # Score the objective normally
@@ -578,7 +584,7 @@ class GameState:
         return new_state._create_new_state(combat_scoring=new_combat_scoring)
 
     def execute_status_phase_step_1_score_objectives(
-        self, player_id: str, objectives: list[Objective]
+        self, player_id: str, objectives: list[ObjectiveCard]
     ) -> GameState:
         """Execute status phase step 1: score objectives."""
         # Rule 81.1: Following initiative order, each player may score up to one public and one secret objective
@@ -597,25 +603,31 @@ class GameState:
         return self._create_new_state(status_phase_scoring={})
 
     def _validate_status_phase_scoring_limits(
-        self, player_id: str, objective: Objective
+        self, player_id: str, objective: ObjectiveCard
     ) -> None:
         """Validate status phase scoring limits (Rule 61.6)."""
         player_scoring = self.status_phase_scoring.get(
             player_id, {"public": 0, "secret": 0}
         )
 
-        if objective.is_public and player_scoring.get("public", 0) >= 1:
+        if (
+            objective.type.value.startswith("public")
+            and player_scoring.get("public", 0) >= 1
+        ):
             raise ValueError(
                 f"Already scored a public objective during this status phase for player '{player_id}'"
             )
 
-        if not objective.is_public and player_scoring.get("secret", 0) >= 1:
+        if (
+            objective.type.value.startswith("secret")
+            and player_scoring.get("secret", 0) >= 1
+        ):
             raise ValueError(
                 f"Already scored a secret objective during this status phase for player '{player_id}'"
             )
 
     def _update_status_phase_scoring(
-        self, player_id: str, objective: Objective, current_phase: GamePhase
+        self, player_id: str, objective: ObjectiveCard, current_phase: GamePhase
     ) -> dict[str, dict[str, int]]:
         """Update status phase scoring tracking."""
         new_status_phase_scoring = {
@@ -626,7 +638,7 @@ class GameState:
             if player_id not in new_status_phase_scoring:
                 new_status_phase_scoring[player_id] = {"public": 0, "secret": 0}
 
-            if objective.is_public:
+            if objective.type.value.startswith("public"):
                 new_status_phase_scoring[player_id]["public"] += 1
             else:
                 new_status_phase_scoring[player_id]["secret"] += 1
@@ -636,7 +648,7 @@ class GameState:
     # Secret Objective System Methods (Rule 61.19-61.20)
 
     def assign_secret_objective(
-        self, player_id: str, objective: Objective
+        self, player_id: str, objective: ObjectiveCard
     ) -> GameState:
         """Assign a secret objective to a player (Rule 61.19)."""
         # Check if player already has this secret objective
@@ -668,7 +680,7 @@ class GameState:
         )
 
     def score_objective(
-        self, player_id: str, objective: Objective, current_phase: GamePhase
+        self, player_id: str, objective: ObjectiveCard, current_phase: GamePhase
     ) -> GameState:
         """
         Score an objective for a player with comprehensive validation.
@@ -678,10 +690,12 @@ class GameState:
         - Secret objective ownership verification (Rule 61.19-61.20)
         - One-time scoring enforcement (Rule 61.8)
         - Status phase scoring limits (Rule 61.6)
+        - Home system control validation (Rule 61.16)
+        - Objective requirement validation
 
         Args:
             player_id: The ID of the player scoring the objective
-            objective: The objective being scored
+            objective: The objective card being scored
             current_phase: The current game phase when scoring occurs
 
         Returns:
@@ -689,35 +703,62 @@ class GameState:
 
         Raises:
             ValueError: If scoring validation fails for any reason
+            ObjectiveSystemError: If objective system validation fails
         """
         self._validate_objective_scoring(player_id, objective, current_phase)
 
         return self._execute_objective_scoring(player_id, objective, current_phase)
 
     def _validate_objective_scoring(
-        self, player_id: str, objective: Objective, current_phase: GamePhase
+        self, player_id: str, objective: ObjectiveCard, current_phase: GamePhase
     ) -> None:
         """Validate all conditions for objective scoring."""
+        from .objective import (
+            HomeSystemControlError,
+            InvalidObjectivePhaseError,
+            ObjectiveAlreadyScoredError,
+            ObjectiveNotEligibleError,
+        )
+
         # Validate player exists in the game
         if not any(player.id == player_id for player in self.players):
             raise ValueError(f"Player {player_id} does not exist in the game")
 
         # Rule 61.19-61.20: Secret objective ownership validation
-        if not objective.is_public:
+        if objective.type.value.startswith("secret"):
             self._validate_secret_objective_ownership(player_id, objective)
 
+        # Rule 61.16: Home system control validation for public objectives
+        if objective.type.value.startswith("public"):
+            try:
+                self._validate_home_system_control_for_public_objective(player_id)
+            except ValueError as e:
+                raise HomeSystemControlError(str(e)) from e
+
         # Rule 61.5: Phase-specific timing validation
-        self._validate_objective_timing(objective, current_phase)
+        try:
+            self._validate_objective_timing(objective, current_phase)
+        except ValueError as e:
+            raise InvalidObjectivePhaseError(str(e)) from e
 
         # Rule 61.8: One-time scoring enforcement
-        self._validate_objective_not_already_scored(player_id, objective)
+        try:
+            self._validate_objective_not_already_scored(player_id, objective)
+        except ValueError as e:
+            raise ObjectiveAlreadyScoredError(str(e)) from e
+
+        # Objective requirement validation
+        if not objective.requirement_validator(player_id, self):
+            raise ObjectiveNotEligibleError(
+                f"Player {player_id} does not meet requirements for objective '{objective.name}'"
+            )
 
         # Rule 61.6: Status phase scoring limits
         if current_phase == GamePhase.STATUS:
             self._validate_status_phase_scoring_limits(player_id, objective)
 
     def _validate_secret_objective_ownership(
-        self, player_id: str, objective: Objective
+        self, player_id: str, objective: ObjectiveCard
     ) -> None:
         """Validate that the player owns the secret objective they're trying to score."""
         player_secrets = self.get_player_secret_objectives(player_id)
@@ -727,13 +768,34 @@ class GameState:
             )
 
     def _validate_objective_timing(
-        self, objective: Objective, current_phase: GamePhase
+        self, objective: ObjectiveCard, current_phase: GamePhase
     ) -> None:
         """Validate that the objective can be scored in the current phase."""
-        if objective.scoring_phase != current_phase:
+        if objective.phase != current_phase:
             raise ValueError(
-                f"Cannot score objective '{objective.id}' requiring {objective.scoring_phase.value} phase during {current_phase.value} phase"
+                f"Cannot score objective '{objective.id}' requiring {objective.phase.value} phase during {current_phase.value} phase"
             )
+
+    def _validate_home_system_control_for_public_objective(
+        self, player_id: str
+    ) -> None:
+        """Validate that player controls all planets in their home system for public objectives.
+
+        Implements Rule 61.16: Players must control all planets in their home system
+        to score public objectives.
+
+        Args:
+            player_id: ID of the player attempting to score a public objective
+
+        Raises:
+            HomeSystemControlError: If player doesn't control all home system planets
+            ValueError: If validation cannot be performed due to missing data
+        """
+        validator = HomeSystemControlValidator()
+        result = validator.validate_home_system_control(player_id, self)
+
+        if not result.is_valid:
+            raise HomeSystemControlError(result.error_message)
 
     def get_active_system(self) -> System | None:
         """Get the currently active system for movement/combat operations.
@@ -881,7 +943,7 @@ class GameState:
         return getattr(self, "_agenda_phase", None)
 
     def _validate_objective_not_already_scored(
-        self, player_id: str, objective: Objective
+        self, player_id: str, objective: ObjectiveCard
     ) -> None:
         """Validate that the objective hasn't already been scored by this player."""
         if self.is_objective_completed(player_id, objective):
@@ -890,7 +952,7 @@ class GameState:
             )
 
     def _execute_objective_scoring(
-        self, player_id: str, objective: Objective, current_phase: GamePhase
+        self, player_id: str, objective: ObjectiveCard, current_phase: GamePhase
     ) -> GameState:
         """Execute the objective scoring with all state updates."""
         # Update completed objectives tracking
@@ -919,7 +981,7 @@ class GameState:
         )
 
     def _update_completed_objectives(
-        self, player_id: str, objective: Objective
+        self, player_id: str, objective: ObjectiveCard
     ) -> dict[str, list[str]]:
         """Update the completed objectives tracking."""
         new_completed_objectives = {
@@ -934,7 +996,7 @@ class GameState:
         return new_completed_objectives
 
     def _update_victory_points(
-        self, player_id: str, objective: Objective
+        self, player_id: str, objective: ObjectiveCard
     ) -> dict[str, int]:
         """Update the victory points for the player."""
         new_victory_points = self.victory_points.copy()
@@ -1083,15 +1145,18 @@ class GameState:
         return game_state
 
     def _update_secret_objectives_after_scoring(
-        self, player_id: str, objective: Objective
-    ) -> dict[str, list[Objective]]:
+        self, player_id: str, objective: ObjectiveCard
+    ) -> dict[str, list[ObjectiveCard]]:
         """Remove scored secret objective from player's hand."""
         new_player_secret_objectives = {
             pid: objectives.copy() if isinstance(objectives, list) else objectives
             for pid, objectives in self.player_secret_objectives.items()
         }
 
-        if not objective.is_public and player_id in new_player_secret_objectives:
+        if (
+            objective.type.value.startswith("secret")
+            and player_id in new_player_secret_objectives
+        ):
             new_player_secret_objectives[player_id] = [
                 obj
                 for obj in new_player_secret_objectives[player_id]
@@ -1100,9 +1165,11 @@ class GameState:
 
         return new_player_secret_objectives
 
-    def can_player_see_objective(self, player_id: str, objective: Objective) -> bool:
+    def can_player_see_objective(
+        self, player_id: str, objective: ObjectiveCard
+    ) -> bool:
         """Check if a player can see an objective (public objectives and completed objectives are visible)."""
-        if objective.is_public:
+        if objective.type.value.startswith("public"):
             return True
 
         # Check if objective is completed by any player (completed secret objectives are revealed)
@@ -1111,6 +1178,67 @@ class GameState:
                 return True
 
         return False
+
+    # Backward Compatibility Bridge Methods
+    def _convert_objective_to_objective_card(
+        self, objective: Objective
+    ) -> ObjectiveCard:
+        """Convert old Objective to new ObjectiveCard for backward compatibility."""
+
+        # Determine objective type based on is_public flag
+        if objective.is_public:
+            obj_type = ObjectiveType.PUBLIC_STAGE_I  # Default to Stage I for public
+        else:
+            obj_type = ObjectiveType.SECRET
+
+        # Create ObjectiveCard with placeholder validator
+        return ObjectiveCard(
+            id=objective.id,
+            name=objective.name,
+            condition=objective.description,
+            points=objective.points,
+            expansion=Expansion.BASE,  # Default to base game
+            phase=objective.scoring_phase,
+            type=obj_type,
+            requirement_validator=lambda player_id, game_state: True,  # Placeholder
+            category=ObjectiveCategory.SPECIAL,  # Default category
+            dependencies=[],  # Will be determined by factory
+        )
+
+    def _convert_objective_card_to_objective(
+        self, objective_card: ObjectiveCard
+    ) -> Objective:
+        """Convert new ObjectiveCard to old Objective for backward compatibility."""
+        return Objective(
+            id=objective_card.id,
+            name=objective_card.name,
+            description=objective_card.condition,
+            points=objective_card.points,
+            is_public=objective_card.type.value.startswith("public"),
+            scoring_phase=objective_card.phase,
+        )
+
+    # Legacy methods for backward compatibility
+    def score_objective_legacy(
+        self, player_id: str, objective: Objective, current_phase: GamePhase
+    ) -> GameState:
+        """Legacy method to score old Objective format."""
+        objective_card = self._convert_objective_to_objective_card(objective)
+        return self.score_objective(player_id, objective_card, current_phase)
+
+    def assign_secret_objective_legacy(
+        self, player_id: str, objective: Objective
+    ) -> GameState:
+        """Legacy method to assign old Objective format."""
+        objective_card = self._convert_objective_to_objective_card(objective)
+        return self.assign_secret_objective(player_id, objective_card)
+
+    def is_objective_completed_legacy(
+        self, player_id: str, objective: Objective
+    ) -> bool:
+        """Legacy method to check completion of old Objective format."""
+        objective_card = self._convert_objective_to_objective_card(objective)
+        return self.is_objective_completed(player_id, objective_card)
 
     # Transaction Integration Methods (Rule 28)
 
@@ -2297,7 +2425,7 @@ class GameState:
             planet_control_mapping=new_planet_control_mapping,
         )
 
-    def get_secret_objective_deck(self) -> list[Objective]:
+    def get_secret_objective_deck(self) -> list[ObjectiveCard]:
         """Get the secret objective deck.
 
         Returns:
@@ -2417,7 +2545,7 @@ class GameState:
         """
         return self.player_technology_cards.get(player_id, [])
 
-    def add_secret_objective_to_deck(self, objective: Objective) -> GameState:
+    def add_secret_objective_to_deck(self, objective: ObjectiveCard) -> GameState:
         """Add a secret objective to the deck.
 
         Args:

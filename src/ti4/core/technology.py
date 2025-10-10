@@ -239,6 +239,7 @@ class TechnologyManager:
             TechnologyEnum.ANTIMASS_DEFLECTORS: TechnologyColor.BLUE,  # Blue tech, no prerequisites (confirmed)
             TechnologyEnum.QUANTUM_DATAHUB_NODE: TechnologyColor.YELLOW,  # Yellow tech, Hacan faction (confirmed)
             TechnologyEnum.DARK_ENERGY_TAP: TechnologyColor.BLUE,  # Blue tech, confirmed through framework
+            TechnologyEnum.AI_DEVELOPMENT_ALGORITHM: TechnologyColor.YELLOW,  # Yellow tech, confirmed through framework
             # Note: SPEC_OPS_II is a unit upgrade and has no color
         }
 
@@ -286,6 +287,7 @@ class TechnologyManager:
                 TechnologyColor.YELLOW,
             ],  # Confirmed: 3x Yellow (Hacan faction tech)
             TechnologyEnum.DARK_ENERGY_TAP: [],  # Confirmed: No prerequisites (Level 0), confirmed through framework
+            TechnologyEnum.AI_DEVELOPMENT_ALGORITHM: [],  # Confirmed: No prerequisites (Level 0), confirmed through framework
         }
 
         # Return confirmed data or raise error for unconfirmed technologies
@@ -323,6 +325,7 @@ class TechnologyManager:
             TechnologyEnum.SPEC_OPS_II,
             TechnologyEnum.QUANTUM_DATAHUB_NODE,
             TechnologyEnum.DARK_ENERGY_TAP,  # Confirmed through framework
+            TechnologyEnum.AI_DEVELOPMENT_ALGORITHM,  # Confirmed through framework
         }:
             raise ValueError(
                 f"Technology {technology} unit upgrade status not confirmed. Please ask user for specification."
