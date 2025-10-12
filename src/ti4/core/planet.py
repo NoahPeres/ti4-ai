@@ -131,11 +131,9 @@ class Planet:
     # Rule 27: Custodians token support
     def set_custodians_token(self, token: CustodiansToken) -> None:
         """Set the custodians token on this planet (for Mecatol Rex)."""
-        self._custodians_token = token
-        # Ensure token state is synchronized - token should be on Mecatol Rex
         if not token.is_on_mecatol_rex():
-            # This shouldn't happen in normal gameplay, but ensure consistency
-            token._on_mecatol_rex = True
+            raise ValueError("Cannot set custodians token that is not on Mecatol Rex")
+        self._custodians_token = token
 
     def remove_custodians_token(self) -> None:
         """Remove the custodians token from this planet."""
@@ -154,6 +152,11 @@ class Planet:
     def can_land_ground_forces(self, player_id: str) -> bool:
         """
         Check if ground forces can land on this planet.
+
+        Args:
+            player_id: Player attempting to land ground forces. Currently unused
+                      for LRR 27.1 but reserved for future player-specific rules
+                      and API consistency.
 
         LRR 27.1: Players cannot land ground forces on Mecatol Rex while
         the custodians token is on that planet.
