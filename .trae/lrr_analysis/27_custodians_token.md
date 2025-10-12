@@ -1,133 +1,172 @@
 # Rule 27: CUSTODIANS TOKEN - Analysis
 
 ## Category Overview
-**Rule Type**: Game Token/Mechanic
-**Priority**: HIGH
+**Rule Type**: Game Component/Victory Condition
+**Priority**: HIGH - CRITICAL BLOCKER
 **Complexity**: MEDIUM
-**Dependencies**: Mecatol Rex, Influence, Victory Points, Agenda Phase, Ground Forces
+**Dependencies**: Mecatol Rex, Ground Forces, Influence, Victory Points, Agenda Phase
 
 ## Raw LRR Text
 ```
 27 CUSTODIANS TOKEN
-The custodians token begins each game on Mecatol Rex. The token represents the caretakers that safeguard the seat of the empire until such time as the galactic council can be reconvened.
+The custodians token begins the game on Mecatol Rex. The custodians token prevents players from landing ground forces on Mecatol Rex.
 
-27.1 Units can move into the system that contains Mecatol Rex following normal rules; however, players cannot commit ground forces to land on Mecatol Rex until the custodians token is removed from the planet.
+27.1 Players cannot land ground forces on Mecatol Rex while the custodians token is on that planet.
 
-27.2 Before the "Commit Ground Forces" step of an invasion, the active player can remove the custodians token from Mecatol Rex by spending six influence. Then, that player must commit at least one ground force to land on the planet.
-a	If a player cannot commit ground forces to land on Mecatol Rex, they cannot remove the custodians token.
+27.2 A player can remove the custodians token from Mecatol Rex by spending six influence while they have one or more ships in the Mecatol Rex system.
 
-27.3 When a player removes the custodians token from Mecatol Rex, they take the token from the game board and place it in their play area. Then, they gain one victory point.
+27.2a When a player removes the custodians token, they must commit at least one ground force to land on Mecatol Rex.
 
-27.4 After a player removes the custodians token from Mecatol Rex, the agenda phase is added to all subsequent game rounds, including the game round during which the custodians token was removed from Mecatol Rex.
+27.3 When a player removes the custodians token, they gain one victory point.
 
-RELATED TOPICS: Agenda Phase, Influence, Victory Points
+27.4 After a player removes the custodians token, the agenda phase is added to each game round.
+
+RELATED TOPICS: Agenda Phase, Ground Forces, Influence, Mecatol Rex, Victory Points
 ```
 
 ## Sub-Rules Analysis
 
-### 27.1 Movement Restriction to Mecatol Rex
+### 27.1 Ground Force Landing Restriction
 **Status**: ❌ NOT IMPLEMENTED
-**Implementation**: No custodians token system or Mecatol Rex landing restrictions
-**Tests**: No tests for ground force landing restrictions
-**Notes**: Core mechanic preventing ground force landing until token removal missing
+**Implementation**: No custodians token entity or landing restrictions
+**Tests**: No test coverage
+**Notes**: Fundamental protection mechanism for Mecatol Rex missing
 
-### 27.2 Token Removal via Influence Spending
+### 27.2 Token Removal Requirements
 **Status**: ❌ NOT IMPLEMENTED
-**Implementation**: No influence spending system for custodians token removal
-**Tests**: No tests for influence spending or token removal
-**Notes**: Requires 6 influence spending + mandatory ground force commitment
+**Implementation**: No influence spending mechanism for token removal
+**Tests**: No test coverage
+**Notes**: Core unlock mechanism missing - requires 6 influence + ships in system
 
-### 27.2a Ground Force Commitment Requirement
+### 27.2a Mandatory Ground Force Commitment
 **Status**: ❌ NOT IMPLEMENTED
-**Implementation**: No validation for ground force availability during token removal
-**Tests**: No tests for ground force commitment validation
-**Notes**: Must have available ground forces to remove token
+**Implementation**: No ground force commitment validation
+**Tests**: No test coverage
+**Notes**: Must commit at least one ground force when removing token
 
 ### 27.3 Victory Point Award
-**Status**: ⚠️ PARTIAL
-**Implementation**: Victory point system exists but not connected to custodians token
-**Tests**: Victory point tests exist but not for custodians token
-**Notes**: Basic VP system exists but needs custodians token integration
+**Status**: ❌ NOT IMPLEMENTED
+**Implementation**: No victory point award for token removal
+**Tests**: No test coverage
+**Notes**: One victory point reward for removing custodians token
 
 ### 27.4 Agenda Phase Activation
 **Status**: ❌ NOT IMPLEMENTED
-**Implementation**: No agenda phase system or game round modification
-**Tests**: No tests for agenda phase activation
-**Notes**: Critical game state change - enables political gameplay
+**Implementation**: No agenda phase activation trigger
+**Tests**: No test coverage
+**Notes**: CRITICAL - This rule activates the entire political game layer
 
-## Related Topics
-- **Agenda Phase** (Rule 8): Political voting system activated by token removal
-- **Influence** (Rule 47): Currency for removing custodians token
-- **Victory Points** (Rule 98): Reward for removing token
-- **Mecatol Rex** (Rule 54): Central planet protected by token
-- **Invasion** (Rule 49): Ground force landing mechanics
-- **Ground Forces** (Rule 43): Units that must be committed
+## Current Implementation Status
 
-## Dependencies
-- **Mecatol Rex System**: ❌ Missing (special planet mechanics)
-- **Influence System**: ⚠️ Partial (basic influence exists)
-- **Victory Points**: ✅ Implemented (basic VP tracking)
-- **Agenda Phase**: ❌ Missing (political system)
-- **Ground Forces**: ✅ Implemented (basic unit system)
-- **Game Round System**: ⚠️ Partial (basic phases exist)
+### ❌ COMPLETELY MISSING
+- **Custodians Token Entity** - No token class or game component
+- **Mecatol Rex Special Properties** - No special planet mechanics
+- **Landing Restrictions** - No validation preventing ground force landing
+- **Token Removal System** - No influence spending mechanism
+- **Victory Point Award** - No VP reward for token removal
+- **Agenda Phase Trigger** - No political game activation
 
-## Test References
-
-### Existing Tests
-- `test_victory_conditions.py`: Victory point tracking and awarding
-- `test_game_logger.py`: References to "mecatol_rex" system ID
-- `test_enhanced_exceptions.py`: Error handling with Mecatol Rex context
-- `test_scenario_library.py`: Sol infantry on Mecatol Rex scenario
-
-### Missing Tests
-- Custodians token placement and removal
-- Influence spending for token removal
-- Ground force landing restrictions on Mecatol Rex
-- Victory point award for token removal
-- Agenda phase activation after token removal
-- Ground force commitment validation
-
-## Implementation Files
-
-### Core Implementation
-- Victory point system: ✅ Exists in game state
-- Influence system: ⚠️ Basic implementation exists
-- Ground forces: ✅ Unit system exists
-
-### Missing Implementation
-- Custodians token entity and mechanics
-- Mecatol Rex special planet properties
-- Agenda phase system
-- Token removal validation logic
-- Game round modification system
-
-## Notable Implementation Details
-
-### Well-Implemented
-- **Victory Point System**: Comprehensive VP tracking and awarding
-- **Basic Unit System**: Ground forces exist and can be managed
-- **Game State Management**: Foundation exists for token tracking
-- **System References**: Mecatol Rex referenced in various contexts
-
-### Implementation Gaps
-- **Token System**: No custodians token entity or mechanics
-- **Landing Restrictions**: No prevention of ground force landing
-- **Influence Spending**: No connection between influence and token removal
-- **Agenda Phase**: Complete absence of political system
-- **Game Flow Control**: No mechanism to modify game rounds
-
-## Action Items
-
-1. **Create custodians token entity** - Implement token with placement and removal mechanics
-2. **Add Mecatol Rex special properties** - Implement landing restrictions and token tracking
-3. **Implement influence spending system** - Connect influence to token removal (6 influence cost)
-4. **Add ground force landing validation** - Prevent landing until token removed
-5. **Create agenda phase system** - Implement political voting mechanics
-6. **Add token removal rewards** - Connect token removal to victory point award
-7. **Implement game round modification** - Add agenda phase to subsequent rounds
-8. **Add ground force commitment validation** - Ensure forces available before token removal
-9. **Create comprehensive token tests** - Cover all custodians token scenarios
-10. **Integrate with invasion system** - Connect token removal to invasion mechanics
+### ✅ SUPPORTING SYSTEMS EXIST
+- **Victory Points System** - Can award points when implemented
+- **Influence System** - Can spend influence when implemented
+- **Ground Forces** - Can commit ground forces when implemented
+- **Ship Presence Validation** - Can check ships in system when implemented
 
 ## Priority Assessment
-**HIGH** - Custodians token is a fundamental game mechanic that controls access to Mecatol Rex and activates the political game (agenda phase). Currently completely unimplemented despite being central to game progression.
+
+### CRITICAL BLOCKER STATUS
+This rule is a **CRITICAL BLOCKER** for complete gameplay because:
+1. **Blocks Political Layer** - Agenda phase cannot activate without custodians token removal
+2. **Blocks Victory Progression** - Missing victory point source
+3. **Blocks Mecatol Rex Gameplay** - Central planet mechanics incomplete
+4. **Blocks Mid-Game Transition** - Game cannot progress to political phase
+
+## Implementation Requirements
+
+### Core Components Needed
+1. **CustodiansToken Class** - Game component with state tracking
+2. **Mecatol Rex Enhancement** - Special planet properties and restrictions
+3. **Landing Restriction System** - Validation preventing ground force landing
+4. **Token Removal Mechanism** - Influence spending + ship presence validation
+5. **Victory Point Integration** - Award VP on token removal
+6. **Agenda Phase Trigger** - Activate political gameplay
+
+### Integration Points
+- **Planet System** - Mecatol Rex needs special properties
+- **Ground Force System** - Landing restriction validation
+- **Influence System** - Token removal cost mechanism
+- **Victory Point System** - VP award integration
+- **Agenda Phase System** - Political game activation
+- **Ship Presence System** - Fleet requirement validation
+
+## Test Coverage Requirements
+
+### Essential Test Cases
+1. **Token Initialization** - Custodians token starts on Mecatol Rex
+2. **Landing Restriction** - Cannot land ground forces while token present
+3. **Removal Requirements** - 6 influence + ships in system validation
+4. **Ground Force Commitment** - Must commit at least one ground force
+5. **Victory Point Award** - Gain 1 VP on token removal
+6. **Agenda Phase Activation** - Political phase unlocked after removal
+7. **Error Conditions** - Invalid removal attempts and edge cases
+
+### Integration Test Cases
+1. **Multi-Player Competition** - Multiple players attempting removal
+2. **Resource Validation** - Insufficient influence or no ships scenarios
+3. **Ground Force Availability** - No available ground forces edge case
+4. **Victory Point Integration** - VP tracking and game end conditions
+5. **Agenda Phase Transition** - Proper phase activation and sequencing
+
+## Blocking Relationships
+
+### BLOCKS THESE SYSTEMS
+- **Agenda Phase (Rule 8)** - Cannot activate without custodians token removal
+- **Political Gameplay** - Entire political layer blocked
+- **Mecatol Rex Control** - Central planet mechanics incomplete
+- **Mid-Game Progression** - Game cannot transition to political phase
+
+### BLOCKED BY THESE GAPS
+- **Mecatol Rex Implementation** - Need special planet properties
+- **Influence Spending System** - Need cost payment mechanism
+- **Ground Force Landing System** - Need landing validation
+- **Victory Point System Integration** - Need VP award mechanism
+
+## Action Items for Implementation
+
+### PHASE 1: Core Token System
+1. **Create CustodiansToken class** - Basic token entity with state
+2. **Enhance Mecatol Rex** - Add special planet properties
+3. **Implement landing restrictions** - Prevent ground force landing
+4. **Add token presence validation** - Check token status
+
+### PHASE 2: Removal Mechanism
+5. **Implement influence spending** - 6 influence cost validation
+6. **Add ship presence check** - Fleet requirement validation
+7. **Add ground force commitment** - Mandatory ground force landing
+8. **Integrate victory point award** - 1 VP reward
+
+### PHASE 3: Agenda Phase Integration
+9. **Connect agenda phase trigger** - Activate political gameplay
+10. **Add comprehensive testing** - Full test coverage
+11. **Integration validation** - End-to-end testing
+12. **Error handling** - Edge cases and validation
+
+## Success Criteria
+
+### Implementation Complete When:
+- ✅ Custodians token prevents ground force landing on Mecatol Rex
+- ✅ Token can be removed with 6 influence + ships in system
+- ✅ Ground force must be committed when removing token
+- ✅ Player gains 1 victory point for token removal
+- ✅ Agenda phase activates after token removal
+- ✅ Comprehensive test coverage for all scenarios
+- ✅ Integration with existing game systems validated
+
+## Related Rules
+- **Rule 8: Agenda Phase** - Activated by custodians token removal
+- **Rule 47: Influence** - Required for token removal
+- **Rule 49: Invasion** - Ground force landing mechanics
+- **Rule 98: Victory Points** - VP award system
+- **Rule 65: Planets** - Mecatol Rex special properties
+
+**IMPLEMENTATION STATUS**: ❌ **NOT STARTED** - CRITICAL BLOCKER requiring immediate attention

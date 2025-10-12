@@ -229,36 +229,36 @@ Cards and faction sheets each have abilities that players can resolve to trigger
 **Test References**: None found
 **Notes**: Context-aware ability resolution needed
 
-## Implementation Priority Summary
+## Current Implementation Status
 
-### CRITICAL (Must implement first)
-- **1.2**: Card ability precedence over rules
-- **1.6**: "Cannot" effects absolute precedence
-- **1.14**: Before/After timing system
-- **1.15**: "When" timing system
-- **1.16**: Timing priority (when > after)
+### ✅ IMPLEMENTED (Core Foundation)
+- **1.2**: Card ability precedence over rules - ✅ Complete with precedence system
+- **1.6**: "Cannot" effects absolute precedence - ✅ Basic precedence implemented
+- **1.14**: Before/After timing system - ✅ Basic timing windows exist
+- **1.15**: "When" timing system - ✅ Basic timing windows exist
+- **1.16**: Timing priority (when > after) - ✅ Basic precedence system exists
+- **1.17**: "Then" conditional effects - ✅ Basic conditional effects exist
+- **1.18**: Ability frequency tracking - ✅ Basic frequency tracking exists
+- **1.22**: Action card abilities - ✅ Partial implementation exists
+- **1.23**: Promissory note abilities - ✅ Partial implementation exists
+- **1.26**: Unit abilities - ✅ Complete implementation
 
-### HIGH (Core functionality)
-- **1.3**: Ability description and duration tracking
-- **1.5**: Action abilities integration
-- **1.7**: Complete ability resolution
-- **1.8**: Mandatory ability triggers
-- **1.11**: Cost validation system
-- **1.17**: "Then" conditional effects
-- **1.18**: Ability frequency tracking
-- **1.19**: Action phase multi-player resolution
-- **1.20**: Strategy/agenda phase resolution
-- **1.22**: Action card abilities
-- **1.23**: Promissory note abilities
-- **1.25**: Faction abilities
-- **1.26**: Unit abilities
+### ⚠️ PARTIALLY IMPLEMENTED (Needs Completion)
+- **1.3**: Ability description and duration tracking - Basic framework exists, duration tracking missing
+- **1.5**: Action abilities integration - Framework exists, needs action phase integration
+- **1.8**: Mandatory ability triggers - Missing auto-triggering system
+- **1.11**: Cost validation system - Missing comprehensive cost validation
+- **1.19**: Action phase multi-player resolution - Missing simultaneous resolution system
+- **1.20**: Strategy/agenda phase resolution - Missing phase-specific resolution mechanics
+- **1.25**: Faction abilities - Missing faction-specific abilities
 
-### MEDIUM (Supporting features)
-- **1.4**: Multiple abilities per card
-- **1.9**: Partial resolution of "and" effects
-- **1.12**: Cost type examples
-- **1.24**: Agenda card abilities
-- **1.27**: Context resolution
+### ❌ NOT IMPLEMENTED (High Priority Gaps)
+- **1.4**: Multiple abilities per card - Cards need multiple distinct abilities
+- **1.7**: Complete ability resolution - Missing full resolution validation
+- **1.9**: Partial resolution of "and" effects - Missing partial resolution system
+- **1.12**: Cost type examples - Missing comprehensive cost validation
+- **1.24**: Agenda card abilities - Missing agenda phase integration
+- **1.27**: Context resolution - Missing "this system/planet" resolution
 
 ## Key Timing Windows Identified from Compendium
 
@@ -424,14 +424,30 @@ Each sub-rule needs comprehensive test coverage:
 - **Initiative/Speaker Systems**: For simultaneous resolution (1.19, 1.20)
 - **Precedence System**: For conflicting abilities (1.2, 1.6)
 
-## Action Items for Full Implementation
-1. **CRITICAL**: Implement ability precedence system (1.2, 1.6)
-2. **HIGH**: Create general ability framework with duration tracking (1.3)
-3. **HIGH**: Implement cost validation system (1.11)
-4. **HIGH**: Build event system with before/after/when timing (1.14, 1.15)
-5. **HIGH**: Create simultaneous ability resolution system (1.19, 1.20)
-6. **MEDIUM**: Implement contextual reference resolution (1.27)
-7. **MEDIUM**: Add partial effect resolution for "and" separated effects (1.9)
+## Priority Action Items for Completion
+
+### CRITICAL (Blocking Core Gameplay)
+1. **Mandatory ability auto-triggering (1.8)** - System needs to automatically trigger mandatory abilities
+2. **Multi-player simultaneous resolution (1.19, 1.20)** - Action phase and strategy/agenda phase resolution mechanics
+3. **Duration tracking for temporary effects (1.3)** - Abilities with specified durations need persistence
+
+### HIGH (Advanced Features)
+4. **Complete "then" conditional resolution (1.17)** - Full conditional execution validation
+5. **Comprehensive cost validation (1.11)** - Unified cost validation across all ability types
+6. **Faction-specific abilities (1.25)** - Faction abilities and flagship abilities
+7. **Complete ability resolution validation (1.7)** - Ensure abilities are fully resolved
+
+### MEDIUM (Supporting Features)
+8. **Multiple abilities per card (1.4)** - Cards need support for multiple distinct abilities
+9. **Contextual reference resolution (1.27)** - "This system/planet" reference resolution
+10. **Partial effect resolution (1.9)** - "And" separated effects with partial resolution
+11. **Agenda card abilities integration (1.24)** - Agenda phase ability integration
+
+## Blocking Relationships
+- **Rule 1.8** blocks automatic game progression and card-based mechanics
+- **Rule 1.19/1.20** blocks proper multi-player ability resolution
+- **Rule 1.3** blocks temporary effect mechanics and duration-based abilities
+- **Rule 1.25** blocks faction-specific gameplay features
 
 ## Related Rules
 - Rule 2: Action Cards
