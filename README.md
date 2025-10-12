@@ -32,6 +32,19 @@ A comprehensive, enterprise-grade framework for Twilight Imperium 4th Edition th
 - **Memory Managed**: Automatic resource cleanup for long-running sessions
 - **Error Recovery**: Graceful degradation with comprehensive error context
 
+## 🚨 IMPORTANT: Development Standards
+
+**ALL AI AGENTS AND DEVELOPERS**: Before working on this project, you MUST read and follow the comprehensive development standards documented in [`.kiro/steering/ti4_development_standards.md`](.kiro/steering/ti4_development_standards.md).
+
+These standards ensure:
+- ✅ **90%+ test coverage** maintained for all implementations
+- ✅ **Strict type safety** with zero compromises
+- ✅ **TDD workflow** with mandatory RED-GREEN-REFACTOR cycles
+- ✅ **Evidence-based development** with no assumptions
+- ✅ **Critical path focus** on Rules 27, 92, 81, 89
+
+**Quality gates are NEVER bypassed. When in doubt, ask rather than assume.**
+
 ## Installation
 
 ### Development Setup
