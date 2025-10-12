@@ -225,10 +225,60 @@ The agenda phase is where players cast votes on agenda cards that can change the
 - **8.20-8.21**: Law vs Directive lifecycle (basic distinction with Elect outcomes now handled, law persistence and directive discard implemented)
 
 ### Not Yet Implemented (❌ PENDING)
+- **8.9-8.11**: Election mechanics for player/planet elections
+- **8.12**: Vote declaration system
+- **8.13**: Trade goods voting restrictions
+- **8.15-8.16**: Additional vote effects and restrictions
 - **8.22**: Outcome prediction and advanced agenda interactions
+
+## Current Implementation Status Summary
+
+### ✅ CORE SUBSET FULLY IMPLEMENTED
+- Phase activation and timing (8.1) ✅
+- Two-agenda resolution sequence (8.2, 8.3) ✅
+- Planet readying and round transition (8.4) ✅
+- Vote casting mechanics (8.6) ✅
+- Single outcome voting restriction (8.7) ✅
+- For/Against voting (8.8) ✅
+- Abstention option (8.14) ✅
+- Outcome resolution and tie-breaking (8.18-8.19) ✅
+- Basic law vs directive resolution (8.20-8.21) ✅
+- Timing windows implementation (8.23) ✅
+
+### ⚠️ PARTIALLY IMPLEMENTED
+- **Law vs Directive lifecycle** - Basic distinction implemented, but Elect outcomes and full persistence/discard integration needs refinement
+
+### ❌ HIGH PRIORITY GAPS
+- **Election mechanics (8.9-8.11)** - Player/planet election system missing
+- **Trade goods restrictions (8.13)** - Payment method validation missing
+- **Vote modification effects (8.15-8.16)** - Advanced voting abilities missing
+
+### ❌ LOW PRIORITY GAPS
+- **Vote declaration (8.12)** - Transparency requirement (UI-dependent)
+- **Outcome prediction (8.22)** - Special agenda interaction
+
+## Priority Action Items for Completion
+
+### HIGH (Core Political Gameplay)
+1. **Implement election mechanics (8.9-8.11)** - Player/planet election system with eligibility validation
+2. **Add trade goods voting restrictions (8.13)** - Prevent trade goods from being used as votes
+3. **Complete vote modification effects (8.15-8.16)** - Additional votes and voting restrictions
+
+### MEDIUM (Advanced Features)
+4. **Refine law vs directive resolution** - Complete Elect outcome handling and persistence rules
+5. **Add outcome prediction system (8.22)** - Timing-sensitive prediction mechanic
+
+### LOW (Polish Features)
+6. **Implement vote declaration (8.12)** - Vote transparency requirement
+7. **Enhanced error handling** - Better validation messages for voting violations
+
+## Blocking Relationships
+- **Election mechanics** block agenda cards that require player/planet elections
+- **Trade goods restrictions** affect economic balance in political gameplay
+- **Vote modification effects** block faction abilities and action cards that affect voting
 
 **Test Coverage**: 13 comprehensive test cases covering all core mechanics
 **Code Architecture**: AgendaPhase, VotingSystem, SpeakerSystem, CustodiansToken modules
 **Integration Status**: Fully integrated with game state and phase management
 
-**RULE 8 CORE SUBSET FULLY IMPLEMENTED** - Advanced features pending
+**RULE 8 CORE POLITICAL GAMEPLAY FUNCTIONAL** - Advanced features and edge cases pending
