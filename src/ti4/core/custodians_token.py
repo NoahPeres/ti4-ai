@@ -45,10 +45,11 @@ class CustodiansToken:
         """Check if custodians token is on Mecatol Rex."""
         return self._on_mecatol_rex
 
-    def remove_from_mecatol_rex(self) -> bool:
+    def remove_from_mecatol_rex(self, player_id: str | None = None) -> bool:
         """Basic token removal (for backward compatibility)."""
         if self._on_mecatol_rex:
             self._on_mecatol_rex = False
+            self.location = "removed"  # Update location field for consistency
             return True
         return False
 
@@ -77,7 +78,7 @@ class CustodiansToken:
 
     def remove_with_ground_force_commitment(
         self, player_id: str, ground_force: Unit | None, game_state: Any
-    ) -> TokenRemovalResult:
+    ) -> tuple[TokenRemovalResult, Any]:
         """
         Remove custodians token with ground force commitment.
 
@@ -88,36 +89,50 @@ class CustodiansToken:
 
         LRR 27.4: After a player removes the custodians token, the agenda phase
         is added to each game round.
+
+        Returns:
+            Tuple of (TokenRemovalResult, updated GameState)
         """
         # Check if token can be removed (Rule 27.2 requirements)
         if not self.can_be_removed_by_player(player_id, game_state):
-            return TokenRemovalResult(
-                success=False,
-                error_message="Player does not meet requirements to remove custodians token",
+            return (
+                TokenRemovalResult(
+                    success=False,
+                    error_message="Player does not meet requirements to remove custodians token",
+                ),
+                game_state,
             )
 
         # Check ground force commitment requirement (Rule 27.2a)
         if ground_force is None:
-            return TokenRemovalResult(
-                success=False,
-                error_message="Must commit at least one ground force to remove custodians token",
+            return (
+                TokenRemovalResult(
+                    success=False,
+                    error_message="Must commit at least one ground force to remove custodians token",
+                ),
+                game_state,
             )
 
         # Validate ground force ownership
         if ground_force.owner != player_id:
-            return TokenRemovalResult(
-                success=False, error_message="Ground force must be owned by the player"
+            return (
+                TokenRemovalResult(
+                    success=False,
+                    error_message="Ground force must be owned by the player",
+                ),
+                game_state,
             )
 
         # Remove the token from Mecatol Rex
         self.remove_from_mecatol_rex()
 
-        # Award victory point (Rule 27.3)
-        game_state.award_victory_points(player_id, 1)
+        # Award victory point (Rule 27.3) and activate agenda phase (Rule 27.4)
+        new_state = game_state.award_victory_points(player_id, 1)
+        new_state = new_state.activate_agenda_phase()
 
-        # Activate agenda phase (Rule 27.4)
-        game_state.activate_agenda_phase()
-
-        return TokenRemovalResult(
-            success=True, victory_points_awarded=1, agenda_phase_activated=True
+        return (
+            TokenRemovalResult(
+                success=True, victory_points_awarded=1, agenda_phase_activated=True
+            ),
+            new_state,
         )

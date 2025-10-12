@@ -198,7 +198,7 @@ class TestRule27GroundForceCommitment:
         game_state.get_player_available_ground_forces.return_value = [ground_force]
 
         # Act: Attempt to remove token with ground force commitment
-        result = token.remove_with_ground_force_commitment(
+        result, new_game_state = token.remove_with_ground_force_commitment(
             "player1", ground_force, game_state
         )
 
@@ -222,7 +222,9 @@ class TestRule27GroundForceCommitment:
         game_state.get_player_available_ground_forces.return_value = []
 
         # Act: Attempt to remove token without ground force
-        result = token.remove_with_ground_force_commitment("player1", None, game_state)
+        result, new_game_state = token.remove_with_ground_force_commitment(
+            "player1", None, game_state
+        )
 
         # Assert: Removal should fail
         assert result.success is False
@@ -251,7 +253,7 @@ class TestRule27VictoryPointAward:
         game_state.get_player_victory_points.return_value = 0
 
         # Act: Remove token with ground force commitment
-        result = token.remove_with_ground_force_commitment(
+        result, new_game_state = token.remove_with_ground_force_commitment(
             "player1", ground_force, game_state
         )
 
@@ -281,12 +283,20 @@ class TestRule27AgendaPhaseActivation:
         game_state.get_player_available_ground_forces.return_value = [ground_force]
         game_state.is_agenda_phase_active.return_value = False
 
+        # Mock the chained method calls: award_victory_points returns a new state
+        # that has activate_agenda_phase method
+        intermediate_state = Mock()
+        final_state = Mock()
+        game_state.award_victory_points.return_value = intermediate_state
+        intermediate_state.activate_agenda_phase.return_value = final_state
+
         # Act: Remove token with ground force commitment
-        result = token.remove_with_ground_force_commitment(
+        result, new_game_state = token.remove_with_ground_force_commitment(
             "player1", ground_force, game_state
         )
 
         # Assert: Agenda phase should be activated
         assert result.success is True
         assert result.agenda_phase_activated is True
-        game_state.activate_agenda_phase.assert_called_once()
+        game_state.award_victory_points.assert_called_once_with("player1", 1)
+        intermediate_state.activate_agenda_phase.assert_called_once()

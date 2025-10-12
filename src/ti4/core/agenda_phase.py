@@ -7,8 +7,9 @@ Key Components:
 - AgendaPhase: Main phase controller
 - VotingSystem: Handles voting mechanics and influence calculation
 - AgendaCard: Represents agenda cards (laws and directives)
-- CustodiansToken: Tracks custodians token state
 - SpeakerSystem: Manages speaker privileges and tie-breaking
+
+Note: CustodiansToken is imported from custodians_token module
 """
 
 from __future__ import annotations
@@ -17,6 +18,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Callable
 
 from .constants import AgendaType
+from .custodians_token import CustodiansToken
 
 if TYPE_CHECKING:
     from .resource_management import ResourceManager
@@ -138,24 +140,6 @@ class VotingOutcome:
     votes_cast: int = 0
     outcome: str | None = None
     error_message: str | None = None
-
-
-class CustodiansToken:
-    """Manages the custodians token state."""
-
-    def __init__(self) -> None:
-        self.on_mecatol_rex = True
-
-    def is_on_mecatol_rex(self) -> bool:
-        """Check if custodians token is on Mecatol Rex."""
-        return self.on_mecatol_rex
-
-    def remove_from_mecatol_rex(self, player_id: str | None = None) -> bool:
-        """Remove custodians token from Mecatol Rex."""
-        if self.on_mecatol_rex:
-            self.on_mecatol_rex = False
-            return True
-        return False
 
 
 class SpeakerSystem:

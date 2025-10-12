@@ -132,9 +132,16 @@ class Planet:
     def set_custodians_token(self, token: CustodiansToken) -> None:
         """Set the custodians token on this planet (for Mecatol Rex)."""
         self._custodians_token = token
+        # Ensure token state is synchronized - token should be on Mecatol Rex
+        if not token.is_on_mecatol_rex():
+            # This shouldn't happen in normal gameplay, but ensure consistency
+            token._on_mecatol_rex = True
 
     def remove_custodians_token(self) -> None:
         """Remove the custodians token from this planet."""
+        if self._custodians_token is not None:
+            # Synchronize token state when removing from planet
+            self._custodians_token.remove_from_mecatol_rex()
         self._custodians_token = None
 
     def has_custodians_token(self) -> bool:
