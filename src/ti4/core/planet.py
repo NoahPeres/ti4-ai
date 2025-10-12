@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from .custodians_token import CustodiansToken
     from .exploration import ExplorationCard
     from .unit import Unit
 
@@ -23,6 +24,9 @@ class Planet:
         self.attached_cards: list[
             ExplorationCard
         ] = []  # Rule 35: Cards attached to this planet
+        self._custodians_token: CustodiansToken | None = (
+            None  # Rule 27: Custodians token
+        )
 
     def set_control(self, player_id: str) -> None:
         """Set the controlling player of this planet."""
@@ -123,3 +127,33 @@ class Planet:
     def get_units(self) -> list[Unit]:
         """Get all units on this planet."""
         return self.units.copy()
+
+    # Rule 27: Custodians token support
+    def set_custodians_token(self, token: CustodiansToken) -> None:
+        """Set the custodians token on this planet (for Mecatol Rex)."""
+        self._custodians_token = token
+
+    def remove_custodians_token(self) -> None:
+        """Remove the custodians token from this planet."""
+        self._custodians_token = None
+
+    def has_custodians_token(self) -> bool:
+        """Check if this planet has the custodians token."""
+        return (
+            self._custodians_token is not None
+            and self._custodians_token.is_on_mecatol_rex()
+        )
+
+    def can_land_ground_forces(self, player_id: str) -> bool:
+        """
+        Check if ground forces can land on this planet.
+
+        LRR 27.1: Players cannot land ground forces on Mecatol Rex while
+        the custodians token is on that planet.
+        """
+        # Check if custodians token prevents landing
+        if self.has_custodians_token():
+            return False
+
+        # Otherwise, ground forces can land (subject to other game rules)
+        return True
