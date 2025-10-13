@@ -172,6 +172,11 @@ class GameState:
         hash=False,
     )  # Agenda deck state for persistence
 
+    # Agenda phase activation tracking (Rule 27.4)
+    agenda_phase_active: bool = field(
+        default=False, hash=False
+    )  # Whether agenda phase is active in game rounds
+
     def __post_init__(self) -> None:
         """Validate game state invariants after initialization."""
         if self.victory_points_to_win <= 0:
@@ -531,6 +536,10 @@ class GameState:
             ),
             # Agenda deck state
             agenda_deck_state=kwargs.get("agenda_deck_state", self.agenda_deck_state),
+            # Agenda phase activation
+            agenda_phase_active=kwargs.get(
+                "agenda_phase_active", self.agenda_phase_active
+            ),
         )
 
         # Ensure every planet card now points at this cloned state for token bookkeeping.
@@ -1076,6 +1085,32 @@ class GameState:
         }
 
         return self.update_agenda_deck_state(deck_state)
+
+    def is_agenda_phase_active(self) -> bool:
+        """Check if the agenda phase is active in game rounds.
+
+        LRR 27.4: After a player removes the custodians token, the agenda phase
+        is added to each game round.
+
+        Returns:
+            True if agenda phase is active, False otherwise
+        """
+        return self.agenda_phase_active
+
+    def activate_agenda_phase(self) -> GameState:
+        """Activate the agenda phase for all future game rounds.
+
+        LRR 27.4: After a player removes the custodians token, the agenda phase
+        is added to each game round.
+
+        Returns:
+            New GameState with agenda phase activated
+        """
+        if self.agenda_phase_active:
+            # Already active, return current state
+            return self
+
+        return self._create_new_state(agenda_phase_active=True)
 
     def serialize_for_persistence(self) -> dict[str, Any]:
         """Serialize game state for persistence including agenda card data and players."""
