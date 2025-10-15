@@ -236,7 +236,7 @@ This document provides detailed implementation sequence documentation for the 4 
        # Step 2: Replenish commodities to faction maximum
        new_state = self._replenish_commodities(player_id, new_state)
        # Step 3: Choose players for free secondary ability
-       return StrategyCardAbilityResult(success=True, new_game_state=new_state)
+       return StrategyCardAbilityResult(success=True), new_state
    ```
 
 2. **Implement Commodity Replenishment** (2 days)
@@ -272,7 +272,7 @@ This document provides detailed implementation sequence documentation for the 4 
        # Spend command token and replenish commodities
        new_state = game_state.spend_command_token(player_id, "strategy")
        new_state = self._replenish_commodities(player_id, new_state)
-       return StrategyCardAbilityResult(success=True, new_game_state=new_state)
+       return StrategyCardAbilityResult(success=True), new_state
    ```
 
 2. **Implement Player Selection for Free Secondary** (2 days)

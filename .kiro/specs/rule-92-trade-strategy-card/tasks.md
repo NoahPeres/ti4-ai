@@ -6,7 +6,7 @@ Convert the feature design into a series of prompts for a code-generation LLM th
 
 - [x] 1. Research existing strategy card patterns and set up test foundation
   - Examine existing strategy card implementations (Leadership, Politics, Construction) for integration patterns
-  - Create comprehensive test file `tests/test_rule_92_trade_strategy_card.py` following existing test patterns
+  - Create comprehensive test file `tests/test_rule_92_end_to_end_integration.py` following existing test patterns
   - Implement basic TradeStrategyCard class inheriting from BaseStrategyCard with proper interface compliance
   - Write tests for basic properties (initiative value 5, card type TRADE) following existing test patterns
   - Ensure integration with existing BaseStrategyCard framework and StrategyCardAbilityResult patterns
@@ -15,7 +15,7 @@ Convert the feature design into a series of prompts for a code-generation LLM th
 - [x] 2. Implement primary ability Step 1 - Gain Trade Goods
   - Write failing tests for trade goods gain (3 trade goods awarded to active player)
   - Implement _gain_trade_goods() method with resource management integration
-  - Add validation for trade goods capacity and overflow handling
+  - Add validation for commodity limits
   - Write comprehensive tests for trade goods gain scenarios including edge cases
   - _Requirements: 2.1, 2.2, 2.3, 7.1_
 

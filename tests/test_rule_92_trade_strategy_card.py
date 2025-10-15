@@ -2340,8 +2340,8 @@ class TestTradeCardQualityAssurance:
         result = self.card.execute_primary_ability(
             player_id="player_0", game_state=None
         )
-        assert result.success is True  # Should return placeholder result
-        assert "requires user confirmation" in result.error_message
+        assert result.success is False  # Should return error for None game_state
+        assert "Game state is required" in result.error_message
 
         # Test None game state in secondary ability
         result = self.card.execute_secondary_ability(
@@ -2510,9 +2510,9 @@ class TestTradeCardCoverageImprovement:
             player_id="test_player", game_state=None
         )
 
-        assert result.success is True
+        assert result.success is False
         assert result.player_id == "test_player"
-        assert "requires user confirmation" in result.error_message
+        assert "Game state is required" in result.error_message
 
     def test_primary_ability_with_invalid_player(self) -> None:
         """Test primary ability with invalid player ID.

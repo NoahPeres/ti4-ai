@@ -3,7 +3,7 @@
 This module implements the Trade strategy card following the
 BaseStrategyCard pattern established for all strategy cards.
 
-LRR Reference: Rule 83 - STRATEGY CARD (Trade)
+LRR Reference: Rule 92 - STRATEGY CARD (Trade)
 """
 
 import time
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 class TradeStrategyCard(BaseStrategyCard):
     """Implementation of the Trade strategy card.
 
-    LRR Reference: Rule 83 - The "Trade" strategy card.
+    LRR Reference: Rule 92 - The "Trade" strategy card.
     This card's initiative value is "5."
     """
 
@@ -48,7 +48,7 @@ class TradeStrategyCard(BaseStrategyCard):
         Returns:
             The initiative value (5)
 
-        LRR Reference: Rule 83 - Trade has initiative value "5"
+        LRR Reference: Rule 92 - Trade has initiative value "5"
         """
         return 5
 
@@ -87,11 +87,11 @@ class TradeStrategyCard(BaseStrategyCard):
         # Performance monitoring - start timing
         start_time = time.perf_counter()
         if game_state is None:
-            # Placeholder implementation - specific abilities need user confirmation
+            # Game state is required for primary ability execution
             return StrategyCardAbilityResult(
-                success=True,
+                success=False,
                 player_id=player_id,
-                error_message="Trade primary ability implementation requires user confirmation of specific effects",
+                error_message="Game state is required for Trade primary ability execution",
             )
 
         from ...exceptions import TI4GameError
@@ -119,11 +119,15 @@ class TradeStrategyCard(BaseStrategyCard):
             chosen_players = kwargs.get("chosen_players")
             if chosen_players is not None:
                 self._process_chosen_players(player_id, chosen_players, game_state)
+            else:
+                # Ensure no stale freebies carry over between plays
+                self._chosen_players_by_game[id(game_state)] = []
 
             # All steps completed successfully
             result = StrategyCardAbilityResult(
                 success=True,
                 player_id=player_id,
+                additional_data={"chosen_players": self.get_chosen_players(game_state)},
             )
 
             # Performance monitoring - record execution time
@@ -227,8 +231,8 @@ class TradeStrategyCard(BaseStrategyCard):
         """
         from ...exceptions import TI4GameError
 
-        # Handle duplicates by converting to set and back to list
-        unique_chosen_players = list(set(chosen_players))
+        # Handle duplicates while preserving order
+        unique_chosen_players = list(dict.fromkeys(chosen_players))
 
         # Validate each chosen player
         for player_id in unique_chosen_players:
@@ -328,6 +332,7 @@ class TradeStrategyCard(BaseStrategyCard):
         try:
             # Check if execution is free (player was chosen by active player or explicitly set)
             is_free = kwargs.get("is_free", False)
+            tokens_spent = 0
 
             # Auto-detect if player was chosen for free execution
             if not is_free:
@@ -361,9 +366,10 @@ class TradeStrategyCard(BaseStrategyCard):
                         player_id=player_id,
                         error_message="Failed to spend command token from strategy pool",
                     )
+                tokens_spent = 1
 
             # Step 2: Replenish commodities to faction maximum
-            player.replenish_commodities()
+            self._replenish_commodities(player_id, game_state)
 
             # Performance monitoring - record execution time
             execution_time = (
@@ -374,6 +380,8 @@ class TradeStrategyCard(BaseStrategyCard):
             return StrategyCardAbilityResult(
                 success=True,
                 player_id=player_id,
+                command_tokens_spent=tokens_spent,
+                additional_data={"is_free": is_free},
             )
 
         except TI4GameError as e:
@@ -412,7 +420,7 @@ class TradeStrategyCard(BaseStrategyCard):
         game_id = id(game_state)
         return self._chosen_players_by_game.get(game_id, [])
 
-    def get_performance_metrics(self) -> dict[str, dict[str, float]]:
+    def get_performance_metrics(self) -> dict[str, dict[str, float | int]]:
         """Get performance metrics for the Trade strategy card.
 
         Returns:
