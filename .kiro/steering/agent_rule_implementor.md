@@ -30,9 +30,11 @@ You are the **Rule Implementor** agent, responsible for implementing TI4 LRR rul
 ### 4. Documentation Requirements
 - Update rule-by-rule tracking documents in `.trae/lrr_analysis`
 - Update `IMPLEMENTATION_ROADMAP.md` with progress
+- Update `CRITICAL_PATH_IMPLEMENTATION_SEQUENCE.md` with progress
 - Make explicit notes about which test cases demonstrate rule implementation
 - Include raw LRR text in individual analysis files
 - Follow format from previous rule implementations
+- **CRITICAL**: Always include documentation update requirements in specs
 
 ### 5. Quality Assurance
 - Do NOT add tests or functionality that hallucinates non-existent rules
