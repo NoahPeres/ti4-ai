@@ -1,6 +1,6 @@
 """Tests for runtime type checking module."""
 
-from typing import Any, Optional, Union
+from typing import Any
 
 import pytest
 
@@ -49,7 +49,7 @@ class TestRuntimeTypeCheck:
         """Test runtime_type_check decorator with optional parameters."""
 
         @runtime_type_check
-        def process_value(value: Optional[int] = None) -> str:
+        def process_value(value: int | None = None) -> str:
             if value is None:
                 return "No value"
             return f"Value: {value}"
@@ -221,7 +221,7 @@ class TestRuntimeTypeCheckingIntegration:
 
         @runtime_type_check
         def process_data(
-            items: list[dict[str, Union[int, str]]], default: Optional[str] = None
+            items: list[dict[str, int | str]], default: str | None = None
         ) -> list[str]:
             result = []
             for item in items:
@@ -229,7 +229,7 @@ class TestRuntimeTypeCheckingIntegration:
                 result.append(str(name))
             return result
 
-        test_data: list[dict[str, Union[int, str]]] = [
+        test_data: list[dict[str, int | str]] = [
             {"name": "item1", "value": 10},
             {"name": "item2", "value": "test"},
             {"value": 42},  # Missing name

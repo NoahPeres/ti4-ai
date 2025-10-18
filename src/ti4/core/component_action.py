@@ -12,7 +12,7 @@ LRR References:
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 from .action_cards import (
     ActionCard,
@@ -40,9 +40,9 @@ class ComponentActionContext:
     player_id: str
     action_type: ComponentActionType
     component_id: str
-    game_state: Optional[Any] = None
-    targets: Optional[dict[str, Any]] = None
-    additional_data: Optional[dict[str, Any]] = None
+    game_state: Any | None = None
+    targets: dict[str, Any] | None = None
+    additional_data: dict[str, Any] | None = None
 
 
 @dataclass
@@ -51,9 +51,9 @@ class ComponentActionResult:
 
     success: bool
     action_consumed: bool = True  # Whether this used the player's action
-    effects_applied: Optional[list[str]] = None
-    error_message: Optional[str] = None
-    additional_data: Optional[dict[str, Any]] = None
+    effects_applied: list[str] | None = None
+    error_message: str | None = None
+    additional_data: dict[str, Any] | None = None
 
 
 class ComponentActionProvider(ABC):
@@ -87,7 +87,7 @@ class ComponentActionManager:
     def __init__(self) -> None:
         self._action_card_manager = ActionCardManager()
         self._registered_providers: dict[str, ComponentActionProvider] = {}
-        self._current_player: Optional[str] = None
+        self._current_player: str | None = None
         self._action_phase_active = False
 
     def set_action_phase_active(self, active: bool) -> None:
@@ -110,7 +110,7 @@ class ComponentActionManager:
         action_type: ComponentActionType,
         component_id: str,
         **kwargs: Any,
-    ) -> tuple[bool, Optional[str]]:
+    ) -> tuple[bool, str | None]:
         """Check if a component action can be performed.
 
         LRR 22.3: A component action cannot be performed if its ability
@@ -214,7 +214,7 @@ class ComponentActionManager:
 
     def _can_perform_action_card_component_action(
         self, context: ComponentActionContext, **kwargs: Any
-    ) -> tuple[bool, Optional[str]]:
+    ) -> tuple[bool, str | None]:
         """Check if an action card component action can be performed."""
         action_card = kwargs.get("action_card")
         if not isinstance(action_card, ActionCard):
@@ -319,7 +319,7 @@ class TechnologyComponentActionProvider(ComponentActionProvider):
         self,
         tech_name: str,
         description: str,
-        requirements: Optional[dict[str, Any]] = None,
+        requirements: dict[str, Any] | None = None,
     ):
         self.tech_name = tech_name
         self.description = description

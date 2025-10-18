@@ -398,5 +398,23 @@ class TestReturnStrategyCardsStep:
         assert "player2" in result.players_processed
         assert updated_state is not None
 
+    def test_return_strategy_cards_step_error_when_player_return_fails(
+        self, monkeypatch
+    ) -> None:
+        """Test ReturnStrategyCardsStep error handling when per-player return fails."""
+        step = ReturnStrategyCardsStep()
+        game_state = GameState().add_player(Player("player1", Faction.SOL))
+
+        def boom(player_id, state):
+            raise RuntimeError("simulated failure")
+
+        monkeypatch.setattr(
+            ReturnStrategyCardsStep, "return_player_strategy_card", boom
+        )
+        result, updated = step.execute(game_state)
+        assert result.success is False
+        assert "Error processing player player1" in result.error_message
+        assert updated is not None
+
         # The actual state changes will be implemented later when we integrate
         # with the real strategy card return system

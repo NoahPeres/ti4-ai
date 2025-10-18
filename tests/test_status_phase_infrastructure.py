@@ -184,7 +184,7 @@ class TestStatusPhaseStepHandler:
 
         # Create complete subclass
         class CompleteHandler(StatusPhaseStepHandler):
-            def execute(
+            def _execute_step(
                 self, game_state: "GameState"
             ) -> tuple[StepResult, "GameState"]:
                 result = StepResult(success=True, step_name="Test")

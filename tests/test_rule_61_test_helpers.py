@@ -1,7 +1,5 @@
 """Test helpers for Rule 61: OBJECTIVE CARDS tests."""
 
-from typing import Optional
-
 import pytest
 
 from ti4.core.constants import Expansion, Faction
@@ -143,7 +141,7 @@ def assert_objective_scored(
     game_state: GameState,
     player_id: str,
     objective: ObjectiveCard,
-    expected_points: Optional[int] = None,
+    expected_points: int | None = None,
 ) -> None:
     """Helper assertion for verifying objective scoring."""
     assert game_state.is_objective_completed(player_id, objective)

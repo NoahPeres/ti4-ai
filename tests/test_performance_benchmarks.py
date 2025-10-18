@@ -113,7 +113,7 @@ def test_batch_operations_performance() -> None:
     assert all(result.is_valid for result in batch_results)
 
     # Verify detailed equivalence between individual and batch results
-    for individual, batch in zip(individual_results, batch_results):
+    for individual, batch in zip(individual_results, batch_results, strict=False):
         assert individual.is_valid == batch.is_valid
         assert individual.required_resources == batch.required_resources
         assert individual.available_resources == batch.available_resources

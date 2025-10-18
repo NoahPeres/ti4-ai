@@ -5,7 +5,8 @@ This module provides mapping functions and utilities to integrate
 technology card specifications with the abilities system.
 """
 
-from typing import Any, Callable, Optional
+from collections.abc import Callable
+from typing import Any
 
 from ti4.core.abilities import Ability, AbilityEffect, TimingWindow
 from ti4.core.constants import AbilityEffectType, AbilityTrigger
@@ -207,7 +208,7 @@ class EnhancedAbility(Ability):
     of technology-specific conditions before triggering.
     """
 
-    def __init__(self, conditions: Optional[list[Any]] = None, **kwargs: Any) -> None:
+    def __init__(self, conditions: list[Any] | None = None, **kwargs: Any) -> None:
         """Initialize enhanced ability with conditions."""
         super().__init__(**kwargs)
         self.conditions = conditions or []
@@ -216,7 +217,7 @@ class EnhancedAbility(Ability):
         if self.conditions:
             self._validate_condition_types()
 
-    def can_trigger(self, event: str, context: Optional[dict[str, Any]] = None) -> bool:
+    def can_trigger(self, event: str, context: dict[str, Any] | None = None) -> bool:
         """Check if ability can trigger, including condition validation."""
         # First check base ability triggering
         if not super().can_trigger(event, context):

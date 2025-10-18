@@ -2,7 +2,8 @@
 
 import logging
 import time
-from typing import Any, Callable, Optional
+from collections.abc import Callable
+from typing import Any
 
 from .exceptions import TI4GameError
 
@@ -37,8 +38,8 @@ class CircuitBreaker:
 
     def __init__(
         self,
-        failure_threshold: Optional[int] = None,
-        recovery_timeout: Optional[float] = None,
+        failure_threshold: int | None = None,
+        recovery_timeout: float | None = None,
     ) -> None:
         from .constants import CircuitBreakerConstants, PerformanceConstants
 
@@ -116,8 +117,8 @@ class ErrorRecoveryManager:
     def execute_with_retry(
         self,
         operation: Callable[[], Any],
-        max_retries: Optional[int] = None,
-        retry_delay: Optional[float] = None,
+        max_retries: int | None = None,
+        retry_delay: float | None = None,
     ) -> Any:
         from .constants import PerformanceConstants
 
@@ -161,7 +162,7 @@ class ErrorRecoveryManager:
         self,
         operation: Callable[[], Any],
         operation_id: str,
-        failure_threshold: Optional[int] = None,
+        failure_threshold: int | None = None,
     ) -> Any:
         from .constants import PerformanceConstants
 
@@ -191,7 +192,7 @@ class ErrorRecoveryManager:
             raise
 
     def execute_with_recovery(
-        self, operation: Callable[[], Any], context: Optional[dict[str, Any]] = None
+        self, operation: Callable[[], Any], context: dict[str, Any] | None = None
     ) -> Any:
         """Execute operation with registered recovery strategies."""
         context = context or {}
@@ -212,7 +213,7 @@ class ErrorRecoveryManager:
         self,
         error: Exception,
         recovery_type: str,
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> None:
         """Log recovery attempt details."""
         self._log_error_recovery_attempt(error, recovery_type)

@@ -12,8 +12,6 @@ CONFIRMED SPECIFICATIONS - DO NOT MODIFY WITHOUT USER APPROVAL:
 - Has two exhaustible abilities (neither are ACTION abilities)
 """
 
-from typing import Optional
-
 from ti4.core.abilities import Ability, AbilityEffect, TimingWindow
 from ti4.core.constants import Faction, Technology
 from ti4.core.technology import TechnologyColor
@@ -45,7 +43,7 @@ class AIDevelopmentAlgorithm(ExhaustibleTechnologyCard):
         )
 
     @property
-    def color(self) -> Optional[TechnologyColor]:
+    def color(self) -> TechnologyColor | None:
         """Technology color (Yellow)."""
         return TechnologyColor.YELLOW
 
@@ -55,7 +53,7 @@ class AIDevelopmentAlgorithm(ExhaustibleTechnologyCard):
         return []
 
     @property
-    def faction_restriction(self) -> Optional[Faction]:
+    def faction_restriction(self) -> Faction | None:
         """Faction restriction (available to all)."""
         return None
 

@@ -1,6 +1,6 @@
 """Tests for TI4 Tactical Action implementation."""
 
-from typing import Any, Optional
+from typing import Any
 
 import pytest
 
@@ -786,7 +786,7 @@ class MockGameState:
     """Mock game state for testing."""
 
     def __init__(
-        self, galaxy: Optional[Galaxy] = None, systems: Optional[dict[str, Any]] = None
+        self, galaxy: Galaxy | None = None, systems: dict[str, Any] | None = None
     ) -> None:
         self.galaxy = galaxy
         self.systems = systems or {}

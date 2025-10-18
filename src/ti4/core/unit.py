@@ -1,7 +1,7 @@
 """Unit structure for TI4 game pieces."""
 
 import uuid
-from typing import Any, Optional
+from typing import Any
 
 from .constants import Faction, Technology, UnitType
 from .unit_stats import UnitStats, UnitStatsProvider
@@ -19,20 +19,20 @@ class Unit:
     id: str
     unit_type: UnitType
     owner: str
-    faction: Optional[Faction]
+    faction: Faction | None
     technologies: set[Technology]
     _stats_provider: UnitStatsProvider
-    _cached_stats: Optional[UnitStats]
+    _cached_stats: UnitStats | None
     _sustained_damage: bool
 
     def __init__(
         self,
         unit_type: UnitType,
         owner: str,
-        faction: Optional[Faction] = None,
-        technologies: Optional[set[Technology]] = None,
-        stats_provider: Optional[UnitStatsProvider] = None,
-        unit_id: Optional[str] = None,
+        faction: Faction | None = None,
+        technologies: set[Technology] | None = None,
+        stats_provider: UnitStatsProvider | None = None,
+        unit_id: str | None = None,
     ) -> None:
         self.id = unit_id or str(uuid.uuid4())
 
@@ -55,7 +55,7 @@ class Unit:
             self.technologies = set()
 
         self._stats_provider = stats_provider or UnitStatsProvider()
-        self._cached_stats: Optional[UnitStats] = None
+        self._cached_stats: UnitStats | None = None
         self._sustained_damage = False
 
     def get_stats(self) -> UnitStats:
@@ -75,11 +75,11 @@ class Unit:
         """Get the capacity of this unit."""
         return self.get_stats().capacity
 
-    def get_combat_value(self) -> Optional[int]:
+    def get_combat_value(self) -> int | None:
         """Get the combat value for this unit."""
         return self.get_stats().combat_value
 
-    def get_combat(self) -> Optional[int]:
+    def get_combat(self) -> int | None:
         """Get the combat value for this unit (alias for get_combat_value)."""
         return self.get_combat_value()
 

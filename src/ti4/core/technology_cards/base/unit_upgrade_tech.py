@@ -4,7 +4,7 @@ Unit upgrade technology card base implementation.
 This module provides the base class for unit upgrade technology cards.
 """
 
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any
 
 from ti4.core.constants import UnitStatModification, UnitType
 from ti4.core.technology import TechnologyColor
@@ -40,7 +40,7 @@ class UnitUpgradeTechnologyCard(BaseTechnologyCard):
         self._upgraded_unit_type = upgraded_unit_type
 
     @property
-    def color(self) -> Optional[TechnologyColor]:
+    def color(self) -> TechnologyColor | None:
         """Technology color (None for unit upgrades)."""
         # Unit upgrades have no color per TI4 rules
         return None
@@ -52,7 +52,7 @@ class UnitUpgradeTechnologyCard(BaseTechnologyCard):
 
     def get_unit_stat_modifications(
         self,
-    ) -> dict[UnitStatModification, Union[int, bool]]:
+    ) -> dict[UnitStatModification, int | bool]:
         """
         Get the stat modifications this upgrade provides using enums.
 

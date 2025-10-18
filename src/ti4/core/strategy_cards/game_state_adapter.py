@@ -25,11 +25,11 @@ class StrategyCardGameStateAdapter:
     def __init__(
         self,
         game_state: Optional["GameState"] = None,
-        action_card_system: Optional[ActionCardManager] = None,
-        command_token_system: Optional[CommandTokenManager] = None,
-        agenda_deck: Optional[AgendaDeck] = None,
-        speaker_system: Optional[SpeakerSystem] = None,
-        players: Optional[list[str]] = None,
+        action_card_system: ActionCardManager | None = None,
+        command_token_system: CommandTokenManager | None = None,
+        agenda_deck: AgendaDeck | None = None,
+        speaker_system: SpeakerSystem | None = None,
+        players: list[str] | None = None,
     ) -> None:
         """Initialize the adapter with game systems.
 

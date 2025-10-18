@@ -14,7 +14,7 @@ class PlanetCard:
         name: str,
         resources: int,
         influence: int,
-        trait: Optional[str] = None,
+        trait: str | None = None,
         game_state: Optional["GameState"] = None,
     ) -> None:
         if not name or not isinstance(name, str):

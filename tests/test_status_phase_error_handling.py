@@ -758,10 +758,10 @@ class TestEnhancedValidationScenarios:
 
             result, updated_state = step.execute(mock_game_state)
 
-            # Should use graceful degradation - continues execution despite invalid state
-            assert result.success is True  # Graceful degradation
-            assert "player1" in result.players_processed
-            # Player processed but likely encountered errors during objective scoring
+            # Should fail when prerequisites are not met - this is correct behavior
+            assert result.success is False  # Proper error handling
+            assert "Prerequisites not met" in result.error_message
+            # Step should not process players when prerequisites fail
 
     def test_step_handler_validates_game_component_integrity(self) -> None:
         """Test that step handlers validate game component integrity."""
@@ -775,12 +775,10 @@ class TestEnhancedValidationScenarios:
 
         result, updated_state = step.execute(mock_game_state)
 
-        # Should handle missing components gracefully
-        assert result.success is True  # Graceful degradation
-        assert (
-            "no objectives" in result.actions_taken[0].lower()
-            or "skipped" in result.actions_taken[0].lower()
-        )
+        # Should fail when game state is invalid - this is correct behavior
+        assert result.success is False  # Proper error handling
+        assert result.error_message is not None
+        # Step should not process when game state is corrupted
 
 
 class TestPerformanceRelatedErrorHandling:

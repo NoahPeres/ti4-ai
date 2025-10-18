@@ -4,8 +4,6 @@ Technology card registry system.
 This module provides the registry for managing concrete technology card implementations.
 """
 
-from typing import Optional
-
 from ti4.core.constants import Technology
 
 from .protocols import TechnologyCardProtocol
@@ -39,7 +37,7 @@ class TechnologyCardRegistry:
             )
         self._cards[card.technology_enum] = card
 
-    def get_card(self, technology: Technology) -> Optional[TechnologyCardProtocol]:
+    def get_card(self, technology: Technology) -> TechnologyCardProtocol | None:
         """
         Get a technology card implementation.
 

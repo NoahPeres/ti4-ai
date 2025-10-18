@@ -6,8 +6,6 @@ following the established patterns and providing centralized access.
 LRR Reference: Rule 83 - STRATEGY CARD
 """
 
-from typing import Optional
-
 from .base_strategy_card import BaseStrategyCard
 from .strategic_action import StrategyCardType
 
@@ -48,7 +46,7 @@ class StrategyCardRegistry:
         self._cards[StrategyCardType.TECHNOLOGY] = TechnologyStrategyCard()
         self._cards[StrategyCardType.IMPERIAL] = ImperialStrategyCard()
 
-    def get_card(self, card_type: StrategyCardType) -> Optional[BaseStrategyCard]:
+    def get_card(self, card_type: StrategyCardType) -> BaseStrategyCard | None:
         """Get a strategy card by type.
 
         Args:

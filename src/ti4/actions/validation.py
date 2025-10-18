@@ -1,6 +1,6 @@
 """Action validation engine for TI4."""
 
-from typing import Any, Optional
+from typing import Any
 
 
 class ValidationError(Exception):
@@ -34,7 +34,7 @@ class ValidationResult:
     """Result of validation containing success status and any errors."""
 
     def __init__(
-        self, is_valid: bool, errors: Optional[list[ValidationError]] = None
+        self, is_valid: bool, errors: list[ValidationError] | None = None
     ) -> None:
         self.is_valid = is_valid
         self.errors = errors or []

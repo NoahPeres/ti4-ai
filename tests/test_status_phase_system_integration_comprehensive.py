@@ -20,8 +20,6 @@ LRR References:
 
 from unittest.mock import patch
 
-import pytest
-
 from src.ti4.core.constants import Faction
 from src.ti4.core.game_phase import GamePhase
 from src.ti4.core.game_state import GameState
@@ -189,6 +187,77 @@ class TestStatusPhaseSystemIntegrationComprehensive:
         # The steps should succeed regardless of whether player tracking is implemented
         assert remove_step.success is True
         assert gain_step.success is True
+
+    def test_command_token_gain_verification_rule_81_5(self) -> None:
+        """Test that Step 5 actually gains 2 command tokens per player (Rule 81.5).
+
+        This test verifies the actual token gain mechanics, not just step success.
+        """
+        # Arrange: Game state with players having sufficient reinforcements
+        players = [
+            Player(id="player1", faction=Faction.SOL),
+            Player(id="player2", faction=Faction.HACAN),
+        ]
+
+        # Ensure players have reinforcements for token gain
+        for player in players:
+            # Set reinforcements to ensure tokens can be gained
+            object.__setattr__(player, "reinforcements", 10)
+
+        game_state = GameState(
+            players=players,
+            phase=GamePhase.STATUS,
+        )
+
+        # Capture initial token counts
+        initial_token_counts = {}
+        for player in game_state.players:
+            initial_token_counts[player.id] = {
+                "tactic": player.command_sheet.tactic_pool,
+                "fleet": player.command_sheet.fleet_pool,
+                "strategy": player.command_sheet.strategy_pool,
+                "total": (
+                    player.command_sheet.tactic_pool
+                    + player.command_sheet.fleet_pool
+                    + player.command_sheet.strategy_pool
+                ),
+            }
+
+        # Act: Execute status phase
+        result, final_state = self.status_phase_manager.execute_complete_status_phase(
+            game_state
+        )
+
+        # Assert: Status phase succeeded
+        assert result.success is True
+
+        # Verify Step 5 succeeded
+        gain_step = result.get_step_result(5)
+        assert gain_step is not None
+        assert gain_step.success is True
+
+        # Verify each player gained tokens (Rule 81.5 requires +2 tokens per player)
+        for player in final_state.players:
+            initial_total = initial_token_counts[player.id]["total"]
+            final_total = (
+                player.command_sheet.tactic_pool
+                + player.command_sheet.fleet_pool
+                + player.command_sheet.strategy_pool
+            )
+
+            # Each player should have gained tokens (up to 2, limited by reinforcements)
+            tokens_gained = final_total - initial_total
+            assert tokens_gained >= 0, (
+                f"Player {player.id} lost tokens instead of gaining"
+            )
+
+            # If player had sufficient reinforcements, they should gain exactly 2
+            if (
+                initial_token_counts[player.id]["total"] + 2 <= 16
+            ):  # Assuming max 16 tokens
+                assert tokens_gained == 2, (
+                    f"Player {player.id} should have gained 2 tokens but gained {tokens_gained}"
+                )
 
     def test_strategy_card_system_integration_comprehensive(self) -> None:
         """Test comprehensive integration with strategy card system (Rule 83).
@@ -388,8 +457,8 @@ class TestCompleteRoundProgressionScenarios:
         """
         # Arrange: Game state with agenda phase active
         players = [
-            Player(id="player1", faction="sol"),
-            Player(id="player2", faction="letnev"),
+            Player(id="player1", faction=Faction.SOL),
+            Player(id="player2", faction=Faction.BARONY),
         ]
 
         # Start in action phase with agenda phase active
@@ -427,8 +496,8 @@ class TestCompleteRoundProgressionScenarios:
         """
         # Arrange: Initial game state
         players = [
-            Player(id="player1", faction="sol"),
-            Player(id="player2", faction="letnev"),
+            Player(id="player1", faction=Faction.SOL),
+            Player(id="player2", faction=Faction.BARONY),
         ]
 
         current_state = GameState(
@@ -612,7 +681,7 @@ class TestPhaseTransitionValidation:
         Requirements: 9.1 - Phase transition validation with error handling
         """
         # Arrange: Game state in wrong phase for status phase execution
-        players = [Player(id="test_player", faction="sol")]
+        players = [Player(id="test_player", faction=Faction.SOL)]
 
         # Try to execute status phase from strategy phase (invalid)
         invalid_state = GameState(
@@ -635,8 +704,3 @@ class TestPhaseTransitionValidation:
         # 1. Execute anyway (flexible implementation)
         # 2. Fail gracefully with clear error message
         # Either approach is acceptable as long as it's consistent
-
-
-if __name__ == "__main__":
-    # Run comprehensive system integration tests when executed directly
-    pytest.main([__file__, "-v"])

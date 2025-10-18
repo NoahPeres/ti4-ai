@@ -37,7 +37,7 @@ class PromissoryNote:
 
     note_type: PromissoryNoteType
     issuing_player: str
-    receiving_player: Optional[str] = None
+    receiving_player: str | None = None
 
     def __post_init__(self) -> None:
         """Validate promissory note after initialization."""
@@ -76,7 +76,7 @@ class TransactionResult:
     success: bool
     player1_gave: TransactionOffer
     player2_gave: TransactionOffer
-    error_message: Optional[str] = None
+    error_message: str | None = None
 
 
 class TransactionManager:
@@ -101,7 +101,7 @@ class TransactionManager:
         self._galaxy = galaxy
 
         # Track active player for transaction timing
-        self._active_player: Optional[str] = None
+        self._active_player: str | None = None
 
         # Track completed transactions per turn (Rule 94.1 - one per neighbor)
         self._completed_transactions: dict[str, set[str]] = {}
@@ -241,7 +241,7 @@ class TransactionManager:
         )
 
     def validate_offer(
-        self, offer: TransactionOffer, player_supply: Optional[dict[str, int]] = None
+        self, offer: TransactionOffer, player_supply: dict[str, int] | None = None
     ) -> bool:
         """Validate that a transaction offer contains only valid exchangeable items.
 

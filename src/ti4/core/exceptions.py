@@ -3,7 +3,7 @@ Core exceptions for the TI4 game system.
 """
 
 import time
-from typing import Any, Optional
+from typing import Any
 
 # Re-export ValidationError from the validation module to avoid duplication and API drift
 from .validation import ValidationError  # noqa: F401
@@ -21,8 +21,8 @@ class TI4GameError(TI4Error):
     def __init__(
         self,
         message: str,
-        context: Optional[dict[str, Any]] = None,
-        cause: Optional[Exception] = None,
+        context: dict[str, Any] | None = None,
+        cause: Exception | None = None,
     ):
         super().__init__(message)
         self.context = context or {}
@@ -86,8 +86,8 @@ class CommandExecutionError(TI4Error):
         self,
         command: Any,
         reason: str,
-        context: Optional[dict[str, Any]] = None,
-        cause: Optional[Exception] = None,
+        context: dict[str, Any] | None = None,
+        cause: Exception | None = None,
     ):
         self.command = command
         self.reason = reason
@@ -108,7 +108,7 @@ class PhaseTransitionError(TI4Error):
     """Raised when a phase transition fails."""
 
     def __init__(
-        self, from_phase: Any, to_phase: Any, context: Optional[dict[str, Any]] = None
+        self, from_phase: Any, to_phase: Any, context: dict[str, Any] | None = None
     ):
         self.from_phase = from_phase
         self.to_phase = to_phase
@@ -130,7 +130,7 @@ class FleetCapacityError(TI4Error):
 class StrategyCardStateError(TI4Error):
     """Raised when strategy card state is inconsistent."""
 
-    def __init__(self, message: str, context: Optional[dict[str, Any]] = None):
+    def __init__(self, message: str, context: dict[str, Any] | None = None):
         super().__init__(message)
         self.context = context or {}
 

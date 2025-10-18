@@ -22,18 +22,30 @@ if TYPE_CHECKING:
 def add_comprehensive_error_handling_to_step_handlers() -> None:
     """Add comprehensive error handling to all status phase step handlers.
 
-    This function enhances all step handlers with:
-    - Input validation and error recovery
-    - Comprehensive exception handling
-    - State validation and rollback mechanisms
-    - Descriptive and actionable error messages
+    This function is now a no-op since error handling is built into the base classes.
+    Kept for backward compatibility.
     """
-    # For now, this is a placeholder
-    # The actual monkey patching can be implemented later if needed
+    # No-op: Error handling is now built into the step handler base classes
     pass
 
 
-def _is_valid_game_state(game_state: Any) -> bool:
+def create_enhanced_step_result(
+    success: bool, step_name: str, error_message: str = ""
+) -> StepResult:
+    """Create a step result with enhanced error information.
+
+    Args:
+        success: Whether the step succeeded
+        step_name: The name of the step
+        error_message: Optional error message for failures
+
+    Returns:
+        A StepResult with appropriate error information
+    """
+    return StepResult(success=success, step_name=step_name, error_message=error_message)
+
+
+def validate_game_state(game_state: Any) -> bool:
     """Validate that the provided object is a valid game state.
 
     Args:
@@ -49,16 +61,14 @@ def _is_valid_game_state(game_state: Any) -> bool:
     if not hasattr(game_state, "players"):
         return False
 
-    # Check if it has other expected game state attributes
-    if not any(
-        hasattr(game_state, attr) for attr in ["systems", "phase", "current_player"]
-    ):
+    # Accept either known fields or cloning capability
+    if not (hasattr(game_state, "phase") or hasattr(game_state, "_create_new_state")):
         return False
 
     return True
 
 
-def _create_error_result(step_name: str, error_message: str) -> StepResult:
+def create_error_result(step_name: str, error_message: str) -> StepResult:
     """Create a standardized error result.
 
     Args:

@@ -184,10 +184,9 @@ class TestStatusPhasePerformance:
                 f"Step {step_number} took {execution_time:.2f}ms, should be <100ms"
             )
 
-            # Verify functionality
-            assert (
-                result.success or not result.success
-            )  # Either outcome is acceptable for individual steps
+            # Verify result structure
+            assert isinstance(result.step_name, str) and result.step_name
+            assert isinstance(result.success, bool)
 
         # Verify total time is reasonable
         total_time = sum(step_times.values())

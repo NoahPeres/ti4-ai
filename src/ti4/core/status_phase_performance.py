@@ -17,7 +17,6 @@ from dataclasses import dataclass, field
 from typing import (
     TYPE_CHECKING,
     Any,
-    Optional,
     TypeVar,
 )
 
@@ -65,7 +64,7 @@ class StatusPhasePerformanceReport:
 
     total_execution_time_ms: float
     step_metrics: dict[int, PerformanceMetrics] = field(default_factory=dict)
-    overall_metrics: Optional[PerformanceMetrics] = None
+    overall_metrics: PerformanceMetrics | None = None
     memory_optimization_enabled: bool = False
     performance_warnings: list[str] = field(default_factory=list)
 
@@ -79,7 +78,7 @@ class StatusPhasePerformanceReport:
                 f"Step {step_number} exceeded timing requirement: {metrics.execution_time_ms:.2f}ms"
             )
 
-    def get_slowest_step(self) -> Optional[tuple[int, PerformanceMetrics]]:
+    def get_slowest_step(self) -> tuple[int, PerformanceMetrics] | None:
         """Get the slowest executing step."""
         if not self.step_metrics:
             return None
@@ -260,7 +259,7 @@ class OptimizedStatusPhaseOrchestrator(StatusPhaseOrchestrator):
     Extends the base orchestrator with performance monitoring and optimization features.
     """
 
-    def __init__(self, optimizer: Optional[StatusPhasePerformanceOptimizer] = None):
+    def __init__(self, optimizer: StatusPhasePerformanceOptimizer | None = None):
         """Initialize the optimized orchestrator.
 
         Args:
@@ -401,7 +400,7 @@ class OptimizedStatusPhaseOrchestrator(StatusPhaseOrchestrator):
 
         return result, current_state
 
-    def get_performance_report(self) -> Optional[StatusPhasePerformanceReport]:
+    def get_performance_report(self) -> StatusPhasePerformanceReport | None:
         """Get the most recent performance report.
 
         Returns:

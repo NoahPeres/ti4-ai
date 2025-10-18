@@ -4,8 +4,6 @@ This module implements the agenda deck mechanics, including deck management
 and card manipulation for the Politics strategy card.
 """
 
-from typing import Optional
-
 
 class AgendaDeck:
     """Manages the agenda deck and card manipulation."""
@@ -66,7 +64,7 @@ class AgendaDeck:
         self.cards = cards + remaining_cards
         return True
 
-    def draw_card(self) -> Optional[str]:
+    def draw_card(self) -> str | None:
         """Draw the top card from the agenda deck.
 
         Returns:
@@ -97,7 +95,7 @@ class AgendaDeck:
         """
         return len(self.cards)
 
-    def peek_top_card(self) -> Optional[str]:
+    def peek_top_card(self) -> str | None:
         """Peek at the top card without drawing it.
 
         Returns:

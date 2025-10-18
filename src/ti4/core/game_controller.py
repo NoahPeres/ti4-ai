@@ -1,7 +1,7 @@
 """Game controller for managing TI4 game flow."""
 
 # Import for type hints
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any, Union
 
 from ti4.commands.base import GameCommand
 from ti4.commands.manager import CommandManager
@@ -34,10 +34,10 @@ class GameController:
         self._selected_strategy_cards: dict[str, list[StrategyCard]] = {}
         self._consecutive_passes = 0
         self._command_manager = CommandManager()
-        self._event_bus: Optional[Any] = None
+        self._event_bus: Any | None = None
         self._game_id = "default_game"  # TODO: Make this configurable
         self._round_number = 1
-        self._current_game_state: Optional[Any] = None  # Will be set when game starts
+        self._current_game_state: Any | None = None  # Will be set when game starts
         self._passed_players: set[str] = set()  # Track players who have passed
         self._strategic_actions_taken: dict[
             str, set[int]
@@ -656,7 +656,7 @@ class GameController:
         """Set the current game state."""
         self._current_game_state = game_state
 
-    def get_current_game_state(self) -> Optional[Any]:
+    def get_current_game_state(self) -> Any | None:
         """Get the current game state."""
         return self._current_game_state
 

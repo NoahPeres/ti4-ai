@@ -1,7 +1,7 @@
 """Unit statistics system for TI4."""
 
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 from .constants import Faction, Technology, UnitType
 
@@ -17,7 +17,7 @@ class UnitStats:
 
     # === FUNDAMENTAL UNIT PROPERTIES ===
     cost: float = 0
-    combat_value: Optional[int] = None
+    combat_value: int | None = None
     combat_dice: int = 0
     movement: int = 0
     capacity: int = 0
@@ -26,15 +26,15 @@ class UnitStats:
     # === UNIT ABILITIES ===
     sustain_damage: bool = False
     anti_fighter_barrage: bool = False
-    anti_fighter_barrage_value: Optional[int] = None
+    anti_fighter_barrage_value: int | None = None
     anti_fighter_barrage_dice: int = 0
     bombardment: bool = False
-    bombardment_value: Optional[int] = None
+    bombardment_value: int | None = None
     bombardment_dice: int = 0
     deploy: bool = False
     planetary_shield: bool = False
     space_cannon: bool = False
-    space_cannon_value: Optional[int] = None
+    space_cannon_value: int | None = None
     space_cannon_dice: int = 0
     has_production: bool = (
         False  # Whether unit has production ability (separate from production value)
@@ -180,8 +180,8 @@ class UnitStatsProvider:
     def get_unit_stats(
         self,
         unit_type: UnitType,
-        faction: Optional[Faction] = None,
-        technologies: Optional[set[Technology]] = None,
+        faction: Faction | None = None,
+        technologies: set[Technology] | None = None,
     ) -> UnitStats:
         """Get unit statistics with faction and technology modifications."""
         # Convert technologies to frozenset for hashability
@@ -197,7 +197,7 @@ class UnitStatsProvider:
     def _get_cached_unit_stats(
         self,
         unit_type: str,
-        faction: Optional[str],
+        faction: str | None,
         technologies: frozenset[str],
     ) -> UnitStats:
         """Cached version of unit stats calculation."""

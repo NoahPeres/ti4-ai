@@ -179,13 +179,11 @@ class StatusPhaseStepHandler(ABC):
     - Rule 81: Status Phase - Step handler interface
     """
 
-    @abstractmethod
     def execute(self, game_state: "GameState") -> tuple[StepResult, "GameState"]:
-        """Execute this status phase step.
+        """Execute this status phase step with built-in error handling.
 
-        This method performs the actual work of the status phase step,
-        modifying the game state as necessary and returning both the
-        result of the operation and the updated game state.
+        This method provides comprehensive error handling around the actual
+        step implementation, ensuring consistent error reporting and recovery.
 
         Args:
             game_state: The current game state
@@ -196,7 +194,52 @@ class StatusPhaseStepHandler(ABC):
             - GameState: The updated game state after step execution
 
         Raises:
-            StatusPhaseError: If step execution fails
+            Exception: Caught and converted to error result for graceful handling
+        """
+        step_name = self.get_step_name()
+
+        try:
+            # Validate game state
+            if game_state is None:
+                return StepResult(
+                    success=False,
+                    step_name=step_name,
+                    error_message="Game state cannot be None",
+                ), game_state
+
+            # Validate prerequisites
+            if not self.validate_prerequisites(game_state):
+                return StepResult(
+                    success=False,
+                    step_name=step_name,
+                    error_message=f"Prerequisites not met for {step_name}",
+                ), game_state
+
+            # Execute the actual step implementation
+            return self._execute_step(game_state)
+
+        except Exception as e:
+            return StepResult(
+                success=False,
+                step_name=step_name,
+                error_message=f"Error executing {step_name}: {str(e)}",
+            ), game_state
+
+    @abstractmethod
+    def _execute_step(self, game_state: "GameState") -> tuple[StepResult, "GameState"]:
+        """Execute the actual step implementation.
+
+        This method performs the actual work of the status phase step,
+        modifying the game state as necessary and returning both the
+        result of the operation and the updated game state.
+
+        Args:
+            game_state: The current game state (guaranteed to be valid)
+
+        Returns:
+            A tuple containing:
+            - StepResult: The result of executing this step
+            - GameState: The updated game state after step execution
         """
         pass
 
@@ -226,6 +269,16 @@ class StatusPhaseStepHandler(ABC):
             A human-readable name for this status phase step
         """
         pass
+
+    def _create_fallback_game_state(self) -> "GameState":
+        """Create a minimal fallback game state for error recovery.
+
+        Returns:
+            A minimal GameState instance
+        """
+        from .game_state import GameState
+
+        return GameState()
 
 
 # Round Transition Manager
@@ -688,7 +741,7 @@ class StatusPhaseOrchestrator:
             def __init__(self, step_num: int) -> None:
                 self.step_num = step_num
 
-            def execute(
+            def _execute_step(
                 self, game_state: "GameState"
             ) -> tuple[StepResult, "GameState"]:
                 result = StepResult(success=True, step_name=f"Step {self.step_num}")
@@ -717,7 +770,7 @@ class ScoreObjectivesStep(StatusPhaseStepHandler):
     - Rule 61: Objectives - Scoring mechanics and limits
     """
 
-    def execute(self, game_state: "GameState") -> tuple[StepResult, "GameState"]:
+    def _execute_step(self, game_state: "GameState") -> tuple[StepResult, "GameState"]:
         """Execute Step 1: Score Objectives.
 
         Allows each player to score up to one public and one secret objective
@@ -1005,7 +1058,7 @@ class RemoveCommandTokensStep(StatusPhaseStepHandler):
     - Rule 20: Command Tokens - Token management mechanics
     """
 
-    def execute(self, game_state: "GameState") -> tuple[StepResult, "GameState"]:
+    def _execute_step(self, game_state: "GameState") -> tuple[StepResult, "GameState"]:
         """Execute Step 4: Remove Command Tokens.
 
         Removes all command tokens from the game board for all players
@@ -1108,7 +1161,7 @@ class GainRedistributeTokensStep(StatusPhaseStepHandler):
     - Rule 20: Command Tokens - Token management mechanics
     """
 
-    def execute(self, game_state: "GameState") -> tuple[StepResult, "GameState"]:
+    def _execute_step(self, game_state: "GameState") -> tuple[StepResult, "GameState"]:
         """Execute Step 5: Gain and Redistribute Command Tokens.
 
         Gives each player 2 additional command tokens and allows redistribution
@@ -1143,8 +1196,16 @@ class GainRedistributeTokensStep(StatusPhaseStepHandler):
 
             for player in current_state.players:
                 try:
-                    # Give player 2 additional command tokens (simplified implementation)
-                    # In a full implementation, this would check reinforcements and add tokens
+                    # Give player 2 additional command tokens (Rule 81.5)
+                    tokens_gained = 0
+
+                    # Attempt to gain 2 tokens, placing them in tactic pool by default
+                    for _ in range(2):
+                        if player.gain_command_token("tactic"):
+                            tokens_gained += 1
+                        else:
+                            # If no reinforcements available, stop trying
+                            break
 
                     # Allow redistribution among pools - call the command sheet method
                     if hasattr(player, "command_sheet") and hasattr(
@@ -1161,7 +1222,7 @@ class GainRedistributeTokensStep(StatusPhaseStepHandler):
 
                     players_processed.append(player.id)
                     actions_taken.append(
-                        f"Player {player.id} gained 2 tokens and redistributed"
+                        f"Player {player.id} gained {tokens_gained} command tokens and redistributed"
                     )
 
                 except Exception as e:
@@ -1253,7 +1314,7 @@ class RevealObjectiveStep(StatusPhaseStepHandler):
     - Rule 80: Speaker - Speaker token privileges and powers
     """
 
-    def execute(self, game_state: "GameState") -> tuple[StepResult, "GameState"]:
+    def _execute_step(self, game_state: "GameState") -> tuple[StepResult, "GameState"]:
         """Execute Step 2: Reveal Public Objective.
 
         The speaker reveals the next unrevealed public objective
@@ -1281,8 +1342,21 @@ class RevealObjectiveStep(StatusPhaseStepHandler):
                     error_message="Game state cannot be None",
                 ), game_state
 
+            # Ensure we have a speaker - assign first player if none exists
+            working_state = game_state
+            if not hasattr(game_state, "speaker_id") or game_state.speaker_id is None:
+                if game_state.players:
+                    # Assign first player as speaker if none exists
+                    working_state = game_state.set_speaker(game_state.players[0].id)
+                else:
+                    return StepResult(
+                        success=False,
+                        step_name=step_name,
+                        error_message="No players available to assign as speaker",
+                    ), game_state
+
             # Get the next unrevealed objective
-            objective_to_reveal = self.get_next_unrevealed_objective(game_state)
+            objective_to_reveal = self.get_next_unrevealed_objective(working_state)
 
             if objective_to_reveal is None:
                 # No unrevealed objectives remain - skip gracefully
@@ -1290,13 +1364,13 @@ class RevealObjectiveStep(StatusPhaseStepHandler):
                     success=True,
                     step_name=step_name,
                     actions_taken=["No unrevealed objectives remain - step skipped"],
-                ), game_state
+                ), working_state
 
             # Reveal the objective
-            updated_state = self.reveal_objective(objective_to_reveal, game_state)
+            updated_state = self.reveal_objective(objective_to_reveal, working_state)
 
             # Track the action taken
-            action_description = f"Speaker {game_state.speaker_id} revealed objective: {objective_to_reveal.name}"
+            action_description = f"Speaker {working_state.speaker_id} revealed objective: {objective_to_reveal.name}"
 
             return StepResult(
                 success=True, step_name=step_name, actions_taken=[action_description]
@@ -1310,8 +1384,9 @@ class RevealObjectiveStep(StatusPhaseStepHandler):
     def validate_prerequisites(self, game_state: "GameState") -> bool:
         """Validate prerequisites for Step 2: Reveal Public Objective.
 
-        Checks that the game state is valid for objective revealing,
-        including having a speaker assigned.
+        Checks that the game state is valid for objective revealing.
+        If no speaker is assigned, the step will gracefully handle this
+        by assigning the first player as speaker.
 
         Args:
             game_state: The current game state
@@ -1320,10 +1395,6 @@ class RevealObjectiveStep(StatusPhaseStepHandler):
             True if prerequisites are met, False otherwise
         """
         if game_state is None:
-            return False
-
-        # Must have a speaker to reveal objectives
-        if not hasattr(game_state, "speaker_id") or game_state.speaker_id is None:
             return False
 
         # Basic validation - game state exists and has players
@@ -1555,7 +1626,7 @@ class DrawActionCardsStep(StatusPhaseStepHandler):
     - Rule 2: Action Cards - Drawing mechanics and deck management
     """
 
-    def execute(self, game_state: "GameState") -> tuple[StepResult, "GameState"]:
+    def _execute_step(self, game_state: "GameState") -> tuple[StepResult, "GameState"]:
         """Execute Step 3: Draw Action Cards.
 
         Each player draws one action card in initiative order
@@ -1714,7 +1785,7 @@ class ReadyCardsStep(StatusPhaseStepHandler):
     - Rule 34.2: Ready Cards step mechanics
     """
 
-    def execute(self, game_state: "GameState") -> tuple[StepResult, "GameState"]:
+    def _execute_step(self, game_state: "GameState") -> tuple[StepResult, "GameState"]:
         """Execute Step 6: Ready Cards.
 
         Readies all exhausted cards for all players as defined by Rule 81.6.
@@ -1841,6 +1912,22 @@ class StatusPhaseManager:
         self.validator = StatusPhaseValidator()
         self.transition_manager = RoundTransitionManager()
         self.performance_optimization_enabled = enable_performance_optimization
+
+        # Apply comprehensive error handling wrappers (idempotent)
+        try:
+            from .status_phase_error_enhancements import (
+                add_comprehensive_error_handling_to_step_handlers,
+            )
+
+            add_comprehensive_error_handling_to_step_handlers()
+        except Exception as e:
+            # Non-fatal: enhancements are optional and should not break core functionality
+            # Log the error but continue with core functionality
+            import logging
+
+            logging.getLogger(__name__).debug(
+                "Failed to load status phase error enhancements: %s", e
+            )
 
     def execute_complete_status_phase(
         self, game_state: "GameState"
@@ -2101,7 +2188,7 @@ class RepairUnitsStep(StatusPhaseStepHandler):
     - Rule 31: Destroyed - Unit damage and repair mechanics
     """
 
-    def execute(self, game_state: "GameState") -> tuple[StepResult, "GameState"]:
+    def _execute_step(self, game_state: "GameState") -> tuple[StepResult, "GameState"]:
         """Execute Step 7: Repair Units.
 
         Repairs all damaged units for all players as defined by Rule 81.7.
@@ -2253,7 +2340,7 @@ class ReturnStrategyCardsStep(StatusPhaseStepHandler):
     - Rule 83: Strategy Cards - Card management mechanics
     """
 
-    def execute(self, game_state: "GameState") -> tuple[StepResult, "GameState"]:
+    def _execute_step(self, game_state: "GameState") -> tuple[StepResult, "GameState"]:
         """Execute Step 8: Return Strategy Cards.
 
         Collects all strategy cards from players and returns them to the

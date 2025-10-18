@@ -1,7 +1,7 @@
 """Base command interface for TI4 game actions."""
 
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Any
 
 from ..core.game_state import GameState
 
@@ -35,7 +35,7 @@ class GameCommand(ABC):
         pass
 
     def execute_with_events(
-        self, game_state: GameState, event_bus: Optional[Any] = None
+        self, game_state: GameState, event_bus: Any | None = None
     ) -> GameState:
         """Execute the command and publish events if event bus is provided."""
         result = self.execute(game_state)

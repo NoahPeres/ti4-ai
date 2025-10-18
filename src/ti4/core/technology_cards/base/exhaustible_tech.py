@@ -4,7 +4,7 @@ Exhaustible technology card base implementation.
 This module provides the base class for technology cards that can be exhausted.
 """
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from ti4.core.abilities import Ability
 
@@ -65,7 +65,7 @@ class ExhaustibleTechnologyCard(BaseTechnologyCard):
         """
         return []
 
-    def get_action_ability(self) -> Optional[Ability]:
+    def get_action_ability(self) -> Ability | None:
         """
         Get the ACTION ability that exhausts this card (if any).
 

@@ -9,13 +9,9 @@ LRR References:
 """
 
 import time
-from typing import TYPE_CHECKING
 from unittest.mock import Mock
 
 import pytest
-
-if TYPE_CHECKING:
-    pass
 
 
 class TestStatusPhaseOrchestrator:
