@@ -6,6 +6,29 @@ This document establishes **MANDATORY** development standards for the TI4 AI pro
 
 **ALL AI AGENTS working on this project MUST follow these standards without exception.**
 
+## 🚨 ABSOLUTE PROHIBITION: NEVER IGNORE PRODUCTION CODE QUALITY
+
+**CRITICAL RULE: NEVER ignore mypy checks or failing tests on ANY production code (`src/` directory).**
+
+- ❌ **NEVER use `# type: ignore` without specific error codes** in production code
+- ❌ **NEVER bypass failing tests** in production code
+- ❌ **NEVER commit code that fails type checking** in the `src/` directory
+- ❌ **NEVER use `--no-verify` or similar bypass mechanisms**
+
+**Why this is non-negotiable:**
+- Production code type safety is what enables our 90%+ test coverage and zero-bug deployment record
+- Type errors in production code lead to runtime failures that break the entire game engine
+- Bypassing quality checks creates technical debt that compounds exponentially
+- Our strict type safety is a competitive advantage that must be preserved
+
+**If you encounter type errors in production code:**
+1. **FIX the underlying type issue** - don't ignore it
+2. **Add proper type annotations** where missing
+3. **Use specific type ignores with error codes** only when absolutely necessary
+4. **Ask for help** if you're unsure how to resolve the type issue
+
+**Test code (`tests/` directory) can have relaxed type checking, but production code must be pristine.**
+
 ---
 
 ## 📊 Project Quality Achievements (DO NOT COMPROMISE)
