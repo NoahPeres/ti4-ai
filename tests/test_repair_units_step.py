@@ -102,6 +102,7 @@ class TestRepairUnitsStep:
         # Add a system with damaged units on planets
         system = System("system1")
         from src.ti4.core.planet import Planet
+
         planet = Planet("planet1", 2, 1)
         mech = Unit(UnitType.MECH, "player1")
         mech.sustain_damage()  # Damage the unit
@@ -166,7 +167,9 @@ class TestRepairUnitsStep:
         assert "Game state cannot be None" in result.error_message
         assert updated_state is None
 
-    def test_repair_units_step_execute_with_mixed_damaged_and_undamaged_units(self) -> None:
+    def test_repair_units_step_execute_with_mixed_damaged_and_undamaged_units(
+        self,
+    ) -> None:
         """Test RepairUnitsStep execution with mix of damaged and undamaged units."""
         step = RepairUnitsStep()
         game_state = GameState()

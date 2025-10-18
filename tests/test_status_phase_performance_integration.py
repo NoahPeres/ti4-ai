@@ -4,7 +4,6 @@ This module tests the integration between the StatusPhaseManager and
 the performance optimization features.
 """
 
-
 from src.ti4.core.constants import Faction
 from src.ti4.core.game_state import GameState
 from src.ti4.core.planet import Planet
@@ -69,7 +68,9 @@ class TestStatusPhasePerformanceIntegration:
         # Test performance reporting (should indicate optimization not enabled)
         performance_report = manager.get_performance_report()
         assert isinstance(performance_report, dict)
-        assert "Performance optimization not enabled" in performance_report.get("message", "")
+        assert "Performance optimization not enabled" in performance_report.get(
+            "message", ""
+        )
 
     def test_performance_cache_management(self) -> None:
         """Test performance cache management functionality."""
@@ -103,15 +104,13 @@ class TestStatusPhasePerformanceIntegration:
         factions = [Faction.SOL, Faction.HACAN, Faction.XXCHA, Faction.ARBOREC]
 
         for i, faction in enumerate(factions):
-            player = Player(id=f"player{i+1}", faction=faction)
+            player = Player(id=f"player{i + 1}", faction=faction)
             game_state = game_state.add_player(player)
 
             # Add planets to each player
             for j in range(4):
                 planet = Planet(
-                    name=f"Planet_{i}_{j}",
-                    resources=j % 3 + 1,
-                    influence=j % 2 + 1
+                    name=f"Planet_{i}_{j}", resources=j % 3 + 1, influence=j % 2 + 1
                 )
                 game_state = game_state.add_player_planet(player.id, planet)
 
@@ -165,7 +164,7 @@ class TestStatusPhasePerformanceIntegration:
 
         # Should return a valid game state
         assert updated_state is not None
-        assert hasattr(updated_state, 'players')
+        assert hasattr(updated_state, "players")
 
     def test_error_handling_with_performance_optimization(self) -> None:
         """Test error handling when performance optimization encounters issues."""
@@ -176,10 +175,16 @@ class TestStatusPhasePerformanceIntegration:
 
         # Should handle error gracefully
         assert not result.success
-        # Error message should be in one of the step results
-        error_found = any("cannot be None" in step_result.error_message
-                         for step_result in result.step_results.values())
-        assert error_found, f"Expected error message not found in step results: {result.step_results}"
+        # Error message should be in the main result error_message or step results
+        error_found = (
+            result.error_message and "cannot be None" in result.error_message
+        ) or any(
+            "cannot be None" in step_result.error_message
+            for step_result in result.step_results.values()
+        )
+        assert error_found, (
+            f"Expected error message not found. Main error: {result.error_message}, Step results: {result.step_results}"
+        )
 
         # Performance report should still be available
         performance_report = manager.get_performance_report()

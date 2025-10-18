@@ -57,9 +57,7 @@ class TestTask15_1_IntegrationWithAllGameSystems:
         ]
 
         game_state = GameState(
-            players=players,
-            phase=GamePhase.STATUS,
-            agenda_phase_active=False
+            players=players, phase=GamePhase.STATUS, agenda_phase_active=False
         )
 
         # Act: Execute complete status phase with all system integrations
@@ -69,29 +67,38 @@ class TestTask15_1_IntegrationWithAllGameSystems:
 
         # Assert: All steps completed successfully
         assert result.success is True, f"Status phase failed: {result.error_message}"
-        assert len(result.steps_completed) == 8, f"Expected 8 steps, got {len(result.steps_completed)}"
+        assert len(result.steps_completed) == 8, (
+            f"Expected 8 steps, got {len(result.steps_completed)}"
+        )
 
         # Assert: Each system integration step completed
         expected_steps = [
-            (1, "Score Objectives"),           # Objective system (Rule 61)
-            (2, "Reveal Public Objective"),   # Objective system (Rule 61)
-            (3, "Draw Action Cards"),          # Action card system (Rule 2)
-            (4, "Remove Command Tokens"),      # Command token system (Rule 20)
-            (5, "Gain and Redistribute Command Tokens"), # Command token system (Rule 20)
-            (6, "Ready Cards"),                # Leader system (Rule 51) + others
-            (7, "Repair Units"),               # Unit system
-            (8, "Return Strategy Cards"),      # Strategy card system (Rule 83)
+            (1, "Score Objectives"),  # Objective system (Rule 61)
+            (2, "Reveal Public Objective"),  # Objective system (Rule 61)
+            (3, "Draw Action Cards"),  # Action card system (Rule 2)
+            (4, "Remove Command Tokens"),  # Command token system (Rule 20)
+            (
+                5,
+                "Gain and Redistribute Command Tokens",
+            ),  # Command token system (Rule 20)
+            (6, "Ready Cards"),  # Leader system (Rule 51) + others
+            (7, "Repair Units"),  # Unit system
+            (8, "Return Strategy Cards"),  # Strategy card system (Rule 83)
         ]
 
         for step_num, expected_name in expected_steps:
             step_result = result.get_step_result(step_num)
             assert step_result is not None, f"Step {step_num} result missing"
-            assert step_result.success is True, f"Step {step_num} ({expected_name}) failed: {step_result.error_message}"
-            assert step_result.step_name == expected_name, f"Step {step_num} name mismatch: expected '{expected_name}', got '{step_result.step_name}'"
+            assert step_result.success is True, (
+                f"Step {step_num} ({expected_name}) failed: {step_result.error_message}"
+            )
+            assert step_result.step_name == expected_name, (
+                f"Step {step_num} name mismatch: expected '{expected_name}', got '{step_result.step_name}'"
+            )
 
         # Assert: Final state is valid
         assert final_state is not None
-        assert hasattr(final_state, 'players')
+        assert hasattr(final_state, "players")
         assert len(final_state.players) == len(players)
 
     def test_objective_system_integration_edge_cases(self) -> None:
@@ -102,9 +109,7 @@ class TestTask15_1_IntegrationWithAllGameSystems:
         # Arrange: Game state with edge case scenarios
         players = [Player(id="player1", faction="sol")]
         game_state = GameState(
-            players=players,
-            phase=GamePhase.STATUS,
-            agenda_phase_active=False
+            players=players, phase=GamePhase.STATUS, agenda_phase_active=False
         )
 
         # Act: Execute status phase
@@ -133,9 +138,7 @@ class TestTask15_1_IntegrationWithAllGameSystems:
         # Arrange: Game state with action card edge cases
         players = [Player(id="player1", faction="sol")]
         game_state = GameState(
-            players=players,
-            phase=GamePhase.STATUS,
-            agenda_phase_active=False
+            players=players, phase=GamePhase.STATUS, agenda_phase_active=False
         )
 
         # Act: Execute status phase
@@ -159,9 +162,7 @@ class TestTask15_1_IntegrationWithAllGameSystems:
         # Arrange: Game state with command token edge cases
         players = [Player(id="player1", faction="sol")]
         game_state = GameState(
-            players=players,
-            phase=GamePhase.STATUS,
-            agenda_phase_active=False
+            players=players, phase=GamePhase.STATUS, agenda_phase_active=False
         )
 
         # Act: Execute status phase
@@ -190,9 +191,7 @@ class TestTask15_1_IntegrationWithAllGameSystems:
         # Arrange: Game state with strategy card edge cases
         players = [Player(id="player1", faction="sol")]
         game_state = GameState(
-            players=players,
-            phase=GamePhase.STATUS,
-            agenda_phase_active=False
+            players=players, phase=GamePhase.STATUS, agenda_phase_active=False
         )
 
         # Act: Execute status phase
@@ -216,9 +215,7 @@ class TestTask15_1_IntegrationWithAllGameSystems:
         # Arrange: Game state with leader edge cases
         players = [Player(id="player1", faction="sol")]
         game_state = GameState(
-            players=players,
-            phase=GamePhase.STATUS,
-            agenda_phase_active=False
+            players=players, phase=GamePhase.STATUS, agenda_phase_active=False
         )
 
         # Act: Execute status phase
@@ -242,21 +239,43 @@ class TestTask15_1_IntegrationWithAllGameSystems:
         # Arrange: Game state for testing failure recovery
         players = [Player(id="player1", faction="sol")]
         game_state = GameState(
-            players=players,
-            phase=GamePhase.STATUS,
-            agenda_phase_active=False
+            players=players, phase=GamePhase.STATUS, agenda_phase_active=False
         )
 
         # Test each system integration failure independently
         system_failures = [
-            ("src.ti4.core.status_phase.ScoreObjectivesStep.execute", "Objective system failure"),
-            ("src.ti4.core.status_phase.RevealObjectiveStep.execute", "Objective reveal failure"),
-            ("src.ti4.core.status_phase.DrawActionCardsStep.execute", "Action card system failure"),
-            ("src.ti4.core.status_phase.RemoveCommandTokensStep.execute", "Command token removal failure"),
-            ("src.ti4.core.status_phase.GainRedistributeTokensStep.execute", "Token redistribution failure"),
-            ("src.ti4.core.status_phase.ReadyCardsStep.execute", "Card readying failure"),
-            ("src.ti4.core.status_phase.RepairUnitsStep.execute", "Unit repair failure"),
-            ("src.ti4.core.status_phase.ReturnStrategyCardsStep.execute", "Strategy card return failure"),
+            (
+                "src.ti4.core.status_phase.ScoreObjectivesStep.execute",
+                "Objective system failure",
+            ),
+            (
+                "src.ti4.core.status_phase.RevealObjectiveStep.execute",
+                "Objective reveal failure",
+            ),
+            (
+                "src.ti4.core.status_phase.DrawActionCardsStep.execute",
+                "Action card system failure",
+            ),
+            (
+                "src.ti4.core.status_phase.RemoveCommandTokensStep.execute",
+                "Command token removal failure",
+            ),
+            (
+                "src.ti4.core.status_phase.GainRedistributeTokensStep.execute",
+                "Token redistribution failure",
+            ),
+            (
+                "src.ti4.core.status_phase.ReadyCardsStep.execute",
+                "Card readying failure",
+            ),
+            (
+                "src.ti4.core.status_phase.RepairUnitsStep.execute",
+                "Unit repair failure",
+            ),
+            (
+                "src.ti4.core.status_phase.ReturnStrategyCardsStep.execute",
+                "Strategy card return failure",
+            ),
         ]
 
         for mock_target, error_message in system_failures:
@@ -264,13 +283,17 @@ class TestTask15_1_IntegrationWithAllGameSystems:
                 mock_step.side_effect = Exception(error_message)
 
                 # Act: Execute status phase with system failure
-                result, final_state = self.status_phase_manager.execute_complete_status_phase(
-                    game_state
+                result, final_state = (
+                    self.status_phase_manager.execute_complete_status_phase(game_state)
                 )
 
                 # Assert: Graceful handling of system integration failure
-                assert result is not None, f"Result should not be None for {error_message}"
-                assert isinstance(result, StatusPhaseResult), f"Result should be StatusPhaseResult for {error_message}"
+                assert result is not None, (
+                    f"Result should not be None for {error_message}"
+                )
+                assert isinstance(result, StatusPhaseResult), (
+                    f"Result should be StatusPhaseResult for {error_message}"
+                )
 
                 # The implementation should handle failures gracefully
                 # Either by continuing with other steps or providing clear error information
@@ -301,9 +324,7 @@ class TestTask15_1_CompleteRoundProgressionScenarios:
 
         # Simulate end of action phase
         action_phase_state = GameState(
-            players=players,
-            phase=GamePhase.ACTION,
-            agenda_phase_active=False
+            players=players, phase=GamePhase.ACTION, agenda_phase_active=False
         )
 
         # Transition to status phase (normally done by game controller)
@@ -321,8 +342,12 @@ class TestTask15_1_CompleteRoundProgressionScenarios:
         assert len(result.steps_completed) == 8, "All 8 steps should complete"
 
         # Assert: Transitions to strategy phase (new round)
-        assert result.next_phase == "strategy", f"Expected strategy phase, got {result.next_phase}"
-        assert final_state.phase == GamePhase.STRATEGY, f"Expected STRATEGY phase, got {final_state.phase}"
+        assert result.next_phase == "strategy", (
+            f"Expected strategy phase, got {result.next_phase}"
+        )
+        assert final_state.phase == GamePhase.STRATEGY, (
+            f"Expected STRATEGY phase, got {final_state.phase}"
+        )
 
         # Assert: Game state consistency maintained
         assert len(final_state.players) == len(players)
@@ -341,9 +366,7 @@ class TestTask15_1_CompleteRoundProgressionScenarios:
 
         # Simulate end of action phase with agenda phase active (custodians token removed)
         action_phase_state = GameState(
-            players=players,
-            phase=GamePhase.ACTION,
-            agenda_phase_active=True
+            players=players, phase=GamePhase.ACTION, agenda_phase_active=True
         )
 
         # Transition to status phase
@@ -361,8 +384,12 @@ class TestTask15_1_CompleteRoundProgressionScenarios:
         assert len(result.steps_completed) == 8, "All 8 steps should complete"
 
         # Assert: Transitions to agenda phase
-        assert result.next_phase == "agenda", f"Expected agenda phase, got {result.next_phase}"
-        assert final_state.phase == GamePhase.AGENDA, f"Expected AGENDA phase, got {final_state.phase}"
+        assert result.next_phase == "agenda", (
+            f"Expected agenda phase, got {result.next_phase}"
+        )
+        assert final_state.phase == GamePhase.AGENDA, (
+            f"Expected AGENDA phase, got {final_state.phase}"
+        )
 
         # Assert: Game state consistency maintained
         assert len(final_state.players) == len(players)
@@ -380,33 +407,37 @@ class TestTask15_1_CompleteRoundProgressionScenarios:
         ]
 
         current_state = GameState(
-            players=players,
-            phase=GamePhase.STATUS,
-            agenda_phase_active=False
+            players=players, phase=GamePhase.STATUS, agenda_phase_active=False
         )
 
         # Act & Assert: Execute multiple consecutive rounds
         for round_num in range(5):  # Test 5 consecutive rounds
             # Execute status phase
-            result, current_state = self.status_phase_manager.execute_complete_status_phase(
-                current_state
+            result, current_state = (
+                self.status_phase_manager.execute_complete_status_phase(current_state)
             )
 
             # Assert: Each round completes successfully
-            assert result.success is True, f"Round {round_num + 1} failed: {result.error_message}"
+            assert result.success is True, (
+                f"Round {round_num + 1} failed: {result.error_message}"
+            )
             assert len(result.steps_completed) == 8, f"Round {round_num + 1} incomplete"
 
             # Assert: Proper phase transition
-            expected_phase = "agenda" if current_state.agenda_phase_active else "strategy"
-            assert result.next_phase == expected_phase, f"Round {round_num + 1} wrong next phase"
+            expected_phase = (
+                "agenda" if current_state.agenda_phase_active else "strategy"
+            )
+            assert result.next_phase == expected_phase, (
+                f"Round {round_num + 1} wrong next phase"
+            )
 
             # Assert: Game state consistency
-            assert len(current_state.players) == len(players), f"Round {round_num + 1} player count changed"
+            assert len(current_state.players) == len(players), (
+                f"Round {round_num + 1} player count changed"
+            )
 
             # Simulate completing the next phase and returning to status phase
-            current_state = current_state._create_new_state(
-                phase=GamePhase.STATUS
-            )
+            current_state = current_state._create_new_state(phase=GamePhase.STATUS)
 
     def test_round_progression_with_custodians_token_activation(self) -> None:
         """Test round progression when custodians token is removed mid-game.
@@ -418,14 +449,12 @@ class TestTask15_1_CompleteRoundProgressionScenarios:
 
         # Round 1: No agenda phase
         round1_state = GameState(
-            players=players,
-            phase=GamePhase.STATUS,
-            agenda_phase_active=False
+            players=players, phase=GamePhase.STATUS, agenda_phase_active=False
         )
 
         # Act: Execute first round
-        result1, state_after_round1 = self.status_phase_manager.execute_complete_status_phase(
-            round1_state
+        result1, state_after_round1 = (
+            self.status_phase_manager.execute_complete_status_phase(round1_state)
         )
 
         # Assert: First round transitions to strategy phase
@@ -435,13 +464,11 @@ class TestTask15_1_CompleteRoundProgressionScenarios:
 
         # Simulate custodians token removal (would happen during action phase)
         state_with_agenda = state_after_round1.activate_agenda_phase()
-        round2_state = state_with_agenda._create_new_state(
-            phase=GamePhase.STATUS
-        )
+        round2_state = state_with_agenda._create_new_state(phase=GamePhase.STATUS)
 
         # Act: Execute second round after custodians token removal
-        result2, state_after_round2 = self.status_phase_manager.execute_complete_status_phase(
-            round2_state
+        result2, state_after_round2 = (
+            self.status_phase_manager.execute_complete_status_phase(round2_state)
         )
 
         # Assert: Second round transitions to agenda phase
@@ -464,9 +491,7 @@ class TestTask15_1_CompleteRoundProgressionScenarios:
         ]
 
         game_state = GameState(
-            players=players,
-            phase=GamePhase.STATUS,
-            agenda_phase_active=False
+            players=players, phase=GamePhase.STATUS, agenda_phase_active=False
         )
 
         # Act: Execute status phase and measure performance
@@ -476,7 +501,9 @@ class TestTask15_1_CompleteRoundProgressionScenarios:
 
         # Assert: Performance requirements met
         assert result.success is True
-        assert result.total_execution_time < 0.5, f"Execution time {result.total_execution_time}s exceeds 500ms limit"
+        assert result.total_execution_time < 0.5, (
+            f"Execution time {result.total_execution_time}s exceeds 500ms limit"
+        )
 
         # Assert: All steps completed within reasonable time
         for step_num in range(1, 9):
@@ -548,16 +575,18 @@ class TestTask15_1_PhaseTransitionValidation:
             game_state = GameState(
                 players=scenario["players"],
                 phase=GamePhase.STATUS,
-                agenda_phase_active=scenario["agenda_active"]
+                agenda_phase_active=scenario["agenda_active"],
             )
 
             # Act: Execute status phase
-            result, final_state = self.status_phase_manager.execute_complete_status_phase(
-                game_state
+            result, final_state = (
+                self.status_phase_manager.execute_complete_status_phase(game_state)
             )
 
             # Assert: Correct phase transition for scenario
-            assert result.success is True, f"Scenario {scenario['name']} failed: {result.error_message}"
+            assert result.success is True, (
+                f"Scenario {scenario['name']} failed: {result.error_message}"
+            )
             assert result.next_phase == scenario["expected_next_phase"], (
                 f"Scenario {scenario['name']}: expected next phase '{scenario['expected_next_phase']}', "
                 f"got '{result.next_phase}'"
@@ -587,9 +616,7 @@ class TestTask15_1_PhaseTransitionValidation:
         ]
 
         initial_state = GameState(
-            players=players,
-            phase=GamePhase.STATUS,
-            agenda_phase_active=False
+            players=players, phase=GamePhase.STATUS, agenda_phase_active=False
         )
 
         # Store initial state properties for comparison
@@ -603,13 +630,23 @@ class TestTask15_1_PhaseTransitionValidation:
         )
 
         # Assert: Original state unchanged (immutability)
-        assert initial_state.phase == GamePhase.STATUS, "Original state phase should be unchanged"
-        assert len(initial_state.players) == initial_player_count, "Original state player count should be unchanged"
-        assert initial_state.agenda_phase_active == initial_agenda_status, "Original state agenda status should be unchanged"
+        assert initial_state.phase == GamePhase.STATUS, (
+            "Original state phase should be unchanged"
+        )
+        assert len(initial_state.players) == initial_player_count, (
+            "Original state player count should be unchanged"
+        )
+        assert initial_state.agenda_phase_active == initial_agenda_status, (
+            "Original state agenda status should be unchanged"
+        )
 
         # Assert: New state has correct changes
-        assert final_state.phase != initial_state.phase, "Final state should have different phase"
-        assert len(final_state.players) == initial_player_count, "Player count should be preserved"
+        assert final_state.phase != initial_state.phase, (
+            "Final state should have different phase"
+        )
+        assert len(final_state.players) == initial_player_count, (
+            "Player count should be preserved"
+        )
 
         final_player_ids = [p.id for p in final_state.players]
         assert final_player_ids == initial_player_ids, "Player IDs should be preserved"
@@ -627,13 +664,17 @@ class TestTask15_1_PhaseTransitionValidation:
 
         for invalid_state in invalid_states:
             # Act: Attempt phase transition with invalid state
-            result, returned_state = self.status_phase_manager.execute_complete_status_phase(
-                invalid_state
+            result, returned_state = (
+                self.status_phase_manager.execute_complete_status_phase(invalid_state)
             )
 
             # Assert: Graceful error handling
-            assert result is not None, "Result should not be None even for invalid states"
-            assert isinstance(result, StatusPhaseResult), "Result should be StatusPhaseResult"
+            assert result is not None, (
+                "Result should not be None even for invalid states"
+            )
+            assert isinstance(result, StatusPhaseResult), (
+                "Result should be StatusPhaseResult"
+            )
 
             # The implementation should handle invalid states gracefully
             # Either by returning an error result or by providing a default transition
@@ -649,21 +690,25 @@ class TestTask15_1_PhaseTransitionValidation:
         # Test multiple executions with identical states
         for execution_num in range(10):
             game_state = GameState(
-                players=players,
-                phase=GamePhase.STATUS,
-                agenda_phase_active=False
+                players=players, phase=GamePhase.STATUS, agenda_phase_active=False
             )
 
             # Act: Execute status phase
-            result, final_state = self.status_phase_manager.execute_complete_status_phase(
-                game_state
+            result, final_state = (
+                self.status_phase_manager.execute_complete_status_phase(game_state)
             )
 
             # Assert: Consistent results across executions
             assert result.success is True, f"Execution {execution_num + 1} failed"
-            assert result.next_phase == "strategy", f"Execution {execution_num + 1} inconsistent next phase"
-            assert final_state.phase == GamePhase.STRATEGY, f"Execution {execution_num + 1} inconsistent final phase"
-            assert len(result.steps_completed) == 8, f"Execution {execution_num + 1} inconsistent step count"
+            assert result.next_phase == "strategy", (
+                f"Execution {execution_num + 1} inconsistent next phase"
+            )
+            assert final_state.phase == GamePhase.STRATEGY, (
+                f"Execution {execution_num + 1} inconsistent final phase"
+            )
+            assert len(result.steps_completed) == 8, (
+                f"Execution {execution_num + 1} inconsistent step count"
+            )
 
     def test_phase_transition_with_different_player_counts(self) -> None:
         """Test phase transitions work correctly with different player counts.
@@ -674,29 +719,36 @@ class TestTask15_1_PhaseTransitionValidation:
         for player_count in range(1, 7):
             # Arrange: Game state with specific player count
             players = [
-                Player(id=f"player{i+1}", faction="sol")
-                for i in range(player_count)
+                Player(id=f"player{i + 1}", faction="sol") for i in range(player_count)
             ]
 
             game_state = GameState(
-                players=players,
-                phase=GamePhase.STATUS,
-                agenda_phase_active=False
+                players=players, phase=GamePhase.STATUS, agenda_phase_active=False
             )
 
             # Act: Execute status phase
-            result, final_state = self.status_phase_manager.execute_complete_status_phase(
-                game_state
+            result, final_state = (
+                self.status_phase_manager.execute_complete_status_phase(game_state)
             )
 
             # Assert: Successful execution regardless of player count
-            assert result.success is True, f"Failed with {player_count} players: {result.error_message}"
-            assert len(result.steps_completed) == 8, f"Incomplete execution with {player_count} players"
-            assert result.next_phase == "strategy", f"Wrong next phase with {player_count} players"
-            assert final_state.phase == GamePhase.STRATEGY, f"Wrong final phase with {player_count} players"
+            assert result.success is True, (
+                f"Failed with {player_count} players: {result.error_message}"
+            )
+            assert len(result.steps_completed) == 8, (
+                f"Incomplete execution with {player_count} players"
+            )
+            assert result.next_phase == "strategy", (
+                f"Wrong next phase with {player_count} players"
+            )
+            assert final_state.phase == GamePhase.STRATEGY, (
+                f"Wrong final phase with {player_count} players"
+            )
 
             # Assert: Player count preserved
-            assert len(final_state.players) == player_count, f"Player count changed with {player_count} players"
+            assert len(final_state.players) == player_count, (
+                f"Player count changed with {player_count} players"
+            )
 
 
 if __name__ == "__main__":

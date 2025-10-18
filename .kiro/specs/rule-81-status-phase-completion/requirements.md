@@ -29,7 +29,7 @@ This specification addresses the completion of Rule 81 (Status Phase) implementa
 
 1. WHEN the score objectives step begins THEN the system SHALL process players in initiative order
 2. WHEN a player's turn arrives THEN the system SHALL allow scoring up to 1 public objective
-3. WHEN a player's turn arrives THEN the system SHALL allow scoring up to 1 secret objective  
+3. WHEN a player's turn arrives THEN the system SHALL allow scoring up to 1 secret objective
 4. WHEN a player scores an objective THEN the system SHALL validate the objective requirements are met
 5. WHEN a player scores an objective THEN the system SHALL award the appropriate victory points
 6. WHEN a player cannot score any objectives THEN the system SHALL skip to the next player

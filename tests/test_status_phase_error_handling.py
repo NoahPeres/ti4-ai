@@ -550,9 +550,13 @@ class TestSystemIntegrationErrorScenarios:
                 "Objective system unavailable"
             )
 
-            with patch('src.ti4.core.strategy_cards.coordinator.StrategyCardCoordinator') as mock_coordinator_class:
+            with patch(
+                "src.ti4.core.strategy_cards.coordinator.StrategyCardCoordinator"
+            ) as mock_coordinator_class:
                 mock_coordinator = Mock()
-                mock_coordinator.get_status_phase_initiative_order.return_value = ["player1"]
+                mock_coordinator.get_status_phase_initiative_order.return_value = [
+                    "player1"
+                ]
                 mock_coordinator_class.return_value = mock_coordinator
 
                 result, updated_state = step.execute(mock_game_state)
@@ -637,13 +641,19 @@ class TestStateRollbackMechanisms:
         initial_state = Mock()
         initial_state.phase = "status"
         initial_state.round_number = 1
+        # Ensure _create_new_state returns the same object for rollback testing
+        initial_state._create_new_state.return_value = initial_state
 
         # Mock step handlers - critical step fails
         def mock_get_handler_side_effect(step_number):
             mock_handler = Mock(spec=StatusPhaseStepHandler)
             if step_number == 8:  # Critical step - return strategy cards
                 mock_handler.execute.return_value = (
-                    StepResult(success=False, step_name=f"Step {step_number}", error_message="Critical state corruption"),
+                    StepResult(
+                        success=False,
+                        step_name=f"Step {step_number}",
+                        error_message="Critical state corruption",
+                    ),
                     initial_state,
                 )
             else:
@@ -725,7 +735,11 @@ class TestEnhancedValidationScenarios:
         # Should use graceful degradation - continues execution despite wrong phase
         assert result.success is False  # Overall failure due to multiple step failures
         # Multiple steps will fail due to invalid mock game state, but execution continues
-        failed_steps = [step_result for step_result in result.step_results.values() if not step_result.success]
+        failed_steps = [
+            step_result
+            for step_result in result.step_results.values()
+            if not step_result.success
+        ]
         assert len(failed_steps) > 0  # Some steps should fail with invalid game state
 
     def test_step_handler_validates_player_state_consistency(self) -> None:
@@ -786,7 +800,11 @@ class TestPerformanceRelatedErrorHandling:
             if step_number == 1:
                 # Simulate timeout by returning failure result
                 mock_handler.execute.return_value = (
-                    StepResult(success=False, step_name=f"Step {step_number}", error_message="Operation timed out after 1000ms"),
+                    StepResult(
+                        success=False,
+                        step_name=f"Step {step_number}",
+                        error_message="Operation timed out after 1000ms",
+                    ),
                     Mock(),
                 )
             else:

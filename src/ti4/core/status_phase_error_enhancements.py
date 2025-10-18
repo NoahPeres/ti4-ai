@@ -63,7 +63,9 @@ def _enhance_reveal_objective_step() -> None:
     # Store original execute method
     original_execute = RevealObjectiveStep.execute
 
-    def enhanced_execute(self: Any, game_state: "GameState") -> tuple[StepResult, "GameState"]:
+    def enhanced_execute(
+        self: Any, game_state: "GameState"
+    ) -> tuple[StepResult, "GameState"]:
         """Enhanced execute with comprehensive error handling."""
         step_name = "Reveal Public Objective"
 
@@ -73,7 +75,7 @@ def _enhance_reveal_objective_step() -> None:
                 return StepResult(
                     success=False,
                     step_name=step_name,
-                    error_message="Game state cannot be None - ensure game is properly initialized"
+                    error_message="Game state cannot be None - ensure game is properly initialized",
                 ), game_state
 
             # Validate game state type
@@ -81,7 +83,7 @@ def _enhance_reveal_objective_step() -> None:
                 return StepResult(
                     success=False,
                     step_name=step_name,
-                    error_message="Invalid game state type - must be a valid GameState object"
+                    error_message="Invalid game state type - must be a valid GameState object",
                 ), game_state
 
             # Call original implementation with error recovery
@@ -91,19 +93,19 @@ def _enhance_reveal_objective_step() -> None:
             return StepResult(
                 success=False,
                 step_name=step_name,
-                error_message=f"System integration failure: {str(e)}"
+                error_message=f"System integration failure: {str(e)}",
             ), game_state
         except StatusPhaseGameStateError as e:
             return StepResult(
                 success=False,
                 step_name=step_name,
-                error_message=f"Game state validation error: {str(e)}"
+                error_message=f"Game state validation error: {str(e)}",
             ), game_state
         except Exception as e:
             return StepResult(
                 success=False,
                 step_name=step_name,
-                error_message=f"Unexpected error during objective revealing: {str(e)}"
+                error_message=f"Unexpected error during objective revealing: {str(e)}",
             ), game_state
 
     # Replace the execute method
@@ -117,7 +119,9 @@ def _enhance_draw_action_cards_step() -> None:
     # Store original execute method
     original_execute = DrawActionCardsStep.execute
 
-    def enhanced_execute(self: Any, game_state: "GameState") -> tuple[StepResult, "GameState"]:
+    def enhanced_execute(
+        self: Any, game_state: "GameState"
+    ) -> tuple[StepResult, "GameState"]:
         """Enhanced execute with comprehensive error handling."""
         step_name = "Draw Action Cards"
 
@@ -127,7 +131,7 @@ def _enhance_draw_action_cards_step() -> None:
                 return StepResult(
                     success=False,
                     step_name=step_name,
-                    error_message="Game state cannot be None - ensure game is properly initialized"
+                    error_message="Game state cannot be None - ensure game is properly initialized",
                 ), game_state
 
             # Validate game state type
@@ -135,7 +139,7 @@ def _enhance_draw_action_cards_step() -> None:
                 return StepResult(
                     success=False,
                     step_name=step_name,
-                    error_message="Invalid game state type - must be a valid GameState object"
+                    error_message="Invalid game state type - must be a valid GameState object",
                 ), game_state
 
             # Call original implementation with error recovery
@@ -145,13 +149,13 @@ def _enhance_draw_action_cards_step() -> None:
             return StepResult(
                 success=False,
                 step_name=step_name,
-                error_message=f"Action card system integration failure: {str(e)}"
+                error_message=f"Action card system integration failure: {str(e)}",
             ), game_state
         except Exception as e:
             return StepResult(
                 success=False,
                 step_name=step_name,
-                error_message=f"Unexpected error during action card drawing: {str(e)}"
+                error_message=f"Unexpected error during action card drawing: {str(e)}",
             ), game_state
 
     # Replace the execute method
@@ -165,7 +169,9 @@ def _enhance_remove_command_tokens_step() -> None:
     # Store original execute method
     original_execute = RemoveCommandTokensStep.execute
 
-    def enhanced_execute(self: Any, game_state: "GameState") -> tuple[StepResult, "GameState"]:
+    def enhanced_execute(
+        self: Any, game_state: "GameState"
+    ) -> tuple[StepResult, "GameState"]:
         """Enhanced execute with comprehensive error handling."""
         step_name = "Remove Command Tokens"
 
@@ -175,7 +181,7 @@ def _enhance_remove_command_tokens_step() -> None:
                 return StepResult(
                     success=False,
                     step_name=step_name,
-                    error_message="Game state cannot be None - ensure game is properly initialized"
+                    error_message="Game state cannot be None - ensure game is properly initialized",
                 ), game_state
 
             # Validate game state type
@@ -183,7 +189,7 @@ def _enhance_remove_command_tokens_step() -> None:
                 return StepResult(
                     success=False,
                     step_name=step_name,
-                    error_message="Invalid game state type - must be a valid GameState object"
+                    error_message="Invalid game state type - must be a valid GameState object",
                 ), game_state
 
             # Call original implementation with error recovery
@@ -193,13 +199,13 @@ def _enhance_remove_command_tokens_step() -> None:
             return StepResult(
                 success=False,
                 step_name=step_name,
-                error_message=f"Command token system integration failure: {str(e)}"
+                error_message=f"Command token system integration failure: {str(e)}",
             ), game_state
         except Exception as e:
             return StepResult(
                 success=False,
                 step_name=step_name,
-                error_message=f"Unexpected error during command token removal: {str(e)}"
+                error_message=f"Unexpected error during command token removal: {str(e)}",
             ), game_state
 
     # Replace the execute method
@@ -213,7 +219,9 @@ def _enhance_gain_redistribute_tokens_step() -> None:
     # Store original execute method
     original_execute = GainRedistributeTokensStep.execute
 
-    def enhanced_execute(self: Any, game_state: "GameState") -> tuple[StepResult, "GameState"]:
+    def enhanced_execute(
+        self: Any, game_state: "GameState"
+    ) -> tuple[StepResult, "GameState"]:
         """Enhanced execute with comprehensive error handling."""
         step_name = "Gain and Redistribute Command Tokens"
 
@@ -223,7 +231,7 @@ def _enhance_gain_redistribute_tokens_step() -> None:
                 return StepResult(
                     success=False,
                     step_name=step_name,
-                    error_message="Game state cannot be None - ensure game is properly initialized"
+                    error_message="Game state cannot be None - ensure game is properly initialized",
                 ), game_state
 
             # Validate game state type
@@ -231,7 +239,7 @@ def _enhance_gain_redistribute_tokens_step() -> None:
                 return StepResult(
                     success=False,
                     step_name=step_name,
-                    error_message="Invalid game state type - must be a valid GameState object"
+                    error_message="Invalid game state type - must be a valid GameState object",
                 ), game_state
 
             # Call original implementation with error recovery
@@ -241,13 +249,13 @@ def _enhance_gain_redistribute_tokens_step() -> None:
             return StepResult(
                 success=False,
                 step_name=step_name,
-                error_message=f"Command token system integration failure: {str(e)}"
+                error_message=f"Command token system integration failure: {str(e)}",
             ), game_state
         except Exception as e:
             return StepResult(
                 success=False,
                 step_name=step_name,
-                error_message=f"Unexpected error during token redistribution: {str(e)}"
+                error_message=f"Unexpected error during token redistribution: {str(e)}",
             ), game_state
 
     # Replace the execute method
@@ -261,7 +269,9 @@ def _enhance_ready_cards_step() -> None:
     # Store original execute method
     original_execute = ReadyCardsStep.execute
 
-    def enhanced_execute(self: Any, game_state: "GameState") -> tuple[StepResult, "GameState"]:
+    def enhanced_execute(
+        self: Any, game_state: "GameState"
+    ) -> tuple[StepResult, "GameState"]:
         """Enhanced execute with comprehensive error handling."""
         step_name = "Ready Cards"
 
@@ -271,7 +281,7 @@ def _enhance_ready_cards_step() -> None:
                 return StepResult(
                     success=False,
                     step_name=step_name,
-                    error_message="Game state cannot be None - ensure game is properly initialized"
+                    error_message="Game state cannot be None - ensure game is properly initialized",
                 ), game_state
 
             # Validate game state type
@@ -279,7 +289,7 @@ def _enhance_ready_cards_step() -> None:
                 return StepResult(
                     success=False,
                     step_name=step_name,
-                    error_message="Invalid game state type - must be a valid GameState object"
+                    error_message="Invalid game state type - must be a valid GameState object",
                 ), game_state
 
             # Call original implementation with error recovery
@@ -289,13 +299,13 @@ def _enhance_ready_cards_step() -> None:
             return StepResult(
                 success=False,
                 step_name=step_name,
-                error_message=f"Card system integration failure: {str(e)}"
+                error_message=f"Card system integration failure: {str(e)}",
             ), game_state
         except Exception as e:
             return StepResult(
                 success=False,
                 step_name=step_name,
-                error_message=f"Unexpected error during card readying: {str(e)}"
+                error_message=f"Unexpected error during card readying: {str(e)}",
             ), game_state
 
     # Replace the execute method
@@ -309,7 +319,9 @@ def _enhance_repair_units_step() -> None:
     # Store original execute method
     original_execute = RepairUnitsStep.execute
 
-    def enhanced_execute(self: Any, game_state: "GameState") -> tuple[StepResult, "GameState"]:
+    def enhanced_execute(
+        self: Any, game_state: "GameState"
+    ) -> tuple[StepResult, "GameState"]:
         """Enhanced execute with comprehensive error handling."""
         step_name = "Repair Units"
 
@@ -319,7 +331,7 @@ def _enhance_repair_units_step() -> None:
                 return StepResult(
                     success=False,
                     step_name=step_name,
-                    error_message="Game state cannot be None - ensure game is properly initialized"
+                    error_message="Game state cannot be None - ensure game is properly initialized",
                 ), game_state
 
             # Validate game state type
@@ -327,7 +339,7 @@ def _enhance_repair_units_step() -> None:
                 return StepResult(
                     success=False,
                     step_name=step_name,
-                    error_message="Invalid game state type - must be a valid GameState object"
+                    error_message="Invalid game state type - must be a valid GameState object",
                 ), game_state
 
             # Call original implementation with error recovery
@@ -337,13 +349,13 @@ def _enhance_repair_units_step() -> None:
             return StepResult(
                 success=False,
                 step_name=step_name,
-                error_message=f"Unit system integration failure: {str(e)}"
+                error_message=f"Unit system integration failure: {str(e)}",
             ), game_state
         except Exception as e:
             return StepResult(
                 success=False,
                 step_name=step_name,
-                error_message=f"Unexpected error during unit repair: {str(e)}"
+                error_message=f"Unexpected error during unit repair: {str(e)}",
             ), game_state
 
     # Replace the execute method
@@ -357,7 +369,9 @@ def _enhance_return_strategy_cards_step() -> None:
     # Store original execute method
     original_execute = ReturnStrategyCardsStep.execute
 
-    def enhanced_execute(self: Any, game_state: "GameState") -> tuple[StepResult, "GameState"]:
+    def enhanced_execute(
+        self: Any, game_state: "GameState"
+    ) -> tuple[StepResult, "GameState"]:
         """Enhanced execute with comprehensive error handling."""
         step_name = "Return Strategy Cards"
 
@@ -367,7 +381,7 @@ def _enhance_return_strategy_cards_step() -> None:
                 return StepResult(
                     success=False,
                     step_name=step_name,
-                    error_message="Game state cannot be None - ensure game is properly initialized"
+                    error_message="Game state cannot be None - ensure game is properly initialized",
                 ), game_state
 
             # Validate game state type
@@ -375,7 +389,7 @@ def _enhance_return_strategy_cards_step() -> None:
                 return StepResult(
                     success=False,
                     step_name=step_name,
-                    error_message="Invalid game state type - must be a valid GameState object"
+                    error_message="Invalid game state type - must be a valid GameState object",
                 ), game_state
 
             # Call original implementation with error recovery
@@ -385,13 +399,13 @@ def _enhance_return_strategy_cards_step() -> None:
             return StepResult(
                 success=False,
                 step_name=step_name,
-                error_message=f"Strategy card system integration failure: {str(e)}"
+                error_message=f"Strategy card system integration failure: {str(e)}",
             ), game_state
         except Exception as e:
             return StepResult(
                 success=False,
                 step_name=step_name,
-                error_message=f"Unexpected error during strategy card return: {str(e)}"
+                error_message=f"Unexpected error during strategy card return: {str(e)}",
             ), game_state
 
     # Replace the execute method
@@ -411,8 +425,8 @@ def _is_valid_game_state(game_state: Any) -> bool:
         return False
 
     # Check for basic game state attributes
-    required_attributes = ['players']
-    optional_attributes = ['_create_new_state', 'speaker_id', 'phase']
+    required_attributes = ["players"]
+    optional_attributes = ["_create_new_state", "speaker_id", "phase"]
 
     # Must have at least one required attribute or one optional attribute
     has_required = any(hasattr(game_state, attr) for attr in required_attributes)
@@ -421,7 +435,9 @@ def _is_valid_game_state(game_state: Any) -> bool:
     return has_required or has_optional
 
 
-def _validate_game_state_for_step(game_state: "GameState", step_name: str) -> tuple[bool, str]:
+def _validate_game_state_for_step(
+    game_state: "GameState", step_name: str
+) -> tuple[bool, str]:
     """Validate game state for a specific step.
 
     Args:
@@ -435,7 +451,10 @@ def _validate_game_state_for_step(game_state: "GameState", step_name: str) -> tu
         return False, f"Game state cannot be None for {step_name}"
 
     if not _is_valid_game_state(game_state):
-        return False, f"Invalid game state type for {step_name} - must be a valid GameState object"
+        return (
+            False,
+            f"Invalid game state type for {step_name} - must be a valid GameState object",
+        )
 
     return True, ""
 
@@ -450,8 +469,4 @@ def _create_error_result(step_name: str, error_message: str) -> StepResult:
     Returns:
         A StepResult indicating failure with the provided error message
     """
-    return StepResult(
-        success=False,
-        step_name=step_name,
-        error_message=error_message
-    )
+    return StepResult(success=False, step_name=step_name, error_message=error_message)

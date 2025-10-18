@@ -18,7 +18,7 @@ This design document outlines the completion of Rule 81 (Status Phase) implement
 StatusPhaseManager (Enhanced)
 ├── StatusPhaseOrchestrator (New)
 │   ├── Step1Handler: ScoreObjectivesStep
-│   ├── Step2Handler: RevealObjectiveStep  
+│   ├── Step2Handler: RevealObjectiveStep
 │   ├── Step3Handler: DrawActionCardsStep
 │   ├── Step4Handler: RemoveCommandTokensStep
 │   ├── Step5Handler: GainRedistributeTokensStep
@@ -52,16 +52,16 @@ StatusPhaseManager
 ```python
 class StatusPhaseOrchestrator:
     """Orchestrates the complete 8-step status phase sequence."""
-    
+
     def execute_complete_status_phase(self, game_state: GameState) -> StatusPhaseResult:
         """Execute all 8 status phase steps in LRR order."""
-        
+
     def execute_step(self, step_number: int, game_state: GameState) -> StepResult:
         """Execute a specific status phase step."""
-        
+
     def validate_step_prerequisites(self, step_number: int, game_state: GameState) -> bool:
         """Validate that prerequisites for a step are met."""
-        
+
     def get_step_handler(self, step_number: int) -> StatusPhaseStepHandler:
         """Get the appropriate handler for a status phase step."""
 ```
@@ -82,15 +82,15 @@ class StepResult:
 
 class StatusPhaseStepHandler(ABC):
     """Abstract base for status phase step handlers."""
-    
+
     @abstractmethod
     def execute(self, game_state: GameState) -> tuple[StepResult, GameState]:
         """Execute this status phase step."""
-        
+
     @abstractmethod
     def validate_prerequisites(self, game_state: GameState) -> bool:
         """Validate prerequisites for this step."""
-        
+
     @abstractmethod
     def get_step_name(self) -> str:
         """Get the name of this step."""
@@ -103,15 +103,15 @@ class StatusPhaseStepHandler(ABC):
 ```python
 class ScoreObjectivesStep(StatusPhaseStepHandler):
     """Handles Step 1: Score Objectives in initiative order."""
-    
+
     def execute(self, game_state: GameState) -> tuple[StepResult, GameState]:
         """Allow each player to score up to 1 public + 1 secret objective."""
-        
+
     def process_player_objective_scoring(
         self, player_id: str, game_state: GameState
     ) -> tuple[int, GameState]:
         """Process objective scoring for a single player."""
-        
+
     def get_scorable_objectives(
         self, player_id: str, game_state: GameState
     ) -> tuple[list[ObjectiveCard], list[ObjectiveCard]]:
@@ -123,13 +123,13 @@ class ScoreObjectivesStep(StatusPhaseStepHandler):
 ```python
 class RevealObjectiveStep(StatusPhaseStepHandler):
     """Handles Step 2: Speaker reveals next public objective."""
-    
+
     def execute(self, game_state: GameState) -> tuple[StepResult, GameState]:
         """Speaker reveals the next unrevealed public objective."""
-        
+
     def get_next_unrevealed_objective(self, game_state: GameState) -> ObjectiveCard | None:
         """Get the next objective to reveal."""
-        
+
     def reveal_objective(
         self, objective: ObjectiveCard, game_state: GameState
     ) -> GameState:
@@ -141,10 +141,10 @@ class RevealObjectiveStep(StatusPhaseStepHandler):
 ```python
 class DrawActionCardsStep(StatusPhaseStepHandler):
     """Handles Step 3: Each player draws one action card."""
-    
+
     def execute(self, game_state: GameState) -> tuple[StepResult, GameState]:
         """Each player draws one action card in initiative order."""
-        
+
     def draw_card_for_player(
         self, player_id: str, game_state: GameState
     ) -> tuple[bool, GameState]:
@@ -156,16 +156,16 @@ class DrawActionCardsStep(StatusPhaseStepHandler):
 ```python
 class RemoveCommandTokensStep(StatusPhaseStepHandler):
     """Handles Step 4: Remove all command tokens from game board."""
-    
+
     def execute(self, game_state: GameState) -> tuple[StepResult, GameState]:
         """Remove all command tokens from board for all players."""
 
 class GainRedistributeTokensStep(StatusPhaseStepHandler):
     """Handles Step 5: Gain 2 tokens and redistribute."""
-    
+
     def execute(self, game_state: GameState) -> tuple[StepResult, GameState]:
         """Give each player 2 tokens and allow redistribution."""
-        
+
     def redistribute_tokens_for_player(
         self, player_id: str, game_state: GameState
     ) -> GameState:
@@ -177,10 +177,10 @@ class GainRedistributeTokensStep(StatusPhaseStepHandler):
 ```python
 class RepairUnitsStep(StatusPhaseStepHandler):
     """Handles Step 7: Repair all damaged units."""
-    
+
     def execute(self, game_state: GameState) -> tuple[StepResult, GameState]:
         """Repair all damaged units for all players."""
-        
+
     def repair_player_units(
         self, player_id: str, game_state: GameState
     ) -> tuple[int, GameState]:
@@ -192,10 +192,10 @@ class RepairUnitsStep(StatusPhaseStepHandler):
 ```python
 class ReturnStrategyCardsStep(StatusPhaseStepHandler):
     """Handles Step 8: Return strategy cards to common area."""
-    
+
     def execute(self, game_state: GameState) -> tuple[StepResult, GameState]:
         """Return all strategy cards to common area."""
-        
+
     def return_player_strategy_card(
         self, player_id: str, game_state: GameState
     ) -> GameState:
@@ -209,20 +209,20 @@ class ReturnStrategyCardsStep(StatusPhaseStepHandler):
 ```python
 class StatusPhaseValidator:
     """Validates status phase operations and state."""
-    
+
     def validate_game_state_for_status_phase(self, game_state: GameState) -> bool:
         """Validate that game state is ready for status phase."""
-        
+
     def validate_step_prerequisites(
         self, step_number: int, game_state: GameState
     ) -> tuple[bool, str]:
         """Validate prerequisites for a specific step."""
-        
+
     def validate_objective_scoring(
         self, player_id: str, objective: ObjectiveCard, game_state: GameState
     ) -> bool:
         """Validate that a player can score a specific objective."""
-        
+
     def validate_token_redistribution(
         self, player_id: str, distribution: dict[str, int], game_state: GameState
     ) -> bool:
@@ -236,16 +236,16 @@ class StatusPhaseValidator:
 ```python
 class RoundTransitionManager:
     """Manages phase transitions after status phase."""
-    
+
     def determine_next_phase(self, game_state: GameState) -> str:
         """Determine the next phase after status phase."""
-        
+
     def transition_to_agenda_phase(self, game_state: GameState) -> GameState:
         """Transition to agenda phase if custodians token removed."""
-        
+
     def transition_to_new_round(self, game_state: GameState) -> GameState:
         """Start new round with strategy phase."""
-        
+
     def update_round_counter(self, game_state: GameState) -> GameState:
         """Update round counter and related state."""
 ```
@@ -264,10 +264,10 @@ class StatusPhaseResult:
     total_execution_time: float
     next_phase: str
     error_message: str = ""
-    
+
     def get_step_result(self, step_number: int) -> StepResult | None:
         """Get result for a specific step."""
-        
+
     def was_step_successful(self, step_number: int) -> bool:
         """Check if a specific step was successful."""
 ```
@@ -277,20 +277,20 @@ class StatusPhaseResult:
 ```python
 class StatusPhaseManager:
     """Enhanced status phase manager with complete functionality."""
-    
+
     def __init__(self):
         self.orchestrator = StatusPhaseOrchestrator()
         self.validator = StatusPhaseValidator()
         self.transition_manager = RoundTransitionManager()
-    
+
     def execute_complete_status_phase(self, game_state: GameState) -> tuple[StatusPhaseResult, GameState]:
         """Execute complete status phase with all 8 steps."""
-        
+
     def execute_single_step(
         self, step_number: int, game_state: GameState
     ) -> tuple[StepResult, GameState]:
         """Execute a single status phase step."""
-        
+
     # Existing method - enhanced
     def ready_all_cards(self, game_state: GameState) -> GameState:
         """Ready all exhausted cards (Step 6) - existing implementation."""
@@ -310,13 +310,13 @@ class StatusPhaseManager:
 ```python
 class StatusPhaseError(Exception):
     """Base exception for status phase errors."""
-    
+
 class StepValidationError(StatusPhaseError):
     """Raised when step prerequisites are not met."""
-    
+
 class SystemIntegrationError(StatusPhaseError):
     """Raised when integration with other systems fails."""
-    
+
 class GameStateError(StatusPhaseError):
     """Raised when game state is invalid for status phase."""
 ```
@@ -342,28 +342,28 @@ class GameStateError(StatusPhaseError):
 ```python
 class TestStatusPhaseOrchestrator:
     """Test complete status phase orchestration."""
-    
+
     def test_complete_status_phase_execution(self):
         """Test all 8 steps execute in correct order."""
-        
+
     def test_step_failure_handling(self):
         """Test handling of individual step failures."""
 
 class TestScoreObjectivesStep:
     """Test Step 1: Score Objectives."""
-    
+
     def test_initiative_order_processing(self):
         """Test players processed in initiative order."""
-        
+
     def test_objective_scoring_limits(self):
         """Test 1 public + 1 secret objective limit."""
 
 class TestIntegrationPoints:
     """Test integration with existing systems."""
-    
+
     def test_objective_system_integration(self):
         """Test integration with objective scoring system."""
-        
+
     def test_command_token_system_integration(self):
         """Test integration with command token management."""
 ```
@@ -380,13 +380,13 @@ class TestIntegrationPoints:
 ```python
 class TestStatusPhaseIntegration:
     """Test status phase integration with game flow."""
-    
+
     def test_end_to_end_round_progression(self):
         """Test complete round from action phase through status phase."""
-        
+
     def test_agenda_phase_transition(self):
         """Test transition to agenda phase when custodians token removed."""
-        
+
     def test_new_round_transition(self):
         """Test transition to new round when no agenda phase."""
 ```

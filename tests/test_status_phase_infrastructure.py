@@ -25,10 +25,7 @@ class TestStepResult:
         # RED: This will fail until we implement StepResult
         from src.ti4.core.status_phase import StepResult
 
-        result = StepResult(
-            success=True,
-            step_name="Test Step"
-        )
+        result = StepResult(success=True, step_name="Test Step")
 
         assert result.success is True
         assert result.step_name == "Test Step"
@@ -45,14 +42,17 @@ class TestStepResult:
             step_name="Score Objectives",
             error_message="Player not found",
             players_processed=["player1", "player2"],
-            actions_taken=["scored_public_objective", "scored_secret_objective"]
+            actions_taken=["scored_public_objective", "scored_secret_objective"],
         )
 
         assert result.success is False
         assert result.step_name == "Score Objectives"
         assert result.error_message == "Player not found"
         assert result.players_processed == ["player1", "player2"]
-        assert result.actions_taken == ["scored_public_objective", "scored_secret_objective"]
+        assert result.actions_taken == [
+            "scored_public_objective",
+            "scored_secret_objective",
+        ]
 
 
 class TestStatusPhaseResult:
@@ -68,7 +68,7 @@ class TestStatusPhaseResult:
             steps_completed=["Step 1", "Step 2"],
             step_results={},
             total_execution_time=0.5,
-            next_phase="agenda"
+            next_phase="agenda",
         )
 
         assert result.success is True
@@ -88,7 +88,7 @@ class TestStatusPhaseResult:
             steps_completed=["Step 1"],
             step_results={1: step_result},
             total_execution_time=0.5,
-            next_phase="agenda"
+            next_phase="agenda",
         )
 
         retrieved = result.get_step_result(1)
@@ -103,7 +103,7 @@ class TestStatusPhaseResult:
             steps_completed=[],
             step_results={},
             total_execution_time=0.5,
-            next_phase="agenda"
+            next_phase="agenda",
         )
 
         retrieved = result.get_step_result(1)
@@ -119,7 +119,7 @@ class TestStatusPhaseResult:
             steps_completed=["Step 1"],
             step_results={1: step_result},
             total_execution_time=0.5,
-            next_phase="agenda"
+            next_phase="agenda",
         )
 
         assert result.was_step_successful(1) is True
@@ -134,7 +134,7 @@ class TestStatusPhaseResult:
             steps_completed=["Step 1"],
             step_results={1: step_result},
             total_execution_time=0.5,
-            next_phase="agenda"
+            next_phase="agenda",
         )
 
         assert result.was_step_successful(1) is False
@@ -148,7 +148,7 @@ class TestStatusPhaseResult:
             steps_completed=[],
             step_results={},
             total_execution_time=0.5,
-            next_phase="agenda"
+            next_phase="agenda",
         )
 
         assert result.was_step_successful(1) is False
@@ -184,7 +184,9 @@ class TestStatusPhaseStepHandler:
 
         # Create complete subclass
         class CompleteHandler(StatusPhaseStepHandler):
-            def execute(self, game_state: "GameState") -> tuple[StepResult, "GameState"]:
+            def execute(
+                self, game_state: "GameState"
+            ) -> tuple[StepResult, "GameState"]:
                 result = StepResult(success=True, step_name="Test")
                 return result, game_state
 

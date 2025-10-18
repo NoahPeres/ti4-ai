@@ -31,10 +31,22 @@ class TestEnhancedStatusPhaseManager:
         """Set up test fixtures."""
         self.manager = StatusPhaseManager()
         self.mock_game_state = Mock(spec=GameState)
-        self.mock_game_state.players = [
-            Mock(spec=Player, id="player1"),
-            Mock(spec=Player, id="player2"),
-        ]
+
+        # Create mock players with proper attributes
+        mock_player1 = Mock(spec=Player)
+        mock_player1.id = "player1"
+        mock_player1.leader_sheet = None
+        mock_player1.configure_mock(**{"id": "player1", "leader_sheet": None})
+
+        mock_player2 = Mock(spec=Player)
+        mock_player2.id = "player2"
+        mock_player2.leader_sheet = None
+        mock_player2.configure_mock(**{"id": "player2", "leader_sheet": None})
+
+        self.mock_game_state.players = [mock_player1, mock_player2]
+
+        # Mock the game state to have systems as a dictionary (not list)
+        self.mock_game_state.systems = {}
 
     def test_execute_complete_status_phase_success(self):
         """Test complete status phase execution end-to-end."""
@@ -149,8 +161,8 @@ class TestEnhancedStatusPhaseManager:
             self.mock_game_state,
         )
 
-        # Create new manager to trigger orchestrator creation
-        manager = StatusPhaseManager()
+        # Create new manager to trigger orchestrator creation (disable performance optimization to use standard orchestrator)
+        manager = StatusPhaseManager(enable_performance_optimization=False)
 
         # Act
         result, updated_state = manager.execute_complete_status_phase(
@@ -248,14 +260,26 @@ class TestStatusPhaseManagerIntegration:
 
         # Create a more realistic mock game state
         self.game_state = Mock(spec=GameState)
-        self.game_state.players = [
-            Mock(spec=Player, id="player1"),
-            Mock(spec=Player, id="player2"),
-        ]
+
+        # Create mock players with proper attributes
+        mock_player1 = Mock(spec=Player)
+        mock_player1.id = "player1"
+        mock_player1.leader_sheet = None
+        mock_player1.configure_mock(**{"id": "player1", "leader_sheet": None})
+
+        mock_player2 = Mock(spec=Player)
+        mock_player2.id = "player2"
+        mock_player2.leader_sheet = None
+        mock_player2.configure_mock(**{"id": "player2", "leader_sheet": None})
+
+        self.game_state.players = [mock_player1, mock_player2]
         self.game_state.exhausted_strategy_cards = []
         self.game_state.player_planets = {"player1": [], "player2": []}
         self.game_state.player_technology_cards = {"player1": [], "player2": []}
         self.game_state._create_new_state.return_value = self.game_state
+
+        # Mock the game state to have systems as a dictionary (not list)
+        self.game_state.systems = {}
 
     def test_end_to_end_status_phase_execution(self):
         """Test complete end-to-end status phase execution."""
@@ -348,11 +372,22 @@ class TestStatusPhaseManagerComprehensiveIntegration:
         game_state = Mock(spec=GameState)
 
         # Players
-        game_state.players = [
-            Mock(spec=Player, id="player1"),
-            Mock(spec=Player, id="player2"),
-            Mock(spec=Player, id="player3"),
-        ]
+        mock_player1 = Mock(spec=Player)
+        mock_player1.id = "player1"
+        mock_player1.leader_sheet = None
+        mock_player1.configure_mock(**{"id": "player1", "leader_sheet": None})
+
+        mock_player2 = Mock(spec=Player)
+        mock_player2.id = "player2"
+        mock_player2.leader_sheet = None
+        mock_player2.configure_mock(**{"id": "player2", "leader_sheet": None})
+
+        mock_player3 = Mock(spec=Player)
+        mock_player3.id = "player3"
+        mock_player3.leader_sheet = None
+        mock_player3.configure_mock(**{"id": "player3", "leader_sheet": None})
+
+        game_state.players = [mock_player1, mock_player2, mock_player3]
 
         # Game state attributes for backward compatibility
         game_state.exhausted_strategy_cards = []

@@ -56,9 +56,7 @@ class TestStatusPhaseSystemIntegrationComprehensive:
 
         # Create game state with all systems initialized
         return GameState(
-            players=players,
-            phase=GamePhase.STATUS,
-            agenda_phase_active=False
+            players=players, phase=GamePhase.STATUS, agenda_phase_active=False
         )
 
     def test_integration_with_all_game_systems_simultaneously(self) -> None:
@@ -83,21 +81,26 @@ class TestStatusPhaseSystemIntegrationComprehensive:
 
         # Assert: All system integration steps completed
         system_integration_steps = [
-            (1, "Score Objectives"),      # Objective system integration
-            (2, "Reveal Public Objective"),      # Objective system integration
-            (3, "Draw Action Cards"),     # Action card system integration
-            (4, "Remove Command Tokens"), # Command token system integration
-            (5, "Gain and Redistribute Command Tokens"), # Command token system integration
-            (6, "Ready Cards"),           # Leader system integration
-            (7, "Repair Units"),          # Unit system integration
-            (8, "Return Strategy Cards"), # Strategy card system integration
+            (1, "Score Objectives"),  # Objective system integration
+            (2, "Reveal Public Objective"),  # Objective system integration
+            (3, "Draw Action Cards"),  # Action card system integration
+            (4, "Remove Command Tokens"),  # Command token system integration
+            (
+                5,
+                "Gain and Redistribute Command Tokens",
+            ),  # Command token system integration
+            (6, "Ready Cards"),  # Leader system integration
+            (7, "Repair Units"),  # Unit system integration
+            (8, "Return Strategy Cards"),  # Strategy card system integration
         ]
 
         for step_num, expected_name in system_integration_steps:
             step_result = result.get_step_result(step_num)
             assert step_result is not None, f"Step {step_num} result missing"
             assert step_result.success is True, f"Step {step_num} failed"
-            assert step_result.step_name == expected_name, f"Step {step_num} name mismatch"
+            assert step_result.step_name == expected_name, (
+                f"Step {step_num} name mismatch"
+            )
 
     def test_objective_system_integration_comprehensive(self) -> None:
         """Test comprehensive integration with objective system (Rule 61).
@@ -265,12 +268,14 @@ class TestStatusPhaseSystemIntegrationComprehensive:
         game_state = self.base_game_state
 
         # Test objective system integration failure
-        with patch("src.ti4.core.status_phase.ScoreObjectivesStep.execute") as mock_score:
+        with patch(
+            "src.ti4.core.status_phase.ScoreObjectivesStep.execute"
+        ) as mock_score:
             mock_score.side_effect = Exception("Objective system integration failed")
 
             # Act: Execute status phase with objective system failure
-            result, final_state = self.status_phase_manager.execute_complete_status_phase(
-                game_state
+            result, final_state = (
+                self.status_phase_manager.execute_complete_status_phase(game_state)
             )
 
             # Assert: Other systems continue to work (graceful degradation)
@@ -278,12 +283,14 @@ class TestStatusPhaseSystemIntegrationComprehensive:
             assert isinstance(result, StatusPhaseResult)
 
         # Test action card system integration failure
-        with patch("src.ti4.core.status_phase.DrawActionCardsStep.execute") as mock_draw:
+        with patch(
+            "src.ti4.core.status_phase.DrawActionCardsStep.execute"
+        ) as mock_draw:
             mock_draw.side_effect = Exception("Action card system integration failed")
 
             # Act: Execute status phase with action card system failure
-            result, final_state = self.status_phase_manager.execute_complete_status_phase(
-                game_state
+            result, final_state = (
+                self.status_phase_manager.execute_complete_status_phase(game_state)
             )
 
             # Assert: Other systems continue to work
@@ -346,9 +353,7 @@ class TestCompleteRoundProgressionScenarios:
 
         # Start in action phase (simulating end of action phase)
         action_phase_state = GameState(
-            players=players,
-            phase=GamePhase.ACTION,
-            agenda_phase_active=False
+            players=players, phase=GamePhase.ACTION, agenda_phase_active=False
         )
 
         # Transition to status phase (this would normally be done by game controller)
@@ -390,7 +395,7 @@ class TestCompleteRoundProgressionScenarios:
         action_phase_state = GameState(
             players=players,
             phase=GamePhase.ACTION,
-            agenda_phase_active=True  # Custodians token was removed
+            agenda_phase_active=True,  # Custodians token was removed
         )
 
         # Transition to status phase
@@ -426,16 +431,14 @@ class TestCompleteRoundProgressionScenarios:
         ]
 
         current_state = GameState(
-            players=players,
-            phase=GamePhase.STATUS,
-            agenda_phase_active=False
+            players=players, phase=GamePhase.STATUS, agenda_phase_active=False
         )
 
         # Act & Assert: Execute multiple round cycles
         for round_cycle in range(3):
             # Execute status phase
-            result, current_state = self.status_phase_manager.execute_complete_status_phase(
-                current_state
+            result, current_state = (
+                self.status_phase_manager.execute_complete_status_phase(current_state)
             )
 
             # Assert: Each round completes successfully
@@ -452,9 +455,7 @@ class TestCompleteRoundProgressionScenarios:
 
             # Simulate completing the next phase and returning to status phase
             # (In real game, this would go through strategy/action or agenda phases)
-            current_state = current_state._create_new_state(
-                phase=GamePhase.STATUS
-            )
+            current_state = current_state._create_new_state(phase=GamePhase.STATUS)
 
     def test_custodians_token_removal_triggers_agenda_phase_activation(self) -> None:
         """Test that custodians token removal properly activates agenda phase.
@@ -466,14 +467,12 @@ class TestCompleteRoundProgressionScenarios:
 
         # Initial state: No agenda phase active
         initial_state = GameState(
-            players=players,
-            phase=GamePhase.STATUS,
-            agenda_phase_active=False
+            players=players, phase=GamePhase.STATUS, agenda_phase_active=False
         )
 
         # Act: Execute status phase without agenda phase
-        result1, state_after_first = self.status_phase_manager.execute_complete_status_phase(
-            initial_state
+        result1, state_after_first = (
+            self.status_phase_manager.execute_complete_status_phase(initial_state)
         )
 
         # Assert: First round transitions to strategy phase
@@ -487,8 +486,10 @@ class TestCompleteRoundProgressionScenarios:
         )
 
         # Act: Execute status phase after custodians token removal
-        result2, state_after_second = self.status_phase_manager.execute_complete_status_phase(
-            status_state_with_agenda
+        result2, state_after_second = (
+            self.status_phase_manager.execute_complete_status_phase(
+                status_state_with_agenda
+            )
         )
 
         # Assert: Second round transitions to agenda phase
@@ -551,12 +552,12 @@ class TestPhaseTransitionValidation:
             game_state = GameState(
                 players=players,
                 phase=GamePhase.STATUS,
-                agenda_phase_active=scenario["agenda_active"]
+                agenda_phase_active=scenario["agenda_active"],
             )
 
             # Act: Execute status phase
-            result, final_state = self.status_phase_manager.execute_complete_status_phase(
-                game_state
+            result, final_state = (
+                self.status_phase_manager.execute_complete_status_phase(game_state)
             )
 
             # Assert: Correct phase transition for scenario
@@ -582,9 +583,7 @@ class TestPhaseTransitionValidation:
         ]
 
         initial_state = GameState(
-            players=players,
-            phase=GamePhase.STATUS,
-            agenda_phase_active=False
+            players=players, phase=GamePhase.STATUS, agenda_phase_active=False
         )
 
         # Act: Execute status phase
@@ -618,7 +617,7 @@ class TestPhaseTransitionValidation:
         invalid_state = GameState(
             players=players,
             phase=GamePhase.STRATEGY,  # Wrong phase
-            agenda_phase_active=False
+            agenda_phase_active=False,
         )
 
         # Act: Attempt to execute status phase from wrong phase

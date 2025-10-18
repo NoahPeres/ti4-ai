@@ -26,7 +26,7 @@ from .status_phase import StatusPhaseOrchestrator, StatusPhaseResult, StepResult
 if TYPE_CHECKING:
     from .game_state import GameState
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 @dataclass
@@ -85,8 +85,7 @@ class StatusPhasePerformanceReport:
             return None
 
         slowest_step = max(
-            self.step_metrics.items(),
-            key=lambda item: item[1].execution_time_ms
+            self.step_metrics.items(), key=lambda item: item[1].execution_time_ms
         )
         return slowest_step
 
@@ -115,7 +114,9 @@ class StatusPhasePerformanceOptimizer:
     and performance monitoring for the status phase.
     """
 
-    def __init__(self, enable_caching: bool = True, enable_memory_optimization: bool = True):
+    def __init__(
+        self, enable_caching: bool = True, enable_memory_optimization: bool = True
+    ):
         """Initialize the performance optimizer.
 
         Args:
@@ -128,7 +129,9 @@ class StatusPhasePerformanceOptimizer:
         self._performance_history: list[StatusPhasePerformanceReport] = []
 
     @contextmanager
-    def monitor_performance(self, operation_name: str) -> Generator[PerformanceMetrics, None, None]:
+    def monitor_performance(
+        self, operation_name: str
+    ) -> Generator[PerformanceMetrics, None, None]:
         """Context manager for monitoring operation performance.
 
         Args:
@@ -139,8 +142,7 @@ class StatusPhasePerformanceOptimizer:
         """
         # Initialize metrics
         metrics = PerformanceMetrics(
-            operation_name=operation_name,
-            execution_time_ms=0.0
+            operation_name=operation_name, execution_time_ms=0.0
         )
 
         # Measure memory before operation
@@ -208,7 +210,7 @@ class StatusPhasePerformanceOptimizer:
         return {
             "cache_size": len(self._cache),
             "cache_enabled": self.enable_caching,
-            "memory_optimization_enabled": self.enable_memory_optimization
+            "memory_optimization_enabled": self.enable_memory_optimization,
         }
 
     def add_performance_report(self, report: StatusPhasePerformanceReport) -> None:
@@ -234,7 +236,9 @@ class StatusPhasePerformanceOptimizer:
 
         recent_reports = self._performance_history[-10:]  # Last 10 executions
 
-        avg_execution_time = sum(r.total_execution_time_ms for r in recent_reports) / len(recent_reports)
+        avg_execution_time = sum(
+            r.total_execution_time_ms for r in recent_reports
+        ) / len(recent_reports)
 
         performance_degradation = False
         if len(recent_reports) >= 2:
@@ -246,7 +250,7 @@ class StatusPhasePerformanceOptimizer:
             "average_execution_time_ms": avg_execution_time,
             "performance_degradation_detected": performance_degradation,
             "total_reports": len(self._performance_history),
-            "recent_reports_analyzed": len(recent_reports)
+            "recent_reports_analyzed": len(recent_reports),
         }
 
 
@@ -279,7 +283,9 @@ class OptimizedStatusPhaseOrchestrator(StatusPhaseOrchestrator):
         # Create performance report
         report = StatusPhasePerformanceReport(total_execution_time_ms=0.0)
 
-        with self.optimizer.monitor_performance("complete_status_phase") as overall_metrics:
+        with self.optimizer.monitor_performance(
+            "complete_status_phase"
+        ) as overall_metrics:
             # Optimize game state for large states
             optimized_state = self.optimizer.optimize_for_large_game_states(game_state)
 
@@ -296,7 +302,9 @@ class OptimizedStatusPhaseOrchestrator(StatusPhaseOrchestrator):
         report.total_execution_time_ms = overall_metrics.execution_time_ms
 
         # Update result with actual timing
-        result.total_execution_time = overall_metrics.execution_time_ms / 1000  # Convert to seconds
+        result.total_execution_time = (
+            overall_metrics.execution_time_ms / 1000
+        )  # Convert to seconds
         report.memory_optimization_enabled = self.optimizer.enable_memory_optimization
 
         # Add to performance history
@@ -316,6 +324,32 @@ class OptimizedStatusPhaseOrchestrator(StatusPhaseOrchestrator):
         Returns:
             Tuple of (StatusPhaseResult, updated GameState)
         """
+        # Enhanced game state validation (same as base orchestrator)
+        if game_state is None:
+            result = StatusPhaseResult(
+                success=False,
+                steps_completed=[],
+                step_results={},
+                total_execution_time=0.0,
+                next_phase="strategy",
+                error_message="Game state cannot be None",
+            )
+            return result, game_state
+
+        # Validate game state type - reject invalid types
+        if not hasattr(game_state, "players") and not hasattr(
+            game_state, "_create_new_state"
+        ):
+            result = StatusPhaseResult(
+                success=False,
+                steps_completed=[],
+                step_results={},
+                total_execution_time=0.0,
+                next_phase="strategy",
+                error_message="Invalid game state type - must be a valid GameState object",
+            )
+            return result, game_state
+
         step_results = {}
         steps_completed = []
         current_state = game_state
@@ -325,7 +359,9 @@ class OptimizedStatusPhaseOrchestrator(StatusPhaseOrchestrator):
         for step_num in range(1, 9):
             with self.optimizer.monitor_performance(f"step_{step_num}") as step_metrics:
                 try:
-                    step_result, current_state = self.execute_step(step_num, current_state)
+                    step_result, current_state = self.execute_step(
+                        step_num, current_state
+                    )
                     step_results[step_num] = step_result
                     steps_completed.append(step_result.step_name)
 
@@ -343,7 +379,7 @@ class OptimizedStatusPhaseOrchestrator(StatusPhaseOrchestrator):
                     step_result = StepResult(
                         success=False,
                         step_name=f"Step {step_num}",
-                        error_message=str(e)
+                        error_message=str(e),
                     )
                     step_results[step_num] = step_result
 
@@ -360,7 +396,7 @@ class OptimizedStatusPhaseOrchestrator(StatusPhaseOrchestrator):
             steps_completed=steps_completed,
             step_results=step_results,
             total_execution_time=0.0,  # Will be set by caller
-            next_phase="agenda" if overall_success else "strategy"
+            next_phase="agenda" if overall_success else "strategy",
         )
 
         return result, current_state
@@ -389,15 +425,14 @@ class OptimizedStatusPhaseOrchestrator(StatusPhaseOrchestrator):
             "performance_trends": trends,
             "optimization_features": {
                 "caching_enabled": self.optimizer.enable_caching,
-                "memory_optimization_enabled": self.optimizer.enable_memory_optimization
-            }
+                "memory_optimization_enabled": self.optimizer.enable_memory_optimization,
+            },
         }
 
 
 # Convenience function for creating optimized orchestrator
 def create_optimized_status_phase_orchestrator(
-    enable_caching: bool = True,
-    enable_memory_optimization: bool = True
+    enable_caching: bool = True, enable_memory_optimization: bool = True
 ) -> OptimizedStatusPhaseOrchestrator:
     """Create an optimized status phase orchestrator with performance features.
 
@@ -410,6 +445,6 @@ def create_optimized_status_phase_orchestrator(
     """
     optimizer = StatusPhasePerformanceOptimizer(
         enable_caching=enable_caching,
-        enable_memory_optimization=enable_memory_optimization
+        enable_memory_optimization=enable_memory_optimization,
     )
     return OptimizedStatusPhaseOrchestrator(optimizer)

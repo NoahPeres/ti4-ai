@@ -49,8 +49,10 @@ class TestStatusPhaseOrchestrator:
         """
         from src.ti4.core.status_phase import StatusPhaseOrchestrator, StatusPhaseResult
 
-        # Arrange: Create mock game state
+        # Arrange: Create mock game state with proper structure
         mock_game_state = Mock()
+        mock_game_state.players = []
+        mock_game_state.systems = {}
 
         # Act: Execute complete status phase
         orchestrator = StatusPhaseOrchestrator()
@@ -98,8 +100,10 @@ class TestStatusPhaseOrchestrator:
         """
         from src.ti4.core.status_phase import StatusPhaseOrchestrator, StepResult
 
-        # Arrange: Create mock game state
+        # Arrange: Create mock game state with proper structure
         mock_game_state = Mock()
+        mock_game_state.players = []
+        mock_game_state.systems = {}
 
         # Act: Execute individual step
         orchestrator = StatusPhaseOrchestrator()
@@ -245,8 +249,15 @@ class TestStatusPhaseOrchestrator:
         """
         from src.ti4.core.status_phase import StatusPhaseOrchestrator
 
-        # Arrange: Create mock game state
+        # Arrange: Create mock game state with proper structure
         mock_game_state = Mock()
+        mock_game_state.players = []
+        mock_game_state.systems = {}
+        mock_game_state.exhausted_strategy_cards = []
+        mock_game_state.player_planets = {}
+        mock_game_state.player_technology_cards = {}
+        mock_game_state.ready_strategy_card = Mock(return_value=mock_game_state)
+        mock_game_state._create_new_state = Mock(return_value=mock_game_state)
 
         # Act: Execute complete status phase
         orchestrator = StatusPhaseOrchestrator()
@@ -429,7 +440,7 @@ class TestStatusPhaseOrchestratorIntegration:
             5: "Gain and Redistribute Command Tokens",
             6: "Ready Cards",
             7: "Repair Units",
-            8: "Return Strategy Cards"
+            8: "Return Strategy Cards",
         }
 
         # Act & Assert: All step numbers 1-8 should have handlers
@@ -490,8 +501,15 @@ class TestStatusPhaseOrchestratorIntegration:
         """
         from src.ti4.core.status_phase import StatusPhaseOrchestrator
 
-        # Arrange: Create mock game state
+        # Arrange: Create mock game state with proper structure
         mock_game_state = Mock()
+        mock_game_state.players = []
+        mock_game_state.systems = {}
+        mock_game_state.exhausted_strategy_cards = []
+        mock_game_state.player_planets = {}
+        mock_game_state.player_technology_cards = {}
+        mock_game_state.ready_strategy_card = Mock(return_value=mock_game_state)
+        mock_game_state._create_new_state = Mock(return_value=mock_game_state)
 
         # Act: Execute complete status phase
         orchestrator = StatusPhaseOrchestrator()

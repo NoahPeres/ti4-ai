@@ -59,25 +59,31 @@ class TestStatusPhasePerformance:
         game_state = GameState()
 
         # Add 6 players (maximum for TI4)
-        factions = [Faction.SOL, Faction.HACAN, Faction.XXCHA,
-                   Faction.ARBOREC, Faction.YSSARIL, Faction.NAALU]
+        factions = [
+            Faction.SOL,
+            Faction.HACAN,
+            Faction.XXCHA,
+            Faction.ARBOREC,
+            Faction.YSSARIL,
+            Faction.NAALU,
+        ]
 
         for i, faction in enumerate(factions):
-            player = Player(id=f"player{i+1}", faction=faction)
+            player = Player(id=f"player{i + 1}", faction=faction)
             game_state = game_state.add_player(player)
 
             # Add many planets to each player (simulate late game)
             for j in range(8):  # 8 planets per player
                 planet = Planet(
-                    name=f"Planet_{i}_{j}",
-                    resources=j % 5 + 1,
-                    influence=j % 3 + 1
+                    name=f"Planet_{i}_{j}", resources=j % 5 + 1, influence=j % 3 + 1
                 )
                 game_state = game_state.add_player_planet(player.id, planet)
 
         return game_state
 
-    def measure_execution_time(self, func: Any, *args: Any, **kwargs: Any) -> tuple[Any, float]:
+    def measure_execution_time(
+        self, func: Any, *args: Any, **kwargs: Any
+    ) -> tuple[Any, float]:
         """Measure execution time of a function.
 
         Args:
@@ -122,7 +128,9 @@ class TestStatusPhasePerformance:
         print(f"Complete status phase (minimal): {execution_time:.2f}ms")
 
         # Verify performance requirement
-        assert execution_time < 500, f"Status phase took {execution_time:.2f}ms, should be <500ms"
+        assert execution_time < 500, (
+            f"Status phase took {execution_time:.2f}ms, should be <500ms"
+        )
 
         # Verify functionality
         assert isinstance(result, StatusPhaseResult)
@@ -144,7 +152,9 @@ class TestStatusPhasePerformance:
         print(f"Complete status phase (large): {execution_time:.2f}ms")
 
         # Verify performance requirement (may be more lenient for large states)
-        assert execution_time < 1000, f"Status phase took {execution_time:.2f}ms, should be <1000ms for large states"
+        assert execution_time < 1000, (
+            f"Status phase took {execution_time:.2f}ms, should be <1000ms for large states"
+        )
 
         # Verify functionality
         assert isinstance(result, StatusPhaseResult)
@@ -170,15 +180,21 @@ class TestStatusPhasePerformance:
             print(f"Step {step_number}: {execution_time:.2f}ms")
 
             # Verify performance requirement
-            assert execution_time < 100, f"Step {step_number} took {execution_time:.2f}ms, should be <100ms"
+            assert execution_time < 100, (
+                f"Step {step_number} took {execution_time:.2f}ms, should be <100ms"
+            )
 
             # Verify functionality
-            assert result.success or not result.success  # Either outcome is acceptable for individual steps
+            assert (
+                result.success or not result.success
+            )  # Either outcome is acceptable for individual steps
 
         # Verify total time is reasonable
         total_time = sum(step_times.values())
         print(f"Total individual step time: {total_time:.2f}ms")
-        assert total_time < 800, f"Total step time {total_time:.2f}ms should be reasonable"
+        assert total_time < 800, (
+            f"Total step time {total_time:.2f}ms should be reasonable"
+        )
 
     def test_individual_step_performance_large_state(self) -> None:
         """Test individual step execution times with large game state.
@@ -199,7 +215,9 @@ class TestStatusPhasePerformance:
             print(f"Step {step_number} (large): {execution_time:.2f}ms")
 
             # More lenient for large states, but still reasonable
-            assert execution_time < 200, f"Step {step_number} took {execution_time:.2f}ms, should be <200ms for large states"
+            assert execution_time < 200, (
+                f"Step {step_number} took {execution_time:.2f}ms, should be <200ms for large states"
+            )
 
         # Verify total time is reasonable
         total_time = sum(step_times.values())
@@ -218,7 +236,9 @@ class TestStatusPhasePerformance:
         after_creation_memory = self.measure_memory_usage()
 
         # Execute status phase
-        result, updated_state = self.orchestrator.execute_complete_status_phase(game_state)
+        result, updated_state = self.orchestrator.execute_complete_status_phase(
+            game_state
+        )
         after_execution_memory = self.measure_memory_usage()
 
         # Clean up
@@ -238,10 +258,14 @@ class TestStatusPhasePerformance:
         # Memory growth during execution should be reasonable compared to creation
         if creation_growth > 0:
             growth_ratio = execution_growth / creation_growth
-            assert growth_ratio < 0.5, f"Memory growth during execution ({execution_growth}) should be <50% of creation growth ({creation_growth})"
+            assert growth_ratio < 0.5, (
+                f"Memory growth during execution ({execution_growth}) should be <50% of creation growth ({creation_growth})"
+            )
 
         # Memory should be mostly cleaned up after deletion
-        cleanup_ratio = (after_cleanup_memory - baseline_memory) / max(creation_growth, 1)
+        cleanup_ratio = (after_cleanup_memory - baseline_memory) / max(
+            creation_growth, 1
+        )
         assert cleanup_ratio < 2.0, "Memory should be mostly cleaned up after deletion"
 
     def test_repeated_execution_performance(self) -> None:
@@ -258,18 +282,22 @@ class TestStatusPhasePerformance:
                 self.orchestrator.execute_complete_status_phase, game_state
             )
             execution_times.append(execution_time)
-            print(f"Execution {i+1}: {execution_time:.2f}ms")
+            print(f"Execution {i + 1}: {execution_time:.2f}ms")
 
         # Verify all executions meet performance requirements
         for i, time_ms in enumerate(execution_times):
-            assert time_ms < 500, f"Execution {i+1} took {time_ms:.2f}ms, should be <500ms"
+            assert time_ms < 500, (
+                f"Execution {i + 1} took {time_ms:.2f}ms, should be <500ms"
+            )
 
         # Verify performance consistency (no significant degradation)
         avg_time = sum(execution_times) / len(execution_times)
         max_time = max(execution_times)
 
         # Maximum time shouldn't be more than 50% higher than average
-        assert max_time < avg_time * 1.5, f"Performance inconsistency: max {max_time:.2f}ms vs avg {avg_time:.2f}ms"
+        assert max_time < avg_time * 1.5, (
+            f"Performance inconsistency: max {max_time:.2f}ms vs avg {avg_time:.2f}ms"
+        )
 
     def test_concurrent_execution_performance(self) -> None:
         """Test performance under concurrent execution scenarios.
@@ -281,10 +309,14 @@ class TestStatusPhasePerformance:
         def execute_status_phase() -> tuple[bool, float]:
             """Execute status phase and return success and timing."""
             game_state = self.create_minimal_game_state()
-            orchestrator = StatusPhaseOrchestrator()  # Create new instance for thread safety
+            orchestrator = (
+                StatusPhaseOrchestrator()
+            )  # Create new instance for thread safety
 
             start_time = time.perf_counter()
-            result, updated_state = orchestrator.execute_complete_status_phase(game_state)
+            result, updated_state = orchestrator.execute_complete_status_phase(
+                game_state
+            )
             end_time = time.perf_counter()
 
             execution_time = (end_time - start_time) * 1000
@@ -295,17 +327,23 @@ class TestStatusPhasePerformance:
         results = []
 
         with ThreadPoolExecutor(max_workers=num_concurrent) as executor:
-            futures = [executor.submit(execute_status_phase) for _ in range(num_concurrent)]
+            futures = [
+                executor.submit(execute_status_phase) for _ in range(num_concurrent)
+            ]
 
             for future in as_completed(futures):
                 success, execution_time = future.result()
                 results.append((success, execution_time))
-                print(f"Concurrent execution: {execution_time:.2f}ms, success: {success}")
+                print(
+                    f"Concurrent execution: {execution_time:.2f}ms, success: {success}"
+                )
 
         # Verify all executions succeeded and met performance requirements
         for i, (success, execution_time) in enumerate(results):
-            assert success, f"Concurrent execution {i+1} failed"
-            assert execution_time < 1000, f"Concurrent execution {i+1} took {execution_time:.2f}ms, should be <1000ms"
+            assert success, f"Concurrent execution {i + 1} failed"
+            assert execution_time < 1000, (
+                f"Concurrent execution {i + 1} took {execution_time:.2f}ms, should be <1000ms"
+            )
 
     def test_status_phase_manager_performance(self) -> None:
         """Test StatusPhaseManager performance.
@@ -322,7 +360,9 @@ class TestStatusPhasePerformance:
         print(f"StatusPhaseManager execution: {execution_time:.2f}ms")
 
         # Verify performance requirement
-        assert execution_time < 500, f"StatusPhaseManager took {execution_time:.2f}ms, should be <500ms"
+        assert execution_time < 500, (
+            f"StatusPhaseManager took {execution_time:.2f}ms, should be <500ms"
+        )
 
         # Verify functionality
         assert isinstance(result, StatusPhaseResult)
@@ -341,7 +381,9 @@ class TestStatusPhasePerformance:
         print(f"Error condition execution: {execution_time:.2f}ms")
 
         # Error handling should still be fast
-        assert execution_time < 100, f"Error handling took {execution_time:.2f}ms, should be <100ms"
+        assert execution_time < 100, (
+            f"Error handling took {execution_time:.2f}ms, should be <100ms"
+        )
 
         # Verify error was handled properly
         assert isinstance(result, StatusPhaseResult)
@@ -362,9 +404,9 @@ class TestStatusPhasePerformanceBenchmarks:
 
         # Test with different game state sizes
         test_cases = [
-            ("minimal", 2, 2),    # 2 players, 2 planets each
-            ("medium", 4, 4),     # 4 players, 4 planets each
-            ("large", 6, 8),      # 6 players, 8 planets each
+            ("minimal", 2, 2),  # 2 players, 2 planets each
+            ("medium", 4, 4),  # 4 players, 4 planets each
+            ("large", 6, 8),  # 6 players, 8 planets each
         ]
 
         benchmarks = {}
@@ -372,24 +414,30 @@ class TestStatusPhasePerformanceBenchmarks:
         for case_name, num_players, planets_per_player in test_cases:
             # Create game state
             game_state = GameState()
-            factions = [Faction.SOL, Faction.HACAN, Faction.XXCHA,
-                       Faction.ARBOREC, Faction.YSSARIL, Faction.NAALU]
+            factions = [
+                Faction.SOL,
+                Faction.HACAN,
+                Faction.XXCHA,
+                Faction.ARBOREC,
+                Faction.YSSARIL,
+                Faction.NAALU,
+            ]
 
             for i in range(num_players):
-                player = Player(id=f"player{i+1}", faction=factions[i])
+                player = Player(id=f"player{i + 1}", faction=factions[i])
                 game_state = game_state.add_player(player)
 
                 for j in range(planets_per_player):
                     planet = Planet(
-                        name=f"Planet_{i}_{j}",
-                        resources=j % 5 + 1,
-                        influence=j % 3 + 1
+                        name=f"Planet_{i}_{j}", resources=j % 5 + 1, influence=j % 3 + 1
                     )
                     game_state = game_state.add_player_planet(player.id, planet)
 
             # Measure performance
             start_time = time.perf_counter()
-            result, updated_state = orchestrator.execute_complete_status_phase(game_state)
+            result, updated_state = orchestrator.execute_complete_status_phase(
+                game_state
+            )
             end_time = time.perf_counter()
 
             execution_time_ms = (end_time - start_time) * 1000
@@ -409,7 +457,9 @@ class TestStatusPhasePerformanceBenchmarks:
         # Verify reasonable performance scaling
         if benchmarks["medium"] > 0:
             scaling_factor = benchmarks["large"] / benchmarks["medium"]
-            assert scaling_factor < 3.0, f"Performance scaling too poor: {scaling_factor:.2f}x"
+            assert scaling_factor < 3.0, (
+                f"Performance scaling too poor: {scaling_factor:.2f}x"
+            )
 
     def test_step_by_step_performance_analysis(self) -> None:
         """Detailed performance analysis of each status phase step.
@@ -433,7 +483,7 @@ class TestStatusPhasePerformanceBenchmarks:
             "Gain/Redistribute Tokens",
             "Ready Cards",
             "Repair Units",
-            "Return Strategy Cards"
+            "Return Strategy Cards",
         ]
 
         print("\nDetailed step performance analysis:")
@@ -444,7 +494,9 @@ class TestStatusPhasePerformanceBenchmarks:
 
         for step_number in range(1, 9):
             start_time = time.perf_counter()
-            result, current_state = orchestrator.execute_step(step_number, current_state)
+            result, current_state = orchestrator.execute_step(
+                step_number, current_state
+            )
             end_time = time.perf_counter()
 
             execution_time_ms = (end_time - start_time) * 1000
@@ -453,10 +505,14 @@ class TestStatusPhasePerformanceBenchmarks:
             step_name = step_names[step_number - 1]
             status = "✓" if result.success else "✗"
 
-            print(f"Step {step_number} ({step_name}): {execution_time_ms:.2f}ms {status}")
+            print(
+                f"Step {step_number} ({step_name}): {execution_time_ms:.2f}ms {status}"
+            )
 
         print("-" * 50)
         print(f"Total time: {total_time:.2f}ms")
 
         # Verify total time is reasonable
-        assert total_time < 800, f"Total step time {total_time:.2f}ms should be reasonable"
+        assert total_time < 800, (
+            f"Total step time {total_time:.2f}ms should be reasonable"
+        )

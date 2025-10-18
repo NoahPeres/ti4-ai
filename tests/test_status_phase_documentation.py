@@ -140,14 +140,24 @@ class TestStatusPhaseDocstrings:
             # RED: Test that each step handler has proper docstring
             docstring = handler_class.__doc__
             assert docstring is not None, f"{handler_class.__name__} missing docstring"
-            assert "Handles Step" in docstring, f"{handler_class.__name__} docstring missing step description"
-            assert "LRR References:" in docstring, f"{handler_class.__name__} docstring missing LRR references"
+            assert "Handles Step" in docstring, (
+                f"{handler_class.__name__} docstring missing step description"
+            )
+            assert "LRR References:" in docstring, (
+                f"{handler_class.__name__} docstring missing LRR references"
+            )
 
             # Test that all required methods have docstrings
             handler = handler_class()
-            assert handler.execute.__doc__ is not None, f"{handler_class.__name__}.execute missing docstring"
-            assert handler.validate_prerequisites.__doc__ is not None, f"{handler_class.__name__}.validate_prerequisites missing docstring"
-            assert handler.get_step_name.__doc__ is not None, f"{handler_class.__name__}.get_step_name missing docstring"
+            assert handler.execute.__doc__ is not None, (
+                f"{handler_class.__name__}.execute missing docstring"
+            )
+            assert handler.validate_prerequisites.__doc__ is not None, (
+                f"{handler_class.__name__}.validate_prerequisites missing docstring"
+            )
+            assert handler.get_step_name.__doc__ is not None, (
+                f"{handler_class.__name__}.get_step_name missing docstring"
+            )
 
     def test_exception_classes_have_comprehensive_docstrings(self) -> None:
         """Test that all exception classes have comprehensive documentation."""
@@ -161,9 +171,15 @@ class TestStatusPhaseDocstrings:
         for exception_class in exception_classes:
             # RED: Test that each exception has proper docstring
             docstring = exception_class.__doc__
-            assert docstring is not None, f"{exception_class.__name__} missing docstring"
-            assert "LRR References:" in docstring, f"{exception_class.__name__} docstring missing LRR references"
-            assert "Rule 81" in docstring, f"{exception_class.__name__} docstring missing Rule 81 reference"
+            assert docstring is not None, (
+                f"{exception_class.__name__} missing docstring"
+            )
+            assert "LRR References:" in docstring, (
+                f"{exception_class.__name__} docstring missing LRR references"
+            )
+            assert "Rule 81" in docstring, (
+                f"{exception_class.__name__} docstring missing Rule 81 reference"
+            )
 
 
 # Constants for test data
@@ -234,7 +250,9 @@ class TestStatusPhaseLRRReferences:
         assert docstring is not None, f"{cls.__name__} missing docstring"
 
         # Test that LRR references section exists and follows format
-        assert "LRR References:" in docstring, f"{cls.__name__} missing LRR References section"
+        assert "LRR References:" in docstring, (
+            f"{cls.__name__} missing LRR References section"
+        )
 
         # Extract LRR references section
         lrr_section = self._extract_lrr_section(docstring)
@@ -242,9 +260,13 @@ class TestStatusPhaseLRRReferences:
 
         # Test that references follow "Rule XX:" format
         rule_pattern = r"Rule \d+(?:\.\d+)?:"
-        assert re.search(rule_pattern, lrr_section), f"{cls.__name__} LRR references don't follow 'Rule XX:' format"
+        assert re.search(rule_pattern, lrr_section), (
+            f"{cls.__name__} LRR references don't follow 'Rule XX:' format"
+        )
 
-    def _assert_handler_references_rules(self, handler_class: type, expected_rules: list[str]) -> None:
+    def _assert_handler_references_rules(
+        self, handler_class: type, expected_rules: list[str]
+    ) -> None:
         """Assert that a step handler references the expected rules."""
         docstring = handler_class.__doc__
         assert docstring is not None, f"{handler_class.__name__} missing docstring"
@@ -252,7 +274,9 @@ class TestStatusPhaseLRRReferences:
         lrr_section = self._extract_lrr_section(docstring)
 
         for rule in expected_rules:
-            assert rule in lrr_section, f"{handler_class.__name__} missing reference to {rule}"
+            assert rule in lrr_section, (
+                f"{handler_class.__name__} missing reference to {rule}"
+            )
 
     def _assert_class_references_rule_81(self, cls: type) -> None:
         """Assert that a class references Rule 81."""
@@ -271,7 +295,7 @@ class TestStatusPhaseLRRReferences:
         Returns:
             The extracted LRR references section as a string
         """
-        lines = docstring.split('\n')
+        lines = docstring.split("\n")
         lrr_section = []
         in_lrr_section = False
 
@@ -283,10 +307,12 @@ class TestStatusPhaseLRRReferences:
             elif in_lrr_section:
                 if line.startswith("- ") or line.startswith("Rule "):
                     lrr_section.append(line)
-                elif line == "" or line.startswith(("Args:", "Returns:", "Attributes:")):
+                elif line == "" or line.startswith(
+                    ("Args:", "Returns:", "Attributes:")
+                ):
                     break
 
-        return '\n'.join(lrr_section)
+        return "\n".join(lrr_section)
 
 
 class TestStatusPhaseCodeQuality:
@@ -319,18 +345,22 @@ class TestStatusPhaseCodeQuality:
             method = getattr(cls, method_name)
 
             # Skip inherited methods from object
-            if method_name in ['__class__', '__doc__', '__module__']:
+            if method_name in ["__class__", "__doc__", "__module__"]:
                 continue
 
             # Test that method has type hints
             try:
                 type_hints = get_type_hints(method)
                 # Method should have type hints (at minimum return type)
-                assert type_hints or method_name in ['__init__'], f"{cls.__name__}.{method_name} missing type hints"
+                assert type_hints or method_name in ["__init__"], (
+                    f"{cls.__name__}.{method_name} missing type hints"
+                )
             except (NameError, AttributeError):
                 # Some methods might have forward references that can't be resolved in test context
                 # This is acceptable as long as the annotations exist
-                assert hasattr(method, '__annotations__'), f"{cls.__name__}.{method_name} missing type annotations"
+                assert hasattr(method, "__annotations__"), (
+                    f"{cls.__name__}.{method_name} missing type annotations"
+                )
 
     def _assert_class_methods_have_proper_docstrings(self, cls: type) -> None:
         """Assert that all public methods in a class have proper docstring structure."""
@@ -344,18 +374,23 @@ class TestStatusPhaseCodeQuality:
     def _get_public_methods(self, cls: type) -> list[str]:
         """Get all public method names from a class."""
         return [
-            method for method in dir(cls)
-            if not method.startswith('_') and callable(getattr(cls, method))
+            method
+            for method in dir(cls)
+            if not method.startswith("_") and callable(getattr(cls, method))
         ]
 
     def _get_public_methods_from_instance(self, instance: Any) -> list[str]:
         """Get all public method names from a class instance."""
         return [
-            method_name for method_name in dir(instance)
-            if not method_name.startswith('_') and callable(getattr(instance, method_name))
+            method_name
+            for method_name in dir(instance)
+            if not method_name.startswith("_")
+            and callable(getattr(instance, method_name))
         ]
 
-    def _assert_method_has_proper_docstring(self, cls: type, method_name: str, method: Any) -> None:
+    def _assert_method_has_proper_docstring(
+        self, cls: type, method_name: str, method: Any
+    ) -> None:
         """Assert that a method has proper docstring structure."""
         docstring = method.__doc__
 
@@ -364,15 +399,22 @@ class TestStatusPhaseCodeQuality:
 
         # Test docstring structure for methods with parameters
         sig = inspect.signature(method)
-        params = [p for p in sig.parameters.values() if p.name != 'self']
+        params = [p for p in sig.parameters.values() if p.name != "self"]
 
         if params:
             # Methods with parameters should have Args section
-            assert "Args:" in docstring, f"{cls.__name__}.{method_name} missing Args section"
+            assert "Args:" in docstring, (
+                f"{cls.__name__}.{method_name} missing Args section"
+            )
 
-        if sig.return_annotation != inspect.Signature.empty and sig.return_annotation is not None:
+        if (
+            sig.return_annotation != inspect.Signature.empty
+            and sig.return_annotation is not None
+        ):
             # Methods with return type should have Returns section
-            assert "Returns:" in docstring, f"{cls.__name__}.{method_name} missing Returns section"
+            assert "Returns:" in docstring, (
+                f"{cls.__name__}.{method_name} missing Returns section"
+            )
 
     def test_exception_classes_follow_naming_conventions(self) -> None:
         """Test that exception classes follow proper naming conventions."""
@@ -382,11 +424,15 @@ class TestStatusPhaseCodeQuality:
     def _assert_exception_naming_convention(self, exception_class: type) -> None:
         """Assert that an exception class follows naming conventions."""
         # Test that exception class name ends with 'Error'
-        assert exception_class.__name__.endswith('Error'), f"{exception_class.__name__} should end with 'Error'"
+        assert exception_class.__name__.endswith("Error"), (
+            f"{exception_class.__name__} should end with 'Error'"
+        )
 
         # Test that exception inherits from appropriate base class
         if exception_class != StatusPhaseError:
-            assert issubclass(exception_class, StatusPhaseError), f"{exception_class.__name__} should inherit from StatusPhaseError"
+            assert issubclass(exception_class, StatusPhaseError), (
+                f"{exception_class.__name__} should inherit from StatusPhaseError"
+            )
 
     def test_dataclass_fields_are_documented(self) -> None:
         """Test that dataclass fields are properly documented."""
@@ -401,22 +447,26 @@ class TestStatusPhaseCodeQuality:
         assert docstring is not None, f"{dataclass_type.__name__} missing docstring"
 
         # Test that Attributes section exists
-        assert "Attributes:" in docstring, f"{dataclass_type.__name__} missing Attributes section"
+        assert "Attributes:" in docstring, (
+            f"{dataclass_type.__name__} missing Attributes section"
+        )
 
         # Get field names from dataclass
-        if hasattr(dataclass_type, '__dataclass_fields__'):
+        if hasattr(dataclass_type, "__dataclass_fields__"):
             field_names = list(dataclass_type.__dataclass_fields__.keys())
 
             for field_name in field_names:
                 # Test that each field is documented in the Attributes section
-                assert f"{field_name}:" in docstring, f"{dataclass_type.__name__} missing documentation for field '{field_name}'"
+                assert f"{field_name}:" in docstring, (
+                    f"{dataclass_type.__name__} missing documentation for field '{field_name}'"
+                )
 
     def test_abstract_methods_are_properly_documented(self) -> None:
         """Test that abstract methods in StatusPhaseStepHandler are properly documented."""
         abstract_methods = [
-            'execute',
-            'validate_prerequisites',
-            'get_step_name',
+            "execute",
+            "validate_prerequisites",
+            "get_step_name",
         ]
 
         for method_name in abstract_methods:
@@ -424,12 +474,20 @@ class TestStatusPhaseCodeQuality:
             docstring = method.__doc__
 
             # RED: Test that abstract method has comprehensive docstring
-            assert docstring is not None, f"StatusPhaseStepHandler.{method_name} missing docstring"
-            assert "Args:" in docstring, f"StatusPhaseStepHandler.{method_name} missing Args section"
-            assert "Returns:" in docstring, f"StatusPhaseStepHandler.{method_name} missing Returns section"
+            assert docstring is not None, (
+                f"StatusPhaseStepHandler.{method_name} missing docstring"
+            )
+            assert "Args:" in docstring, (
+                f"StatusPhaseStepHandler.{method_name} missing Args section"
+            )
+            assert "Returns:" in docstring, (
+                f"StatusPhaseStepHandler.{method_name} missing Returns section"
+            )
 
-            if method_name == 'execute':
-                assert "Raises:" in docstring, f"StatusPhaseStepHandler.{method_name} missing Raises section"
+            if method_name == "execute":
+                assert "Raises:" in docstring, (
+                    f"StatusPhaseStepHandler.{method_name} missing Raises section"
+                )
 
 
 class TestStatusPhaseDocumentationIntegration:
@@ -443,9 +501,15 @@ class TestStatusPhaseDocumentationIntegration:
         assert module_docstring is not None, "status_phase module missing docstring"
 
         # RED: Test that module docstring mentions key components
-        assert "Rule 81" in module_docstring, "Module docstring missing Rule 81 reference"
-        assert "Rule 34.2" in module_docstring, "Module docstring missing Rule 34.2 reference"
-        assert "8-step sequence" in module_docstring, "Module docstring missing 8-step sequence description"
+        assert "Rule 81" in module_docstring, (
+            "Module docstring missing Rule 81 reference"
+        )
+        assert "Rule 34.2" in module_docstring, (
+            "Module docstring missing Rule 34.2 reference"
+        )
+        assert "8-step sequence" in module_docstring, (
+            "Module docstring missing 8-step sequence description"
+        )
 
     def test_cross_references_between_classes_are_accurate(self) -> None:
         """Test that cross-references between classes are accurate."""
@@ -456,25 +520,42 @@ class TestStatusPhaseDocumentationIntegration:
         # Test that RoundTransitionManager references agenda phase rules
         transition_docstring = RoundTransitionManager.__doc__
         assert transition_docstring is not None
-        assert "Rule 27.4" in transition_docstring, "RoundTransitionManager missing Rule 27.4 reference"
+        assert "Rule 27.4" in transition_docstring, (
+            "RoundTransitionManager missing Rule 27.4 reference"
+        )
 
     def test_error_handling_documentation_is_comprehensive(self) -> None:
         """Test that error handling is properly documented."""
         methods_with_error_handling = [
-            (StatusPhaseOrchestrator, 'execute_complete_status_phase'),
-            (StatusPhaseOrchestrator, 'execute_step'),
-            (RoundTransitionManager, 'determine_next_phase'),
-            (StatusPhaseManager, 'execute_complete_status_phase'),
+            (StatusPhaseOrchestrator, "execute_complete_status_phase"),
+            (StatusPhaseOrchestrator, "execute_step"),
+            (RoundTransitionManager, "determine_next_phase"),
+            (StatusPhaseManager, "execute_complete_status_phase"),
         ]
 
         for cls, method_name in methods_with_error_handling:
             method = getattr(cls, method_name)
             docstring = method.__doc__
 
-            assert docstring is not None, f"{cls.__name__}.{method_name} missing docstring"
+            assert docstring is not None, (
+                f"{cls.__name__}.{method_name} missing docstring"
+            )
 
             # RED: Test that methods that can raise exceptions document them
-            if "raise" in inspect.getsource(method).lower() or "except" in inspect.getsource(method).lower():
+            if (
+                "raise" in inspect.getsource(method).lower()
+                or "except" in inspect.getsource(method).lower()
+            ):
                 # Methods that handle exceptions should document error conditions
-                assert any(keyword in docstring for keyword in ["Raises:", "error", "Error", "exception", "Exception"]), \
+                assert any(
+                    keyword in docstring
+                    for keyword in [
+                        "Raises:",
+                        "error",
+                        "Error",
+                        "exception",
+                        "Exception",
+                    ]
+                ), (
                     f"{cls.__name__}.{method_name} handles exceptions but doesn't document error conditions"
+                )

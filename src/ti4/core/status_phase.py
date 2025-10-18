@@ -19,12 +19,14 @@ if TYPE_CHECKING:
     from .game_state import GameState
     from .objective import ObjectiveCard
 
+
 # Apply comprehensive error handling enhancements
 def _apply_error_handling_enhancements() -> None:
     """Apply comprehensive error handling enhancements to all step handlers."""
     # Temporarily disabled due to type checking issues with method assignment
     # TODO: Refactor error enhancements to use composition instead of monkey patching
     pass
+
 
 # Apply enhancements when module is imported
 _apply_error_handling_enhancements()
@@ -253,7 +255,9 @@ class RoundTransitionManager:
         if game_state is None:
             raise ValueError("Game state cannot be None")
 
-    def _create_phase_transition(self, game_state: "GameState", target_phase: "GamePhase") -> "GameState":
+    def _create_phase_transition(
+        self, game_state: "GameState", target_phase: "GamePhase"
+    ) -> "GameState":
         """Create a new game state with the specified phase.
 
         This helper method encapsulates the phase transition logic,
@@ -274,7 +278,7 @@ class RoundTransitionManager:
         # Create a new state and update the phase
         new_state = game_state._create_new_state()
         # Use object.__setattr__ to bypass frozen dataclass restriction
-        object.__setattr__(new_state, 'phase', target_phase)
+        object.__setattr__(new_state, "phase", target_phase)
         return new_state
 
     def determine_next_phase(self, game_state: "GameState") -> str:
@@ -298,7 +302,10 @@ class RoundTransitionManager:
         self._validate_game_state(game_state)
 
         # Check if agenda phase is active (Rule 27.4)
-        if hasattr(game_state, 'agenda_phase_active') and game_state.agenda_phase_active:
+        if (
+            hasattr(game_state, "agenda_phase_active")
+            and game_state.agenda_phase_active
+        ):
             return "agenda"
         else:
             return "strategy"
@@ -322,6 +329,7 @@ class RoundTransitionManager:
         - Rule 27.4: Agenda phase activation after custodians token removal
         """
         from .game_phase import GamePhase
+
         return self._create_phase_transition(game_state, GamePhase.AGENDA)
 
     def transition_to_new_round(self, game_state: "GameState") -> "GameState":
@@ -343,6 +351,7 @@ class RoundTransitionManager:
         - Rule 81: Status phase completion leads to new round
         """
         from .game_phase import GamePhase
+
         return self._create_phase_transition(game_state, GamePhase.STRATEGY)
 
     def update_round_counter(self, game_state: "GameState") -> "GameState":
@@ -409,6 +418,7 @@ class StatusPhaseOrchestrator:
             StatusPhaseError: If status phase execution fails
         """
         import time
+
         start_time = time.time()
 
         try:
@@ -420,19 +430,21 @@ class StatusPhaseOrchestrator:
                     step_results={},
                     total_execution_time=time.time() - start_time,
                     next_phase="strategy",
-                    error_message="Game state cannot be None"
+                    error_message="Game state cannot be None",
                 )
                 return result, game_state
 
             # Validate game state type - reject invalid types
-            if not hasattr(game_state, 'players') and not hasattr(game_state, '_create_new_state'):
+            if not hasattr(game_state, "players") and not hasattr(
+                game_state, "_create_new_state"
+            ):
                 result = StatusPhaseResult(
                     success=False,
                     steps_completed=[],
                     step_results={},
                     total_execution_time=time.time() - start_time,
                     next_phase="strategy",
-                    error_message="Invalid game state type - must be a valid GameState object"
+                    error_message="Invalid game state type - must be a valid GameState object",
                 )
                 return result, game_state
 
@@ -445,7 +457,9 @@ class StatusPhaseOrchestrator:
 
             for step_num in range(1, 9):
                 try:
-                    step_result, current_state = self.execute_step(step_num, current_state)
+                    step_result, current_state = self.execute_step(
+                        step_num, current_state
+                    )
                     step_results[step_num] = step_result
                     steps_completed.append(step_result.step_name)
 
@@ -464,7 +478,7 @@ class StatusPhaseOrchestrator:
                     step_result = StepResult(
                         success=False,
                         step_name=f"Step {step_num}",
-                        error_message=f"Unexpected error: {str(e)}"
+                        error_message=f"Unexpected error: {str(e)}",
                     )
                     step_results[step_num] = step_result
 
@@ -489,7 +503,9 @@ class StatusPhaseOrchestrator:
 
             # Apply phase transition to the game state
             if next_phase == "agenda":
-                final_state = transition_manager.transition_to_agenda_phase(current_state)
+                final_state = transition_manager.transition_to_agenda_phase(
+                    current_state
+                )
             else:
                 final_state = transition_manager.transition_to_new_round(current_state)
 
@@ -498,7 +514,7 @@ class StatusPhaseOrchestrator:
                 steps_completed=steps_completed,
                 step_results=step_results,
                 total_execution_time=time.time() - start_time,
-                next_phase=next_phase
+                next_phase=next_phase,
             )
 
             return result, final_state
@@ -518,7 +534,7 @@ class StatusPhaseOrchestrator:
                 step_results={},
                 total_execution_time=time.time() - start_time,
                 next_phase=next_phase,
-                error_message=str(e)
+                error_message=str(e),
             )
             return result, game_state
 
@@ -561,14 +577,16 @@ class StatusPhaseOrchestrator:
         """
         # Validate step number
         if step_number < 1 or step_number > 8:
-            raise StepValidationError(f"Invalid step number: {step_number}. Must be 1-8.")
+            raise StepValidationError(
+                f"Invalid step number: {step_number}. Must be 1-8."
+            )
 
         try:
             if game_state is None:
                 result = StepResult(
                     success=False,
                     step_name=f"Step {step_number}",
-                    error_message="Game state cannot be None"
+                    error_message="Game state cannot be None",
                 )
                 return result, game_state
 
@@ -578,9 +596,7 @@ class StatusPhaseOrchestrator:
 
         except Exception as e:
             result = StepResult(
-                success=False,
-                step_name=f"Step {step_number}",
-                error_message=str(e)
+                success=False, step_name=f"Step {step_number}", error_message=str(e)
             )
             return result, game_state
 
@@ -604,7 +620,9 @@ class StatusPhaseOrchestrator:
         """
         # Validate step number
         if step_number < 1 or step_number > 8:
-            raise StepValidationError(f"Invalid step number: {step_number}. Must be 1-8.")
+            raise StepValidationError(
+                f"Invalid step number: {step_number}. Must be 1-8."
+            )
 
         # Minimal implementation for now
         return game_state is not None
@@ -626,7 +644,9 @@ class StatusPhaseOrchestrator:
         """
         # Validate step number
         if step_number < 1 or step_number > 8:
-            raise StepValidationError(f"Invalid step number: {step_number}. Must be 1-8.")
+            raise StepValidationError(
+                f"Invalid step number: {step_number}. Must be 1-8."
+            )
 
         # Return appropriate step handler based on step number
         if step_number == 1:
@@ -647,7 +667,9 @@ class StatusPhaseOrchestrator:
             return ReturnStrategyCardsStep()
         else:
             # This should never happen due to validation above, but included for completeness
-            raise StepValidationError(f"Invalid step number: {step_number}. Must be 1-8.")
+            raise StepValidationError(
+                f"Invalid step number: {step_number}. Must be 1-8."
+            )
 
     def _create_minimal_step_handler(self, step_number: int) -> StatusPhaseStepHandler:
         """Create a minimal step handler for steps not yet implemented.
@@ -661,11 +683,14 @@ class StatusPhaseOrchestrator:
         Returns:
             A minimal StatusPhaseStepHandler implementation
         """
+
         class MinimalStepHandler(StatusPhaseStepHandler):
             def __init__(self, step_num: int) -> None:
                 self.step_num = step_num
 
-            def execute(self, game_state: "GameState") -> tuple[StepResult, "GameState"]:
+            def execute(
+                self, game_state: "GameState"
+            ) -> tuple[StepResult, "GameState"]:
                 result = StepResult(success=True, step_name=f"Step {self.step_num}")
                 return result, game_state
 
@@ -717,7 +742,7 @@ class ScoreObjectivesStep(StatusPhaseStepHandler):
                 return StepResult(
                     success=False,
                     step_name=step_name,
-                    error_message="Game state cannot be None"
+                    error_message="Game state cannot be None",
                 ), game_state
 
             # Get initiative order for status phase with graceful degradation
@@ -730,12 +755,16 @@ class ScoreObjectivesStep(StatusPhaseStepHandler):
                 strategic_action_manager = StrategicActionManager()
                 coordinator = StrategyCardCoordinator(strategic_action_manager)
                 initiative_order = coordinator.get_status_phase_initiative_order()
-            except Exception:
+            except Exception as e:
                 # Graceful degradation: use player order from game state if coordinator fails
-                pass  # initiative_order remains empty, will be filled below
+                # Log the exception for debugging but continue execution
+                import logging
+
+                logging.debug(f"Strategy card coordinator failed: {e}")
+                # initiative_order remains empty, will be filled below
 
             # Ensure we have players to process - graceful degradation
-            if hasattr(game_state, 'players') and game_state.players:
+            if hasattr(game_state, "players") and game_state.players:
                 player_ids = [player.id for player in game_state.players]
 
                 # If initiative order is empty or invalid, use player order from game state
@@ -743,7 +772,9 @@ class ScoreObjectivesStep(StatusPhaseStepHandler):
                     initiative_order = player_ids
 
                 # Filter to only include players that exist in the game
-                valid_initiative_order = [pid for pid in initiative_order if pid in player_ids]
+                valid_initiative_order = [
+                    pid for pid in initiative_order if pid in player_ids
+                ]
 
                 # Fallback: if still no valid order, use all players
                 if not valid_initiative_order:
@@ -759,34 +790,36 @@ class ScoreObjectivesStep(StatusPhaseStepHandler):
 
             for player_id in valid_initiative_order:
                 try:
-                    objectives_scored, current_state = self.process_player_objective_scoring(
-                        player_id, current_state
+                    objectives_scored, current_state = (
+                        self.process_player_objective_scoring(player_id, current_state)
                     )
                     players_processed.append(player_id)
 
                     if objectives_scored > 0:
-                        actions_taken.append(f"Player {player_id} scored {objectives_scored} objectives")
+                        actions_taken.append(
+                            f"Player {player_id} scored {objectives_scored} objectives"
+                        )
                     else:
                         actions_taken.append(f"Player {player_id} scored no objectives")
 
                 except Exception as e:
                     # Graceful degradation: continue processing other players
                     players_processed.append(player_id)
-                    actions_taken.append(f"Player {player_id} scored no objectives (error: {str(e)})")
+                    actions_taken.append(
+                        f"Player {player_id} scored no objectives (error: {str(e)})"
+                    )
                     # Don't return error immediately - continue with other players
 
             return StepResult(
                 success=True,
                 step_name=step_name,
                 players_processed=players_processed,
-                actions_taken=actions_taken
+                actions_taken=actions_taken,
             ), current_state
 
         except Exception as e:
             return StepResult(
-                success=False,
-                step_name=step_name,
-                error_message=str(e)
+                success=False, step_name=step_name, error_message=str(e)
             ), game_state
 
     def validate_prerequisites(self, game_state: "GameState") -> bool:
@@ -804,7 +837,7 @@ class ScoreObjectivesStep(StatusPhaseStepHandler):
             return False
 
         # Basic validation - game state exists and has players
-        return hasattr(game_state, 'players') and game_state.players is not None
+        return hasattr(game_state, "players") and game_state.players is not None
 
     def get_step_name(self) -> str:
         """Get the name of this step.
@@ -944,12 +977,12 @@ class ScoreObjectivesStep(StatusPhaseStepHandler):
         """
         try:
             # Check if objective is already completed by this player
-            if hasattr(game_state, 'is_objective_completed'):
+            if hasattr(game_state, "is_objective_completed"):
                 if game_state.is_objective_completed(player_id, objective):
                     return False
 
             # Check if player meets the objective requirements
-            if hasattr(objective, 'requirement_validator'):
+            if hasattr(objective, "requirement_validator"):
                 if not objective.requirement_validator(player_id, game_state):
                     return False
 
@@ -997,7 +1030,7 @@ class RemoveCommandTokensStep(StatusPhaseStepHandler):
                 return StepResult(
                     success=False,
                     step_name=step_name,
-                    error_message="Game state cannot be None"
+                    error_message="Game state cannot be None",
                 ), game_state
 
             # Process each player and remove their command tokens from all systems
@@ -1011,7 +1044,9 @@ class RemoveCommandTokensStep(StatusPhaseStepHandler):
                     for system_id, system in current_state.systems.items():
                         if system.has_command_token(player.id):
                             system.remove_command_token(player.id)
-                            actions_taken.append(f"Removed command token for {player.id} from {system_id}")
+                            actions_taken.append(
+                                f"Removed command token for {player.id} from {system_id}"
+                            )
 
                     players_processed.append(player.id)
 
@@ -1021,21 +1056,19 @@ class RemoveCommandTokensStep(StatusPhaseStepHandler):
                         step_name=step_name,
                         error_message=f"Integration error: {str(e)}",
                         players_processed=players_processed,
-                        actions_taken=actions_taken
+                        actions_taken=actions_taken,
                     ), current_state
 
             return StepResult(
                 success=True,
                 step_name=step_name,
                 players_processed=players_processed,
-                actions_taken=actions_taken
+                actions_taken=actions_taken,
             ), current_state
 
         except Exception as e:
             return StepResult(
-                success=False,
-                step_name=step_name,
-                error_message=str(e)
+                success=False, step_name=step_name, error_message=str(e)
             ), game_state
 
     def validate_prerequisites(self, game_state: "GameState") -> bool:
@@ -1053,7 +1086,7 @@ class RemoveCommandTokensStep(StatusPhaseStepHandler):
             return False
 
         # Basic validation - game state exists and has players
-        return hasattr(game_state, 'players') and game_state.players is not None
+        return hasattr(game_state, "players") and game_state.players is not None
 
     def get_step_name(self) -> str:
         """Get the name of this step.
@@ -1100,7 +1133,7 @@ class GainRedistributeTokensStep(StatusPhaseStepHandler):
                 return StepResult(
                     success=False,
                     step_name=step_name,
-                    error_message="Game state cannot be None"
+                    error_message="Game state cannot be None",
                 ), game_state
 
             # Process each player to gain and redistribute tokens
@@ -1114,14 +1147,22 @@ class GainRedistributeTokensStep(StatusPhaseStepHandler):
                     # In a full implementation, this would check reinforcements and add tokens
 
                     # Allow redistribution among pools - call the command sheet method
-                    if hasattr(player, 'command_sheet') and hasattr(player.command_sheet, 'redistribute_tokens'):
-                        player.command_sheet.redistribute_tokens("tactic", "strategy", 0)  # Minimal call for testing
+                    if hasattr(player, "command_sheet") and hasattr(
+                        player.command_sheet, "redistribute_tokens"
+                    ):
+                        player.command_sheet.redistribute_tokens(
+                            "tactic", "strategy", 0
+                        )  # Minimal call for testing
 
                     # Allow redistribution among pools
-                    current_state = self.redistribute_tokens_for_player(player.id, current_state)
+                    current_state = self.redistribute_tokens_for_player(
+                        player.id, current_state
+                    )
 
                     players_processed.append(player.id)
-                    actions_taken.append(f"Player {player.id} gained 2 tokens and redistributed")
+                    actions_taken.append(
+                        f"Player {player.id} gained 2 tokens and redistributed"
+                    )
 
                 except Exception as e:
                     return StepResult(
@@ -1129,21 +1170,19 @@ class GainRedistributeTokensStep(StatusPhaseStepHandler):
                         step_name=step_name,
                         error_message=f"Error processing player {player.id}: {str(e)}",
                         players_processed=players_processed,
-                        actions_taken=actions_taken
+                        actions_taken=actions_taken,
                     ), current_state
 
             return StepResult(
                 success=True,
                 step_name=step_name,
                 players_processed=players_processed,
-                actions_taken=actions_taken
+                actions_taken=actions_taken,
             ), current_state
 
         except Exception as e:
             return StepResult(
-                success=False,
-                step_name=step_name,
-                error_message=str(e)
+                success=False, step_name=step_name, error_message=str(e)
             ), game_state
 
     def validate_prerequisites(self, game_state: "GameState") -> bool:
@@ -1161,7 +1200,7 @@ class GainRedistributeTokensStep(StatusPhaseStepHandler):
             return False
 
         # Basic validation - game state exists and has players
-        return hasattr(game_state, 'players') and game_state.players is not None
+        return hasattr(game_state, "players") and game_state.players is not None
 
     def get_step_name(self) -> str:
         """Get the name of this step.
@@ -1189,8 +1228,12 @@ class GainRedistributeTokensStep(StatusPhaseStepHandler):
         # Find the player and call their command sheet redistribution method
         for player in game_state.players:
             if player.id == player_id:
-                if hasattr(player, 'command_sheet') and hasattr(player.command_sheet, 'redistribute_tokens'):
-                    player.command_sheet.redistribute_tokens("tactic", "strategy", 0)  # Minimal call for testing
+                if hasattr(player, "command_sheet") and hasattr(
+                    player.command_sheet, "redistribute_tokens"
+                ):
+                    player.command_sheet.redistribute_tokens(
+                        "tactic", "strategy", 0
+                    )  # Minimal call for testing
                 break
 
         # For now, return the same state - this will be enhanced later
@@ -1235,7 +1278,7 @@ class RevealObjectiveStep(StatusPhaseStepHandler):
                 return StepResult(
                     success=False,
                     step_name=step_name,
-                    error_message="Game state cannot be None"
+                    error_message="Game state cannot be None",
                 ), game_state
 
             # Get the next unrevealed objective
@@ -1246,7 +1289,7 @@ class RevealObjectiveStep(StatusPhaseStepHandler):
                 return StepResult(
                     success=True,
                     step_name=step_name,
-                    actions_taken=["No unrevealed objectives remain - step skipped"]
+                    actions_taken=["No unrevealed objectives remain - step skipped"],
                 ), game_state
 
             # Reveal the objective
@@ -1256,16 +1299,12 @@ class RevealObjectiveStep(StatusPhaseStepHandler):
             action_description = f"Speaker {game_state.speaker_id} revealed objective: {objective_to_reveal.name}"
 
             return StepResult(
-                success=True,
-                step_name=step_name,
-                actions_taken=[action_description]
+                success=True, step_name=step_name, actions_taken=[action_description]
             ), updated_state
 
         except Exception as e:
             return StepResult(
-                success=False,
-                step_name=step_name,
-                error_message=str(e)
+                success=False, step_name=step_name, error_message=str(e)
             ), game_state
 
     def validate_prerequisites(self, game_state: "GameState") -> bool:
@@ -1284,11 +1323,11 @@ class RevealObjectiveStep(StatusPhaseStepHandler):
             return False
 
         # Must have a speaker to reveal objectives
-        if not hasattr(game_state, 'speaker_id') or game_state.speaker_id is None:
+        if not hasattr(game_state, "speaker_id") or game_state.speaker_id is None:
             return False
 
         # Basic validation - game state exists and has players
-        return hasattr(game_state, 'players') and game_state.players is not None
+        return hasattr(game_state, "players") and game_state.players is not None
 
     def get_step_name(self) -> str:
         """Get the name of this step.
@@ -1298,7 +1337,9 @@ class RevealObjectiveStep(StatusPhaseStepHandler):
         """
         return "Reveal Public Objective"
 
-    def get_next_unrevealed_objective(self, game_state: "GameState") -> "ObjectiveCard | None":
+    def get_next_unrevealed_objective(
+        self, game_state: "GameState"
+    ) -> "ObjectiveCard | None":
         """Get the next objective to reveal.
 
         Determines which objective should be revealed next during
@@ -1321,63 +1362,86 @@ class RevealObjectiveStep(StatusPhaseStepHandler):
 
             # Check if this is a mock object - handle carefully to avoid auto-creation
             from unittest.mock import Mock
+
             if isinstance(game_state, Mock):
                 # For mock objects, only access attributes that have been explicitly configured
                 # Check the mock's _mock_children to see what's been set up
-                mock_children = getattr(game_state, '_mock_children', {})
+                mock_children = getattr(game_state, "_mock_children", {})
 
-                if 'get_unrevealed_public_objectives' in mock_children:
+                if "get_unrevealed_public_objectives" in mock_children:
                     try:
-                        unrevealed_objectives = game_state.get_unrevealed_public_objectives()
+                        unrevealed_objectives = (
+                            game_state.get_unrevealed_public_objectives()
+                        )
                         if unrevealed_objectives:
                             first_objective = unrevealed_objectives[0]
-                            if hasattr(first_objective, 'id'):
+                            if hasattr(first_objective, "id"):
                                 from typing import cast
-                                return cast("ObjectiveCard", first_objective)
-                    except Exception:
-                        pass
 
-                if 'public_objectives_deck' in mock_children:
+                                return cast("ObjectiveCard", first_objective)
+                    except Exception as e:
+                        # Log exception for debugging but continue graceful degradation
+                        import logging
+
+                        logging.debug(f"Failed to get first objective from deck: {e}")
+
+                if "public_objectives_deck" in mock_children:
                     try:
                         deck = game_state.public_objectives_deck
-                        if hasattr(deck, 'get_next_objective'):
+                        if hasattr(deck, "get_next_objective"):
                             next_objective = deck.get_next_objective()
-                            if next_objective is not None and hasattr(next_objective, 'id'):
+                            if next_objective is not None and hasattr(
+                                next_objective, "id"
+                            ):
                                 from typing import cast
+
                                 return cast("ObjectiveCard", next_objective)
-                    except Exception:
-                        pass
+                    except Exception as e:
+                        # Log exception for debugging but continue graceful degradation
+                        import logging
+
+                        logging.debug(f"Failed to get next objective from deck: {e}")
 
                 # No configured methods, return None
                 return None
 
             # For real game state objects, try integration points
             # Try to get unrevealed objectives from the game state
-            if hasattr(game_state, 'get_unrevealed_public_objectives'):
+            if hasattr(game_state, "get_unrevealed_public_objectives"):
                 try:
-                    unrevealed_objectives = game_state.get_unrevealed_public_objectives()
+                    unrevealed_objectives = (
+                        game_state.get_unrevealed_public_objectives()
+                    )
                     if unrevealed_objectives:
                         # Return the first unrevealed objective
                         first_objective = unrevealed_objectives[0]
                         # Type check to ensure it's an ObjectiveCard
-                        if hasattr(first_objective, 'id'):
+                        if hasattr(first_objective, "id"):
                             from typing import cast
+
                             return cast("ObjectiveCard", first_objective)
-                except Exception:
-                    pass
+                except Exception as e:
+                    # Log exception for debugging but continue graceful degradation
+                    import logging
+
+                    logging.debug(f"Failed to get first objective from game state: {e}")
 
             # Alternative: check if game state has public objectives deck
-            if hasattr(game_state, 'public_objectives_deck'):
+            if hasattr(game_state, "public_objectives_deck"):
                 try:
                     deck = game_state.public_objectives_deck
-                    if hasattr(deck, 'get_next_objective'):
+                    if hasattr(deck, "get_next_objective"):
                         next_objective = deck.get_next_objective()
                         # Type check to ensure it's an ObjectiveCard
-                        if next_objective is not None and hasattr(next_objective, 'id'):
+                        if next_objective is not None and hasattr(next_objective, "id"):
                             from typing import cast
+
                             return cast("ObjectiveCard", next_objective)
-                except Exception:
-                    pass
+                except Exception as e:
+                    # Log exception for debugging but continue graceful degradation
+                    import logging
+
+                    logging.debug(f"Failed to get next objective from game state: {e}")
 
             # If no integration points available, return None
             return None
@@ -1415,14 +1479,18 @@ class RevealObjectiveStep(StatusPhaseStepHandler):
             # Check if this is a real game state with objective integration
             # For mock objects in tests, we need to be careful not to trigger auto-creation
             from unittest.mock import Mock
+
             if isinstance(game_state, Mock):
                 # For mock objects, only call methods that have been explicitly configured
                 # Check the mock's _mock_children to see if reveal_public_objective was set up
-                if 'reveal_public_objective' in getattr(game_state, '_mock_children', {}):
+                if "reveal_public_objective" in getattr(
+                    game_state, "_mock_children", {}
+                ):
                     # Method was explicitly configured in the test
                     result = game_state.reveal_public_objective(objective)
                     # For mocks, we need to cast the result
                     from typing import cast
+
                     return cast("GameState", result)
                 else:
                     # No method configured, return original state
@@ -1430,12 +1498,17 @@ class RevealObjectiveStep(StatusPhaseStepHandler):
 
             # For real game state objects, try integration points
             # Try to reveal the objective through the game state
-            if hasattr(game_state, 'reveal_public_objective') and callable(game_state.reveal_public_objective):
+            if hasattr(game_state, "reveal_public_objective") and callable(
+                game_state.reveal_public_objective
+            ):
                 try:
                     result = game_state.reveal_public_objective(objective)
                     # Ensure we return a GameState object
-                    if hasattr(result, 'players'):  # Basic check for GameState-like object
+                    if hasattr(
+                        result, "players"
+                    ):  # Basic check for GameState-like object
                         from typing import cast
+
                         return cast("GameState", result)
                     else:
                         return game_state
@@ -1443,17 +1516,19 @@ class RevealObjectiveStep(StatusPhaseStepHandler):
                     return game_state
 
             # Alternative: update public objectives deck directly
-            if hasattr(game_state, 'public_objectives_deck'):
+            if hasattr(game_state, "public_objectives_deck"):
                 try:
                     deck = game_state.public_objectives_deck
-                    if hasattr(deck, 'reveal_objective') and callable(deck.reveal_objective):
+                    if hasattr(deck, "reveal_objective") and callable(
+                        deck.reveal_objective
+                    ):
                         deck.reveal_objective(objective)
                         return game_state
                 except Exception:
                     return game_state
 
             # Alternative: add to revealed objectives list
-            if hasattr(game_state, 'revealed_public_objectives'):
+            if hasattr(game_state, "revealed_public_objectives"):
                 if objective not in game_state.revealed_public_objectives:
                     game_state.revealed_public_objectives.append(objective)
                 return game_state
@@ -1464,7 +1539,9 @@ class RevealObjectiveStep(StatusPhaseStepHandler):
 
         except Exception as e:
             # Convert to our exception hierarchy for better error handling
-            raise SystemIntegrationError(f"Failed to reveal objective {objective.id if hasattr(objective, 'id') else 'unknown'}: {str(e)}") from e
+            raise SystemIntegrationError(
+                f"Failed to reveal objective {objective.id if hasattr(objective, 'id') else 'unknown'}: {str(e)}"
+            ) from e
 
 
 class DrawActionCardsStep(StatusPhaseStepHandler):
@@ -1503,7 +1580,7 @@ class DrawActionCardsStep(StatusPhaseStepHandler):
                 return StepResult(
                     success=False,
                     step_name=step_name,
-                    error_message="Game state cannot be None"
+                    error_message="Game state cannot be None",
                 ), game_state
 
             # Get initiative order for status phase
@@ -1517,7 +1594,9 @@ class DrawActionCardsStep(StatusPhaseStepHandler):
 
             # Filter to only include players that exist in the game
             player_ids = [player.id for player in game_state.players]
-            valid_initiative_order = [pid for pid in initiative_order if pid in player_ids]
+            valid_initiative_order = [
+                pid for pid in initiative_order if pid in player_ids
+            ]
 
             # Process each player in initiative order
             current_state = game_state
@@ -1526,7 +1605,9 @@ class DrawActionCardsStep(StatusPhaseStepHandler):
 
             for player_id in valid_initiative_order:
                 try:
-                    success, current_state = self.draw_card_for_player(player_id, current_state)
+                    success, current_state = self.draw_card_for_player(
+                        player_id, current_state
+                    )
                     players_processed.append(player_id)
 
                     if success:
@@ -1537,7 +1618,7 @@ class DrawActionCardsStep(StatusPhaseStepHandler):
                             step_name=step_name,
                             error_message=f"Error drawing cards for player {player_id}: Failed to draw card",
                             players_processed=players_processed,
-                            actions_taken=actions_taken
+                            actions_taken=actions_taken,
                         ), current_state
 
                 except Exception as e:
@@ -1546,21 +1627,19 @@ class DrawActionCardsStep(StatusPhaseStepHandler):
                         step_name=step_name,
                         error_message=f"Error drawing cards for player {player_id}: {str(e)}",
                         players_processed=players_processed,
-                        actions_taken=actions_taken
+                        actions_taken=actions_taken,
                     ), current_state
 
             return StepResult(
                 success=True,
                 step_name=step_name,
                 players_processed=players_processed,
-                actions_taken=actions_taken
+                actions_taken=actions_taken,
             ), current_state
 
         except Exception as e:
             return StepResult(
-                success=False,
-                step_name=step_name,
-                error_message=str(e)
+                success=False, step_name=step_name, error_message=str(e)
             ), game_state
 
     def validate_prerequisites(self, game_state: "GameState") -> bool:
@@ -1578,7 +1657,7 @@ class DrawActionCardsStep(StatusPhaseStepHandler):
             return False
 
         # Basic validation - game state exists and has players
-        return hasattr(game_state, 'players') and game_state.players is not None
+        return hasattr(game_state, "players") and game_state.players is not None
 
     def get_step_name(self) -> str:
         """Get the name of this step.
@@ -1659,7 +1738,7 @@ class ReadyCardsStep(StatusPhaseStepHandler):
                 return StepResult(
                     success=False,
                     step_name=step_name,
-                    error_message="Game state cannot be None"
+                    error_message="Game state cannot be None",
                 ), game_state
 
             # Use existing StatusPhaseManager.ready_all_cards functionality
@@ -1672,8 +1751,10 @@ class ReadyCardsStep(StatusPhaseStepHandler):
 
             # Track agent readying actions
             for player in game_state.players:
-                if (player.leader_sheet is not None and
-                    player.leader_sheet.agent is not None):
+                if (
+                    player.leader_sheet is not None
+                    and player.leader_sheet.agent is not None
+                ):
                     actions_taken.append(f"Readied agent for player {player.id}")
 
             # Add other card type actions (simplified for now)
@@ -1686,14 +1767,12 @@ class ReadyCardsStep(StatusPhaseStepHandler):
                 success=True,
                 step_name=step_name,
                 players_processed=players_processed,
-                actions_taken=actions_taken
+                actions_taken=actions_taken,
             ), new_state
 
         except Exception as e:
             return StepResult(
-                success=False,
-                step_name=step_name,
-                error_message=str(e)
+                success=False, step_name=step_name, error_message=str(e)
             ), game_state
 
     def validate_prerequisites(self, game_state: "GameState") -> bool:
@@ -1711,7 +1790,7 @@ class ReadyCardsStep(StatusPhaseStepHandler):
             return False
 
         # Basic validation - game state exists and has players
-        return hasattr(game_state, 'players') and game_state.players is not None
+        return hasattr(game_state, "players") and game_state.players is not None
 
     def get_step_name(self) -> str:
         """Get the name of this step.
@@ -1751,6 +1830,7 @@ class StatusPhaseManager:
                 from .status_phase_performance import (
                     create_optimized_status_phase_orchestrator,
                 )
+
                 self.orchestrator = create_optimized_status_phase_orchestrator()
             except ImportError:
                 # Fallback to standard orchestrator if performance module not available
@@ -1762,7 +1842,9 @@ class StatusPhaseManager:
         self.transition_manager = RoundTransitionManager()
         self.performance_optimization_enabled = enable_performance_optimization
 
-    def execute_complete_status_phase(self, game_state: "GameState") -> tuple[StatusPhaseResult, "GameState"]:
+    def execute_complete_status_phase(
+        self, game_state: "GameState"
+    ) -> tuple[StatusPhaseResult, "GameState"]:
         """Execute complete status phase with all 8 steps.
 
         This method executes the complete status phase sequence as defined
@@ -1785,7 +1867,9 @@ class StatusPhaseManager:
         """
         return self.orchestrator.execute_complete_status_phase(game_state)
 
-    def execute_single_step(self, step_number: int, game_state: "GameState") -> tuple[StepResult, "GameState"]:
+    def execute_single_step(
+        self, step_number: int, game_state: "GameState"
+    ) -> tuple[StepResult, "GameState"]:
         """Execute a single status phase step.
 
         This method executes an individual status phase step by number,
@@ -1953,7 +2037,7 @@ class StatusPhaseManager:
 
         try:
             # Try to get performance report from optimized orchestrator
-            if hasattr(self.orchestrator, 'get_performance_report'):
+            if hasattr(self.orchestrator, "get_performance_report"):
                 report = self.orchestrator.get_performance_report()
                 if report:
                     return {
@@ -1962,7 +2046,7 @@ class StatusPhaseManager:
                         "step_count": len(report.step_metrics),
                         "slowest_step": report.get_slowest_step(),
                         "memory_optimization_enabled": report.memory_optimization_enabled,
-                        "performance_warnings": report.performance_warnings
+                        "performance_warnings": report.performance_warnings,
                     }
 
             return {"message": "No performance report available"}
@@ -1979,7 +2063,7 @@ class StatusPhaseManager:
             return {"message": "Performance optimization not enabled"}
 
         try:
-            if hasattr(self.orchestrator, 'get_optimizer_statistics'):
+            if hasattr(self.orchestrator, "get_optimizer_statistics"):
                 stats = self.orchestrator.get_optimizer_statistics()
                 return dict(stats) if stats else {"message": "No statistics available"}
             return {"message": "Optimizer statistics not available"}
@@ -1996,7 +2080,9 @@ class StatusPhaseManager:
             return False
 
         try:
-            if hasattr(self.orchestrator, 'optimizer') and hasattr(self.orchestrator.optimizer, 'clear_cache'):
+            if hasattr(self.orchestrator, "optimizer") and hasattr(
+                self.orchestrator.optimizer, "clear_cache"
+            ):
                 self.orchestrator.optimizer.clear_cache()
                 return True
             return False
@@ -2039,7 +2125,7 @@ class RepairUnitsStep(StatusPhaseStepHandler):
                 return StepResult(
                     success=False,
                     step_name=step_name,
-                    error_message="Game state cannot be None"
+                    error_message="Game state cannot be None",
                 ), game_state
 
             # Find and repair all damaged units
@@ -2062,7 +2148,7 @@ class RepairUnitsStep(StatusPhaseStepHandler):
                         step_name=step_name,
                         error_message=f"Error processing player {player.id}: {str(e)}",
                         players_processed=players_processed,
-                        actions_taken=actions_taken
+                        actions_taken=actions_taken,
                     ), current_state
 
             # Add summary action
@@ -2075,14 +2161,12 @@ class RepairUnitsStep(StatusPhaseStepHandler):
                 success=True,
                 step_name=step_name,
                 players_processed=players_processed,
-                actions_taken=actions_taken
+                actions_taken=actions_taken,
             ), current_state
 
         except Exception as e:
             return StepResult(
-                success=False,
-                step_name=step_name,
-                error_message=str(e)
+                success=False, step_name=step_name, error_message=str(e)
             ), game_state
 
     def validate_prerequisites(self, game_state: "GameState") -> bool:
@@ -2100,7 +2184,7 @@ class RepairUnitsStep(StatusPhaseStepHandler):
             return False
 
         # Basic validation - game state exists and has players
-        return hasattr(game_state, 'players') and game_state.players is not None
+        return hasattr(game_state, "players") and game_state.players is not None
 
     def get_step_name(self) -> str:
         """Get the name of this step.
@@ -2194,7 +2278,7 @@ class ReturnStrategyCardsStep(StatusPhaseStepHandler):
                 return StepResult(
                     success=False,
                     step_name=step_name,
-                    error_message="Game state cannot be None"
+                    error_message="Game state cannot be None",
                 ), game_state
 
             # Process each player and collect their strategy cards
@@ -2206,7 +2290,9 @@ class ReturnStrategyCardsStep(StatusPhaseStepHandler):
             for player in current_state.players:
                 try:
                     # Return strategy card for this player
-                    current_state = self.return_player_strategy_card(player.id, current_state)
+                    current_state = self.return_player_strategy_card(
+                        player.id, current_state
+                    )
                     players_processed.append(player.id)
 
                 except Exception as e:
@@ -2215,27 +2301,27 @@ class ReturnStrategyCardsStep(StatusPhaseStepHandler):
                         step_name=step_name,
                         error_message=f"Error processing player {player.id}: {str(e)}",
                         players_processed=players_processed,
-                        actions_taken=actions_taken
+                        actions_taken=actions_taken,
                     ), current_state
 
             # Add appropriate action message
             if cards_returned == 0:
                 actions_taken.append("No strategy cards to return")
             else:
-                actions_taken.append(f"Returned {cards_returned} strategy cards to common area")
+                actions_taken.append(
+                    f"Returned {cards_returned} strategy cards to common area"
+                )
 
             return StepResult(
                 success=True,
                 step_name=step_name,
                 players_processed=players_processed,
-                actions_taken=actions_taken
+                actions_taken=actions_taken,
             ), current_state
 
         except Exception as e:
             return StepResult(
-                success=False,
-                step_name=step_name,
-                error_message=str(e)
+                success=False, step_name=step_name, error_message=str(e)
             ), game_state
 
     def validate_prerequisites(self, game_state: "GameState") -> bool:
@@ -2253,7 +2339,7 @@ class ReturnStrategyCardsStep(StatusPhaseStepHandler):
             return False
 
         # Basic validation - game state exists and has players
-        return hasattr(game_state, 'players') and game_state.players is not None
+        return hasattr(game_state, "players") and game_state.players is not None
 
     def get_step_name(self) -> str:
         """Get the name of this step.
@@ -2374,7 +2460,9 @@ class StatusPhaseValidator:
             return False, str(e)
 
         # Step-specific prerequisite validation
-        step_validation_error = self._validate_step_specific_prerequisites(step_number, game_state)
+        step_validation_error = self._validate_step_specific_prerequisites(
+            step_number, game_state
+        )
         if step_validation_error:
             return False, step_validation_error
 
@@ -2472,7 +2560,7 @@ class StatusPhaseValidator:
 
     def _validate_game_has_players(self, game_state: "GameState") -> None:
         """Validate that game has at least one player."""
-        if not hasattr(game_state, 'players') or not game_state.players:
+        if not hasattr(game_state, "players") or not game_state.players:
             raise StatusPhaseGameStateError("Game must have at least one player")
 
     def _is_valid_step_number(self, step_number: int) -> bool:
@@ -2488,14 +2576,16 @@ class StatusPhaseValidator:
         player_ids = [player.id for player in game_state.players]
         return player_id in player_ids
 
-    def _validate_step_specific_prerequisites(self, step_number: int, game_state: "GameState") -> str:
+    def _validate_step_specific_prerequisites(
+        self, step_number: int, game_state: "GameState"
+    ) -> str:
         """Validate step-specific prerequisites.
 
         Returns:
             Empty string if valid, error message if invalid
         """
         if step_number == 2:  # Reveal Public Objective
-            if not hasattr(game_state, 'speaker_id') or game_state.speaker_id is None:
+            if not hasattr(game_state, "speaker_id") or game_state.speaker_id is None:
                 return "Step 2 requires a speaker to reveal objectives"
 
         # Add more step-specific validations as needed

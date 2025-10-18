@@ -10,7 +10,6 @@ LRR References:
 - Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 10.5, 12.3
 """
 
-
 from src.ti4.core.constants import Faction
 from src.ti4.core.game_state import GameState
 from src.ti4.core.leaders import LeaderReadyStatus, initialize_player_leaders
@@ -189,8 +188,12 @@ class TestReadyCardsStepIntegration:
         updated_player1 = self._find_player_by_id(new_state, "player1")
         updated_player2 = self._find_player_by_id(new_state, "player2")
 
-        assert updated_player1.leader_sheet.agent.ready_status == LeaderReadyStatus.READIED
-        assert updated_player2.leader_sheet.agent.ready_status == LeaderReadyStatus.READIED
+        assert (
+            updated_player1.leader_sheet.agent.ready_status == LeaderReadyStatus.READIED
+        )
+        assert (
+            updated_player2.leader_sheet.agent.ready_status == LeaderReadyStatus.READIED
+        )
 
     def test_ready_cards_step_handles_multiple_card_types(self) -> None:
         """Test ReadyCardsStep handles multiple types of cards (strategy, planet, tech, agents)."""
@@ -291,8 +294,12 @@ class TestReadyCardsStepComprehensiveValidation:
         assert result.step_name == "Ready Cards"
 
         # Verify strategy card readying was tracked in actions
-        strategy_actions = [action for action in result.actions_taken if "strategy" in action.lower()]
-        assert len(strategy_actions) > 0, "Strategy card readying should be tracked in actions"
+        strategy_actions = [
+            action for action in result.actions_taken if "strategy" in action.lower()
+        ]
+        assert len(strategy_actions) > 0, (
+            "Strategy card readying should be tracked in actions"
+        )
 
     def test_ready_cards_step_validates_planet_cards_readied(self) -> None:
         """Test ReadyCardsStep validates that planet cards are readied (Requirement 6.2)."""
@@ -312,8 +319,12 @@ class TestReadyCardsStepComprehensiveValidation:
         assert result.step_name == "Ready Cards"
 
         # Verify planet card readying was tracked in actions
-        planet_actions = [action for action in result.actions_taken if "planet" in action.lower()]
-        assert len(planet_actions) > 0, "Planet card readying should be tracked in actions"
+        planet_actions = [
+            action for action in result.actions_taken if "planet" in action.lower()
+        ]
+        assert len(planet_actions) > 0, (
+            "Planet card readying should be tracked in actions"
+        )
 
     def test_ready_cards_step_validates_technology_cards_readied(self) -> None:
         """Test ReadyCardsStep validates that technology cards are readied (Requirement 6.3)."""
@@ -333,8 +344,12 @@ class TestReadyCardsStepComprehensiveValidation:
         assert result.step_name == "Ready Cards"
 
         # Verify technology card readying was tracked in actions
-        tech_actions = [action for action in result.actions_taken if "technology" in action.lower()]
-        assert len(tech_actions) > 0, "Technology card readying should be tracked in actions"
+        tech_actions = [
+            action for action in result.actions_taken if "technology" in action.lower()
+        ]
+        assert len(tech_actions) > 0, (
+            "Technology card readying should be tracked in actions"
+        )
 
     def test_ready_cards_step_validates_all_cards_in_readied_state(self) -> None:
         """Test ReadyCardsStep verifies all cards are in readied state (Requirement 6.5)."""
@@ -366,7 +381,9 @@ class TestReadyCardsStepComprehensiveValidation:
         assert result.step_name == "Ready Cards"
 
         # Verify comprehensive validation was performed
-        assert len(result.actions_taken) >= 4, "Should track strategy, planet, technology, and agent readying"
+        assert len(result.actions_taken) >= 4, (
+            "Should track strategy, planet, technology, and agent readying"
+        )
 
         # Verify all card types are mentioned in actions
         action_text = " ".join(result.actions_taken).lower()
@@ -385,7 +402,7 @@ class TestReadyCardsStepComprehensiveValidation:
         # Create game state with multiple players and exhausted components
         game_state = GameState()
         for i in range(6):  # Test with 6 players (max TI4 players)
-            player = Player(f"player{i+1}", Faction.SOL)
+            player = Player(f"player{i + 1}", Faction.SOL)
             game_state = game_state.add_player(player)
             initialize_player_leaders(player)
             if player.leader_sheet.agent:
@@ -400,7 +417,9 @@ class TestReadyCardsStepComprehensiveValidation:
         assert result.success is True
 
         # Verify performance requirement (100ms = 0.1 seconds)
-        assert execution_time < 0.1, f"ReadyCardsStep took {execution_time:.3f}s, should be under 0.1s"
+        assert execution_time < 0.1, (
+            f"ReadyCardsStep took {execution_time:.3f}s, should be under 0.1s"
+        )
 
 
 class TestReadyCardsStepBackwardCompatibility:
@@ -439,7 +458,10 @@ class TestReadyCardsStepBackwardCompatibility:
         old_player = self._find_player_by_id(old_result, "player1")
         new_player = self._find_player_by_id(new_result, "player1")
 
-        assert old_player.leader_sheet.agent.ready_status == new_player.leader_sheet.agent.ready_status
+        assert (
+            old_player.leader_sheet.agent.ready_status
+            == new_player.leader_sheet.agent.ready_status
+        )
         assert step_result.success is True
 
     def test_ready_cards_step_preserves_existing_behavior(self) -> None:
@@ -452,7 +474,7 @@ class TestReadyCardsStepBackwardCompatibility:
 
         # Add multiple players with different exhausted components
         for i in range(3):
-            player = Player(f"player{i+1}", Faction.SOL)
+            player = Player(f"player{i + 1}", Faction.SOL)
             game_state = game_state.add_player(player)
             initialize_player_leaders(player)
 
@@ -472,14 +494,15 @@ class TestReadyCardsStepBackwardCompatibility:
 
         # Verify all players have same agent status in both results
         for i in range(3):
-            player_id = f"player{i+1}"
+            player_id = f"player{i + 1}"
             old_player = self._find_player_by_id(old_result, player_id)
             new_player = self._find_player_by_id(new_result, player_id)
 
             if old_player.leader_sheet.agent and new_player.leader_sheet.agent:
-                assert (old_player.leader_sheet.agent.ready_status ==
-                       new_player.leader_sheet.agent.ready_status), \
-                       f"Agent status mismatch for {player_id}"
+                assert (
+                    old_player.leader_sheet.agent.ready_status
+                    == new_player.leader_sheet.agent.ready_status
+                ), f"Agent status mismatch for {player_id}"
 
     def test_ready_cards_step_integrates_with_status_phase_orchestrator(self) -> None:
         """Test ReadyCardsStep integrates properly with StatusPhaseOrchestrator."""
@@ -508,4 +531,6 @@ class TestReadyCardsStepBackwardCompatibility:
 
         # Verify agent was readied
         updated_player = self._find_player_by_id(new_state, "player1")
-        assert updated_player.leader_sheet.agent.ready_status == LeaderReadyStatus.READIED
+        assert (
+            updated_player.leader_sheet.agent.ready_status == LeaderReadyStatus.READIED
+        )

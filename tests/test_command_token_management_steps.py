@@ -356,7 +356,9 @@ class TestGainRedistributeTokensStep:
         # Assert: Should fail validation
         assert is_valid is False
 
-    def test_gain_redistribute_tokens_integration_with_command_token_system(self) -> None:
+    def test_gain_redistribute_tokens_integration_with_command_token_system(
+        self,
+    ) -> None:
         """Test integration with existing command token system.
 
         Verifies that the step properly integrates with the command token system
@@ -502,7 +504,9 @@ class TestCommandTokenManagementStepsIntegration:
         # Arrange: Create mock game state that will cause integration error
         mock_system = Mock()
         mock_system.command_tokens = {"player1": True}
-        mock_system.remove_command_token = Mock(side_effect=Exception("Integration error"))
+        mock_system.remove_command_token = Mock(
+            side_effect=Exception("Integration error")
+        )
 
         mock_game_state = Mock()
         mock_game_state.players = [Mock(id="player1")]

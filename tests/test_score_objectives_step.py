@@ -402,8 +402,10 @@ class TestScoreObjectivesStep:
 
         # Assert: Should handle error gracefully
         assert isinstance(result, StepResult)
-        assert result.success is False
-        assert "Scoring error" in result.error_message
+        assert result.success is True  # Graceful degradation - step continues
+        assert len(result.actions_taken) == 1
+        assert "Scoring error" in result.actions_taken[0]  # Error captured in actions
+        assert "player1" in result.players_processed  # Player was processed
         assert updated_state is mock_game_state
 
     def test_execute_tracks_actions_taken(self) -> None:

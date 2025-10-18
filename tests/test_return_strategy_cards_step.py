@@ -32,7 +32,9 @@ class TestReturnStrategyCardsStep:
         step = ReturnStrategyCardsStep()
         assert step.get_step_name() == "Return Strategy Cards"
 
-    def test_return_strategy_cards_step_validate_prerequisites_valid_state(self) -> None:
+    def test_return_strategy_cards_step_validate_prerequisites_valid_state(
+        self,
+    ) -> None:
         """Test ReturnStrategyCardsStep validates prerequisites with valid game state."""
         step = ReturnStrategyCardsStep()
         game_state = GameState()
@@ -72,7 +74,9 @@ class TestReturnStrategyCardsStep:
         assert "No strategy cards to return" in result.actions_taken
         assert updated_state is not None
 
-    def test_return_strategy_cards_step_return_player_strategy_card_method(self) -> None:
+    def test_return_strategy_cards_step_return_player_strategy_card_method(
+        self,
+    ) -> None:
         """Test the return_player_strategy_card helper method."""
         step = ReturnStrategyCardsStep()
         game_state = GameState()
@@ -83,7 +87,9 @@ class TestReturnStrategyCardsStep:
         updated_state = step.return_player_strategy_card("player1", game_state)
         assert updated_state is not None
 
-    def test_return_strategy_cards_step_return_player_strategy_card_validation(self) -> None:
+    def test_return_strategy_cards_step_return_player_strategy_card_validation(
+        self,
+    ) -> None:
         """Test return_player_strategy_card method input validation."""
         step = ReturnStrategyCardsStep()
         game_state = GameState()
@@ -125,7 +131,9 @@ class TestReturnStrategyCardsStep:
         assert "No strategy cards to return" in result.actions_taken
         assert updated_state is not None
 
-    def test_return_strategy_cards_step_integration_with_strategy_card_system(self) -> None:
+    def test_return_strategy_cards_step_integration_with_strategy_card_system(
+        self,
+    ) -> None:
         """Test ReturnStrategyCardsStep integration with existing strategy card system."""
         step = ReturnStrategyCardsStep()
         game_state = GameState()
@@ -191,7 +199,7 @@ class TestReturnStrategyCardsStep:
             strategy_card_assignments={
                 "player1": StrategyCardType.LEADERSHIP,
                 "player2": StrategyCardType.DIPLOMACY,
-                "player3": StrategyCardType.POLITICS
+                "player3": StrategyCardType.POLITICS,
             }
         )
 
@@ -222,7 +230,7 @@ class TestReturnStrategyCardsStep:
         game_state = game_state._create_new_state(
             strategy_card_assignments={
                 "player1": StrategyCardType.LEADERSHIP,
-                "player3": StrategyCardType.POLITICS
+                "player3": StrategyCardType.POLITICS,
                 # player2 has no strategy card
             }
         )
@@ -237,7 +245,9 @@ class TestReturnStrategyCardsStep:
         assert "player3" in result.players_processed
         assert updated_state is not None
 
-    def test_return_strategy_cards_step_integration_with_clear_assignments(self) -> None:
+    def test_return_strategy_cards_step_integration_with_clear_assignments(
+        self,
+    ) -> None:
         """Test ReturnStrategyCardsStep integration with GameState clear_strategy_card_assignments."""
         step = ReturnStrategyCardsStep()
         game_state = GameState()
@@ -251,7 +261,10 @@ class TestReturnStrategyCardsStep:
 
         # Verify card is assigned
         assert "player1" in game_state.strategy_card_assignments
-        assert game_state.strategy_card_assignments["player1"] == StrategyCardType.LEADERSHIP
+        assert (
+            game_state.strategy_card_assignments["player1"]
+            == StrategyCardType.LEADERSHIP
+        )
 
         result, updated_state = step.execute(game_state)
 
@@ -259,7 +272,9 @@ class TestReturnStrategyCardsStep:
         assert updated_state is not None
         # The actual integration with clear_strategy_card_assignments will be implemented later
 
-    def test_return_strategy_cards_step_integration_with_ready_all_strategy_cards(self) -> None:
+    def test_return_strategy_cards_step_integration_with_ready_all_strategy_cards(
+        self,
+    ) -> None:
         """Test ReturnStrategyCardsStep integration with GameState ready_all_strategy_cards."""
         step = ReturnStrategyCardsStep()
         game_state = GameState()
@@ -269,7 +284,10 @@ class TestReturnStrategyCardsStep:
         # Set up exhausted strategy cards
         game_state = game_state._create_new_state(
             strategy_card_assignments={"player1": StrategyCardType.LEADERSHIP},
-            exhausted_strategy_cards={StrategyCardType.LEADERSHIP, StrategyCardType.DIPLOMACY}
+            exhausted_strategy_cards={
+                StrategyCardType.LEADERSHIP,
+                StrategyCardType.DIPLOMACY,
+            },
         )
 
         # Verify cards are exhausted
@@ -296,7 +314,7 @@ class TestReturnStrategyCardsStep:
             Player("player5", Faction.SAAR),
             Player("player6", Faction.MUAAT),
             Player("player7", Faction.XXCHA),
-            Player("player8", Faction.YSSARIL)
+            Player("player8", Faction.YSSARIL),
         ]
 
         for player in players:
@@ -311,7 +329,7 @@ class TestReturnStrategyCardsStep:
             "player5": StrategyCardType.TRADE,
             "player6": StrategyCardType.WARFARE,
             "player7": StrategyCardType.TECHNOLOGY,
-            "player8": StrategyCardType.IMPERIAL
+            "player8": StrategyCardType.IMPERIAL,
         }
 
         game_state = game_state._create_new_state(
@@ -365,9 +383,9 @@ class TestReturnStrategyCardsStep:
         game_state = game_state._create_new_state(
             strategy_card_assignments={
                 "player1": StrategyCardType.LEADERSHIP,
-                "player2": StrategyCardType.DIPLOMACY
+                "player2": StrategyCardType.DIPLOMACY,
             },
-            exhausted_strategy_cards={StrategyCardType.LEADERSHIP}
+            exhausted_strategy_cards={StrategyCardType.LEADERSHIP},
         )
 
         # Verify initial state
