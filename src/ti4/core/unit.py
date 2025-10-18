@@ -1,10 +1,13 @@
 """Unit structure for TI4 game pieces."""
 
+import logging
 import uuid
 from typing import Any
 
 from .constants import Faction, Technology, UnitType
 from .unit_stats import UnitStats, UnitStatsProvider
+
+logger = logging.getLogger(__name__)
 
 # Unit categorization for game mechanics
 FIGHTER_TYPE_UNITS = {UnitType.FIGHTER, UnitType.FIGHTER_II}
@@ -67,7 +70,7 @@ class Unit:
             self.technologies = set()
 
         self._stats_provider = stats_provider or UnitStatsProvider()
-        self._cached_stats: UnitStats | None = None
+        self._cached_stats = None
         self._sustained_damage = False
 
     def get_stats(self) -> UnitStats:
@@ -254,14 +257,14 @@ class Unit:
         tech_enums: set[Technology] = set()
         for tech in raw_techs:
             try:
-                tech_enums.add(Technology(tech if isinstance(tech, str) else tech))
-            except Exception as e:
-                # Skip unknown/invalid entries to avoid corrupting stats resolution
-                import logging
-
-                logging.getLogger(__name__).debug(
-                    f"Skipping invalid technology: {tech}, error: {e}"
-                )
+                if isinstance(tech, Technology):
+                    tech_enums.add(tech)
+                elif isinstance(tech, str):
+                    tech_enums.add(Technology(tech))
+                else:
+                    logger.warning(f"Skipping invalid technology type {type(tech).__name__}: {tech}")
+            except ValueError as e:
+                logger.warning(f"Skipping unknown technology: {tech}, error: {e}")
                 continue
 
         return cls(

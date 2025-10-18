@@ -5,6 +5,7 @@ import time
 from collections.abc import Callable
 from typing import Any
 
+from .constants import CircuitBreakerState
 from .exceptions import TI4GameError
 
 
@@ -41,7 +42,7 @@ class CircuitBreaker:
         failure_threshold: int | None = None,
         recovery_timeout: float | None = None,
     ) -> None:
-        from .constants import CircuitBreakerConstants, PerformanceConstants
+        from .constants import PerformanceConstants
 
         if failure_threshold is None:
             failure_threshold = PerformanceConstants.DEFAULT_FAILURE_THRESHOLD
@@ -52,17 +53,15 @@ class CircuitBreaker:
         self.recovery_timeout = recovery_timeout
         self.failure_count = 0
         self.last_failure_time = 0.0
-        self.state = CircuitBreakerConstants.STATE_CLOSED
+        self.state = CircuitBreakerState.CLOSED.value
 
     def can_execute(self) -> bool:
         """Check if operation can be executed."""
-        from .constants import CircuitBreakerConstants
-
-        if self.state == CircuitBreakerConstants.STATE_CLOSED:
+        if self.state == CircuitBreakerState.CLOSED.value:
             return True
-        elif self.state == CircuitBreakerConstants.STATE_OPEN:
+        elif self.state == CircuitBreakerState.OPEN.value:
             if time.time() - self.last_failure_time > self.recovery_timeout:
-                self.state = CircuitBreakerConstants.STATE_HALF_OPEN
+                self.state = CircuitBreakerState.HALF_OPEN.value
                 return True
             return False
         else:  # half-open
@@ -70,20 +69,16 @@ class CircuitBreaker:
 
     def record_success(self) -> None:
         """Record successful operation."""
-        from .constants import CircuitBreakerConstants
-
         self.failure_count = 0
-        self.state = CircuitBreakerConstants.STATE_CLOSED
+        self.state = CircuitBreakerState.CLOSED.value
 
     def record_failure(self) -> None:
         """Record failed operation."""
-        from .constants import CircuitBreakerConstants
-
         self.failure_count += 1
         self.last_failure_time = time.time()
 
         if self.failure_count >= self.failure_threshold:
-            self.state = CircuitBreakerConstants.STATE_OPEN
+            self.state = CircuitBreakerState.OPEN.value
 
 
 class ErrorRecoveryManager:

@@ -274,26 +274,20 @@ class TestRevealObjectiveStep:
         mock_game_state.speaker_id = "player1"
         mock_game_state.players = [Mock(id="player1")]
 
-        # Create mock objective manager
-        mock_objective_manager = Mock()
+        # Create mock objective
         mock_objective = Mock()
         mock_objective.id = "test_objective"
         mock_objective.name = "Test Objective"
-        mock_objective_manager.reveal_next_objective.return_value = mock_objective
 
         # Act: Execute step with objective system integration
         step = RevealObjectiveStep()
-        with patch(
-            "src.ti4.core.objective.PublicObjectiveManager",
-            return_value=mock_objective_manager,
+        with patch.object(
+            step, "get_next_unrevealed_objective", return_value=mock_objective
         ):
             with patch.object(
-                step, "get_next_unrevealed_objective", return_value=mock_objective
+                step, "reveal_objective", return_value=mock_game_state
             ):
-                with patch.object(
-                    step, "reveal_objective", return_value=mock_game_state
-                ):
-                    result, updated_state = step.execute(mock_game_state)
+                result, updated_state = step.execute(mock_game_state)
 
         # Assert: Should integrate with objective system
         assert result.success is True
@@ -400,11 +394,11 @@ class TestRevealObjectiveStepIntegration:
         assert result.success is True
         assert "Stage I Objective" in result.actions_taken[0]
 
-    def test_step_execution_with_objective_system(self) -> None:
-        """Test step execution with objective system integration.
+    def test_step_executes_successfully_with_objective_system(self) -> None:
+        """Test step executes successfully with objective system integration.
 
-        Verifies that the step executes efficiently even
-        when integrating with the objective system.
+        Verifies that the step completes successfully when
+        integrating with the objective system.
 
         Requirements: 10.1 - Integration with objective system
         """
@@ -462,3 +456,42 @@ class TestRevealObjectiveStepIntegration:
         # Assert: Should handle speaker identification robustly
         assert result.success is True
         assert len(result.actions_taken) > 0
+    def test_execute_assigns_speaker_when_none(self) -> None:
+        """Test execution assigns speaker when speaker_id is None."""
+        from src.ti4.core.status_phase import RevealObjectiveStep
+
+        # Arrange: game state with no speaker but with players
+        mock_game_state = Mock()
+        mock_game_state.speaker_id = None
+        mock_player = Mock(id="player1")
+        mock_game_state.players = [mock_player]
+        mock_game_state.set_speaker = Mock(return_value=mock_game_state)
+
+        mock_objective = Mock(id="obj1", name="Test Objective")
+
+        # Act
+        step = RevealObjectiveStep()
+        with patch.object(step, "get_next_unrevealed_objective", return_value=mock_objective):
+            with patch.object(step, "reveal_objective", return_value=mock_game_state):
+                result, updated_state = step.execute(mock_game_state)
+
+        # Assert: Should assign first player as speaker
+        mock_game_state.set_speaker.assert_called_once_with("player1")
+        assert result.success is True
+
+    def test_execute_fails_when_no_players_and_no_speaker(self) -> None:
+        """Test execution fails when no players available for speaker assignment."""
+        from src.ti4.core.status_phase import RevealObjectiveStep
+
+        # Arrange: game state with no speaker and no players
+        mock_game_state = Mock()
+        mock_game_state.speaker_id = None
+        mock_game_state.players = []
+
+        # Act
+        step = RevealObjectiveStep()
+        result, updated_state = step.execute(mock_game_state)
+
+        # Assert: Should fail with appropriate error
+        assert result.success is False
+        assert "No players available" in result.error_message
