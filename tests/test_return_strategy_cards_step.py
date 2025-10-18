@@ -10,6 +10,8 @@ LRR References:
 - Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 10.4, 12.3
 """
 
+import pytest
+
 from src.ti4.core.constants import Faction
 from src.ti4.core.game_state import GameState
 from src.ti4.core.player import Player
@@ -97,18 +99,12 @@ class TestReturnStrategyCardsStep:
         game_state = game_state.add_player(player)
 
         # Test empty player_id validation
-        try:
+        with pytest.raises(ValueError, match="player_id cannot be empty"):
             step.return_player_strategy_card("", game_state)
-            assert False, "Should have raised ValueError for empty player_id"
-        except ValueError as e:
-            assert "player_id cannot be empty" in str(e)
 
         # Test None game_state validation
-        try:
+        with pytest.raises(ValueError, match="game_state cannot be None"):
             step.return_player_strategy_card("player1", None)
-            assert False, "Should have raised ValueError for None game_state"
-        except ValueError as e:
-            assert "game_state cannot be None" in str(e)
 
     def test_return_strategy_cards_step_execute_with_multiple_players(self) -> None:
         """Test ReturnStrategyCardsStep execution with multiple players."""

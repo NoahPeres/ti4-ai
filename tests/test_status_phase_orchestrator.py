@@ -355,9 +355,9 @@ class TestStatusPhaseOrchestrator:
         orchestrator = StatusPhaseOrchestrator()
 
         # Act: Measure execution time for individual step
-        start_time = time.time()
+        start_time = time.perf_counter()
         result, updated_state = orchestrator.execute_step(1, mock_game_state)
-        execution_time = time.time() - start_time
+        execution_time = time.perf_counter() - start_time
 
         # Assert: Should complete within performance requirements (<100ms)
         assert execution_time < 0.1

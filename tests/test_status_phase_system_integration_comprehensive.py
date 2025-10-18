@@ -22,6 +22,7 @@ from unittest.mock import patch
 
 import pytest
 
+from src.ti4.core.constants import Faction
 from src.ti4.core.game_phase import GamePhase
 from src.ti4.core.game_state import GameState
 from src.ti4.core.player import Player
@@ -48,10 +49,10 @@ class TestStatusPhaseSystemIntegrationComprehensive:
     def _create_comprehensive_test_game_state(self) -> GameState:
         """Create a comprehensive test game state with all game systems represented."""
         players = [
-            Player(id="player1", faction="sol"),
-            Player(id="player2", faction="letnev"),
-            Player(id="player3", faction="hacan"),
-            Player(id="player4", faction="sardakk"),
+            Player(id="player1", faction=Faction.SOL),
+            Player(id="player2", faction=Faction.BARONY),
+            Player(id="player3", faction=Faction.HACAN),
+            Player(id="player4", faction=Faction.SAAR),
         ]
 
         # Create game state with all systems initialized
@@ -347,8 +348,8 @@ class TestCompleteRoundProgressionScenarios:
         """
         # Arrange: Game state transitioning from action phase to status phase
         players = [
-            Player(id="player1", faction="sol"),
-            Player(id="player2", faction="letnev"),
+            Player(id="player1", faction=Faction.SOL),
+            Player(id="player2", faction=Faction.BARONY),
         ]
 
         # Start in action phase (simulating end of action phase)
@@ -463,7 +464,7 @@ class TestCompleteRoundProgressionScenarios:
         Requirements: 9.2 - Validate agenda phase transition when custodians token removed
         """
         # Arrange: Game state before custodians token removal
-        players = [Player(id="player1", faction="sol")]
+        players = [Player(id="player1", faction=Faction.SOL)]
 
         # Initial state: No agenda phase active
         initial_state = GameState(
@@ -548,7 +549,7 @@ class TestPhaseTransitionValidation:
 
         for scenario in scenarios:
             # Arrange: Create game state for scenario
-            players = [Player(id="test_player", faction="sol")]
+            players = [Player(id="test_player", faction=Faction.SOL)]
             game_state = GameState(
                 players=players,
                 phase=GamePhase.STATUS,
@@ -578,8 +579,8 @@ class TestPhaseTransitionValidation:
         """
         # Arrange: Game state with specific properties
         players = [
-            Player(id="player1", faction="sol"),
-            Player(id="player2", faction="letnev"),
+            Player(id="player1", faction=Faction.SOL),
+            Player(id="player2", faction=Faction.BARONY),
         ]
 
         initial_state = GameState(

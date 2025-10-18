@@ -17,6 +17,14 @@ from src.ti4.core.player import Player
 from src.ti4.core.status_phase import ReadyCardsStep, StepResult
 
 
+def _find_player_by_id(game_state: GameState, player_id: str) -> Player:
+    """Helper function to find a player by ID in game state."""
+    for player in game_state.players:
+        if player.id == player_id:
+            return player
+    assert False, f"Player {player_id} not found in game state"
+
+
 class TestReadyCardsStep:
     """Test ReadyCardsStep status phase handler."""
 
@@ -84,13 +92,6 @@ class TestReadyCardsStep:
 class TestReadyCardsStepIntegration:
     """Test ReadyCardsStep integration with existing ready_all_cards functionality."""
 
-    def _find_player_by_id(self, game_state: GameState, player_id: str) -> Player:
-        """Helper method to find a player by ID in game state."""
-        for player in game_state.players:
-            if player.id == player_id:
-                return player
-        assert False, f"Player {player_id} not found in game state"
-
     def test_ready_cards_step_integrates_with_existing_agent_readying(self) -> None:
         """Test ReadyCardsStep integrates with existing agent readying functionality."""
         # RED: This will fail until we implement ReadyCardsStep integration
@@ -116,7 +117,7 @@ class TestReadyCardsStepIntegration:
         assert result.step_name == "Ready Cards"
 
         # Verify agent was readied through existing functionality
-        updated_player = self._find_player_by_id(new_state, "player1")
+        updated_player = _find_player_by_id(new_state, "player1")
         updated_agent = updated_player.leader_sheet.agent
         assert updated_agent is not None
         assert updated_agent.ready_status == LeaderReadyStatus.READIED
@@ -145,8 +146,8 @@ class TestReadyCardsStepIntegration:
         step_result, new_result = step.execute(game_state)
 
         # Both should ready the agent
-        old_player = self._find_player_by_id(old_result, "player1")
-        new_player = self._find_player_by_id(new_result, "player1")
+        old_player = _find_player_by_id(old_result, "player1")
+        new_player = _find_player_by_id(new_result, "player1")
 
         assert old_player.leader_sheet.agent.ready_status == LeaderReadyStatus.READIED
         assert new_player.leader_sheet.agent.ready_status == LeaderReadyStatus.READIED
@@ -185,8 +186,8 @@ class TestReadyCardsStepIntegration:
         assert any("agent" in action.lower() for action in result.actions_taken)
 
         # Verify all agents are actually readied
-        updated_player1 = self._find_player_by_id(new_state, "player1")
-        updated_player2 = self._find_player_by_id(new_state, "player2")
+        updated_player1 = _find_player_by_id(new_state, "player1")
+        updated_player2 = _find_player_by_id(new_state, "player2")
 
         assert (
             updated_player1.leader_sheet.agent.ready_status == LeaderReadyStatus.READIED
@@ -268,13 +269,6 @@ class TestReadyCardsStepErrorHandling:
 
 class TestReadyCardsStepComprehensiveValidation:
     """Test comprehensive card readying validation as required by 6.5."""
-
-    def _find_player_by_id(self, game_state: GameState, player_id: str) -> Player:
-        """Helper method to find a player by ID in game state."""
-        for player in game_state.players:
-            if player.id == player_id:
-                return player
-        assert False, f"Player {player_id} not found in game state"
 
     def test_ready_cards_step_validates_strategy_cards_readied(self) -> None:
         """Test ReadyCardsStep validates that strategy cards are readied (Requirement 6.1)."""
@@ -409,9 +403,9 @@ class TestReadyCardsStepComprehensiveValidation:
                 player.leader_sheet.agent.exhaust()
 
         # Measure execution time
-        start_time = time.time()
+        start_time = time.perf_counter()
         result, new_state = step.execute(game_state)
-        execution_time = time.time() - start_time
+        execution_time = time.perf_counter() - start_time
 
         # Verify step succeeded
         assert result.success is True
@@ -424,13 +418,6 @@ class TestReadyCardsStepComprehensiveValidation:
 
 class TestReadyCardsStepBackwardCompatibility:
     """Test backward compatibility with existing systems (Requirement 6.5, 12.5)."""
-
-    def _find_player_by_id(self, game_state: GameState, player_id: str) -> Player:
-        """Helper method to find a player by ID in game state."""
-        for player in game_state.players:
-            if player.id == player_id:
-                return player
-        assert False, f"Player {player_id} not found in game state"
 
     def test_ready_cards_step_maintains_existing_api_compatibility(self) -> None:
         """Test ReadyCardsStep maintains compatibility with existing StatusPhaseManager API."""
@@ -455,8 +442,8 @@ class TestReadyCardsStepBackwardCompatibility:
         step_result, new_result = step.execute(game_state)
 
         # Both should produce equivalent results
-        old_player = self._find_player_by_id(old_result, "player1")
-        new_player = self._find_player_by_id(new_result, "player1")
+        old_player = _find_player_by_id(old_result, "player1")
+        new_player = _find_player_by_id(new_result, "player1")
 
         assert (
             old_player.leader_sheet.agent.ready_status
@@ -495,8 +482,8 @@ class TestReadyCardsStepBackwardCompatibility:
         # Verify all players have same agent status in both results
         for i in range(3):
             player_id = f"player{i + 1}"
-            old_player = self._find_player_by_id(old_result, player_id)
-            new_player = self._find_player_by_id(new_result, player_id)
+            old_player = _find_player_by_id(old_result, player_id)
+            new_player = _find_player_by_id(new_result, player_id)
 
             if old_player.leader_sheet.agent and new_player.leader_sheet.agent:
                 assert (
@@ -530,7 +517,7 @@ class TestReadyCardsStepBackwardCompatibility:
         assert step_result.step_name == "Ready Cards"
 
         # Verify agent was readied
-        updated_player = self._find_player_by_id(new_state, "player1")
+        updated_player = _find_player_by_id(new_state, "player1")
         assert (
             updated_player.leader_sheet.agent.ready_status == LeaderReadyStatus.READIED
         )

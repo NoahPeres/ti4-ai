@@ -37,7 +37,7 @@ class TestScoreObjectivesStep:
 
         Requirements: 2.1 - Step 1 implementation
         """
-        # RED: This will fail until we implement ScoreObjectivesStep
+
         from src.ti4.core.status_phase import (
             ScoreObjectivesStep,
             StatusPhaseStepHandler,
@@ -581,9 +581,9 @@ class TestScoreObjectivesStepIntegration:
             step = ScoreObjectivesStep()
             with patch.object(step, "get_scorable_objectives", return_value=([], [])):
                 # Act: Measure execution time
-                start_time = time.time()
+                start_time = time.perf_counter()
                 result, updated_state = step.execute(mock_game_state)
-                execution_time = time.time() - start_time
+                execution_time = time.perf_counter() - start_time
 
         # Assert: Should complete within performance requirements (<100ms)
         assert execution_time < 0.1

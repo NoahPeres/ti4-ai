@@ -33,7 +33,7 @@ class TestRevealObjectiveStep:
 
         Requirements: 3.1 - Step 2 implementation
         """
-        # RED: This will fail until we implement RevealObjectiveStep
+
         from src.ti4.core.status_phase import RevealObjectiveStep
 
         step = RevealObjectiveStep()
@@ -428,9 +428,9 @@ class TestRevealObjectiveStepIntegration:
             step, "get_next_unrevealed_objective", return_value=mock_objective
         ):
             with patch.object(step, "reveal_objective", return_value=mock_game_state):
-                start_time = time.time()
+                start_time = time.perf_counter()
                 result, updated_state = step.execute(mock_game_state)
-                execution_time = time.time() - start_time
+                execution_time = time.perf_counter() - start_time
 
         # Assert: Should complete within performance requirements (<100ms)
         assert execution_time < 0.1
