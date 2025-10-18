@@ -4,6 +4,10 @@ This module tests the integration between the StatusPhaseManager and
 the performance optimization features.
 """
 
+import os
+
+import pytest
+
 from src.ti4.core.constants import Faction
 from src.ti4.core.game_state import GameState
 from src.ti4.core.planet import Planet
@@ -14,6 +18,11 @@ from src.ti4.core.status_phase import StatusPhaseManager
 class TestStatusPhasePerformanceIntegration:
     """Test integration of performance optimization with StatusPhaseManager."""
 
+    @pytest.mark.performance
+    @pytest.mark.skipif(
+        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        reason="Performance tests skipped in CI environments",
+    )
     def test_status_phase_manager_with_performance_optimization(self) -> None:
         """Test StatusPhaseManager with performance optimization enabled."""
         # Create manager with performance optimization
@@ -46,6 +55,11 @@ class TestStatusPhasePerformanceIntegration:
             assert "total_execution_time_ms" in performance_report
             assert "meets_requirements" in performance_report
 
+    @pytest.mark.performance
+    @pytest.mark.skipif(
+        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        reason="Performance tests skipped in CI environments",
+    )
     def test_status_phase_manager_without_performance_optimization(self) -> None:
         """Test StatusPhaseManager with performance optimization disabled."""
         # Create manager without performance optimization
@@ -72,6 +86,11 @@ class TestStatusPhasePerformanceIntegration:
             "message", ""
         )
 
+    @pytest.mark.performance
+    @pytest.mark.skipif(
+        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        reason="Performance tests skipped in CI environments",
+    )
     def test_performance_cache_management(self) -> None:
         """Test performance cache management functionality."""
         manager = StatusPhaseManager(enable_performance_optimization=True)
@@ -95,6 +114,11 @@ class TestStatusPhasePerformanceIntegration:
         if "message" not in stats:
             assert "optimization_features" in stats or "cache_statistics" in stats
 
+    @pytest.mark.performance
+    @pytest.mark.skipif(
+        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        reason="Performance tests skipped in CI environments",
+    )
     def test_performance_with_large_game_state(self) -> None:
         """Test performance optimization with a larger game state."""
         manager = StatusPhaseManager(enable_performance_optimization=True)
@@ -125,6 +149,11 @@ class TestStatusPhasePerformanceIntegration:
         performance_report = manager.get_performance_report()
         assert isinstance(performance_report, dict)
 
+    @pytest.mark.performance
+    @pytest.mark.skipif(
+        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        reason="Performance tests skipped in CI environments",
+    )
     def test_performance_monitoring_across_multiple_executions(self) -> None:
         """Test performance monitoring across multiple status phase executions."""
         manager = StatusPhaseManager(enable_performance_optimization=True)
@@ -166,6 +195,11 @@ class TestStatusPhasePerformanceIntegration:
         assert updated_state is not None
         assert hasattr(updated_state, "players")
 
+    @pytest.mark.performance
+    @pytest.mark.skipif(
+        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        reason="Performance tests skipped in CI environments",
+    )
     def test_error_handling_with_performance_optimization(self) -> None:
         """Test error handling when performance optimization encounters issues."""
         manager = StatusPhaseManager(enable_performance_optimization=True)

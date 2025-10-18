@@ -40,6 +40,10 @@ addopts = [
     "--cov-report=html",
     "--cov-report=xml",
 ]
+markers = [
+    "performance: marks tests as performance benchmarks (may be slow)",
+    "slow: marks tests as slow running",
+]
 
 
 

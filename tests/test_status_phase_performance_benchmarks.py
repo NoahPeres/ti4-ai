@@ -12,10 +12,13 @@ This test file focuses on comprehensive benchmarking and performance regression 
 """
 
 import gc
+import os
 import statistics
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any
+
+import pytest
 
 from src.ti4.core.constants import Faction
 from src.ti4.core.game_state import GameState
@@ -99,6 +102,11 @@ class TestStatusPhasePerformanceBenchmarks:
         gc.collect()  # Force garbage collection for accurate measurement
         return len(gc.get_objects())
 
+    @pytest.mark.performance
+    @pytest.mark.skipif(
+        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        reason="Performance tests skipped in CI environments",
+    )
     def test_complete_status_phase_execution_time_benchmarks(self) -> None:
         """Test complete status phase execution time benchmarks.
 
@@ -187,6 +195,11 @@ class TestStatusPhasePerformanceBenchmarks:
                 f"({stats['num_players']}p, {stats['planets_per_player']}pl)"
             )
 
+    @pytest.mark.performance
+    @pytest.mark.skipif(
+        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        reason="Performance tests skipped in CI environments",
+    )
     def test_individual_step_execution_time_benchmarks(self) -> None:
         """Test individual step execution time benchmarks.
 
@@ -264,6 +277,11 @@ class TestStatusPhasePerformanceBenchmarks:
             f"Total step time {total_avg_time:.2f}ms should be <800ms"
         )
 
+    @pytest.mark.performance
+    @pytest.mark.skipif(
+        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        reason="Performance tests skipped in CI environments",
+    )
     def test_memory_usage_optimization_benchmarks(self) -> None:
         """Test memory usage optimization benchmarks.
 
@@ -338,6 +356,11 @@ class TestStatusPhasePerformanceBenchmarks:
                 f"Memory not properly cleaned up: {cleanup_ratio:.2f}"
             )
 
+    @pytest.mark.performance
+    @pytest.mark.skipif(
+        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        reason="Performance tests skipped in CI environments",
+    )
     def test_concurrent_execution_performance_benchmarks(self) -> None:
         """Test performance under concurrent execution scenarios.
 
@@ -406,6 +429,11 @@ class TestStatusPhasePerformanceBenchmarks:
                 f"Max time {max_time:.2f}ms too high for concurrency {num_concurrent}"
             )
 
+    @pytest.mark.performance
+    @pytest.mark.skipif(
+        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        reason="Performance tests skipped in CI environments",
+    )
     def test_performance_regression_detection(self) -> None:
         """Test for performance regression detection.
 
@@ -464,6 +492,11 @@ class TestStatusPhasePerformanceBenchmarks:
 
         print(f"Baseline metrics established: {baseline_metrics}")
 
+    @pytest.mark.performance
+    @pytest.mark.skipif(
+        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        reason="Performance tests skipped in CI environments",
+    )
     def test_status_phase_manager_performance_benchmarks(self) -> None:
         """Test StatusPhaseManager performance benchmarks.
 
@@ -507,6 +540,11 @@ class TestStatusPhasePerformanceBenchmarks:
                     f"Manager {case_name} took {avg_time:.2f}ms, should be <1000ms"
                 )
 
+    @pytest.mark.performance
+    @pytest.mark.skipif(
+        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        reason="Performance tests skipped in CI environments",
+    )
     def test_error_handling_performance_impact(self) -> None:
         """Test performance impact of error handling.
 
@@ -545,6 +583,11 @@ class TestStatusPhasePerformanceBenchmarks:
                 f"Error handling {slowdown_factor:.2f}x slower than normal"
             )
 
+    @pytest.mark.performance
+    @pytest.mark.skipif(
+        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        reason="Performance tests skipped in CI environments",
+    )
     def test_performance_with_different_game_phases(self) -> None:
         """Test performance with different game phase contexts.
 

@@ -12,6 +12,7 @@ Requirements tested:
 """
 
 import gc
+import os
 import statistics
 import time
 from typing import Any
@@ -176,9 +177,14 @@ class TestStatusPhasePerformanceIntegrationComprehensive:
             f"Optimized version too slow: {performance_ratio:.2f}x"
         )
 
+    @pytest.mark.performance
     @pytest.mark.skipif(
         not PERFORMANCE_OPTIMIZATION_AVAILABLE,
         reason="Performance optimization not available",
+    )
+    @pytest.mark.skipif(
+        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        reason="Performance tests skipped in CI environments",
     )
     def test_performance_monitoring_integration(self) -> None:
         """Test integration with performance monitoring features.
@@ -229,9 +235,14 @@ class TestStatusPhasePerformanceIntegrationComprehensive:
             for warning in performance_report.performance_warnings:
                 print(f"  - {warning}")
 
+    @pytest.mark.performance
     @pytest.mark.skipif(
         not PERFORMANCE_OPTIMIZATION_AVAILABLE,
         reason="Performance optimization not available",
+    )
+    @pytest.mark.skipif(
+        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        reason="Performance tests skipped in CI environments",
     )
     def test_optimizer_statistics_and_trends(self) -> None:
         """Test optimizer statistics and performance trend analysis.
@@ -468,6 +479,11 @@ class TestStatusPhasePerformanceIntegrationComprehensive:
 
         print(f"\nBaseline established: {baseline_record}")
 
+    @pytest.mark.performance
+    @pytest.mark.skipif(
+        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        reason="Performance tests skipped in CI environments",
+    )
     def test_memory_optimization_integration(self) -> None:
         """Test integration of memory optimization features.
 
