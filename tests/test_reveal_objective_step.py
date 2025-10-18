@@ -284,9 +284,7 @@ class TestRevealObjectiveStep:
         with patch.object(
             step, "get_next_unrevealed_objective", return_value=mock_objective
         ):
-            with patch.object(
-                step, "reveal_objective", return_value=mock_game_state
-            ):
+            with patch.object(step, "reveal_objective", return_value=mock_game_state):
                 result, updated_state = step.execute(mock_game_state)
 
         # Assert: Should integrate with objective system
@@ -456,6 +454,7 @@ class TestRevealObjectiveStepIntegration:
         # Assert: Should handle speaker identification robustly
         assert result.success is True
         assert len(result.actions_taken) > 0
+
     def test_execute_assigns_speaker_when_none(self) -> None:
         """Test execution assigns speaker when speaker_id is None."""
         from src.ti4.core.status_phase import RevealObjectiveStep
@@ -471,7 +470,9 @@ class TestRevealObjectiveStepIntegration:
 
         # Act
         step = RevealObjectiveStep()
-        with patch.object(step, "get_next_unrevealed_objective", return_value=mock_objective):
+        with patch.object(
+            step, "get_next_unrevealed_objective", return_value=mock_objective
+        ):
             with patch.object(step, "reveal_objective", return_value=mock_game_state):
                 result, updated_state = step.execute(mock_game_state)
 

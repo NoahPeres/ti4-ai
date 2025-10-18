@@ -15,6 +15,44 @@ FIGHTER_TYPE_UNITS = {UnitType.FIGHTER, UnitType.FIGHTER_II}
 # FIGHTER_TYPE_UNITS.update({UnitType.FACTION_FIGHTER_VARIANT, ...})
 
 
+def _normalize_technologies(
+    technologies: set[Technology | str] | set[Technology] | None, *, strict: bool = True
+) -> set[Technology]:
+    """Normalize technologies to Technology enums.
+
+    Args:
+        technologies: Mixed set of Technology enums and/or strings
+        strict: If True, raise TypeError for invalid types; if False, log warning and skip
+
+    Returns:
+        Set of Technology enums
+    """
+    if not technologies:
+        return set()
+
+    normalized: set[Technology] = set()
+    for t in technologies:
+        if isinstance(t, Technology):
+            normalized.add(t)
+        elif isinstance(t, str):
+            try:
+                normalized.add(Technology(t))
+            except ValueError:
+                if strict:
+                    # Skip unknown tech strings for robustness; alternatively, raise
+                    continue
+                else:
+                    logger.warning(f"Skipping unknown technology: {t}")
+                    continue
+        else:
+            msg = f"Invalid technology type: {type(t).__name__}"
+            if strict:
+                raise TypeError(msg)
+            else:
+                logger.warning(f"Skipping {msg}: {t}")
+    return normalized
+
+
 class Unit:
     """Represents a game unit with type and owner."""
 
@@ -52,22 +90,7 @@ class Unit:
             self.faction = faction
 
         # Normalize technologies to Technology enums
-        if technologies:
-            normalized: set[Technology] = set()
-            for t in technologies:
-                if isinstance(t, Technology):
-                    normalized.add(t)
-                elif isinstance(t, str):
-                    try:
-                        normalized.add(Technology(t))
-                    except ValueError:
-                        # Skip unknown tech strings for robustness; alternatively, raise
-                        continue
-                else:
-                    raise TypeError(f"Invalid technology type: {type(t).__name__}")
-            self.technologies = normalized
-        else:
-            self.technologies = set()
+        self.technologies = _normalize_technologies(technologies, strict=True)
 
         self._stats_provider = stats_provider or UnitStatsProvider()
         self._cached_stats = None
@@ -254,18 +277,9 @@ class Unit:
         unit_type = UnitType(unit_data["unit_type"])
         faction = Faction(unit_data["faction"]) if unit_data.get("faction") else None
         raw_techs = unit_data.get("technologies", [])
-        tech_enums: set[Technology] = set()
-        for tech in raw_techs:
-            try:
-                if isinstance(tech, Technology):
-                    tech_enums.add(tech)
-                elif isinstance(tech, str):
-                    tech_enums.add(Technology(tech))
-                else:
-                    logger.warning(f"Skipping invalid technology type {type(tech).__name__}: {tech}")
-            except ValueError as e:
-                logger.warning(f"Skipping unknown technology: {tech}, error: {e}")
-                continue
+        tech_enums = _normalize_technologies(
+            set(raw_techs) if raw_techs else None, strict=False
+        )
 
         return cls(
             unit_type=unit_type,

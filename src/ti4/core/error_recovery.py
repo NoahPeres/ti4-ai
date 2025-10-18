@@ -5,7 +5,7 @@ import time
 from collections.abc import Callable
 from typing import Any
 
-from .constants import CircuitBreakerState
+from .constants import CircuitBreakerState, PerformanceConstants
 from .exceptions import TI4GameError
 
 
@@ -42,8 +42,6 @@ class CircuitBreaker:
         failure_threshold: int | None = None,
         recovery_timeout: float | None = None,
     ) -> None:
-        from .constants import PerformanceConstants
-
         if failure_threshold is None:
             failure_threshold = PerformanceConstants.DEFAULT_FAILURE_THRESHOLD
         if recovery_timeout is None:
@@ -53,15 +51,15 @@ class CircuitBreaker:
         self.recovery_timeout = recovery_timeout
         self.failure_count = 0
         self.last_failure_time = 0.0
-        self.state = CircuitBreakerState.CLOSED.value
+        self.state: CircuitBreakerState = CircuitBreakerState.CLOSED
 
     def can_execute(self) -> bool:
         """Check if operation can be executed."""
-        if self.state == CircuitBreakerState.CLOSED.value:
+        if self.state == CircuitBreakerState.CLOSED:
             return True
-        elif self.state == CircuitBreakerState.OPEN.value:
+        elif self.state == CircuitBreakerState.OPEN:
             if time.time() - self.last_failure_time > self.recovery_timeout:
-                self.state = CircuitBreakerState.HALF_OPEN.value
+                self.state = CircuitBreakerState.HALF_OPEN
                 return True
             return False
         else:  # half-open
@@ -70,7 +68,7 @@ class CircuitBreaker:
     def record_success(self) -> None:
         """Record successful operation."""
         self.failure_count = 0
-        self.state = CircuitBreakerState.CLOSED.value
+        self.state = CircuitBreakerState.CLOSED
 
     def record_failure(self) -> None:
         """Record failed operation."""
@@ -78,7 +76,7 @@ class CircuitBreaker:
         self.last_failure_time = time.time()
 
         if self.failure_count >= self.failure_threshold:
-            self.state = CircuitBreakerState.OPEN.value
+            self.state = CircuitBreakerState.OPEN
 
 
 class ErrorRecoveryManager:
@@ -120,8 +118,6 @@ class ErrorRecoveryManager:
         retry_delay: float | None = None,
     ) -> Any:
         """Execute operation with automatic retry for transient errors."""
-        from .constants import PerformanceConstants
-
         if max_retries is None:
             max_retries = PerformanceConstants.DEFAULT_MAX_RETRIES
         if retry_delay is None:
@@ -162,14 +158,15 @@ class ErrorRecoveryManager:
         operation: Callable[[], Any],
         operation_id: str,
         failure_threshold: int | None = None,
+        recovery_timeout: float | None = None,
     ) -> Any:
         """Execute operation with circuit breaker pattern."""
-        from .constants import PerformanceConstants
-
         if failure_threshold is None:
             failure_threshold = PerformanceConstants.DEFAULT_FAILURE_THRESHOLD
         if operation_id not in self.circuit_breakers:
-            self.circuit_breakers[operation_id] = CircuitBreaker(failure_threshold)
+            self.circuit_breakers[operation_id] = CircuitBreaker(
+                failure_threshold, recovery_timeout
+            )
 
         circuit_breaker = self.circuit_breakers[operation_id]
 
@@ -216,6 +213,8 @@ class ErrorRecoveryManager:
     ) -> None:
         """Log recovery attempt details."""
         self._log_error_recovery_attempt(error, recovery_type)
+        if context:
+            self.logger.debug(f"Recovery context: {context}")
 
     def _log_error_recovery_attempt(
         self, error: Exception, recovery_mechanism_type: str

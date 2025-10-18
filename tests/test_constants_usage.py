@@ -4,6 +4,7 @@ import pytest
 
 from ti4.core.constants import (
     CircuitBreakerConstants,
+    CircuitBreakerState,
     EventConstants,
     GameStateConstants,
     PerformanceConstants,
@@ -72,7 +73,7 @@ class TestPerformanceConstants:
             breaker.failure_threshold == PerformanceConstants.DEFAULT_FAILURE_THRESHOLD
         )
         assert breaker.recovery_timeout == PerformanceConstants.CIRCUIT_BREAKER_TIMEOUT
-        assert breaker.state == CircuitBreakerConstants.STATE_CLOSED
+        assert breaker.state == CircuitBreakerState.CLOSED
 
     def test_error_recovery_manager_uses_default_constants(self) -> None:
         """Test that ErrorRecoveryManager uses default constants."""
