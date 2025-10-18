@@ -56,11 +56,13 @@ class CircuitBreaker:
 
     def can_execute(self) -> bool:
         """Check if operation can be executed."""
-        if self.state == "closed":
+        from .constants import CircuitBreakerConstants
+
+        if self.state == CircuitBreakerConstants.STATE_CLOSED:
             return True
-        elif self.state == "open":
+        elif self.state == CircuitBreakerConstants.STATE_OPEN:
             if time.time() - self.last_failure_time > self.recovery_timeout:
-                self.state = "half-open"
+                self.state = CircuitBreakerConstants.STATE_HALF_OPEN
                 return True
             return False
         else:  # half-open
@@ -75,11 +77,13 @@ class CircuitBreaker:
 
     def record_failure(self) -> None:
         """Record failed operation."""
+        from .constants import CircuitBreakerConstants
+
         self.failure_count += 1
         self.last_failure_time = time.time()
 
         if self.failure_count >= self.failure_threshold:
-            self.state = "open"
+            self.state = CircuitBreakerConstants.STATE_OPEN
 
 
 class ErrorRecoveryManager:
@@ -120,13 +124,13 @@ class ErrorRecoveryManager:
         max_retries: int | None = None,
         retry_delay: float | None = None,
     ) -> Any:
+        """Execute operation with automatic retry for transient errors."""
         from .constants import PerformanceConstants
 
         if max_retries is None:
             max_retries = PerformanceConstants.DEFAULT_MAX_RETRIES
         if retry_delay is None:
             retry_delay = PerformanceConstants.DEFAULT_RETRY_DELAY
-        """Execute operation with automatic retry for transient errors."""
         last_exception = None
 
         for attempt in range(max_retries + 1):
@@ -164,11 +168,11 @@ class ErrorRecoveryManager:
         operation_id: str,
         failure_threshold: int | None = None,
     ) -> Any:
+        """Execute operation with circuit breaker pattern."""
         from .constants import PerformanceConstants
 
         if failure_threshold is None:
             failure_threshold = PerformanceConstants.DEFAULT_FAILURE_THRESHOLD
-        """Execute operation with circuit breaker pattern."""
         if operation_id not in self.circuit_breakers:
             self.circuit_breakers[operation_id] = CircuitBreaker(failure_threshold)
 

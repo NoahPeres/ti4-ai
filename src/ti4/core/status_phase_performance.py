@@ -20,7 +20,12 @@ from typing import (
     TypeVar,
 )
 
-from .status_phase import StatusPhaseOrchestrator, StatusPhaseResult, StepResult
+from .status_phase import (
+    RoundTransitionManager,
+    StatusPhaseOrchestrator,
+    StatusPhaseResult,
+    StepResult,
+)
 
 if TYPE_CHECKING:
     from .game_state import GameState
@@ -168,10 +173,10 @@ class StatusPhasePerformanceOptimizer:
                 metrics.memory_after = self._get_memory_usage()
 
     def _get_memory_usage(self) -> int:
-        """Get current memory usage (simplified approach).
+        """Get current memory load proxy (simplified).
 
         Returns:
-            Approximate memory usage in bytes
+            Approximate object count (proxy for memory usage)
         """
         # Use object count as a proxy for memory usage
         # In production, you might use psutil or similar for actual memory measurement
@@ -241,8 +246,14 @@ class StatusPhasePerformanceOptimizer:
 
         performance_degradation = False
         if len(recent_reports) >= 2:
-            recent_avg = sum(r.total_execution_time_ms for r in recent_reports[-3:]) / 3
-            older_avg = sum(r.total_execution_time_ms for r in recent_reports[:3]) / 3
+            recent_slice = recent_reports[-3:]
+            older_slice = recent_reports[:3]
+            recent_avg = sum(r.total_execution_time_ms for r in recent_slice) / max(
+                1, len(recent_slice)
+            )
+            older_avg = sum(r.total_execution_time_ms for r in older_slice) / max(
+                1, len(older_slice)
+            )
             performance_degradation = recent_avg > older_avg * 1.2  # 20% slower
 
         return {
@@ -389,16 +400,29 @@ class OptimizedStatusPhaseOrchestrator(StatusPhaseOrchestrator):
             # Add step metrics to report
             report.add_step_metrics(step_num, step_metrics)
 
-        # Create final result
+        # Determine next phase and apply transition (mirror base orchestrator)
+        transition_manager = RoundTransitionManager()
+        if overall_success:
+            next_phase = transition_manager.determine_next_phase(current_state)
+            if next_phase == "agenda":
+                final_state = transition_manager.transition_to_agenda_phase(
+                    current_state
+                )
+            else:
+                final_state = transition_manager.transition_to_new_round(current_state)
+        else:
+            next_phase = "strategy"
+            final_state = current_state
+
         result = StatusPhaseResult(
             success=overall_success,
             steps_completed=steps_completed,
             step_results=step_results,
             total_execution_time=0.0,  # Will be set by caller
-            next_phase="agenda" if overall_success else "strategy",
+            next_phase=next_phase,
         )
 
-        return result, current_state
+        return result, final_state
 
     def get_performance_report(self) -> StatusPhasePerformanceReport | None:
         """Get the most recent performance report.

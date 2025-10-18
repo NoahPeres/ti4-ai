@@ -600,8 +600,8 @@ class TestSystemIntegrationErrorScenarios:
         mock_game_state = Mock()
         mock_game_state.players = [Mock(id="player1")]
 
-        # The step tries to iterate over players, so mock players should be iterable
-        mock_game_state.players = "not_iterable"  # This will cause iteration error
+        # Force a TypeError: 'int' object is not iterable
+        mock_game_state.players = 42  # This will pass the None check but fail iteration
 
         result, updated_state = step.execute(mock_game_state)
 

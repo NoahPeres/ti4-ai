@@ -4,7 +4,9 @@ This module provides an adapter that connects strategy cards to the
 existing game systems using proper interfaces.
 """
 
-from typing import TYPE_CHECKING, Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from ..action_cards import ActionCardManager
 from ..agenda_deck import AgendaDeck
@@ -24,7 +26,7 @@ class StrategyCardGameStateAdapter:
 
     def __init__(
         self,
-        game_state: Optional["GameState"] = None,
+        game_state: GameState | None = None,
         action_card_system: ActionCardManager | None = None,
         command_token_system: CommandTokenManager | None = None,
         agenda_deck: AgendaDeck | None = None,
@@ -193,7 +195,7 @@ class StrategyCardGameStateAdapter:
 
 
 def create_game_state_adapter_from_game_state(
-    game_state: "GameState",
+    game_state: GameState,
 ) -> StrategyCardGameStateAdapter:
     """Create a strategy card adapter from an existing game state.
 

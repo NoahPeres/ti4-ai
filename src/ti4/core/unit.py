@@ -48,9 +48,21 @@ class Unit:
         else:
             self.faction = faction
 
-        # Store technology enums directly
+        # Normalize technologies to Technology enums
         if technologies:
-            self.technologies = set(technologies)
+            normalized: set[Technology] = set()
+            for t in technologies:
+                if isinstance(t, Technology):
+                    normalized.add(t)
+                elif isinstance(t, str):
+                    try:
+                        normalized.add(Technology(t))
+                    except ValueError:
+                        # Skip unknown tech strings for robustness; alternatively, raise
+                        continue
+                else:
+                    raise TypeError(f"Invalid technology type: {type(t).__name__}")
+            self.technologies = normalized
         else:
             self.technologies = set()
 
@@ -238,16 +250,19 @@ class Unit:
         # Convert string values back to enums
         unit_type = UnitType(unit_data["unit_type"])
         faction = Faction(unit_data["faction"]) if unit_data.get("faction") else None
-        technologies = set(unit_data.get("technologies", []))
-
-        # Convert technology strings to enums if needed
-        tech_enums = set()
-        for tech in technologies:
+        raw_techs = unit_data.get("technologies", [])
+        tech_enums: set[Technology] = set()
+        for tech in raw_techs:
             try:
-                tech_enums.add(Technology(tech))
-            except ValueError:
-                # If it's not a valid enum, keep as string for backward compatibility
-                tech_enums.add(tech)
+                tech_enums.add(Technology(tech if isinstance(tech, str) else tech))
+            except Exception as e:
+                # Skip unknown/invalid entries to avoid corrupting stats resolution
+                import logging
+
+                logging.getLogger(__name__).debug(
+                    f"Skipping invalid technology: {tech}, error: {e}"
+                )
+                continue
 
         return cls(
             unit_type=unit_type,

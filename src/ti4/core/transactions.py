@@ -4,9 +4,11 @@ This module implements Rule 94: TRANSACTIONS mechanics according to the TI4 LRR.
 Handles player-to-player exchanges of commodities, trade goods, promissory notes, and relic fragments.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from .game_phase import GamePhase
 
@@ -90,7 +92,7 @@ class TransactionManager:
     - Agenda phase special rules (Rule 94.6)
     """
 
-    def __init__(self, galaxy: Optional["Galaxy"] = None) -> None:
+    def __init__(self, galaxy: Galaxy | None = None) -> None:
         """Initialize the transaction manager.
 
         Args:
@@ -109,7 +111,7 @@ class TransactionManager:
         # Track current game phase for special transaction rules
         self._current_phase: GamePhase = GamePhase.SETUP
 
-    def set_galaxy(self, galaxy: "Galaxy") -> None:
+    def set_galaxy(self, galaxy: Galaxy) -> None:
         """Set the galaxy instance for neighbor detection.
 
         Args:

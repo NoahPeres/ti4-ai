@@ -130,13 +130,13 @@ class GameStateCache:
     def find_shortest_path(
         self, start_system: str, end_system: str, max_distance: int | None = None
     ) -> list[str]:
+        """Find shortest path between two systems, using cache if available."""
         if max_distance is None:
             from ..core.constants import GameConstants
 
             max_distance = (
                 GameConstants.DEFAULT_MOVEMENT_RANGE * 10
             )  # Allow up to 10 moves
-        """Find shortest path between two systems, using cache if available."""
         from ..core.validation import validate_non_empty_string
 
         validate_non_empty_string(start_system, "start_system")

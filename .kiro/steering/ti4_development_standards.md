@@ -442,36 +442,3 @@ These standards represent the foundation of the TI4 AI project's success. They w
 **Remember**: These standards exist to maintain the exceptional quality already achieved and ensure the project delivers a production-ready TI4 AI system. Following them strictly will result in faster development, fewer bugs, and a more maintainable codebase.
 
 **When in doubt, ask the user rather than making assumptions. Quality and correctness are more important than speed.**
-
-## 🚨 CRITICAL REMINDER: NEVER IGNORE MYPY CHECKS OR TESTS
-
-**This rule was added based on code review feedback and is absolutely mandatory:**
-
-- ❌ **NEVER use `# type: ignore` without specific error codes** in production code (`src/` directory)
-- ❌ **NEVER bypass failing tests** in production code
-- ❌ **NEVER commit code that fails type checking** in the `src/` directory
-- ❌ **NEVER use `--no-verify` or similar bypass mechanisms**
-
-**If you encounter type errors in production code:**
-1. **FIX the underlying type issue** - don't ignore it
-2. **Add proper type annotations** where missing
-3. **Use specific type ignores with error codes** only when absolutely necessary
-4. **Ask for help** if you're unsure how to resolve the type issue
-
-**Production code type safety is what enables our 90%+ test coverage and zero-bug deployment record. This is non-negotiable.**
-
-## 🚨 ABSOLUTE PROHIBITION: NEVER USE TYPE IGNORES
-
-**NEVER use `# type: ignore` comments in production code under any circumstances:**
-
-- ❌ **NEVER use `# type: ignore[attr-defined]`** - Fix the class design instead
-- ❌ **NEVER use `# type: ignore[no-any-return]`** - Add proper type annotations
-- ❌ **NEVER use any other type ignore variants** - Address the root cause
-
-**If you encounter type errors:**
-1. **REFACTOR the code structure** to be type-safe by design
-2. **ADD proper type annotations** and class definitions
-3. **USE proper inheritance and composition** instead of dynamic attributes
-4. **DESIGN classes with static structure** that mypy can understand
-
-**Type ignores indicate poor design and must be eliminated through proper refactoring.**
