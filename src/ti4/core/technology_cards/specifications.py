@@ -6,7 +6,6 @@ technology cards, ensuring type safety and centralized data management.
 """
 
 from dataclasses import dataclass
-from typing import Optional
 
 from ti4.core.constants import (
     AbilityCondition,
@@ -58,9 +57,9 @@ class TechnologySpecification:
 
     technology: Technology
     name: str
-    color: Optional[TechnologyColor]
+    color: TechnologyColor | None
     prerequisites: tuple[TechnologyColor, ...]
-    faction_restriction: Optional[Faction]
+    faction_restriction: Faction | None
     expansion: Expansion
     abilities: tuple[AbilitySpecification, ...]
 
@@ -132,7 +131,7 @@ class TechnologySpecificationRegistry:
 
     def get_specification(
         self, technology: Technology
-    ) -> Optional[TechnologySpecification]:
+    ) -> TechnologySpecification | None:
         """
         Get a technology specification by Technology enum.
 

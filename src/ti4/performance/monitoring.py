@@ -4,7 +4,7 @@ import gc
 import time
 from collections import defaultdict
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any
 
 try:
     import psutil
@@ -162,7 +162,7 @@ class ResourceMonitor:
 class GameStateResourceManager:
     """Manages resources for game states."""
 
-    def __init__(self, max_states: Optional[int] = None) -> None:
+    def __init__(self, max_states: int | None = None) -> None:
         """Initialize the resource manager."""
         if max_states is None:
             from ..core.constants import PerformanceConstants
@@ -182,7 +182,7 @@ class GameStateResourceManager:
         if len(self._game_states) > self._max_states:
             self._evict_least_recently_used_states()
 
-    def access_game_state(self, game_id: str) -> Optional[Any]:
+    def access_game_state(self, game_id: str) -> Any | None:
         """Access a game state and update access time."""
         if game_id in self._game_states:
             self._access_times[game_id] = time.time()
@@ -249,7 +249,7 @@ class GameStateResourceManager:
 
 
 # Global resource manager instance
-_global_resource_manager: Optional[GameStateResourceManager] = None
+_global_resource_manager: GameStateResourceManager | None = None
 
 
 def get_resource_manager() -> GameStateResourceManager:

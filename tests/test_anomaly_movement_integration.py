@@ -75,7 +75,7 @@ class TestAnomalyMovementPathValidation:
         systems[2].add_anomaly_type(AnomalyType.GRAVITY_RIFT)  # Should allow with bonus
 
         # Register systems
-        for i, (coord, system) in enumerate(zip(coords, systems)):
+        for i, (coord, system) in enumerate(zip(coords, systems, strict=False)):
             galaxy.place_system(coord, f"system_{i}")
             galaxy.register_system(system)
 
@@ -248,7 +248,7 @@ class TestComprehensiveAnomalyPathValidation:
         systems[3].add_anomaly_type(AnomalyType.GRAVITY_RIFT)
 
         # Register systems
-        for i, (coord, system) in enumerate(zip(coords, systems)):
+        for i, (coord, system) in enumerate(zip(coords, systems, strict=False)):
             galaxy.place_system(coord, f"system_{i}")
             galaxy.register_system(system)
 
@@ -297,7 +297,7 @@ class TestComprehensiveAnomalyPathValidation:
         systems[2].add_anomaly_type(AnomalyType.SUPERNOVA)
 
         # Register systems
-        for i, (coord, system) in enumerate(zip(coords, systems)):
+        for i, (coord, system) in enumerate(zip(coords, systems, strict=False)):
             galaxy.place_system(coord, f"system_{i}")
             galaxy.register_system(system)
 

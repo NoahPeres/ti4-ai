@@ -11,8 +11,6 @@ CONFIRMED SPECIFICATIONS - DO NOT MODIFY WITHOUT USER APPROVAL:
 - Available to all factions
 """
 
-from typing import Optional
-
 from ti4.core.abilities import Ability, AbilityEffect, TimingWindow
 from ti4.core.constants import AbilityTrigger, Faction, Technology
 from ti4.core.technology import TechnologyColor
@@ -37,7 +35,7 @@ class DarkEnergyTap(PassiveTechnologyCard):
         super().__init__(Technology.DARK_ENERGY_TAP, "Dark Energy Tap")
 
     @property
-    def color(self) -> Optional[TechnologyColor]:
+    def color(self) -> TechnologyColor | None:
         """Technology color (Blue)."""
         return TechnologyColor.BLUE
 
@@ -51,7 +49,7 @@ class DarkEnergyTap(PassiveTechnologyCard):
         return list(spec.prerequisites) if spec else []
 
     @property
-    def faction_restriction(self) -> Optional[Faction]:
+    def faction_restriction(self) -> Faction | None:
         """Faction restriction (available to all)."""
         return None
 

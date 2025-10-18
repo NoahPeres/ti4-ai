@@ -1,7 +1,6 @@
 """Ground combat resolution for Twilight Imperium 4."""
 
 from dataclasses import dataclass
-from typing import Optional
 
 from ti4.core.combat import CombatResolver
 from ti4.core.system import System
@@ -23,7 +22,7 @@ class CombatRoundResult:
 class GroundCombatResult:
     """Result of complete ground combat resolution."""
 
-    winner: Optional[str]  # None if no winner (both sides eliminated)
+    winner: str | None  # None if no winner (both sides eliminated)
     rounds_fought: int
     round_results: list[CombatRoundResult]
 

@@ -1,6 +1,6 @@
 """Integration tests demonstrating the refactored TI4 system."""
 
-from typing import Any, Optional
+from typing import Any
 
 from ti4.core.combat import CombatDetector
 from ti4.core.constants import Faction, Technology, UnitType
@@ -20,7 +20,7 @@ class TestTI4Integration:
         test_name: str,
         expected: Any,
         actual: Any,
-        context: Optional[dict[Any, Any]] = None,
+        context: dict[Any, Any] | None = None,
     ) -> None:
         """Debug helper for test failures."""
         print(f"\n=== TEST FAILURE: {test_name} ===")

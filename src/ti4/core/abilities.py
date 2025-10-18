@@ -21,7 +21,7 @@ import itertools
 import logging
 from dataclasses import dataclass, field
 from enum import Enum, IntEnum
-from typing import TYPE_CHECKING, Any, Optional, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 
 from ti4.core.card_types import ExplorationCardProtocol
 
@@ -75,8 +75,8 @@ class AbilityEffect:
 
     type: str  # Type of effect (modify, trigger, replace, etc.)
     value: Any  # Effect value/data
-    target: Optional[str] = None  # Target of the effect
-    conditions: Optional[list[dict[str, Any]]] = (
+    target: str | None = None  # Target of the effect
+    conditions: list[dict[str, Any]] | None = (
         None  # Conditional effects for "then" (Rule 1.17)
     )
 
@@ -105,9 +105,9 @@ class AbilityCost:
     Represents the cost to activate an ability (Rules 1.11, 1.12)
     """
 
-    type: Optional[str] = None  # Single cost type
-    amount: Optional[int] = None  # Single cost amount
-    costs: Optional[list[dict[str, Any]]] = None  # Multiple costs
+    type: str | None = None  # Single cost type
+    amount: int | None = None  # Single cost amount
+    costs: list[dict[str, Any]] | None = None  # Multiple costs
 
     def can_pay(self, player: PlayerProtocol) -> bool:
         """Check if player can pay the ability cost"""
@@ -155,18 +155,18 @@ class Ability:
     trigger: str
     effect: AbilityEffect
     precedence: AbilityPrecedence = AbilityPrecedence.NORMAL
-    cost: Optional[AbilityCost] = None
-    duration: Optional[str] = None
+    cost: AbilityCost | None = None
+    duration: str | None = None
     frequency: AbilityFrequency = AbilityFrequency.ONCE_PER_TRIGGER
     context_resolver: bool = False
     mandatory: bool = False
 
     # Private fields for tracking
     _usage_count: dict[str, int] = field(default_factory=dict)
-    _active_until: Optional[str] = None
-    _last_triggered: Optional[str] = None
+    _active_until: str | None = None
+    _last_triggered: str | None = None
 
-    def can_trigger(self, event: str, context: Optional[dict[str, Any]] = None) -> bool:
+    def can_trigger(self, event: str, context: dict[str, Any] | None = None) -> bool:
         """Check if ability can trigger for the given event"""
         if self.trigger != event:
             return False
@@ -191,7 +191,7 @@ class Ability:
         return (self.precedence.value * 100) + self.timing.value
 
     def _check_frequency_limit(
-        self, event: str, context: Optional[dict[str, Any]]
+        self, event: str, context: dict[str, Any] | None
     ) -> bool:
         """Check if ability can be used based on frequency limits (Rule 1.18)"""
         if self.frequency == AbilityFrequency.UNLIMITED:
@@ -224,7 +224,7 @@ class Ability:
         # Other frequency types would need game state integration
         return True
 
-    def _get_trigger_key(self, event: str, context: Optional[dict[str, Any]]) -> str:
+    def _get_trigger_key(self, event: str, context: dict[str, Any] | None) -> str:
         """Generate unique key for tracking trigger frequency"""
         if context:
             if "occurrence_id" in context:
@@ -233,7 +233,7 @@ class Ability:
                 return f"{event}_{context['combat_id']}"
         return event
 
-    def mark_used(self, event: str, context: Optional[dict[str, Any]] = None) -> None:
+    def mark_used(self, event: str, context: dict[str, Any] | None = None) -> None:
         """Mark ability as used for frequency tracking"""
         trigger_key = self._get_trigger_key(event, context)
         self._usage_count[trigger_key] = self._usage_count.get(trigger_key, 0) + 1
@@ -261,7 +261,7 @@ class AbilityResolutionResult:
     resolved_abilities: list[Ability]
     failed_abilities: list[Ability] = field(default_factory=list)
     event_modified: bool = False
-    winning_ability: Optional[Ability] = None
+    winning_ability: Ability | None = None
     errors: list[str] = field(default_factory=list)
 
 
@@ -295,7 +295,7 @@ class AbilityManager:
             logger.debug(f"Removed ability: {ability.name}")
 
     def trigger_event(
-        self, event: str, context: Optional[dict[str, Any]] = None
+        self, event: str, context: dict[str, Any] | None = None
     ) -> AbilityResolutionResult:
         """
         Trigger an event and resolve all applicable abilities
@@ -352,7 +352,7 @@ class AbilityManager:
         )
 
     def resolve_conflict(
-        self, event: str, context: Optional[dict[str, Any]] = None
+        self, event: str, context: dict[str, Any] | None = None
     ) -> AbilityResolutionResult:
         """
         Resolve conflicts between abilities (Rules 1.2, 1.6)
@@ -374,7 +374,7 @@ class AbilityManager:
         )
 
     def get_resolution_order(
-        self, event: str, context: Optional[dict[str, Any]] = None
+        self, event: str, context: dict[str, Any] | None = None
     ) -> list[Ability]:
         """Get the order abilities would resolve for an event"""
         applicable_abilities = [
@@ -390,8 +390,8 @@ class AbilityManager:
     def resolve_ability(
         self,
         ability: Ability,
-        player: Optional[PlayerProtocol] = None,
-        context: Optional[dict[str, Any]] = None,
+        player: PlayerProtocol | None = None,
+        context: dict[str, Any] | None = None,
     ) -> AbilityResolutionResult:
         """
         Resolve a specific ability with cost checking and conditional effects
@@ -490,8 +490,8 @@ class AbilityManager:
     def _resolve_single_ability(
         self,
         ability: Ability,
-        context: Optional[dict[str, Any]] = None,
-        player: Optional[PlayerProtocol] = None,
+        context: dict[str, Any] | None = None,
+        player: PlayerProtocol | None = None,
     ) -> bool:
         """Resolve a single ability's effect"""
         # Derive player from context if not explicitly provided
@@ -521,7 +521,7 @@ class AbilityManager:
             logger.error(f"Failed to resolve ability {ability.name}: {e}")
             return False
 
-    def _draw_relic(self, player: Optional[PlayerProtocol]) -> bool:
+    def _draw_relic(self, player: PlayerProtocol | None) -> bool:
         """Draw a relic from the relic deck"""
         if not player:
             return False
@@ -536,8 +536,8 @@ class AbilityManager:
     def _resolve_conditional_ability(
         self,
         ability: Ability,
-        player: Optional[PlayerProtocol],
-        context: Optional[dict[str, Any]],
+        player: PlayerProtocol | None,
+        context: dict[str, Any] | None,
     ) -> AbilityResolutionResult:
         """
         Resolve ability with "then" conditions (Rule 1.17)
@@ -566,8 +566,8 @@ class AbilityManager:
     def _resolve_condition(
         self,
         condition: dict[str, Any],
-        player: Optional[PlayerProtocol],
-        context: Optional[dict[str, Any]],
+        player: PlayerProtocol | None,
+        context: dict[str, Any] | None,
     ) -> bool:
         """Resolve a single condition"""
         condition_type = condition.get("type")

@@ -5,7 +5,7 @@ This module provides the abstract base class for all technology card implementat
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Any
 
 from ti4.core.abilities import Ability
 from ti4.core.constants import Faction, Technology
@@ -43,7 +43,7 @@ class BaseTechnologyCard(ABC):
 
     @property
     @abstractmethod
-    def color(self) -> Optional[TechnologyColor]:
+    def color(self) -> TechnologyColor | None:
         """Technology color (None for unit upgrades)."""
         ...
 
@@ -55,7 +55,7 @@ class BaseTechnologyCard(ABC):
 
     @property
     @abstractmethod
-    def faction_restriction(self) -> Optional[Faction]:
+    def faction_restriction(self) -> Faction | None:
         """Faction restriction (None if available to all)."""
         ...
 

@@ -28,7 +28,7 @@ class StrategyCardInformation:
     card_type: "StrategyCardType"
     name: str
     initiative_number: int
-    current_owner: Optional[str] = None
+    current_owner: str | None = None
     is_exhausted: bool = False
 
 
@@ -42,8 +42,8 @@ class StrategyCardGameStateAnalysis:
     total_assigned_cards: int
     total_available_cards: int
     initiative_order: list[str]
-    lowest_initiative_player: Optional[str] = None
-    highest_initiative_player: Optional[str] = None
+    lowest_initiative_player: str | None = None
+    highest_initiative_player: str | None = None
 
 
 @dataclass
@@ -68,9 +68,9 @@ class InitiativeOrderAnalysis:
     """
 
     initiative_order: list[str]
-    first_player: Optional[str] = None
-    last_player: Optional[str] = None
-    turn_advantages: Optional[list[str]] = None
+    first_player: str | None = None
+    last_player: str | None = None
+    turn_advantages: list[str] | None = None
 
     def __post_init__(self) -> None:
         """Initialize turn_advantages if None."""
@@ -113,9 +113,9 @@ class StrategyCardAssignmentResult:
     """Result of a strategy card assignment operation."""
 
     success: bool
-    player_id: Optional[str] = None
+    player_id: str | None = None
     strategy_card: Optional["StrategyCardType"] = None
-    error_message: Optional[str] = None
+    error_message: str | None = None
 
 
 @dataclass
@@ -123,9 +123,9 @@ class StrategyPhaseSelectionResult:
     """Result of starting a strategy phase selection workflow."""
 
     success: bool
-    current_selecting_player: Optional[str] = None
-    available_cards: Optional[list["StrategyCardType"]] = None
-    error_message: Optional[str] = None
+    current_selecting_player: str | None = None
+    available_cards: list["StrategyCardType"] | None = None
+    error_message: str | None = None
 
     def __post_init__(self) -> None:
         """Initialize available_cards if None."""
@@ -138,10 +138,10 @@ class StrategyCardSelectionResult:
     """Result of a strategy card selection operation."""
 
     success: bool
-    player_id: Optional[str] = None
+    player_id: str | None = None
     strategy_card: Optional["StrategyCardType"] = None
-    next_selecting_player: Optional[str] = None
-    error_message: Optional[str] = None
+    next_selecting_player: str | None = None
+    error_message: str | None = None
 
 
 class StrategyCardCoordinator:
@@ -170,7 +170,7 @@ class StrategyCardCoordinator:
         self._current_selecting_player_index: int = 0
 
         # Game phase integration
-        self._current_game_phase: Optional[GamePhase] = None
+        self._current_game_phase: GamePhase | None = None
 
         # Strategy card state tracking (Requirements 4.1-4.5)
         self._player_card_states: dict[str, dict[StrategyCardType, bool]] = {}
@@ -296,7 +296,7 @@ class StrategyCardCoordinator:
 
     def _validate_basic_inputs(
         self, player_id: str, card: Optional["StrategyCardType"]
-    ) -> Optional[str]:
+    ) -> str | None:
         """Validate basic inputs for card operations.
 
         Args:
@@ -738,7 +738,7 @@ class StrategyCardCoordinator:
 
     # Multi-Player Game Support Methods (Requirements 7.1-7.5)
 
-    def _validate_speaker_order(self, speaker_order: list[str]) -> Optional[str]:
+    def _validate_speaker_order(self, speaker_order: list[str]) -> str | None:
         """Validate speaker order for multi-player game support.
 
         Args:
@@ -770,7 +770,7 @@ class StrategyCardCoordinator:
 
         return None
 
-    def _validate_player_count_bounds(self, player_count: int) -> Optional[str]:
+    def _validate_player_count_bounds(self, player_count: int) -> str | None:
         """Validate that player count is within acceptable bounds.
 
         Args:
@@ -787,7 +787,7 @@ class StrategyCardCoordinator:
 
         return None
 
-    def _validate_no_duplicate_players(self, speaker_order: list[str]) -> Optional[str]:
+    def _validate_no_duplicate_players(self, speaker_order: list[str]) -> str | None:
         """Validate that there are no duplicate player IDs in speaker order.
 
         Args:
@@ -800,7 +800,7 @@ class StrategyCardCoordinator:
             return "Duplicate player IDs are not allowed in speaker order"
         return None
 
-    def _validate_player_ids(self, speaker_order: list[str]) -> Optional[str]:
+    def _validate_player_ids(self, speaker_order: list[str]) -> str | None:
         """Validate that all player IDs are valid.
 
         Args:
@@ -846,7 +846,7 @@ class StrategyCardCoordinator:
         """
         return self._speaker_order.copy()
 
-    def get_current_selecting_player(self) -> Optional[str]:
+    def get_current_selecting_player(self) -> str | None:
         """Get the player who is currently selecting a strategy card.
 
         Returns:

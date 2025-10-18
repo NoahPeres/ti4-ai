@@ -13,7 +13,7 @@ LRR References:
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 
 class ActionCardTiming(Enum):
@@ -37,11 +37,11 @@ class ActionCardContext:
     """Context for action card resolution."""
 
     player_id: str
-    game_state: Optional[Any] = None
-    target_player: Optional[str] = None
-    target_system: Optional[str] = None
-    target_units: Optional[list[str]] = None
-    additional_data: Optional[dict[str, Any]] = None
+    game_state: Any | None = None
+    target_player: str | None = None
+    target_system: str | None = None
+    target_units: list[str] | None = None
+    additional_data: dict[str, Any] | None = None
 
 
 @dataclass
@@ -51,9 +51,9 @@ class ActionCardResult:
     success: bool
     card_discarded: bool = True
     card_returned_to_hand: bool = False
-    effects_applied: Optional[list[str]] = None
-    error_message: Optional[str] = None
-    additional_data: Optional[dict[str, Any]] = None
+    effects_applied: list[str] | None = None
+    error_message: str | None = None
+    additional_data: dict[str, Any] | None = None
 
 
 class ActionCard(ABC):
@@ -71,7 +71,7 @@ class ActionCard(ABC):
         name: str,
         timing: ActionCardTiming,
         description: str,
-        flavor_text: Optional[str] = None,
+        flavor_text: str | None = None,
     ):
         self.name = name
         self.timing = timing
@@ -79,7 +79,7 @@ class ActionCard(ABC):
         self.flavor_text = flavor_text
 
     @abstractmethod
-    def can_play(self, context: ActionCardContext) -> tuple[bool, Optional[str]]:
+    def can_play(self, context: ActionCardContext) -> tuple[bool, str | None]:
         """Check if this action card can be played in the given context.
 
         LRR 22.3: A component action cannot be performed if its ability
@@ -127,7 +127,7 @@ class ActionCardManager:
 
     def __init__(self) -> None:
         self._played_cards_this_window: dict[str, list[str]] = {}
-        self._current_timing_window: Optional[str] = None
+        self._current_timing_window: str | None = None
 
     def set_timing_window(self, window: str) -> None:
         """Set the current timing window for action card resolution."""
@@ -139,8 +139,8 @@ class ActionCardManager:
         self,
         card: ActionCard,
         context: ActionCardContext,
-        timing_window: Optional[str] = None,
-    ) -> tuple[bool, Optional[str]]:
+        timing_window: str | None = None,
+    ) -> tuple[bool, str | None]:
         """Check if an action card can be played.
 
         LRR 2.6b: Multiple action cards with the same name cannot be played
@@ -174,7 +174,7 @@ class ActionCardManager:
         self,
         card: ActionCard,
         context: ActionCardContext,
-        timing_window: Optional[str] = None,
+        timing_window: str | None = None,
     ) -> ActionCardResult:
         """Play an action card.
 
@@ -211,7 +211,7 @@ class ActionCardManager:
                 error_message=f"Error resolving card {card.name}: {str(e)}",
             )
 
-    def cancel_card(self, card_name: str, timing_window: Optional[str] = None) -> None:
+    def cancel_card(self, card_name: str, timing_window: str | None = None) -> None:
         """Cancel a played action card.
 
         LRR 2.8: If an action card is canceled, that card has no effect and is discarded.
@@ -222,7 +222,7 @@ class ActionCardManager:
             if card_name in self._played_cards_this_window[window]:
                 self._played_cards_this_window[window].remove(card_name)
 
-    def clear_timing_window(self, window: Optional[str] = None) -> None:
+    def clear_timing_window(self, window: str | None = None) -> None:
         """Clear played cards for a timing window."""
         window_to_clear = window or self._current_timing_window
         if window_to_clear and window_to_clear in self._played_cards_this_window:
@@ -269,7 +269,7 @@ class DirectHitActionCard(ActionCard):
             flavor_text="The Letnev commander's eyes gleamed as the enemy flagship erupted in flames.",
         )
 
-    def can_play(self, context: ActionCardContext) -> tuple[bool, Optional[str]]:
+    def can_play(self, context: ActionCardContext) -> tuple[bool, str | None]:
         """Check if Direct Hit can be played."""
         # Requires target player and system with ships
         if not context.target_units or len(context.target_units) == 0:
@@ -312,7 +312,7 @@ class LeadershipRiderActionCard(ActionCard):
             flavor_text="Sometimes the best leaders are those who can see what others cannot.",
         )
 
-    def can_play(self, context: ActionCardContext) -> tuple[bool, Optional[str]]:
+    def can_play(self, context: ActionCardContext) -> tuple[bool, str | None]:
         """Check if Leadership Rider can be played."""
         # Can be played as component action
         return True, None
@@ -341,7 +341,7 @@ class UpgradeActionCard(ActionCard):
             flavor_text="The shipyards worked around the clock to retrofit the aging cruiser.",
         )
 
-    def can_play(self, context: ActionCardContext) -> tuple[bool, Optional[str]]:
+    def can_play(self, context: ActionCardContext) -> tuple[bool, str | None]:
         """Check if Upgrade can be played."""
         # Requires target system with cruiser and either home system or space dock
         if not context.target_units or not any(

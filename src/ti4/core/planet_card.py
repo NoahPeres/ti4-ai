@@ -1,6 +1,8 @@
 """Planet card structure for TI4 game."""
 
-from typing import TYPE_CHECKING, Any, Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from .game_state import GameState
@@ -14,8 +16,8 @@ class PlanetCard:
         name: str,
         resources: int,
         influence: int,
-        trait: Optional[str] = None,
-        game_state: Optional["GameState"] = None,
+        trait: str | None = None,
+        game_state: GameState | None = None,
     ) -> None:
         if not name or not isinstance(name, str):
             raise ValueError("Planet name must be a non-empty string")
@@ -157,7 +159,7 @@ class PlanetCard:
         self._attached_cards.clear()
         return purged_cards
 
-    def clone_for_state(self, new_game_state: "GameState") -> "PlanetCard":
+    def clone_for_state(self, new_game_state: GameState) -> PlanetCard:
         """Create a clone of this PlanetCard bound to a new GameState."""
         cloned_card = PlanetCard(
             name=self.name,

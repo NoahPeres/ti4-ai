@@ -470,7 +470,7 @@ class LeadershipStrategyCard(BaseStrategyCard):
         player: Any,
         game_state: Optional["GameState"],
         resource_manager: Optional["ResourceManager"],
-        influence_to_spend: Optional[int],
+        influence_to_spend: int | None,
         planets_to_exhaust: list[str],
         trade_goods_to_spend: int,
     ) -> dict[str, Any]:

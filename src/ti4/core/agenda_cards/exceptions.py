@@ -5,7 +5,7 @@ This module provides custom exceptions for agenda card validation errors
 and other agenda card-related operations.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 
 class AgendaCardValidationError(Exception):
@@ -19,8 +19,8 @@ class AgendaCardValidationError(Exception):
     def __init__(
         self,
         message: str,
-        card_name: Optional[str] = None,
-        field_name: Optional[str] = None,
+        card_name: str | None = None,
+        field_name: str | None = None,
         invalid_value: Any = None,
     ) -> None:
         """
@@ -103,7 +103,7 @@ class AgendaCardOperationError(Exception):
     such as deck management, effect resolution, etc.
     """
 
-    def __init__(self, message: str, operation: Optional[str] = None) -> None:
+    def __init__(self, message: str, operation: str | None = None) -> None:
         """
         Initialize the operation error.
 
@@ -145,7 +145,7 @@ class AgendaCardRegistrationError(AgendaCardOperationError):
     Exception raised when agenda card registration fails.
     """
 
-    def __init__(self, message: str, card_name: Optional[str] = None) -> None:
+    def __init__(self, message: str, card_name: str | None = None) -> None:
         """
         Initialize the registration error.
 

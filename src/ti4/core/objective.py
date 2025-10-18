@@ -3,10 +3,11 @@
 import csv
 import logging
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable, Literal, Optional
+from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
     from .constants import Expansion
@@ -246,7 +247,7 @@ class ObjectiveSetupConfiguration:
     stage_i_count: int = 5
     stage_ii_count: int = 5
     include_expansions: list["Expansion"] = field(default_factory=_default_expansions)
-    random_seed: Optional[int] = None
+    random_seed: int | None = None
 
     def __post_init__(self) -> None:
         """Validate configuration data after initialization."""
@@ -297,12 +298,12 @@ class PublicObjectiveManager:
 
     def __init__(self) -> None:
         """Initialize the public objective manager."""
-        self._reveal_state: Optional[ObjectiveRevealState] = None
+        self._reveal_state: ObjectiveRevealState | None = None
 
     def setup_objectives(
         self,
         game_state: "GameState",
-        config: Optional[ObjectiveSetupConfiguration] = None,
+        config: ObjectiveSetupConfiguration | None = None,
     ) -> None:
         """Set up 5 Stage I and 5 Stage II objectives face-down.
 
@@ -1149,7 +1150,7 @@ class VictoryPointScoreboard:
         # Placeholder implementation - could be expanded for visual track representation
         pass
 
-    def check_victory_condition(self, game_state: "GameState") -> Optional[str]:
+    def check_victory_condition(self, game_state: "GameState") -> str | None:
         """Check if any player has reached victory point threshold.
 
         Args:
@@ -1241,7 +1242,7 @@ class ObjectiveEligibilityTracker:
     def __init__(self) -> None:
         """Initialize the objective eligibility tracker."""
         self._eligibility_cache: dict[str, dict[str, bool]] = {}
-        self._last_game_state_hash: Optional[str] = None
+        self._last_game_state_hash: str | None = None
 
     def check_all_objective_eligibility(
         self, player_id: str, game_state: "GameState"

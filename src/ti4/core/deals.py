@@ -5,10 +5,11 @@ building upon the existing transaction system to provide component-based exchang
 that can be objectively validated and enforced by the game system.
 """
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import TYPE_CHECKING, Any, Callable, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from .transactions import PromissoryNote, PromissoryNoteType, TransactionOffer
 
@@ -100,7 +101,7 @@ class ComponentTransaction:
     request: TransactionOffer
     status: TransactionStatus
     timestamp: datetime
-    completion_timestamp: Optional[datetime] = None
+    completion_timestamp: datetime | None = None
 
     def is_pending(self) -> bool:
         """Check if transaction is awaiting response."""
@@ -204,7 +205,7 @@ class TransactionHistoryEntry:
     request: TransactionOffer
     status: TransactionStatus
     timestamp: datetime
-    completion_timestamp: Optional[datetime] = None
+    completion_timestamp: datetime | None = None
 
     def __post_init__(self) -> None:
         """Validate transaction after initialization.
@@ -810,7 +811,7 @@ class TransactionNotFoundError(TransactionError):
 class TransactionExecutionError(TransactionError):
     """Raised when transaction execution fails."""
 
-    def __init__(self, message: str, context: Optional[dict[str, Any]] = None):
+    def __init__(self, message: str, context: dict[str, Any] | None = None):
         super().__init__(message)
         self.context = context or {}
 
@@ -846,7 +847,7 @@ class TransactionResult:
 
     success: bool
     transaction: ComponentTransaction
-    error_message: Optional[str] = None
+    error_message: str | None = None
 
 
 @dataclass
@@ -856,7 +857,7 @@ class PromissoryNoteExchangeResult:
     success: bool
     immediate_effects_activated: bool = False
     activated_effects: list[str] = field(default_factory=list)
-    error_message: Optional[str] = None
+    error_message: str | None = None
 
 
 class PromissoryNoteImmediateEffects:
@@ -1231,8 +1232,8 @@ class EnhancedTransactionManager:
         self._transaction_counter = 0
 
         # Track game phase and active player for timing rules
-        self._current_phase: Optional[GamePhase] = None
-        self._active_player: Optional[str] = None
+        self._current_phase: GamePhase | None = None
+        self._active_player: str | None = None
 
     def _validate_transaction_players(
         self, proposing_player: str, target_player: str
@@ -1520,7 +1521,7 @@ class EnhancedTransactionManager:
         return self._transactions[transaction_id]
 
     def get_pending_transactions(
-        self, player_id: Optional[str] = None
+        self, player_id: str | None = None
     ) -> list[ComponentTransaction]:
         """Get pending transactions for a player or all pending transactions.
 
@@ -1963,9 +1964,9 @@ class TransactionAPIResult:
     """Result of a transaction API operation."""
 
     success: bool
-    transaction_id: Optional[str] = None
-    transaction: Optional[ComponentTransaction] = None
-    error_message: Optional[str] = None
+    transaction_id: str | None = None
+    transaction: ComponentTransaction | None = None
+    error_message: str | None = None
     game_state: Optional["GameState"] = None
 
 
@@ -1980,7 +1981,7 @@ class TransactionStatusInfo:
     offer: TransactionOffer
     request: TransactionOffer
     timestamp: datetime
-    completion_timestamp: Optional[datetime] = None
+    completion_timestamp: datetime | None = None
 
 
 class TransactionAPI:
@@ -2099,7 +2100,7 @@ class TransactionAPI:
 
     def get_transaction_status(
         self, transaction_id: str
-    ) -> Optional[TransactionStatusInfo]:
+    ) -> TransactionStatusInfo | None:
         """Get the current status of a transaction.
 
         Args:

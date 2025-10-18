@@ -134,7 +134,7 @@ class TestRule101Wormholes:
         ]
         wormhole_configs = [
             (f"{wtype}_system", wtype, coord)
-            for wtype, coord in zip(self.WORMHOLE_TYPES, coords)
+            for wtype, coord in zip(self.WORMHOLE_TYPES, coords, strict=False)
         ]
 
         galaxy = self._create_galaxy_with_wormhole_systems(wormhole_configs)

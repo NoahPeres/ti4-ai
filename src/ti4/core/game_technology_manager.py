@@ -3,8 +3,6 @@
 This module provides the bridge between Rule 90 TechnologyManager and the game state system.
 """
 
-from typing import Optional
-
 from .constants import Technology
 from .game_state import GameState
 from .technology import TechnologyManager
@@ -144,7 +142,7 @@ class GameTechnologyManager:
         """
         return self.technology_manager.get_technology_deck(player_id)
 
-    def get_technology_color(self, technology: Technology) -> Optional[str]:
+    def get_technology_color(self, technology: Technology) -> str | None:
         """Get the color of a technology (if it has one).
 
         Args:

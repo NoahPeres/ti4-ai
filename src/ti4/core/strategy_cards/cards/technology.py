@@ -22,10 +22,10 @@ class TechnologyResearchResult:
     """Result of a technology research attempt."""
 
     success: bool
-    technology_researched: Optional[Technology] = None
+    technology_researched: Technology | None = None
     resources_spent: int = 0
     command_tokens_spent: int = 0
-    error_message: Optional[str] = None
+    error_message: str | None = None
 
 
 class TechnologyStrategyCard(BaseStrategyCard):

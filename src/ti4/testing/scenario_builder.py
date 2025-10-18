@@ -1,6 +1,6 @@
 """Game scenario builder for test setup."""
 
-from typing import Any, Optional
+from typing import Any
 
 from ti4.core.constants import Faction, LocationType, UnitType
 from ti4.core.galaxy import Galaxy
@@ -21,7 +21,7 @@ class GameScenarioBuilder:
 
     def __init__(self) -> None:
         self._players: list[Player] = []
-        self._galaxy: Optional[Galaxy] = None
+        self._galaxy: Galaxy | None = None
         self._phase: GamePhase = GamePhase.SETUP
         self._custom_setup: dict[str, Any] = {}
         self._systems: dict[str, System] = {}

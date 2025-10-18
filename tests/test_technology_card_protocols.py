@@ -5,7 +5,7 @@ This module tests the base technology card protocol and interfaces
 for the technology card framework.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 import pytest
 
@@ -65,7 +65,7 @@ class TestTechnologyCardProtocol:
                 return "Test Technology"
 
             @property
-            def color(self) -> Optional[TechnologyColor]:
+            def color(self) -> TechnologyColor | None:
                 return TechnologyColor.BLUE
 
             @property
@@ -73,7 +73,7 @@ class TestTechnologyCardProtocol:
                 return [TechnologyColor.BLUE]
 
             @property
-            def faction_restriction(self) -> Optional[Faction]:
+            def faction_restriction(self) -> Faction | None:
                 return None
 
             def get_abilities(self) -> list[Ability]:
@@ -124,7 +124,7 @@ class TestExhaustibleTechnologyProtocol:
             def ready(self) -> None:
                 self._exhausted = False
 
-            def get_action_ability(self) -> Optional[Ability]:
+            def get_action_ability(self) -> Ability | None:
                 return None
 
         # Should be able to create instance that follows protocol
@@ -192,7 +192,7 @@ class TestProtocolCompliance:
                 return "Valid Technology"
 
             @property
-            def color(self) -> Optional[TechnologyColor]:
+            def color(self) -> TechnologyColor | None:
                 return TechnologyColor.BLUE
 
             @property
@@ -200,7 +200,7 @@ class TestProtocolCompliance:
                 return []
 
             @property
-            def faction_restriction(self) -> Optional[Faction]:
+            def faction_restriction(self) -> Faction | None:
                 return None
 
             def get_abilities(self) -> list[Ability]:
@@ -237,7 +237,7 @@ class TestBaseTechnologyCardImplementations:
         # Create a concrete implementation for testing
         class TestExhaustibleTech(ExhaustibleTechnologyCard):
             @property
-            def color(self) -> Optional[TechnologyColor]:
+            def color(self) -> TechnologyColor | None:
                 return TechnologyColor.BLUE
 
             @property
@@ -245,7 +245,7 @@ class TestBaseTechnologyCardImplementations:
                 return [TechnologyColor.BLUE]
 
             @property
-            def faction_restriction(self) -> Optional[Faction]:
+            def faction_restriction(self) -> Faction | None:
                 return None
 
             def get_abilities(self) -> list[Ability]:
@@ -281,7 +281,7 @@ class TestBaseTechnologyCardImplementations:
                 return [TechnologyColor.BLUE, TechnologyColor.GREEN]
 
             @property
-            def faction_restriction(self) -> Optional[Faction]:
+            def faction_restriction(self) -> Faction | None:
                 return None
 
             def get_abilities(self) -> list[Ability]:
@@ -342,7 +342,7 @@ class TestBaseTechnologyCardImplementations:
                 return []
 
             @property
-            def faction_restriction(self) -> Optional[Faction]:
+            def faction_restriction(self) -> Faction | None:
                 return None
 
             def get_abilities(self) -> list[Ability]:
@@ -384,7 +384,7 @@ class TestBaseTechnologyCardImplementations:
         # Create a test technology card
         class TestTech(PassiveTechnologyCard):
             @property
-            def color(self) -> Optional[TechnologyColor]:
+            def color(self) -> TechnologyColor | None:
                 return TechnologyColor.BLUE
 
             @property
@@ -392,7 +392,7 @@ class TestBaseTechnologyCardImplementations:
                 return []
 
             @property
-            def faction_restriction(self) -> Optional[Faction]:
+            def faction_restriction(self) -> Faction | None:
                 return None
 
             def get_abilities(self) -> list[Ability]:
@@ -448,7 +448,7 @@ class TestBaseTechnologyCardImplementations:
         # Create a concrete implementation for testing
         class TestPassiveTech(PassiveTechnologyCard):
             @property
-            def color(self) -> Optional[TechnologyColor]:
+            def color(self) -> TechnologyColor | None:
                 return TechnologyColor.GREEN
 
             @property
@@ -456,7 +456,7 @@ class TestBaseTechnologyCardImplementations:
                 return [TechnologyColor.GREEN]
 
             @property
-            def faction_restriction(self) -> Optional[Faction]:
+            def faction_restriction(self) -> Faction | None:
                 return None
 
             def get_abilities(self) -> list[Ability]:

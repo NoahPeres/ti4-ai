@@ -372,7 +372,9 @@ class LawManager:
             and self_law.enacted_round == other_law.enacted_round
             and self_law.effect_description == other_law.effect_description
             and self_law.elected_target == other_law.elected_target
-            for self_law, other_law in zip(self._active_laws, other._active_laws)
+            for self_law, other_law in zip(
+                self._active_laws, other._active_laws, strict=False
+            )
         )
 
     def __hash__(self) -> int:

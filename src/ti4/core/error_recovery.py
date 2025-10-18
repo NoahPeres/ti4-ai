@@ -2,8 +2,10 @@
 
 import logging
 import time
-from typing import Any, Callable, Optional
+from collections.abc import Callable
+from typing import Any
 
+from .constants import CircuitBreakerState, PerformanceConstants
 from .exceptions import TI4GameError
 
 
@@ -37,11 +39,9 @@ class CircuitBreaker:
 
     def __init__(
         self,
-        failure_threshold: Optional[int] = None,
-        recovery_timeout: Optional[float] = None,
+        failure_threshold: int | None = None,
+        recovery_timeout: float | None = None,
     ) -> None:
-        from .constants import CircuitBreakerConstants, PerformanceConstants
-
         if failure_threshold is None:
             failure_threshold = PerformanceConstants.DEFAULT_FAILURE_THRESHOLD
         if recovery_timeout is None:
@@ -51,15 +51,15 @@ class CircuitBreaker:
         self.recovery_timeout = recovery_timeout
         self.failure_count = 0
         self.last_failure_time = 0.0
-        self.state = CircuitBreakerConstants.STATE_CLOSED
+        self.state: CircuitBreakerState = CircuitBreakerState.CLOSED
 
     def can_execute(self) -> bool:
         """Check if operation can be executed."""
-        if self.state == "closed":
+        if self.state == CircuitBreakerState.CLOSED:
             return True
-        elif self.state == "open":
+        elif self.state == CircuitBreakerState.OPEN:
             if time.time() - self.last_failure_time > self.recovery_timeout:
-                self.state = "half-open"
+                self.state = CircuitBreakerState.HALF_OPEN
                 return True
             return False
         else:  # half-open
@@ -67,10 +67,8 @@ class CircuitBreaker:
 
     def record_success(self) -> None:
         """Record successful operation."""
-        from .constants import CircuitBreakerConstants
-
         self.failure_count = 0
-        self.state = CircuitBreakerConstants.STATE_CLOSED
+        self.state = CircuitBreakerState.CLOSED
 
     def record_failure(self) -> None:
         """Record failed operation."""
@@ -78,7 +76,7 @@ class CircuitBreaker:
         self.last_failure_time = time.time()
 
         if self.failure_count >= self.failure_threshold:
-            self.state = "open"
+            self.state = CircuitBreakerState.OPEN
 
 
 class ErrorRecoveryManager:
@@ -116,16 +114,14 @@ class ErrorRecoveryManager:
     def execute_with_retry(
         self,
         operation: Callable[[], Any],
-        max_retries: Optional[int] = None,
-        retry_delay: Optional[float] = None,
+        max_retries: int | None = None,
+        retry_delay: float | None = None,
     ) -> Any:
-        from .constants import PerformanceConstants
-
+        """Execute operation with automatic retry for transient errors."""
         if max_retries is None:
             max_retries = PerformanceConstants.DEFAULT_MAX_RETRIES
         if retry_delay is None:
             retry_delay = PerformanceConstants.DEFAULT_RETRY_DELAY
-        """Execute operation with automatic retry for transient errors."""
         last_exception = None
 
         for attempt in range(max_retries + 1):
@@ -161,15 +157,14 @@ class ErrorRecoveryManager:
         self,
         operation: Callable[[], Any],
         operation_id: str,
-        failure_threshold: Optional[int] = None,
+        failure_threshold: int | None = None,
+        recovery_timeout: float | None = None,
     ) -> Any:
-        from .constants import PerformanceConstants
-
-        if failure_threshold is None:
-            failure_threshold = PerformanceConstants.DEFAULT_FAILURE_THRESHOLD
         """Execute operation with circuit breaker pattern."""
         if operation_id not in self.circuit_breakers:
-            self.circuit_breakers[operation_id] = CircuitBreaker(failure_threshold)
+            self.circuit_breakers[operation_id] = CircuitBreaker(
+                failure_threshold, recovery_timeout
+            )
 
         circuit_breaker = self.circuit_breakers[operation_id]
 
@@ -191,7 +186,7 @@ class ErrorRecoveryManager:
             raise
 
     def execute_with_recovery(
-        self, operation: Callable[[], Any], context: Optional[dict[str, Any]] = None
+        self, operation: Callable[[], Any], context: dict[str, Any] | None = None
     ) -> Any:
         """Execute operation with registered recovery strategies."""
         context = context or {}
@@ -212,10 +207,12 @@ class ErrorRecoveryManager:
         self,
         error: Exception,
         recovery_type: str,
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> None:
         """Log recovery attempt details."""
         self._log_error_recovery_attempt(error, recovery_type)
+        if context:
+            self.logger.debug(f"Recovery context: {context}")
 
     def _log_error_recovery_attempt(
         self, error: Exception, recovery_mechanism_type: str

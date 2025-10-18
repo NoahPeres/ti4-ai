@@ -11,8 +11,6 @@ CONFIRMED SPECIFICATIONS - DO NOT MODIFY WITHOUT USER APPROVAL:
 - Effect: Mandatory movement enhancement
 """
 
-from typing import Optional
-
 from ti4.core.abilities import Ability
 from ti4.core.constants import Faction, Technology
 from ti4.core.technology import TechnologyColor
@@ -66,7 +64,7 @@ class GravityDrive(PassiveTechnologyCard):
         return specification
 
     @property
-    def color(self) -> Optional[TechnologyColor]:
+    def color(self) -> TechnologyColor | None:
         """Technology color from specification."""
         return self._specification.color
 
@@ -76,7 +74,7 @@ class GravityDrive(PassiveTechnologyCard):
         return list(self._specification.prerequisites)
 
     @property
-    def faction_restriction(self) -> Optional[Faction]:
+    def faction_restriction(self) -> Faction | None:
         """Faction restriction from specification."""
         return self._specification.faction_restriction
 

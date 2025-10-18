@@ -1,6 +1,9 @@
 """Tests for performance caching system."""
 
+import os
 from unittest.mock import Mock, patch
+
+import pytest
 
 from ti4.actions.action import PlayerDecision
 from ti4.core.game_state import GameState
@@ -99,6 +102,11 @@ class TestGameStateCache:
             assert result2 == mock_path
             assert mock_pathfind.call_count == 1  # Should not increase
 
+    @pytest.mark.performance
+    @pytest.mark.skipif(
+        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        reason="Performance tests skipped in CI environments",
+    )
     def test_cache_performance_improvement(self) -> None:
         """Test that cache provides performance improvement."""
         import time

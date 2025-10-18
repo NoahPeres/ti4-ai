@@ -2,7 +2,7 @@
 
 import json
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from .events import GameEvent
 from .exceptions import TI4GameError
@@ -62,7 +62,7 @@ class GameLogger:
         self,
         command: Any,  # GameCommand - avoiding circular import
         result: str,
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> None:
         """Log command execution with structured context."""
 
@@ -110,7 +110,7 @@ class GameLogger:
         self.logger.info(message, extra=extra)
 
     def log_error(
-        self, error: Exception, context: Optional[dict[str, Any]] = None
+        self, error: Exception, context: dict[str, Any] | None = None
     ) -> None:
         """Log errors with full context information."""
         message = f"Game error occurred: {str(error)}"

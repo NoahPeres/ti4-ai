@@ -2,7 +2,7 @@
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Union
+from typing import Any
 
 from .events import (
     CombatStartedEvent,
@@ -22,7 +22,7 @@ class EventObserver(ABC):
     @abstractmethod
     def handle_event(
         self,
-        event: Union[GameEvent, UnitMovedEvent, CombatStartedEvent, PhaseChangedEvent],
+        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
     ) -> None:
         """Handle a game event."""
         pass
@@ -42,7 +42,7 @@ class EventObserver(ABC):
 
     def _extract_event_type_identifier(
         self,
-        event: Union[GameEvent, UnitMovedEvent, CombatStartedEvent, PhaseChangedEvent],
+        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
     ) -> str:
         """Extract the event type identifier from a game event object.
 
@@ -68,7 +68,7 @@ class LoggingObserver(EventObserver):
 
     def handle_event(
         self,
-        event: Union[GameEvent, UnitMovedEvent, CombatStartedEvent, PhaseChangedEvent],
+        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
     ) -> None:
         """Log game events with appropriate detail level.
 
@@ -84,7 +84,7 @@ class LoggingObserver(EventObserver):
 
     def _log_event_by_type(
         self,
-        event: Union[GameEvent, UnitMovedEvent, CombatStartedEvent, PhaseChangedEvent],
+        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
         event_type: str,
     ) -> None:
         """Log an event with type-specific formatting.
@@ -106,7 +106,7 @@ class LoggingObserver(EventObserver):
 
     def _log_unit_moved_event(
         self,
-        event: Union[GameEvent, UnitMovedEvent, CombatStartedEvent, PhaseChangedEvent],
+        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
     ) -> None:
         """Log a unit moved event with specific details.
 
@@ -121,7 +121,7 @@ class LoggingObserver(EventObserver):
 
     def _log_phase_changed_event(
         self,
-        event: Union[GameEvent, UnitMovedEvent, CombatStartedEvent, PhaseChangedEvent],
+        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
     ) -> None:
         """Log a phase changed event with specific details.
 
@@ -135,7 +135,7 @@ class LoggingObserver(EventObserver):
 
     def _log_combat_started_event(
         self,
-        event: Union[GameEvent, UnitMovedEvent, CombatStartedEvent, PhaseChangedEvent],
+        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
     ) -> None:
         """Log a combat started event with specific details.
 
@@ -149,7 +149,7 @@ class LoggingObserver(EventObserver):
 
     def _log_generic_event(
         self,
-        event: Union[GameEvent, UnitMovedEvent, CombatStartedEvent, PhaseChangedEvent],
+        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
         event_type: str,
     ) -> None:
         """Log a generic event with basic information.
@@ -174,7 +174,7 @@ class StatisticsCollector(EventObserver):
 
     def handle_event(
         self,
-        event: Union[GameEvent, UnitMovedEvent, CombatStartedEvent, PhaseChangedEvent],
+        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
     ) -> None:
         """Process game events and update statistical counters.
 
@@ -216,7 +216,7 @@ class AITrainingDataCollector(EventObserver):
 
     def handle_event(
         self,
-        event: Union[GameEvent, UnitMovedEvent, CombatStartedEvent, PhaseChangedEvent],
+        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
     ) -> None:
         """Collect and structure game event data for AI training purposes.
 
@@ -235,7 +235,7 @@ class AITrainingDataCollector(EventObserver):
 
     def _create_base_training_record(
         self,
-        event: Union[GameEvent, UnitMovedEvent, CombatStartedEvent, PhaseChangedEvent],
+        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
         event_type: str,
     ) -> dict[str, Any]:
         """Create the base training record with common fields.
@@ -256,7 +256,7 @@ class AITrainingDataCollector(EventObserver):
     def _enrich_training_record_with_event_data(
         self,
         training_record: dict[str, Any],
-        event: Union[GameEvent, UnitMovedEvent, CombatStartedEvent, PhaseChangedEvent],
+        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
         event_type: str,
     ) -> None:
         """Enrich the training record with event-specific data.
@@ -278,7 +278,7 @@ class AITrainingDataCollector(EventObserver):
     def _add_unit_moved_data(
         self,
         training_record: dict[str, Any],
-        event: Union[GameEvent, UnitMovedEvent, CombatStartedEvent, PhaseChangedEvent],
+        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
     ) -> None:
         """Add unit movement specific data to training record.
 
@@ -291,7 +291,7 @@ class AITrainingDataCollector(EventObserver):
     def _add_combat_started_data(
         self,
         training_record: dict[str, Any],
-        event: Union[GameEvent, UnitMovedEvent, CombatStartedEvent, PhaseChangedEvent],
+        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
     ) -> None:
         """Add combat started specific data to training record.
 
@@ -304,7 +304,7 @@ class AITrainingDataCollector(EventObserver):
     def _add_phase_changed_data(
         self,
         training_record: dict[str, Any],
-        event: Union[GameEvent, UnitMovedEvent, CombatStartedEvent, PhaseChangedEvent],
+        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
     ) -> None:
         """Add phase changed specific data to training record.
 

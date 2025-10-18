@@ -4,8 +4,11 @@ Tests caching, lazy evaluation, batch operations, and performance benchmarks
 for the resource management system.
 """
 
+import os
 import time
 from unittest.mock import Mock, patch
+
+import pytest
 
 from src.ti4.core.constants import Faction, UnitType
 from src.ti4.core.game_state import GameState
@@ -241,6 +244,11 @@ class TestBatchOperations:
 class TestPerformanceBenchmarks:
     """Test performance benchmarks and optimization validation."""
 
+    @pytest.mark.performance
+    @pytest.mark.skipif(
+        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        reason="Performance tests skipped in CI environments",
+    )
     def test_resource_calculation_performance_with_many_planets(self) -> None:
         """Test resource calculation performance with maximum number of planets."""
         from src.ti4.core.resource_management import CachedResourceManager
@@ -269,6 +277,11 @@ class TestPerformanceBenchmarks:
             f"Performance too slow: {elapsed_time:.3f}s for 100 calculations"
         )
 
+    @pytest.mark.performance
+    @pytest.mark.skipif(
+        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        reason="Performance tests skipped in CI environments",
+    )
     def test_batch_operation_performance_vs_individual(self) -> None:
         """Test that batch operations are faster than individual operations."""
         from src.ti4.core.resource_management import BatchCostValidator

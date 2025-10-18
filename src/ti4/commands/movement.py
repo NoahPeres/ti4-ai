@@ -1,7 +1,7 @@
 """Movement command implementation."""
 
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 from ..core.events import create_unit_moved_event
 from ..core.game_state import GameState
@@ -19,8 +19,8 @@ class MovementCommand(GameCommand):
     player_id: str
     from_location: str = "space"  # "space" or planet name
     to_location: str = "space"  # "space" or planet name
-    player_technologies: Optional[set[str]] = None
-    transport_ship: Optional[Unit] = None  # For ground force transport
+    player_technologies: set[str] | None = None
+    transport_ship: Unit | None = None  # For ground force transport
 
     def __post_init__(self) -> None:
         """Initialize undo data storage."""

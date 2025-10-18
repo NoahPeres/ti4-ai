@@ -3,8 +3,9 @@
 import statistics
 import time
 from collections import Counter, defaultdict
+from collections.abc import Callable
 from contextlib import contextmanager
-from typing import Any, Callable
+from typing import Any
 
 from ..commands.base import GameCommand
 from .game_state import GameState

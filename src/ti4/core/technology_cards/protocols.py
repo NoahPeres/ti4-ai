@@ -5,7 +5,7 @@ This module defines the core protocols that all technology card implementations
 must follow to ensure consistency and proper integration with game systems.
 """
 
-from typing import Any, Optional, Protocol, Union, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 from ti4.core.abilities import Ability
 from ti4.core.constants import Faction, Technology, UnitStatModification, UnitType
@@ -32,7 +32,7 @@ class TechnologyCardProtocol(Protocol):
         ...
 
     @property
-    def color(self) -> Optional[TechnologyColor]:
+    def color(self) -> TechnologyColor | None:
         """Technology color (None for unit upgrades)."""
         ...
 
@@ -42,7 +42,7 @@ class TechnologyCardProtocol(Protocol):
         ...
 
     @property
-    def faction_restriction(self) -> Optional[Faction]:
+    def faction_restriction(self) -> Faction | None:
         """Faction restriction (None if available to all)."""
         ...
 
@@ -82,7 +82,7 @@ class ExhaustibleTechnologyProtocol(Protocol):
         """Get all abilities that can exhaust this card."""
         ...
 
-    def get_action_ability(self) -> Optional[Ability]:
+    def get_action_ability(self) -> Ability | None:
         """Get the ACTION ability that exhausts this card (if any)."""
         ...
 
@@ -103,7 +103,7 @@ class UnitUpgradeTechnologyProtocol(Protocol):
 
     def get_unit_stat_modifications(
         self,
-    ) -> dict[UnitStatModification, Union[int, bool]]:
+    ) -> dict[UnitStatModification, int | bool]:
         """Get the stat modifications this upgrade provides."""
         ...
 

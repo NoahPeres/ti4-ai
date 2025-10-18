@@ -5,8 +5,9 @@ This module provides comprehensive validation for agenda card data,
 operations, and state management.
 """
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable, Optional
+from typing import Any
 
 from ti4.core.constants import AgendaType
 
@@ -19,8 +20,8 @@ class ValidationResult:
 
     is_valid: bool
     error_message: str = ""
-    card_name: Optional[str] = None
-    field_name: Optional[str] = None
+    card_name: str | None = None
+    field_name: str | None = None
 
 
 class AgendaCardValidator:

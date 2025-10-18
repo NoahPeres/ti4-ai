@@ -5,7 +5,7 @@ This module provides the integration between technology cards and the unit stats
 mapping enum-based stat modifications to actual UnitStats objects.
 """
 
-from typing import Any, Union
+from typing import Any
 
 from ti4.core.constants import UnitStatModification
 from ti4.core.unit_stats import UnitStats
@@ -50,7 +50,7 @@ class UnitStatModificationMapper:
 
     @staticmethod
     def map_modifications_to_unit_stats(
-        modifications: dict[UnitStatModification, Union[int, bool]],
+        modifications: dict[UnitStatModification, int | bool],
     ) -> UnitStats:
         """
         Convert enum-based modifications to UnitStats object.

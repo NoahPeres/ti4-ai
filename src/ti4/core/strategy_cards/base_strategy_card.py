@@ -21,11 +21,11 @@ class StrategyCardAbilityResult:
     """Result of a strategy card ability execution."""
 
     success: bool
-    player_id: Optional[str] = None
+    player_id: str | None = None
     resources_spent: int = 0
     command_tokens_spent: int = 0
-    error_message: Optional[str] = None
-    additional_data: Optional[dict[str, Any]] = None
+    error_message: str | None = None
+    additional_data: dict[str, Any] | None = None
 
 
 class BaseStrategyCard(ABC):

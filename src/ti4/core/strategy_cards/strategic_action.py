@@ -6,7 +6,7 @@ Handles strategy card activation, primary/secondary ability resolution, and turn
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from .coordinator import StrategyCardCoordinator
@@ -65,11 +65,11 @@ class StrategicActionResult:
     """Result of a strategic action activation."""
 
     success: bool
-    resolving_player: Optional[str] = None
+    resolving_player: str | None = None
     primary_ability_resolved: bool = False
     secondary_abilities_offered: bool = False
     secondary_ability_order: list[str] = field(default_factory=list)
-    error_message: Optional[str] = None
+    error_message: str | None = None
 
 
 @dataclass
@@ -77,10 +77,10 @@ class SecondaryAbilityResult:
     """Result of a secondary ability resolution attempt."""
 
     success: bool
-    player: Optional[str] = None
+    player: str | None = None
     resolved: bool = False
     skipped: bool = False
-    error_message: Optional[str] = None
+    error_message: str | None = None
 
 
 class StrategicActionManager:
@@ -105,12 +105,12 @@ class StrategicActionManager:
         self._action_phase: bool = False
 
         # Track current strategic action state
-        self._current_activation: Optional[str] = None  # Currently activated card
+        self._current_activation: str | None = None  # Currently activated card
         self._secondary_resolution_order: list[str] = []
         self._secondary_resolution_index: int = 0
 
         # Strategy card coordinator integration (Rule 83)
-        self._strategy_card_coordinator: Optional[StrategyCardCoordinator] = None
+        self._strategy_card_coordinator: StrategyCardCoordinator | None = None
 
     def set_action_phase(self, action_phase: bool) -> None:
         """Set whether the game is in action phase.
@@ -151,7 +151,7 @@ class StrategicActionManager:
         self._player_strategy_cards[player_id][strategy_card.name] = strategy_card
 
     def can_activate_strategy_card(
-        self, player_id: str, card_name: Union[str, StrategyCardType]
+        self, player_id: str, card_name: str | StrategyCardType
     ) -> bool:
         """Check if a player can activate a specific strategy card.
 
@@ -186,7 +186,7 @@ class StrategicActionManager:
         return not card.is_exhausted()
 
     def activate_strategy_card(
-        self, player_id: str, card_name: Union[str, StrategyCardType]
+        self, player_id: str, card_name: str | StrategyCardType
     ) -> StrategicActionResult:
         """Activate a strategy card and resolve its primary ability.
 
@@ -228,7 +228,7 @@ class StrategicActionManager:
         )
 
     def activate_strategy_card_via_component_action(
-        self, player_id: str, card_name: Union[str, StrategyCardType]
+        self, player_id: str, card_name: str | StrategyCardType
     ) -> StrategicActionResult:
         """Activate a strategy card via component action.
 
@@ -246,7 +246,7 @@ class StrategicActionManager:
         return result
 
     def exhaust_strategy_card(
-        self, player_id: str, card_name: Union[str, StrategyCardType]
+        self, player_id: str, card_name: str | StrategyCardType
     ) -> None:
         """Manually exhaust a strategy card.
 
@@ -266,7 +266,7 @@ class StrategicActionManager:
             self._player_strategy_cards[player_id][card_name_str].exhaust()
 
     def is_strategy_card_exhausted(
-        self, player_id: str, card_name: Union[str, StrategyCardType]
+        self, player_id: str, card_name: str | StrategyCardType
     ) -> bool:
         """Check if a strategy card is exhausted.
 
@@ -290,7 +290,7 @@ class StrategicActionManager:
         return True  # Non-existent cards are considered "exhausted"
 
     def resolve_secondary_ability(
-        self, player_id: str, card_name: Union[str, StrategyCardType]
+        self, player_id: str, card_name: str | StrategyCardType
     ) -> SecondaryAbilityResult:
         """Resolve a secondary ability for a player.
 
@@ -311,7 +311,7 @@ class StrategicActionManager:
         )
 
     def skip_secondary_ability(
-        self, player_id: str, card_name: Union[str, StrategyCardType]
+        self, player_id: str, card_name: str | StrategyCardType
     ) -> SecondaryAbilityResult:
         """Skip a secondary ability for a player.
 
@@ -389,8 +389,8 @@ class StrategicActionManager:
         return secondary_order
 
     def _convert_to_strategy_card_type(
-        self, card: Union[str, StrategyCardType]
-    ) -> Optional[StrategyCardType]:
+        self, card: str | StrategyCardType
+    ) -> StrategyCardType | None:
         """Convert a card name or type to StrategyCardType enum.
 
         Args:
@@ -410,7 +410,7 @@ class StrategicActionManager:
             return None
 
     def can_activate_strategy_card_via_coordinator(
-        self, player_id: str, card: Union[str, StrategyCardType]
+        self, player_id: str, card: str | StrategyCardType
     ) -> bool:
         """Check if a player can activate a strategy card via coordinator.
 
@@ -440,7 +440,7 @@ class StrategicActionManager:
         )
 
     def activate_strategy_card_via_coordinator(
-        self, player_id: str, card: Union[str, StrategyCardType]
+        self, player_id: str, card: str | StrategyCardType
     ) -> StrategicActionResult:
         """Activate a strategy card via coordinator integration.
 

@@ -4,9 +4,11 @@ This module implements Rule 94: TRANSACTIONS mechanics according to the TI4 LRR.
 Handles player-to-player exchanges of commodities, trade goods, promissory notes, and relic fragments.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from .game_phase import GamePhase
 
@@ -37,7 +39,7 @@ class PromissoryNote:
 
     note_type: PromissoryNoteType
     issuing_player: str
-    receiving_player: Optional[str] = None
+    receiving_player: str | None = None
 
     def __post_init__(self) -> None:
         """Validate promissory note after initialization."""
@@ -76,7 +78,7 @@ class TransactionResult:
     success: bool
     player1_gave: TransactionOffer
     player2_gave: TransactionOffer
-    error_message: Optional[str] = None
+    error_message: str | None = None
 
 
 class TransactionManager:
@@ -90,7 +92,7 @@ class TransactionManager:
     - Agenda phase special rules (Rule 94.6)
     """
 
-    def __init__(self, galaxy: Optional["Galaxy"] = None) -> None:
+    def __init__(self, galaxy: Galaxy | None = None) -> None:
         """Initialize the transaction manager.
 
         Args:
@@ -101,7 +103,7 @@ class TransactionManager:
         self._galaxy = galaxy
 
         # Track active player for transaction timing
-        self._active_player: Optional[str] = None
+        self._active_player: str | None = None
 
         # Track completed transactions per turn (Rule 94.1 - one per neighbor)
         self._completed_transactions: dict[str, set[str]] = {}
@@ -109,7 +111,7 @@ class TransactionManager:
         # Track current game phase for special transaction rules
         self._current_phase: GamePhase = GamePhase.SETUP
 
-    def set_galaxy(self, galaxy: "Galaxy") -> None:
+    def set_galaxy(self, galaxy: Galaxy) -> None:
         """Set the galaxy instance for neighbor detection.
 
         Args:
@@ -241,7 +243,7 @@ class TransactionManager:
         )
 
     def validate_offer(
-        self, offer: TransactionOffer, player_supply: Optional[dict[str, int]] = None
+        self, offer: TransactionOffer, player_supply: dict[str, int] | None = None
     ) -> bool:
         """Validate that a transaction offer contains only valid exchangeable items.
 

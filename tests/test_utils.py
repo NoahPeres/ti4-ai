@@ -1,6 +1,6 @@
 """Test utilities for TI4 game framework tests."""
 
-from typing import Any, Optional
+from typing import Any
 
 from ti4.core.constants import Faction, FactionConstants, UnitType
 from ti4.core.fleet import Fleet
@@ -26,8 +26,8 @@ class TestDataFactory:
     def create_unit(
         unit_type: UnitType = UnitType.CRUISER,
         owner: str = "test_player",
-        faction: Optional[Faction] = None,
-        technologies: Optional[set[str]] = None,
+        faction: Faction | None = None,
+        technologies: set[str] | None = None,
     ) -> Unit:
         """Create a test unit."""
         return Unit(
@@ -41,7 +41,7 @@ class TestDataFactory:
     def create_fleet(
         owner: str = "test_player",
         system_id: str = "test_system",
-        units: Optional[list[Unit]] = None,
+        units: list[Unit] | None = None,
     ) -> Fleet:
         """Create a test fleet."""
         fleet = Fleet(owner=owner, system_id=system_id)
@@ -116,13 +116,13 @@ class TestAssertions:
 class MockStatsProvider(UnitStatsProvider):
     """Mock stats provider for testing."""
 
-    def __init__(self, custom_stats: Optional[dict[str, Any]] = None) -> None:
+    def __init__(self, custom_stats: dict[str, Any] | None = None) -> None:
         """Initialize with optional custom stats."""
         super().__init__()
         self.custom_stats = custom_stats or {}
 
     def get_unit_stats(
-        self, unit_type: str, faction: Optional[str] = None, technologies: Any = None
+        self, unit_type: str, faction: str | None = None, technologies: Any = None
     ) -> Any:
         """Get stats, using custom stats if provided."""
         if unit_type in self.custom_stats:

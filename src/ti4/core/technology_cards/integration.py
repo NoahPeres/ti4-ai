@@ -6,8 +6,6 @@ with existing game systems, ensuring that Dark Energy Tap and Gravity Drive
 are properly registered and available throughout the game.
 """
 
-from typing import Optional
-
 from ti4.core.abilities import AbilityManager
 from ti4.core.constants import Technology
 from ti4.core.unit_stats import UnitStatsProvider
@@ -28,8 +26,8 @@ class TechnologyFrameworkIntegration:
 
     def __init__(
         self,
-        ability_manager: Optional[AbilityManager] = None,
-        unit_stats_provider: Optional[UnitStatsProvider] = None,
+        ability_manager: AbilityManager | None = None,
+        unit_stats_provider: UnitStatsProvider | None = None,
     ) -> None:
         """
         Initialize the technology framework integration.
@@ -89,7 +87,7 @@ class TechnologyFrameworkIntegration:
 
     def get_technology_card(
         self, technology: Technology
-    ) -> Optional[TechnologyCardProtocol]:
+    ) -> TechnologyCardProtocol | None:
         """
         Get a technology card instance.
 
@@ -168,7 +166,7 @@ class TechnologyFrameworkIntegration:
 
 
 # Global integration instance for easy access
-_global_integration: Optional[TechnologyFrameworkIntegration] = None
+_global_integration: TechnologyFrameworkIntegration | None = None
 
 
 def get_technology_framework_integration() -> TechnologyFrameworkIntegration:
@@ -185,8 +183,8 @@ def get_technology_framework_integration() -> TechnologyFrameworkIntegration:
 
 
 def initialize_technology_framework(
-    ability_manager: Optional[AbilityManager] = None,
-    unit_stats_provider: Optional[UnitStatsProvider] = None,
+    ability_manager: AbilityManager | None = None,
+    unit_stats_provider: UnitStatsProvider | None = None,
 ) -> TechnologyFrameworkIntegration:
     """
     Initialize the technology framework with specific managers.
