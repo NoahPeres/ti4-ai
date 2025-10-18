@@ -20,7 +20,7 @@ class TestStatusPhasePerformanceIntegration:
 
     @pytest.mark.performance
     @pytest.mark.skipif(
-        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
         reason="Performance tests skipped in CI environments",
     )
     def test_status_phase_manager_with_performance_optimization(self) -> None:
@@ -57,7 +57,7 @@ class TestStatusPhasePerformanceIntegration:
 
     @pytest.mark.performance
     @pytest.mark.skipif(
-        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
         reason="Performance tests skipped in CI environments",
     )
     def test_status_phase_manager_without_performance_optimization(self) -> None:
@@ -88,7 +88,7 @@ class TestStatusPhasePerformanceIntegration:
 
     @pytest.mark.performance
     @pytest.mark.skipif(
-        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
         reason="Performance tests skipped in CI environments",
     )
     def test_performance_cache_management(self) -> None:
@@ -116,7 +116,7 @@ class TestStatusPhasePerformanceIntegration:
 
     @pytest.mark.performance
     @pytest.mark.skipif(
-        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
         reason="Performance tests skipped in CI environments",
     )
     def test_performance_with_large_game_state(self) -> None:
@@ -151,7 +151,7 @@ class TestStatusPhasePerformanceIntegration:
 
     @pytest.mark.performance
     @pytest.mark.skipif(
-        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
         reason="Performance tests skipped in CI environments",
     )
     def test_performance_monitoring_across_multiple_executions(self) -> None:
@@ -197,7 +197,7 @@ class TestStatusPhasePerformanceIntegration:
 
     @pytest.mark.performance
     @pytest.mark.skipif(
-        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
         reason="Performance tests skipped in CI environments",
     )
     def test_error_handling_with_performance_optimization(self) -> None:

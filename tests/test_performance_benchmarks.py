@@ -24,7 +24,7 @@ from src.ti4.core.resource_management import (
 
 @pytest.mark.performance
 @pytest.mark.skipif(
-    os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+    bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
     reason="Performance tests skipped in CI environments",
 )
 def test_caching_performance_improvement() -> None:
@@ -75,7 +75,7 @@ def test_caching_performance_improvement() -> None:
 
 @pytest.mark.performance
 @pytest.mark.skipif(
-    os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+    bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
     reason="Performance tests skipped in CI environments",
 )
 def test_batch_operations_performance() -> None:

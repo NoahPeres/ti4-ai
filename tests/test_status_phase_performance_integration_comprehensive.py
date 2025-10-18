@@ -183,7 +183,7 @@ class TestStatusPhasePerformanceIntegrationComprehensive:
         reason="Performance optimization not available",
     )
     @pytest.mark.skipif(
-        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
         reason="Performance tests skipped in CI environments",
     )
     def test_performance_monitoring_integration(self) -> None:
@@ -241,7 +241,7 @@ class TestStatusPhasePerformanceIntegrationComprehensive:
         reason="Performance optimization not available",
     )
     @pytest.mark.skipif(
-        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
         reason="Performance tests skipped in CI environments",
     )
     def test_optimizer_statistics_and_trends(self) -> None:
@@ -481,7 +481,7 @@ class TestStatusPhasePerformanceIntegrationComprehensive:
 
     @pytest.mark.performance
     @pytest.mark.skipif(
-        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
         reason="Performance tests skipped in CI environments",
     )
     def test_memory_optimization_integration(self) -> None:

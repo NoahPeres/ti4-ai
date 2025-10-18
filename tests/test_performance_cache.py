@@ -104,7 +104,7 @@ class TestGameStateCache:
 
     @pytest.mark.performance
     @pytest.mark.skipif(
-        os.getenv("CI") or os.getenv("GITHUB_ACTIONS"),
+        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
         reason="Performance tests skipped in CI environments",
     )
     def test_cache_performance_improvement(self) -> None:
