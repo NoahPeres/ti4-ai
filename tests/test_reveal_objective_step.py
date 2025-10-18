@@ -259,38 +259,6 @@ class TestRevealObjectiveStep:
         # Assert: Should return the same state initially
         assert updated_state is mock_game_state
 
-    def test_execute_integration_with_objective_system(self) -> None:
-        """Test integration with existing objective system.
-
-        Verifies that the step properly integrates with the
-        existing objective system for objective management.
-
-        Requirements: 10.1 - Integration with objective system
-        """
-        from src.ti4.core.status_phase import RevealObjectiveStep
-
-        # Arrange: Create mock game state with speaker
-        mock_game_state = Mock()
-        mock_game_state.speaker_id = "player1"
-        mock_game_state.players = [Mock(id="player1")]
-
-        # Create mock objective
-        mock_objective = Mock()
-        mock_objective.id = "test_objective"
-        mock_objective.name = "Test Objective"
-
-        # Act: Execute step with objective system integration
-        step = RevealObjectiveStep()
-        with patch.object(
-            step, "get_next_unrevealed_objective", return_value=mock_objective
-        ):
-            with patch.object(step, "reveal_objective", return_value=mock_game_state):
-                result, updated_state = step.execute(mock_game_state)
-
-        # Assert: Should integrate with objective system
-        assert result.success is True
-        assert "Test Objective" in result.actions_taken[0]
-
     def test_execute_identifies_speaker_correctly(self) -> None:
         """Test that execution identifies the speaker correctly.
 
@@ -352,108 +320,55 @@ class TestRevealObjectiveStepIntegration:
         handler = orchestrator.get_step_handler(2)
 
         # Assert: Should return step handler with proper interface
-        # Note: This will initially fail until we integrate the step with orchestrator
-        # For now, we'll just verify the interface works
         assert handler is not None
         assert hasattr(handler, "execute")
         assert hasattr(handler, "validate_prerequisites")
         assert hasattr(handler, "get_step_name")
 
-    def test_step_handles_complex_objective_scenarios(self) -> None:
-        """Test step handling of complex objective scenarios.
+    def test_step_handles_multiple_objective_types(self) -> None:
+        """Test step handling of different objective types.
 
-        Verifies that the step can handle complex scenarios
-        with multiple objective types and revelation states.
+        Verifies that the step can handle revealing objectives
+        of different types (Stage I, Stage II) appropriately.
 
         Requirements: 3.1 - Step 2 implementation robustness
         """
         from src.ti4.core.status_phase import RevealObjectiveStep
 
-        # Arrange: Create complex mock game state
+        # Arrange: Create mock game state
         mock_game_state = Mock()
         mock_game_state.speaker_id = "player1"
         mock_game_state.players = [Mock(id="player1")]
 
-        # Create mock objectives of different types
+        step = RevealObjectiveStep()
+
+        # Test Stage I objective
         mock_stage_i_obj = Mock()
         mock_stage_i_obj.id = "stage_i_obj"
         mock_stage_i_obj.name = "Stage I Objective"
-        mock_stage_i_obj.type = "PUBLIC_STAGE_I"
 
-        # Act: Execute step with complex scenario
-        step = RevealObjectiveStep()
         with patch.object(
             step, "get_next_unrevealed_objective", return_value=mock_stage_i_obj
         ):
             with patch.object(step, "reveal_objective", return_value=mock_game_state):
-                result, updated_state = step.execute(mock_game_state)
+                result_i, _ = step.execute(mock_game_state)
 
-        # Assert: Should handle complex scenario successfully
-        assert result.success is True
-        assert "Stage I Objective" in result.actions_taken[0]
+        # Test Stage II objective
+        mock_stage_ii_obj = Mock()
+        mock_stage_ii_obj.id = "stage_ii_obj"
+        mock_stage_ii_obj.name = "Stage II Objective"
 
-    def test_step_executes_successfully_with_objective_system(self) -> None:
-        """Test step executes successfully with objective system integration.
-
-        Verifies that the step completes successfully when
-        integrating with the objective system.
-
-        Requirements: 10.1 - Integration with objective system
-        """
-        from src.ti4.core.status_phase import RevealObjectiveStep
-
-        # Arrange: Create game state with objective system
-        mock_game_state = Mock()
-        mock_game_state.speaker_id = "player1"
-        mock_game_state.players = [Mock(id="player1")]
-
-        # Create mock objective
-        mock_objective = Mock()
-        mock_objective.id = "test_objective"
-        mock_objective.name = "Test Objective"
-
-        # Act: Execute step
-        step = RevealObjectiveStep()
         with patch.object(
-            step, "get_next_unrevealed_objective", return_value=mock_objective
+            step, "get_next_unrevealed_objective", return_value=mock_stage_ii_obj
         ):
             with patch.object(step, "reveal_objective", return_value=mock_game_state):
-                result, updated_state = step.execute(mock_game_state)
+                result_ii, _ = step.execute(mock_game_state)
 
-        # Assert: Should execute successfully
-        assert result.success is True
-
-    def test_step_executes_with_multiple_players(self) -> None:
-        """Test step execution with multiple players present.
-
-        Verifies that the step correctly identifies and uses the
-        designated speaker when multiple players are present.
-
-        Requirements: 3.2 - Speaker identification robustness
-        """
-        from src.ti4.core.status_phase import RevealObjectiveStep
-
-        # Arrange: Create mock game state with speaker
-        mock_game_state = Mock()
-        mock_game_state.speaker_id = "player1"
-        mock_game_state.players = [Mock(id="player1"), Mock(id="player2")]
-
-        # Create mock objective
-        mock_objective = Mock()
-        mock_objective.id = "test_objective"
-        mock_objective.name = "Test Objective"
-
-        # Act: Execute step
-        step = RevealObjectiveStep()
-        with patch.object(
-            step, "get_next_unrevealed_objective", return_value=mock_objective
-        ):
-            with patch.object(step, "reveal_objective", return_value=mock_game_state):
-                result, updated_state = step.execute(mock_game_state)
-
-        # Assert: Should handle speaker identification robustly
-        assert result.success is True
-        assert len(result.actions_taken) > 0
+        # Assert: Should handle both objective types successfully
+        assert result_i.success is True
+        assert result_ii.success is True
+        assert "Stage I Objective" in result_i.actions_taken[0]
+        assert "Stage II Objective" in result_ii.actions_taken[0]
 
     def test_execute_assigns_speaker_when_none(self) -> None:
         """Test execution assigns speaker when speaker_id is None."""

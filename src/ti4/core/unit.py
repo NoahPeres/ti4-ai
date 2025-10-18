@@ -22,7 +22,7 @@ def _normalize_technologies(
 
     Args:
         technologies: Mixed set of Technology enums and/or strings
-        strict: If True, raise TypeError for invalid types; if False, log warning and skip
+        strict: If True, raise on unknown techs/invalid types; if False, log warning and skip
 
     Returns:
         Set of Technology enums
@@ -39,8 +39,7 @@ def _normalize_technologies(
                 normalized.add(Technology(t))
             except ValueError:
                 if strict:
-                    # Skip unknown tech strings for robustness; alternatively, raise
-                    continue
+                    raise ValueError(f"Unknown technology: {t}") from None
                 else:
                     logger.warning(f"Skipping unknown technology: {t}")
                     continue
@@ -49,7 +48,10 @@ def _normalize_technologies(
             if strict:
                 raise TypeError(msg)
             else:
-                logger.warning(f"Skipping {msg}: {t}")
+                logger.warning(
+                    f"Skipping invalid technology type {type(t).__name__}: {t}"
+                )
+                continue
     return normalized
 
 

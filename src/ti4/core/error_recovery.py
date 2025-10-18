@@ -161,8 +161,6 @@ class ErrorRecoveryManager:
         recovery_timeout: float | None = None,
     ) -> Any:
         """Execute operation with circuit breaker pattern."""
-        if failure_threshold is None:
-            failure_threshold = PerformanceConstants.DEFAULT_FAILURE_THRESHOLD
         if operation_id not in self.circuit_breakers:
             self.circuit_breakers[operation_id] = CircuitBreaker(
                 failure_threshold, recovery_timeout

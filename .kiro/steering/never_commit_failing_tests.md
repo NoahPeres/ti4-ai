@@ -2,7 +2,7 @@
 
 ## 🚨 ABSOLUTE PROHIBITION
 
-**NEVER, UNDER ANY CIRCUMSTANCES, COMMIT CODE WITH FAILING TESTS**
+### ❌ NEVER, UNDER ANY CIRCUMSTANCES, COMMIT CODE WITH FAILING TESTS
 
 This is a fundamental violation of our quality standards and must never happen.
 
