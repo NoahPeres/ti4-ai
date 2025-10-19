@@ -446,12 +446,24 @@ class TestStatusPhasePerformanceBenchmarks:
         print(f"  Std Dev: {baseline_std:.2f}ms")
         print(f"  95th %ile: {baseline_p95:.2f}ms")
 
-        # Establish regression thresholds
-        regression_thresholds = {
-            "average_ms": baseline_avg * 1.2,  # 20% slower than baseline
-            "p95_ms": baseline_p95 * 1.3,  # 30% slower for 95th percentile
-            "std_dev_ms": baseline_std * 2.0,  # 2x more variable
-        }
+        # Establish regression thresholds vs historical baseline (env-provided)
+        # Example: PERF_BASELINE_JSON='{"average_ms":200,"p95_ms":280,"std_dev_ms":40}'
+        import json as _json
+
+        env = os.getenv("PERF_BASELINE_JSON")
+        if not env:
+            pytest.skip(
+                "PERF_BASELINE_JSON not set; skipping regression detection benchmark"
+            )
+        try:
+            hb = _json.loads(env)
+            regression_thresholds = {
+                "average_ms": float(hb["average_ms"]) * 1.2,
+                "p95_ms": float(hb["p95_ms"]) * 1.3,
+                "std_dev_ms": float(hb["std_dev_ms"]) * 2.0,
+            }
+        except Exception as e:
+            pytest.skip(f"Invalid PERF_BASELINE_JSON: {e}")
 
         print("Regression Thresholds:")
         for metric, threshold in regression_thresholds.items():

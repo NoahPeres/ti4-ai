@@ -147,11 +147,14 @@ class TestStatusPhasePerformanceIntegrationComprehensive:
         game_state_opt = self.create_test_game_state("medium")
 
         # Test standard orchestrator
+        # Warm-up (unmeasured) to stabilize caches/imports
+        _ = self.standard_orchestrator.execute_complete_status_phase(game_state_std)
         (std_result, std_state), std_metrics = self.measure_performance(
             self.standard_orchestrator.execute_complete_status_phase, game_state_std
         )
 
         # Test optimized orchestrator
+        _ = self.optimized_orchestrator.execute_complete_status_phase(game_state_opt)
         (opt_result, opt_state), opt_metrics = self.measure_performance(
             self.optimized_orchestrator.execute_complete_status_phase, game_state_opt
         )
@@ -453,12 +456,27 @@ class TestStatusPhasePerformanceIntegrationComprehensive:
         print(f"Average memory delta: {baseline_stats['avg_memory']:.1f} objects")
         print(f"Max memory delta: {baseline_stats['max_memory']} objects")
 
-        # Load historical "known good" baseline (replace with file/db in real use)
-        historical_baseline = {
-            "avg_time_ms": 100.0,
-            "p95_time_ms": 130.0,
-            "max_memory": 500,
-        }
+        # Load historical "known good" baseline; allow ENV override (JSON)
+        # Example: PERF_BASELINE_JSON='{"avg_time_ms":120,"p95_time_ms":150,"max_memory":800}'
+        import json as _json  # local import to avoid global dependency when skipped
+
+        env_baseline = os.getenv("PERF_BASELINE_JSON")
+        if env_baseline:
+            try:
+                hb = _json.loads(env_baseline)
+                historical_baseline = {
+                    "avg_time_ms": float(hb.get("avg_time_ms", 100.0)),
+                    "p95_time_ms": float(hb.get("p95_time_ms", 130.0)),
+                    "max_memory": int(hb.get("max_memory", 500)),
+                }
+            except Exception:
+                pytest.skip("Invalid PERF_BASELINE_JSON; skipping regression check")
+        else:
+            historical_baseline = {
+                "avg_time_ms": 100.0,
+                "p95_time_ms": 130.0,
+                "max_memory": 500,
+            }
         # Define regression thresholds vs historical baseline
         regression_thresholds = {
             "avg_time_ms": historical_baseline["avg_time_ms"] * 1.25,

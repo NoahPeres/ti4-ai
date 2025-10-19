@@ -236,6 +236,9 @@ class TestStatusPhasePerformance:
             assert execution_time < 200, (
                 f"Step {step_number} took {execution_time:.2f}ms, should be <200ms for large states"
             )
+            # Verify result structure
+            assert isinstance(result.step_name, str) and result.step_name
+            assert isinstance(result.success, bool)
 
         # Verify total time is reasonable
         total_time = sum(step_times.values())
@@ -282,10 +285,12 @@ class TestStatusPhasePerformance:
             )
 
         # Memory should be mostly cleaned up after deletion
-        cleanup_ratio = (after_cleanup_memory - baseline_memory) / max(
+        cleanup_ratio = abs(after_cleanup_memory - baseline_memory) / max(
             creation_growth, 1
         )
-        assert cleanup_ratio < 2.0, "Memory should be mostly cleaned up after deletion"
+        assert cleanup_ratio < 0.5, (
+            "Memory cleanup ratio must be <0.5 to match integration test expectations"
+        )
 
     # decorators removed; handled by module-level pytestmark
     def test_repeated_execution_performance(self) -> None:
