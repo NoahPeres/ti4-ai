@@ -65,7 +65,6 @@ class TestStatusPhasePerformanceIntegrationComprehensive:
 
         if PERFORMANCE_OPTIMIZATION_AVAILABLE:
             self.optimized_orchestrator = create_optimized_status_phase_orchestrator()
-            self.optimizer = StatusPhasePerformanceOptimizer()
 
     def create_test_game_state(self, size: str = "medium") -> GameState:
         """Create a test game state of specified size.
@@ -144,16 +143,17 @@ class TestStatusPhasePerformanceIntegrationComprehensive:
         if not PERFORMANCE_OPTIMIZATION_AVAILABLE:
             pytest.skip("Performance optimization not available")
 
-        game_state = self.create_test_game_state("medium")
+        game_state_std = self.create_test_game_state("medium")
+        game_state_opt = self.create_test_game_state("medium")
 
         # Test standard orchestrator
         (std_result, std_state), std_metrics = self.measure_performance(
-            self.standard_orchestrator.execute_complete_status_phase, game_state
+            self.standard_orchestrator.execute_complete_status_phase, game_state_std
         )
 
         # Test optimized orchestrator
         (opt_result, opt_state), opt_metrics = self.measure_performance(
-            self.optimized_orchestrator.execute_complete_status_phase, game_state
+            self.optimized_orchestrator.execute_complete_status_phase, game_state_opt
         )
 
         # Verify both succeeded
@@ -195,6 +195,9 @@ class TestStatusPhasePerformanceIntegrationComprehensive:
 
         Requirements: 12.1, 12.2, 12.3 - Performance monitoring
         """
+        if not PERFORMANCE_OPTIMIZATION_AVAILABLE:
+            pytest.skip("Performance optimization not available")
+
         game_state = self.create_test_game_state("medium")
 
         # Execute with performance monitoring
@@ -245,6 +248,9 @@ class TestStatusPhasePerformanceIntegrationComprehensive:
 
         Requirements: 12.1, 12.2 - Performance trend monitoring
         """
+        if not PERFORMANCE_OPTIMIZATION_AVAILABLE:
+            pytest.skip("Performance optimization not available")
+
         game_state = self.create_test_game_state("small")
 
         # Execute multiple times to build performance history
@@ -572,33 +578,3 @@ class TestStatusPhasePerformanceIntegrationComprehensive:
             assert slowdown_factor < 10.0, (
                 f"Error handling too slow compared to normal: {slowdown_factor:.2f}x"
             )
-
-
-if __name__ == "__main__":
-    # Run comprehensive performance integration tests when executed directly
-    test_instance = TestStatusPhasePerformanceIntegrationComprehensive()
-    test_instance.setup_method()
-
-    print("Running Comprehensive Status Phase Performance Integration Tests...")
-    print("=" * 70)
-
-    try:
-        if PERFORMANCE_OPTIMIZATION_AVAILABLE:
-            test_instance.test_standard_vs_optimized_orchestrator_performance()
-            test_instance.test_performance_monitoring_integration()
-            test_instance.test_optimizer_statistics_and_trends()
-            test_instance.test_memory_optimization_integration()
-        else:
-            print("Performance optimization not available - running basic tests only")
-
-        test_instance.test_performance_with_different_game_state_sizes()
-        test_instance.test_performance_under_concurrent_load()
-        test_instance.test_performance_regression_detection_comprehensive()
-        test_instance.test_error_handling_performance_impact()
-
-        print(
-            "\nAll comprehensive performance integration tests completed successfully!"
-        )
-    except Exception as e:
-        print(f"\nComprehensive performance test failed: {e}")
-        raise

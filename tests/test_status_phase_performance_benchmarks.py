@@ -38,6 +38,10 @@ pytestmark = [
         os.getenv("RUN_PERF") != "1",
         reason="Set RUN_PERF=1 to run performance benchmarks",
     ),
+    pytest.mark.skipif(
+        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
+        reason="Performance tests skipped in CI environments",
+    ),
 ]
 
 
@@ -47,7 +51,6 @@ class TestStatusPhasePerformanceBenchmarks:
     def setup_method(self) -> None:
         """Set up test fixtures for each test method."""
         self.orchestrator = StatusPhaseOrchestrator()
-        self.manager = StatusPhaseManager()
 
     def create_game_state_with_size(
         self, num_players: int, planets_per_player: int
@@ -112,11 +115,6 @@ class TestStatusPhasePerformanceBenchmarks:
         gc.collect()  # Force garbage collection for accurate measurement
         return len(gc.get_objects())
 
-    @pytest.mark.performance
-    @pytest.mark.skipif(
-        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
-        reason="Performance tests skipped in CI environments",
-    )
     def test_complete_status_phase_execution_time_benchmarks(self) -> None:
         """Test complete status phase execution time benchmarks.
 
@@ -205,11 +203,6 @@ class TestStatusPhasePerformanceBenchmarks:
                 f"({stats['num_players']}p, {stats['planets_per_player']}pl)"
             )
 
-    @pytest.mark.performance
-    @pytest.mark.skipif(
-        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
-        reason="Performance tests skipped in CI environments",
-    )
     def test_individual_step_execution_time_benchmarks(self) -> None:
         """Test individual step execution time benchmarks.
 
@@ -239,16 +232,10 @@ class TestStatusPhasePerformanceBenchmarks:
 
             # Run multiple iterations for each step
             for _ in range(10):
-                (result, updated_state), execution_time = (
-                    self.measure_execution_time_ms(
-                        self.orchestrator.execute_step, step_number, current_state
-                    )
+                (result, _), execution_time = self.measure_execution_time_ms(
+                    self.orchestrator.execute_step, step_number, current_state
                 )
                 execution_times.append(execution_time)
-
-                # Update state for next iteration (use the updated state)
-                if result.success:
-                    current_state = updated_state
 
             # Calculate statistics
             avg_time = statistics.mean(execution_times)
@@ -287,11 +274,6 @@ class TestStatusPhasePerformanceBenchmarks:
             f"Total step time {total_avg_time:.2f}ms should be <800ms"
         )
 
-    @pytest.mark.performance
-    @pytest.mark.skipif(
-        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
-        reason="Performance tests skipped in CI environments",
-    )
     def test_memory_usage_optimization_benchmarks(self) -> None:
         """Test memory usage optimization benchmarks.
 
@@ -366,11 +348,6 @@ class TestStatusPhasePerformanceBenchmarks:
                 f"Memory not properly cleaned up: {cleanup_ratio:.2f}"
             )
 
-    @pytest.mark.performance
-    @pytest.mark.skipif(
-        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
-        reason="Performance tests skipped in CI environments",
-    )
     def test_concurrent_execution_performance_benchmarks(self) -> None:
         """Test performance under concurrent execution scenarios.
 
@@ -439,11 +416,6 @@ class TestStatusPhasePerformanceBenchmarks:
                 f"Max time {max_time:.2f}ms too high for concurrency {num_concurrent}"
             )
 
-    @pytest.mark.performance
-    @pytest.mark.skipif(
-        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
-        reason="Performance tests skipped in CI environments",
-    )
     def test_performance_regression_detection(self) -> None:
         """Test for performance regression detection.
 
@@ -502,11 +474,6 @@ class TestStatusPhasePerformanceBenchmarks:
 
         print(f"Baseline metrics established: {baseline_metrics}")
 
-    @pytest.mark.performance
-    @pytest.mark.skipif(
-        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
-        reason="Performance tests skipped in CI environments",
-    )
     def test_status_phase_manager_performance_benchmarks(self) -> None:
         """Test StatusPhaseManager performance benchmarks.
 
@@ -550,11 +517,6 @@ class TestStatusPhasePerformanceBenchmarks:
                     f"Manager {case_name} took {avg_time:.2f}ms, should be <600ms"
                 )
 
-    @pytest.mark.performance
-    @pytest.mark.skipif(
-        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
-        reason="Performance tests skipped in CI environments",
-    )
     def test_error_handling_performance_impact(self) -> None:
         """Test performance impact of error handling.
 
@@ -593,11 +555,6 @@ class TestStatusPhasePerformanceBenchmarks:
                 f"Error handling {slowdown_factor:.2f}x slower than normal"
             )
 
-    @pytest.mark.performance
-    @pytest.mark.skipif(
-        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
-        reason="Performance tests skipped in CI environments",
-    )
     def test_performance_with_different_game_phases(self) -> None:
         """Test performance with different game phase contexts.
 
@@ -651,22 +608,3 @@ class TestStatusPhasePerformanceBenchmarks:
             assert scaling_factor < 4.0, (
                 f"Performance scaling across contexts too poor: {scaling_factor:.2f}x"
             )
-
-
-if __name__ == "__main__":
-    # Run benchmarks when executed directly
-    test_instance = TestStatusPhasePerformanceBenchmarks()
-    test_instance.setup_method()
-
-    print("Running Status Phase Performance Benchmarks...")
-    print("=" * 60)
-
-    try:
-        test_instance.test_complete_status_phase_execution_time_benchmarks()
-        test_instance.test_individual_step_execution_time_benchmarks()
-        test_instance.test_memory_usage_optimization_benchmarks()
-        test_instance.test_performance_regression_detection()
-        print("\nAll performance benchmarks completed successfully!")
-    except Exception as e:
-        print(f"\nBenchmark failed: {e}")
-        raise

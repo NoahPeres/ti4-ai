@@ -293,13 +293,13 @@ class TestStatusPhasePerformance:
 
         Verifies that performance doesn't degrade with repeated use.
         """
-        game_state = self.create_minimal_game_state()
         execution_times = []
 
         # Execute status phase multiple times
         for i in range(5):
+            gs = self.create_minimal_game_state()
             (result, updated_state), execution_time = self.measure_execution_time(
-                self.orchestrator.execute_complete_status_phase, game_state
+                self.orchestrator.execute_complete_status_phase, gs
             )
             execution_times.append(execution_time)
             print(f"Execution {i + 1}: {execution_time:.2f}ms")
@@ -522,6 +522,7 @@ class TestStatusPhasePerformanceBenchmarks:
             result, current_state = orchestrator.execute_step(
                 step_number, current_state
             )
+            assert result.success, f"Step {step_number} failed: {result.error_message}"
             end_time = time.perf_counter()
 
             execution_time_ms = (end_time - start_time) * 1000
