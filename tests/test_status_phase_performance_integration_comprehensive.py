@@ -28,6 +28,18 @@ from src.ti4.core.status_phase import (
     StatusPhaseOrchestrator,
 )
 
+# Module-level marks/gating
+pytestmark = [
+    pytest.mark.performance,
+    pytest.mark.skipif(
+        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
+        reason="Performance tests skipped in CI",
+    ),
+    pytest.mark.skipif(
+        os.getenv("RUN_PERF") != "1", reason="Set RUN_PERF=1 to run performance tests"
+    ),
+]
+
 # Try to import performance optimization features
 try:
     from src.ti4.core.status_phase_performance import (
@@ -92,7 +104,7 @@ class TestStatusPhasePerformanceIntegrationComprehensive:
 
     def measure_performance(
         self, func: Any, *args: Any, **kwargs: Any
-    ) -> tuple[Any, dict[str, float]]:
+    ) -> tuple[Any, dict[str, int | float]]:
         """Measure comprehensive performance metrics for a function.
 
         Args:
@@ -162,10 +174,10 @@ class TestStatusPhasePerformanceIntegrationComprehensive:
         )
 
         # Both should meet performance requirements (allow some tolerance for system load)
-        assert std_metrics["execution_time_ms"] < 1000, (
+        assert std_metrics["execution_time_ms"] < 600, (
             f"Standard too slow: {std_metrics['execution_time_ms']:.2f}ms"
         )
-        assert opt_metrics["execution_time_ms"] < 1000, (
+        assert opt_metrics["execution_time_ms"] < 600, (
             f"Optimized too slow: {opt_metrics['execution_time_ms']:.2f}ms"
         )
 
@@ -173,19 +185,11 @@ class TestStatusPhasePerformanceIntegrationComprehensive:
         performance_ratio = (
             opt_metrics["execution_time_ms"] / std_metrics["execution_time_ms"]
         )
-        assert performance_ratio < 5000.0, (
+        assert performance_ratio < 2.0, (
             f"Optimized version too slow: {performance_ratio:.2f}x"
         )
 
-    @pytest.mark.performance
-    @pytest.mark.skipif(
-        not PERFORMANCE_OPTIMIZATION_AVAILABLE,
-        reason="Performance optimization not available",
-    )
-    @pytest.mark.skipif(
-        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
-        reason="Performance tests skipped in CI environments",
-    )
+    # decorators removed; handled by module-level pytestmark
     def test_performance_monitoring_integration(self) -> None:
         """Test integration with performance monitoring features.
 
@@ -235,15 +239,7 @@ class TestStatusPhasePerformanceIntegrationComprehensive:
             for warning in performance_report.performance_warnings:
                 print(f"  - {warning}")
 
-    @pytest.mark.performance
-    @pytest.mark.skipif(
-        not PERFORMANCE_OPTIMIZATION_AVAILABLE,
-        reason="Performance optimization not available",
-    )
-    @pytest.mark.skipif(
-        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
-        reason="Performance tests skipped in CI environments",
-    )
+    # decorators removed; handled by module-level pytestmark
     def test_optimizer_statistics_and_trends(self) -> None:
         """Test optimizer statistics and performance trend analysis.
 
@@ -331,8 +327,8 @@ class TestStatusPhasePerformanceIntegrationComprehensive:
 
             print(f"{size:6} game state: {avg_time:6.2f}ms, memory: {avg_memory:+5.1f}")
 
-            # Verify performance requirements
-            max_allowed = {"small": 200, "medium": 400, "large": 800}[size]
+            # Req 12.1: <500ms (with modest tolerance)
+            max_allowed = {"small": 150, "medium": 350, "large": 500}[size]
             assert avg_time < max_allowed, (
                 f"{size} game state too slow: {avg_time:.2f}ms"
             )
@@ -403,7 +399,7 @@ class TestStatusPhasePerformanceIntegrationComprehensive:
 
                 # Verify performance under concurrent load
                 assert success_rate >= 0.8, f"Success rate too low: {success_rate:.1%}"
-                assert avg_time < 1000, (
+                assert avg_time < 600, (
                     f"Average time too high under concurrency: {avg_time:.2f}ms"
                 )
             else:
@@ -451,12 +447,17 @@ class TestStatusPhasePerformanceIntegrationComprehensive:
         print(f"Average memory delta: {baseline_stats['avg_memory']:.1f} objects")
         print(f"Max memory delta: {baseline_stats['max_memory']} objects")
 
-        # Define regression thresholds
+        # Load historical "known good" baseline (replace with file/db in real use)
+        historical_baseline = {
+            "avg_time_ms": 100.0,
+            "p95_time_ms": 130.0,
+            "max_memory": 500,
+        }
+        # Define regression thresholds vs historical baseline
         regression_thresholds = {
-            "avg_time_ms": baseline_stats["avg_time_ms"] * 1.25,  # 25% slower
-            "p95_time_ms": baseline_stats["p95_time_ms"]
-            * 1.3,  # 30% slower for 95th percentile
-            "max_memory": baseline_stats["max_memory"] * 1.5,  # 50% more memory
+            "avg_time_ms": historical_baseline["avg_time_ms"] * 1.25,
+            "p95_time_ms": historical_baseline["p95_time_ms"] * 1.3,
+            "max_memory": historical_baseline["max_memory"] * 1.5,
         }
 
         print("\nRegression Thresholds:")
@@ -479,11 +480,7 @@ class TestStatusPhasePerformanceIntegrationComprehensive:
 
         print(f"\nBaseline established: {baseline_record}")
 
-    @pytest.mark.performance
-    @pytest.mark.skipif(
-        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
-        reason="Performance tests skipped in CI environments",
-    )
+    # decorators removed; handled by module-level pytestmark
     def test_memory_optimization_integration(self) -> None:
         """Test integration of memory optimization features.
 

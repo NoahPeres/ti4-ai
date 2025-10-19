@@ -27,6 +27,18 @@ from src.ti4.core.status_phase import (
     StatusPhaseResult,
 )
 
+# Apply to whole module
+pytestmark = [
+    pytest.mark.performance,
+    pytest.mark.skipif(
+        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
+        reason="Performance tests skipped in CI",
+    ),
+    pytest.mark.skipif(
+        os.getenv("RUN_PERF") != "1", reason="Set RUN_PERF=1 to run performance tests"
+    ),
+]
+
 
 class TestStatusPhasePerformance:
     """Performance tests for status phase execution."""
@@ -107,7 +119,7 @@ class TestStatusPhasePerformance:
         """Measure current memory usage.
 
         Returns:
-            Memory usage in bytes (approximate)
+            Approximate memory usage (object count)
         """
         # Force garbage collection for more accurate measurement
         gc.collect()
@@ -116,16 +128,7 @@ class TestStatusPhasePerformance:
         # This is a simplified approach - in production you might use psutil
         return len(gc.get_objects())
 
-    @pytest.mark.performance
-    @pytest.mark.skipif(
-        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
-        reason="Performance tests skipped in CI environments",
-    )
-    @pytest.mark.performance
-    @pytest.mark.skipif(
-        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
-        reason="Performance tests skipped in CI environments",
-    )
+    # decorators removed; handled by module-level pytestmark
     def test_complete_status_phase_performance_minimal(self) -> None:
         """Test complete status phase execution time with minimal game state.
 
@@ -150,16 +153,7 @@ class TestStatusPhasePerformance:
         assert result.success
         assert len(result.steps_completed) > 0
 
-    @pytest.mark.performance
-    @pytest.mark.skipif(
-        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
-        reason="Performance tests skipped in CI environments",
-    )
-    @pytest.mark.performance
-    @pytest.mark.skipif(
-        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
-        reason="Performance tests skipped in CI environments",
-    )
+    # decorators removed; handled by module-level pytestmark
     def test_complete_status_phase_performance_large(self) -> None:
         """Test complete status phase execution time with large game state.
 
@@ -175,8 +169,8 @@ class TestStatusPhasePerformance:
         print(f"Complete status phase (large): {execution_time:.2f}ms")
 
         # Verify performance requirement (may be more lenient for large states)
-        assert execution_time < 1000, (
-            f"Status phase took {execution_time:.2f}ms, should be <1000ms for large states"
+        assert execution_time < 600, (
+            f"Status phase took {execution_time:.2f}ms, should be <600ms for large states"
         )
 
         # Verify functionality
@@ -184,11 +178,7 @@ class TestStatusPhasePerformance:
         assert result.success
         assert len(result.steps_completed) > 0
 
-    @pytest.mark.performance
-    @pytest.mark.skipif(
-        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
-        reason="Performance tests skipped in CI environments",
-    )
+    # decorators removed; handled by module-level pytestmark
     def test_individual_step_performance(self) -> None:
         """Test individual step execution times.
 
@@ -223,11 +213,7 @@ class TestStatusPhasePerformance:
             f"Total step time {total_time:.2f}ms should be reasonable"
         )
 
-    @pytest.mark.performance
-    @pytest.mark.skipif(
-        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
-        reason="Performance tests skipped in CI environments",
-    )
+    # decorators removed; handled by module-level pytestmark
     def test_individual_step_performance_large_state(self) -> None:
         """Test individual step execution times with large game state.
 
@@ -255,11 +241,7 @@ class TestStatusPhasePerformance:
         total_time = sum(step_times.values())
         print(f"Total individual step time (large): {total_time:.2f}ms")
 
-    @pytest.mark.performance
-    @pytest.mark.skipif(
-        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
-        reason="Performance tests skipped in CI environments",
-    )
+    # decorators removed; handled by module-level pytestmark
     def test_memory_usage_optimization(self) -> None:
         """Test memory usage optimization for large game states.
 
@@ -305,11 +287,7 @@ class TestStatusPhasePerformance:
         )
         assert cleanup_ratio < 2.0, "Memory should be mostly cleaned up after deletion"
 
-    @pytest.mark.performance
-    @pytest.mark.skipif(
-        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
-        reason="Performance tests skipped in CI environments",
-    )
+    # decorators removed; handled by module-level pytestmark
     def test_repeated_execution_performance(self) -> None:
         """Test performance consistency across repeated executions.
 
@@ -341,11 +319,7 @@ class TestStatusPhasePerformance:
             f"Performance inconsistency: max {max_time:.2f}ms vs avg {avg_time:.2f}ms"
         )
 
-    @pytest.mark.performance
-    @pytest.mark.skipif(
-        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
-        reason="Performance tests skipped in CI environments",
-    )
+    # decorators removed; handled by module-level pytestmark
     def test_concurrent_execution_performance(self) -> None:
         """Test performance under concurrent execution scenarios.
 
@@ -388,15 +362,11 @@ class TestStatusPhasePerformance:
         # Verify all executions succeeded and met performance requirements
         for i, (success, execution_time) in enumerate(results):
             assert success, f"Concurrent execution {i + 1} failed"
-            assert execution_time < 1000, (
-                f"Concurrent execution {i + 1} took {execution_time:.2f}ms, should be <1000ms"
+            assert execution_time < 600, (
+                f"Concurrent execution {i + 1} took {execution_time:.2f}ms, should be <600ms"
             )
 
-    @pytest.mark.performance
-    @pytest.mark.skipif(
-        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
-        reason="Performance tests skipped in CI environments",
-    )
+    # decorators removed; handled by module-level pytestmark
     def test_status_phase_manager_performance(self) -> None:
         """Test StatusPhaseManager performance.
 
@@ -412,19 +382,15 @@ class TestStatusPhasePerformance:
         print(f"StatusPhaseManager execution: {execution_time:.2f}ms")
 
         # Verify performance requirement
-        assert execution_time < 1000, (
-            f"StatusPhaseManager took {execution_time:.2f}ms, should be <1000ms"
+        assert execution_time < 600, (
+            f"StatusPhaseManager took {execution_time:.2f}ms, should be <600ms"
         )
 
         # Verify functionality
         assert isinstance(result, StatusPhaseResult)
         assert result.success
 
-    @pytest.mark.performance
-    @pytest.mark.skipif(
-        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
-        reason="Performance tests skipped in CI environments",
-    )
+    # decorators removed; handled by module-level pytestmark
     def test_performance_with_error_conditions(self) -> None:
         """Test performance when error conditions occur.
 
@@ -451,11 +417,7 @@ class TestStatusPhasePerformance:
 class TestStatusPhasePerformanceBenchmarks:
     """Benchmark tests for status phase performance analysis."""
 
-    @pytest.mark.performance
-    @pytest.mark.skipif(
-        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
-        reason="Performance tests skipped in CI environments",
-    )
+    # decorators removed; handled by module-level pytestmark
     def test_performance_regression_benchmark(self) -> None:
         """Benchmark test to detect performance regressions.
 
@@ -523,11 +485,7 @@ class TestStatusPhasePerformanceBenchmarks:
                 f"Performance scaling too poor: {scaling_factor:.2f}x"
             )
 
-    @pytest.mark.performance
-    @pytest.mark.skipif(
-        bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
-        reason="Performance tests skipped in CI environments",
-    )
+    # decorators removed; handled by module-level pytestmark
     def test_step_by_step_performance_analysis(self) -> None:
         """Detailed performance analysis of each status phase step.
 

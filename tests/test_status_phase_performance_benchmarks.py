@@ -30,6 +30,16 @@ from src.ti4.core.status_phase import (
     StatusPhaseResult,
 )
 
+# Run only when explicitly enabled
+pytestmark = [
+    pytest.mark.performance,
+    pytest.mark.slow,
+    pytest.mark.skipif(
+        os.getenv("RUN_PERF") != "1",
+        reason="Set RUN_PERF=1 to run performance benchmarks",
+    ),
+]
+
 
 class TestStatusPhasePerformanceBenchmarks:
     """Comprehensive performance benchmarks for status phase execution."""
@@ -422,10 +432,10 @@ class TestStatusPhasePerformanceBenchmarks:
             assert success_rate >= 0.8, (
                 f"Success rate {success_rate:.1%} too low for concurrency {num_concurrent}"
             )
-            assert avg_time < 1000, (
+            assert avg_time < 600, (
                 f"Avg time {avg_time:.2f}ms too high for concurrency {num_concurrent}"
             )
-            assert max_time < 2000, (
+            assert max_time < 1200, (
                 f"Max time {max_time:.2f}ms too high for concurrency {num_concurrent}"
             )
 
@@ -536,8 +546,8 @@ class TestStatusPhasePerformanceBenchmarks:
                 print(f"{case_name:8} ({opt_status:9}): {avg_time:6.2f}ms")
 
                 # Verify performance requirements
-                assert avg_time < 1000, (
-                    f"Manager {case_name} took {avg_time:.2f}ms, should be <1000ms"
+                assert avg_time < 600, (
+                    f"Manager {case_name} took {avg_time:.2f}ms, should be <600ms"
                 )
 
     @pytest.mark.performance
