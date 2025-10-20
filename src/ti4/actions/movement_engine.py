@@ -8,7 +8,7 @@ For Rule 89 compliance validation, use TacticalActionValidator in core/tactical_
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 from ..core.constants import LocationType
 
@@ -423,9 +423,9 @@ class ValidationResult:
     """Result of movement plan validation."""
 
     is_valid: bool
-    transport_assignments: Optional[Any] = None
-    errors: Optional[list[str]] = None
-    technology_effects: Optional[dict[str, Any]] = None
+    transport_assignments: Any | None = None
+    errors: list[str] | None = None
+    technology_effects: dict[str, Any] | None = None
 
 
 class MovementValidator:
@@ -438,7 +438,7 @@ class MovementValidator:
         self,
         movement_plan: MovementPlan,
         player_id: str,
-        technologies: Optional[set[Any]] = None,
+        technologies: set[Any] | None = None,
     ) -> ValidationResult:
         """Validate an entire movement plan jointly."""
         technologies = technologies or set()

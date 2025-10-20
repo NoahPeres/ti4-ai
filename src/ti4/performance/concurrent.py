@@ -3,9 +3,10 @@
 import threading
 import time
 import uuid
+from collections.abc import Callable
 from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass, field
-from typing import Any, Callable, Optional
+from typing import Any
 
 from ti4.core.game_state import GameState
 from ti4.performance.monitoring import ResourceMonitor
@@ -26,7 +27,7 @@ class GameInstance:
 class ConcurrentGameManager:
     """Manages multiple concurrent game instances with thread safety."""
 
-    def __init__(self, max_concurrent_games: Optional[int] = None) -> None:
+    def __init__(self, max_concurrent_games: int | None = None) -> None:
         """Initialize the concurrent game manager."""
         if max_concurrent_games is None:
             from ..core.constants import PerformanceConstants
@@ -43,7 +44,7 @@ class ConcurrentGameManager:
             thread_name_prefix=PerformanceConstants.THREAD_NAME_PREFIX,
         )
 
-    def create_game(self, game_id: Optional[str] = None) -> str:
+    def create_game(self, game_id: str | None = None) -> str:
         """Create a new game instance."""
         if game_id is None:
             game_id = str(uuid.uuid4())
@@ -65,7 +66,7 @@ class ConcurrentGameManager:
             self._games[game_id] = game_instance
             return game_id
 
-    def get_game(self, game_id: str) -> Optional[GameInstance]:
+    def get_game(self, game_id: str) -> GameInstance | None:
         """Get a game instance by ID."""
         with self._global_lock:
             game_instance = self._games.get(game_id)
@@ -189,7 +190,7 @@ class ConcurrentGameManager:
 class ThreadSafeGameStateCache:
     """Thread-safe version of game state cache."""
 
-    def __init__(self, max_size: Optional[int] = None) -> None:
+    def __init__(self, max_size: int | None = None) -> None:
         """Initialize thread-safe cache."""
         if max_size is None:
             from ..core.constants import PerformanceConstants
@@ -211,7 +212,7 @@ class ThreadSafeGameStateCache:
             return self._cache.are_systems_adjacent(system_id1, system_id2)
 
     def find_shortest_path(
-        self, start_system: str, end_system: str, max_distance: Optional[int] = None
+        self, start_system: str, end_system: str, max_distance: int | None = None
     ) -> Any:
         """Thread-safe pathfinding."""
         if max_distance is None:
@@ -224,7 +225,7 @@ class ThreadSafeGameStateCache:
             )
 
     def invalidate_cache(
-        self, game_state: Optional[GameState] = None, player_id: Optional[str] = None
+        self, game_state: GameState | None = None, player_id: str | None = None
     ) -> None:
         """Thread-safe cache invalidation."""
         with self._lock:
@@ -232,7 +233,7 @@ class ThreadSafeGameStateCache:
 
 
 # Global concurrent game manager
-_global_game_manager: Optional[ConcurrentGameManager] = None
+_global_game_manager: ConcurrentGameManager | None = None
 _manager_lock = threading.Lock()
 
 

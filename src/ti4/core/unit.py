@@ -1,15 +1,58 @@
 """Unit structure for TI4 game pieces."""
 
+import logging
 import uuid
-from typing import Any, Optional
+from typing import Any
 
 from .constants import Faction, Technology, UnitType
 from .unit_stats import UnitStats, UnitStatsProvider
+
+logger = logging.getLogger(__name__)
 
 # Unit categorization for game mechanics
 FIGHTER_TYPE_UNITS = {UnitType.FIGHTER, UnitType.FIGHTER_II}
 # Future expansion: Add faction-specific fighters here
 # FIGHTER_TYPE_UNITS.update({UnitType.FACTION_FIGHTER_VARIANT, ...})
+
+
+def _normalize_technologies(
+    technologies: set[Technology | str] | set[Technology] | None, *, strict: bool = True
+) -> set[Technology]:
+    """Normalize technologies to Technology enums.
+
+    Args:
+        technologies: Mixed set of Technology enums and/or strings
+        strict: If True, raise on unknown techs/invalid types; if False, log warning and skip
+
+    Returns:
+        Set of Technology enums
+    """
+    if not technologies:
+        return set()
+
+    normalized: set[Technology] = set()
+    for t in technologies:
+        if isinstance(t, Technology):
+            normalized.add(t)
+        elif isinstance(t, str):
+            try:
+                normalized.add(Technology(t))
+            except ValueError:
+                if strict:
+                    raise ValueError(f"Unknown technology: {t}") from None
+                else:
+                    logger.warning(f"Skipping unknown technology: {t}")
+                    continue
+        else:
+            msg = f"Invalid technology type: {type(t).__name__}"
+            if strict:
+                raise TypeError(msg)
+            else:
+                logger.warning(
+                    f"Skipping invalid technology type {type(t).__name__}: {t}"
+                )
+                continue
+    return normalized
 
 
 class Unit:
@@ -19,20 +62,20 @@ class Unit:
     id: str
     unit_type: UnitType
     owner: str
-    faction: Optional[Faction]
+    faction: Faction | None
     technologies: set[Technology]
     _stats_provider: UnitStatsProvider
-    _cached_stats: Optional[UnitStats]
+    _cached_stats: UnitStats | None
     _sustained_damage: bool
 
     def __init__(
         self,
         unit_type: UnitType,
         owner: str,
-        faction: Optional[Faction] = None,
-        technologies: Optional[set[Technology]] = None,
-        stats_provider: Optional[UnitStatsProvider] = None,
-        unit_id: Optional[str] = None,
+        faction: Faction | None = None,
+        technologies: set[Technology] | None = None,
+        stats_provider: UnitStatsProvider | None = None,
+        unit_id: str | None = None,
     ) -> None:
         self.id = unit_id or str(uuid.uuid4())
 
@@ -48,14 +91,11 @@ class Unit:
         else:
             self.faction = faction
 
-        # Store technology enums directly
-        if technologies:
-            self.technologies = set(technologies)
-        else:
-            self.technologies = set()
+        # Normalize technologies to Technology enums
+        self.technologies = _normalize_technologies(technologies, strict=True)
 
         self._stats_provider = stats_provider or UnitStatsProvider()
-        self._cached_stats: Optional[UnitStats] = None
+        self._cached_stats = None
         self._sustained_damage = False
 
     def get_stats(self) -> UnitStats:
@@ -75,11 +115,11 @@ class Unit:
         """Get the capacity of this unit."""
         return self.get_stats().capacity
 
-    def get_combat_value(self) -> Optional[int]:
+    def get_combat_value(self) -> int | None:
         """Get the combat value for this unit."""
         return self.get_stats().combat_value
 
-    def get_combat(self) -> Optional[int]:
+    def get_combat(self) -> int | None:
         """Get the combat value for this unit (alias for get_combat_value)."""
         return self.get_combat_value()
 
@@ -238,16 +278,10 @@ class Unit:
         # Convert string values back to enums
         unit_type = UnitType(unit_data["unit_type"])
         faction = Faction(unit_data["faction"]) if unit_data.get("faction") else None
-        technologies = set(unit_data.get("technologies", []))
-
-        # Convert technology strings to enums if needed
-        tech_enums = set()
-        for tech in technologies:
-            try:
-                tech_enums.add(Technology(tech))
-            except ValueError:
-                # If it's not a valid enum, keep as string for backward compatibility
-                tech_enums.add(tech)
+        raw_techs = unit_data.get("technologies", [])
+        tech_enums = _normalize_technologies(
+            set(raw_techs) if raw_techs else None, strict=False
+        )
 
         return cls(
             unit_type=unit_type,

@@ -5,7 +5,7 @@ This module handles the payment and validation of ability costs,
 separating this concern from the main ability resolution logic.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 from ti4.core.card_types import ExplorationCardProtocol, PlanetTrait
 
@@ -51,7 +51,7 @@ class AbilityCostManager:
 
         return False
 
-    def _extract_trait_from_cost_type(self, cost_type: str) -> Optional[PlanetTrait]:
+    def _extract_trait_from_cost_type(self, cost_type: str) -> PlanetTrait | None:
         """Extract planet trait from cost type string"""
         prefix = "purge_"
         suffix = "_relic_fragments"

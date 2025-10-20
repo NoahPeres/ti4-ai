@@ -1,7 +1,7 @@
 """Shared validation utilities to eliminate code duplication."""
 
-from collections.abc import Collection
-from typing import Any, Callable, Optional, TypeVar, Union
+from collections.abc import Callable, Collection
+from typing import Any, TypeVar
 
 T = TypeVar("T")
 
@@ -10,7 +10,7 @@ class ValidationError(ValueError):
     """Base class for validation errors with enhanced context."""
 
     def __init__(
-        self, message: str, field_name: Optional[str] = None, value: Any = None
+        self, message: str, field_name: str | None = None, value: Any = None
     ) -> None:
         super().__init__(message)
         self.field_name = field_name
@@ -75,7 +75,7 @@ def validate_collection_not_empty(collection: Collection[Any], field_name: str) 
         raise ValidationError(f"{field_name} cannot be empty", field_name, collection)
 
 
-def validate_positive_number(value: Union[int, float], field_name: str) -> None:
+def validate_positive_number(value: int | float, field_name: str) -> None:
     """Validate that a number is positive.
 
     Args:
@@ -107,9 +107,9 @@ def validate_callable(value: Any, field_name: str) -> None:
 
 
 def validate_unique_collection(
-    collection: Optional[Collection[Any]],
+    collection: Collection[Any] | None,
     field_name: str,
-    key: Optional[Callable[[Any], Any]] = None,
+    key: Callable[[Any], Any] | None = None,
 ) -> None:
     """Validate that all items in a collection are unique.
 
@@ -137,7 +137,7 @@ def validate_unique_collection(
 
 
 def validate_minimum_count(
-    collection: Optional[Collection[Any]], min_count: int, field_name: str
+    collection: Collection[Any] | None, min_count: int, field_name: str
 ) -> None:
     """Validate that a collection has at least the minimum number of items.
 
@@ -163,7 +163,7 @@ def validate_minimum_count(
 
 
 def validate_maximum_count(
-    collection: Optional[Collection[Any]], max_count: int, field_name: str
+    collection: Collection[Any] | None, max_count: int, field_name: str
 ) -> None:
     """Validate that a collection has at most the maximum number of items.
 
@@ -188,9 +188,9 @@ def validate_maximum_count(
 
 
 def validate_in_range(
-    value: Union[int, float],
-    min_val: Union[int, float],
-    max_val: Union[int, float],
+    value: int | float,
+    min_val: int | float,
+    max_val: int | float,
     field_name: str,
 ) -> None:
     """Validate that a number is within a specified range.

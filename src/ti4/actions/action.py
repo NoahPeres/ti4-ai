@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -11,7 +11,7 @@ class ActionResult:
 
     success: bool
     new_state: Any
-    message: Optional[str] = None
+    message: str | None = None
 
 
 class PlayerDecision(ABC):

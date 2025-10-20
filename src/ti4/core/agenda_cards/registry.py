@@ -4,8 +4,6 @@ Agenda card registry system.
 This module provides the registry for managing concrete agenda card implementations.
 """
 
-from typing import Optional
-
 from .base import BaseAgendaCard
 
 
@@ -37,7 +35,7 @@ class AgendaCardRegistry:
             raise ValueError(f"Agenda card '{card.get_name()}' is already registered")
         self._cards[card.get_name()] = card
 
-    def get_card(self, name: str) -> Optional[BaseAgendaCard]:
+    def get_card(self, name: str) -> BaseAgendaCard | None:
         """
         Get an agenda card implementation.
 

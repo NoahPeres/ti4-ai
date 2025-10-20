@@ -1,8 +1,9 @@
 """Event system infrastructure for TI4 game framework."""
 
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable, Union
+from typing import Any
 
 from .validation import validate_non_empty_string
 
@@ -196,7 +197,7 @@ class GameEventBus:
 
     def publish(
         self,
-        event: Union[GameEvent, UnitMovedEvent, CombatStartedEvent, PhaseChangedEvent],
+        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
     ) -> None:
         """Publish event to all subscribers."""
         # Convert specific event types to GameEvent if needed

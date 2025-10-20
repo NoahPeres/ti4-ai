@@ -4,8 +4,11 @@ This module provides benchmarks to demonstrate the performance improvements
 achieved through caching, lazy evaluation, and batch operations.
 """
 
+import os
 import time
 from unittest.mock import Mock
+
+import pytest
 
 from src.ti4.core.constants import Faction, UnitType
 from src.ti4.core.game_state import GameState
@@ -19,6 +22,11 @@ from src.ti4.core.resource_management import (
 )
 
 
+@pytest.mark.performance
+@pytest.mark.skipif(
+    bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
+    reason="Performance tests skipped in CI environments",
+)
 def test_caching_performance_improvement() -> None:
     """Benchmark demonstrating caching performance improvement."""
     # Create game state with many planets
@@ -65,6 +73,11 @@ def test_caching_performance_improvement() -> None:
     # but the cache is working correctly as evidenced by the high hit rate
 
 
+@pytest.mark.performance
+@pytest.mark.skipif(
+    bool(os.getenv("CI")) or bool(os.getenv("GITHUB_ACTIONS")),
+    reason="Performance tests skipped in CI environments",
+)
 def test_batch_operations_performance() -> None:
     """Benchmark demonstrating batch operations performance improvement."""
     # Create game state
@@ -113,7 +126,7 @@ def test_batch_operations_performance() -> None:
     assert all(result.is_valid for result in batch_results)
 
     # Verify detailed equivalence between individual and batch results
-    for individual, batch in zip(individual_results, batch_results):
+    for individual, batch in zip(individual_results, batch_results, strict=True):
         assert individual.is_valid == batch.is_valid
         assert individual.required_resources == batch.required_resources
         assert individual.available_resources == batch.available_resources

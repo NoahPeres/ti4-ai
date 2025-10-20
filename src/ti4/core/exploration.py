@@ -9,7 +9,7 @@ determined by the cards drawn from the exploration decks.
 import random
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 from ti4.core.abilities import Ability
 from ti4.core.card_types import ExplorationCardProtocol, PlanetTrait
@@ -37,7 +37,7 @@ class ExplorationCard(ExplorationCardProtocol):
     trait: PlanetTrait
     card_type: ExplorationCardType
     effect: str
-    ability: Optional[Ability] = None
+    ability: Ability | None = None
 
     @property
     def is_attachment(self) -> bool:
@@ -61,15 +61,15 @@ class ExplorationResult:
 
     success: bool = False
     exploration_triggered: bool = False
-    deck_used: Optional[PlanetTrait] = None
-    card_drawn: Optional[ExplorationCard] = None
+    deck_used: PlanetTrait | None = None
+    card_drawn: ExplorationCard | None = None
     card_discarded: bool = False
     card_attached: bool = False
     relic_fragment_gained: bool = False
     relic_drawn: bool = False
     frontier_token_removed: bool = False
     effect_applied: bool = False
-    planet_name: Optional[str] = None
+    planet_name: str | None = None
 
 
 class ExplorationDeck:
@@ -166,7 +166,7 @@ class ExplorationDeck:
                 for name, card_type, effect in deck_configs[self.trait]
             ]
 
-    def draw_card(self) -> Optional[ExplorationCard]:
+    def draw_card(self) -> ExplorationCard | None:
         """Draw a card from the deck, reshuffling if necessary.
 
         LRR 35.7a: If there are no cards in an exploration deck, its discard
@@ -206,7 +206,7 @@ class ExplorationSystem:
         }
 
     def should_trigger_exploration(
-        self, planet: Planet, previous_controller: Optional[str] = None
+        self, planet: Planet, previous_controller: str | None = None
     ) -> bool:
         """Determine if exploration should be triggered for a planet.
 
@@ -230,9 +230,9 @@ class ExplorationSystem:
         player: Player,
         planet: Planet,
         game_state: GameState,
-        chosen_trait: Optional[PlanetTrait] = None,
+        chosen_trait: PlanetTrait | None = None,
         force_exploration: bool = False,
-        previous_controller: Optional[str] = None,
+        previous_controller: str | None = None,
     ) -> ExplorationResult:
         """Explore a planet according to Rule 35.
 
@@ -284,7 +284,7 @@ class ExplorationSystem:
         return result
 
     def _determine_exploration_deck(
-        self, planet_traits: list[PlanetTrait], chosen_trait: Optional[PlanetTrait]
+        self, planet_traits: list[PlanetTrait], chosen_trait: PlanetTrait | None
     ) -> PlanetTrait:
         """Determine which exploration deck to use based on planet traits."""
         if not planet_traits:
@@ -300,9 +300,7 @@ class ExplorationSystem:
             # For multiple traits, default to first trait (in real game, player chooses)
             return planet_traits[0]
 
-    def _draw_exploration_card(
-        self, deck_trait: PlanetTrait
-    ) -> Optional[ExplorationCard]:
+    def _draw_exploration_card(self, deck_trait: PlanetTrait) -> ExplorationCard | None:
         """Draw a card from the appropriate exploration deck."""
         deck = self.decks[deck_trait]
         return deck.draw_card()
@@ -406,8 +404,8 @@ class ExplorationSystem:
         self,
         card: ExplorationCard,
         player: Player,
-        planet: Optional[Planet] = None,
-        game_state: Optional[GameState] = None,
+        planet: Planet | None = None,
+        game_state: GameState | None = None,
     ) -> ExplorationResult:
         """Resolve an exploration card (Rule 35.7-35.9).
 
@@ -427,7 +425,7 @@ class ExplorationSystem:
         return result
 
     def _resolve_attachment_card(
-        self, card: ExplorationCard, planet: Optional[Planet]
+        self, card: ExplorationCard, planet: Planet | None
     ) -> ExplorationResult:
         """Resolve an attachment card (Rule 35.8)."""
         result = ExplorationResult(success=True, effect_applied=True)

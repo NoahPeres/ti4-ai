@@ -4,7 +4,8 @@ This module provides decorators and utilities for runtime type validation
 to complement static type checking with mypy.
 """
 
-from typing import Any, Callable, TypeVar
+from collections.abc import Callable
+from typing import Any, TypeVar
 
 try:
     from beartype import beartype

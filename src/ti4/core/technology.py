@@ -1,7 +1,7 @@
 """Technology system for TI4."""
 
 from enum import Enum
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
 from .constants import Technology as TechnologyEnum
 from .constants import UnitType
@@ -71,7 +71,7 @@ class TechnologyCard:
         """Add a passive ability to this technology card."""
         self._passive_abilities[ability_name] = value
 
-    def get_passive_ability(self, ability_name: str) -> Optional[Any]:
+    def get_passive_ability(self, ability_name: str) -> Any | None:
         """Get a passive ability value (works even when exhausted)."""
         return self._passive_abilities.get(ability_name)
 
@@ -464,7 +464,7 @@ class TechnologyManager:
 class TechnologyEffectSystem:
     """Manages technology effects on game mechanics."""
 
-    def __init__(self, unit_stats_provider: Optional[Any] = None) -> None:
+    def __init__(self, unit_stats_provider: Any | None = None) -> None:
         """Initialize the technology effect system."""
         from .unit_stats import UnitStatsProvider
 
