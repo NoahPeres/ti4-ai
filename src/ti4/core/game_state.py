@@ -13,6 +13,7 @@ from .home_system_control_validator import HomeSystemControlValidator
 from .objective import HomeSystemControlError, ObjectiveCategory, ObjectiveType
 from .player import Player
 from .promissory_notes import PromissoryNoteManager
+from .resource_management import ResourceManager
 
 if TYPE_CHECKING:
     from .agenda_cards.law_manager import LawManager
@@ -84,6 +85,10 @@ class GameState:
     public_objectives: list[ObjectiveCard] = field(
         default_factory=list, hash=False
     )  # List of public objectives
+    # Track revealed public objectives explicitly (Rule 61)
+    revealed_public_objectives: list[ObjectiveCard] = field(
+        default_factory=list, hash=False
+    )
     # player_influence field removed - incorrect implementation
     # Influence should be tracked on planets per Rules 47 and 75
 
@@ -216,6 +221,43 @@ class GameState:
             List of public objectives
         """
         return self.public_objectives.copy()
+
+    def get_unrevealed_public_objectives(self) -> list[ObjectiveCard]:
+        """Get public objectives that have not yet been revealed.
+
+        Returns:
+            A copy of the list of unrevealed public objectives.
+        """
+        # Unrevealed objectives are those in public_objectives not yet in revealed_public_objectives
+        unrevealed = [
+            obj
+            for obj in self.public_objectives
+            if obj not in self.revealed_public_objectives
+        ]
+        return unrevealed.copy()
+
+    def reveal_public_objective(self, objective: ObjectiveCard) -> GameState:
+        """Reveal a public objective, returning a new immutable GameState.
+
+        If the objective is already revealed, returns a new state unchanged for idempotency.
+
+        Args:
+            objective: The ObjectiveCard to reveal
+
+        Returns:
+            New GameState with the objective marked as revealed.
+
+        Raises:
+            ValueError: If objective is None
+        """
+        if objective is None:
+            raise ValueError("objective cannot be None")
+
+        new_revealed = list(self.revealed_public_objectives)
+        if objective not in new_revealed:
+            new_revealed.append(objective)
+
+        return self._create_new_state(revealed_public_objectives=new_revealed)
 
     def get_player_secret_objectives(self, player_id: str) -> list[Any]:
         """Get secret objectives for a specific player.
@@ -478,6 +520,10 @@ class GameState:
             ),
             secret_objective_deck=kwargs.get(
                 "secret_objective_deck", self.secret_objective_deck
+            ),
+            public_objectives=kwargs.get("public_objectives", self.public_objectives),
+            revealed_public_objectives=kwargs.get(
+                "revealed_public_objectives", self.revealed_public_objectives
             ),
             # player_influence parameter removed - incorrect implementation
             strategy_card_assignments=kwargs.get(
@@ -1111,6 +1157,48 @@ class GameState:
             return self
 
         return self._create_new_state(agenda_phase_active=True)
+
+    # ---- Rule 27 integration helpers ----
+    def get_player_available_influence(self, player_id: str) -> int:
+        """Calculate total influence available to a player (planets + trade goods).
+
+        Uses ResourceManager to honor planet exhaustion and trade goods conversion.
+        Not a voting context.
+        """
+        resource_manager = ResourceManager(self)
+        return resource_manager.calculate_available_influence(
+            player_id, for_voting=False
+        )
+
+    def player_has_ships_in_system(self, player_id: str, system_id: str) -> bool:
+        """Check if a player has any ships (including fighters) in a system."""
+        system = self.systems.get(system_id)
+        if system is None:
+            return False
+
+        try:
+            from .ships import ShipManager
+
+            ship_manager = ShipManager()
+            return any(
+                unit.owner == player_id and ship_manager.is_ship(unit)
+                for unit in system.get_units_in_space()
+            )
+        except (ImportError, AttributeError):
+            # Fallback: check unit_type membership against canonical ship types
+            try:
+                from .constants import GameConstants
+            except ImportError:
+                # If constants can't be imported for some reason, be conservative
+                return False
+
+            ship_types = GameConstants.SHIP_TYPES
+            return any(
+                getattr(unit, "owner", None) == player_id
+                and hasattr(unit, "unit_type")
+                and unit.unit_type in ship_types
+                for unit in system.get_units_in_space()
+            )
 
     def serialize_for_persistence(self) -> dict[str, Any]:
         """Serialize game state for persistence including agenda card data and players."""

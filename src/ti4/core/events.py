@@ -117,6 +117,46 @@ class PhaseChangedEvent:
         )
 
 
+@dataclass(frozen=True)
+class CustodiansTokenRemovedEvent:
+    """Event fired when the Custodians Token is removed from Mecatol Rex (Rule 27)."""
+
+    game_id: str
+    player_id: str
+    influence_spent: int
+    system_id: str
+    ground_force_id: str | None = None
+    victory_points_awarded: int = 1
+    agenda_phase_activated: bool = True
+    timestamp: float = field(default_factory=time.time)
+
+    @property
+    def event_type(self) -> str:
+        from .constants import EventType
+
+        return EventType.CUSTODIANS_TOKEN_REMOVED.value
+
+    @property
+    def data(self) -> dict[str, Any]:
+        return {
+            "player_id": self.player_id,
+            "influence_spent": self.influence_spent,
+            "system_id": self.system_id,
+            "ground_force_id": self.ground_force_id,
+            "victory_points_awarded": self.victory_points_awarded,
+            "agenda_phase_activated": self.agenda_phase_activated,
+        }
+
+    def to_game_event(self) -> GameEvent:
+        """Convert to a GameEvent instance."""
+        return GameEvent(
+            event_type=self.event_type,
+            game_id=self.game_id,
+            data=self.data,
+            timestamp=self.timestamp,
+        )
+
+
 # Factory methods for consistent event creation
 def create_unit_moved_event(
     game_id: str, unit_id: str, from_system: str, to_system: str, player_id: str
@@ -171,6 +211,38 @@ def create_phase_changed_event(
     )
 
 
+def create_custodians_token_removed_event(
+    game_id: str,
+    player_id: str,
+    influence_spent: int,
+    system_id: str,
+    ground_force_id: str | None,
+    victory_points_awarded: int = 1,
+    agenda_phase_activated: bool = True,
+) -> CustodiansTokenRemovedEvent:
+    """Create a custodians token removed event with validation."""
+    validate_non_empty_string(game_id, "Game ID")
+    validate_non_empty_string(player_id, "Player ID")
+    validate_non_empty_string(system_id, "System ID")
+    # Validate optional ground force identifier when provided
+    if ground_force_id is not None:
+        validate_non_empty_string(ground_force_id, "Ground Force ID")
+    from .validation import validate_positive_number
+
+    validate_positive_number(influence_spent, "Influence Spent")
+    validate_positive_number(victory_points_awarded, "Victory Points Awarded")
+
+    return CustodiansTokenRemovedEvent(
+        game_id=game_id,
+        player_id=player_id,
+        influence_spent=influence_spent,
+        system_id=system_id,
+        ground_force_id=ground_force_id,
+        victory_points_awarded=victory_points_awarded,
+        agenda_phase_activated=agenda_phase_activated,
+    )
+
+
 class GameEventBus:
     """Central event bus for game event notifications."""
 
@@ -197,11 +269,23 @@ class GameEventBus:
 
     def publish(
         self,
-        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
+        event: GameEvent
+        | UnitMovedEvent
+        | CombatStartedEvent
+        | PhaseChangedEvent
+        | CustodiansTokenRemovedEvent,
     ) -> None:
         """Publish event to all subscribers."""
         # Convert specific event types to GameEvent if needed
-        if isinstance(event, (UnitMovedEvent, CombatStartedEvent, PhaseChangedEvent)):
+        if isinstance(
+            event,
+            (
+                UnitMovedEvent,
+                CombatStartedEvent,
+                PhaseChangedEvent,
+                CustodiansTokenRemovedEvent,
+            ),
+        ):
             game_event = event.to_game_event()
         else:
             game_event = event

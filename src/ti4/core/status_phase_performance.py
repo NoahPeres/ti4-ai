@@ -11,13 +11,19 @@ Requirements addressed:
 
 import gc
 import time
-from collections.abc import Generator
-from contextlib import contextmanager
 from dataclasses import dataclass, field
+from types import TracebackType
 from typing import (
     TYPE_CHECKING,
     Any,
     TypeVar,
+    cast,
+)
+
+from ti4.performance.optimizer_protocol import (
+    CMProtocol,
+    MetricsProtocol,
+    PerformanceOptimizerProtocol,
 )
 
 from .status_phase import (
@@ -34,6 +40,7 @@ T = TypeVar("T")
 
 
 @dataclass
+@dataclass(slots=True)
 class PerformanceMetrics:
     """Performance metrics for status phase operations.
 
@@ -47,7 +54,7 @@ class PerformanceMetrics:
     memory_after: int = 0
     memory_peak: int = 0
     success: bool = True
-    error_message: str = ""
+    error_message: str | None = None
 
     @property
     def memory_delta(self) -> int:
@@ -63,7 +70,7 @@ class PerformanceMetrics:
             return self.execution_time_ms < 100  # Individual steps <100ms
 
 
-@dataclass
+@dataclass(slots=True)
 class StatusPhasePerformanceReport:
     """Comprehensive performance report for status phase execution."""
 
@@ -132,45 +139,62 @@ class StatusPhasePerformanceOptimizer:
         self._cache: dict[str, Any] = {}
         self._performance_history: list[StatusPhasePerformanceReport] = []
 
-    @contextmanager
-    def monitor_performance(
-        self, operation_name: str
-    ) -> Generator[PerformanceMetrics, None, None]:
-        """Context manager for monitoring operation performance.
+    def monitor_performance(self, operation_name: str) -> CMProtocol:
+        """Create a context manager for monitoring operation performance.
 
         Args:
             operation_name: Name of the operation being monitored
 
-        Yields:
-            PerformanceMetrics object that will be populated with timing data
+        Returns:
+            A context manager that yields a PerformanceMetrics object populated with timing data
         """
-        # Initialize metrics
-        metrics = PerformanceMetrics(
-            operation_name=operation_name, execution_time_ms=0.0
-        )
 
-        # Measure memory before operation
-        if self.enable_memory_optimization:
-            gc.collect()  # Force garbage collection for accurate measurement
-            metrics.memory_before = self._get_memory_usage()
+        class _PerfCM:
+            def __init__(
+                self, outer: "StatusPhasePerformanceOptimizer", op_name: str
+            ) -> None:
+                self._outer = outer
+                self._op_name = op_name
+                self._metrics = PerformanceMetrics(
+                    operation_name=op_name, execution_time_ms=0.0
+                )
+                self._start_time: float = 0.0
 
-        # Start timing
-        start_time = time.perf_counter()
+            def __enter__(self) -> MetricsProtocol:
+                if self._outer.enable_memory_optimization:
+                    gc.collect()
+                    self._metrics.memory_before = self._outer._get_memory_usage()
+                self._start_time = time.perf_counter()
+                return self._metrics
 
-        try:
-            yield metrics
-        except Exception as e:
-            metrics.success = False
-            metrics.error_message = str(e)
-            raise
-        finally:
-            # End timing
-            end_time = time.perf_counter()
-            metrics.execution_time_ms = (end_time - start_time) * 1000
+            def __exit__(
+                self,
+                exc_type: type[BaseException] | None,
+                exc: BaseException | None,
+                tb: TracebackType | None,
+            ) -> bool | None:
+                end_time = time.perf_counter()
+                self._metrics.execution_time_ms = (end_time - self._start_time) * 1000
+                if self._outer.enable_memory_optimization:
+                    self._metrics.memory_after = self._outer._get_memory_usage()
+                if exc is not None:
+                    self._metrics.success = False
+                    self._metrics.error_message = str(exc)
+                return None
 
-            # Measure memory after operation
-            if self.enable_memory_optimization:
-                metrics.memory_after = self._get_memory_usage()
+        return _PerfCM(self, operation_name)
+
+    def meets_performance_requirements(self) -> bool:
+        """Check if recent performance meets defined requirements.
+
+        Returns:
+            True if requirements are met based on the latest report or no data is available.
+        """
+        latest = self.get_latest_report()
+        if latest is None:
+            # With no data, assume requirements are met.
+            return True
+        return latest.meets_performance_requirements()
 
     def _get_memory_usage(self) -> int:
         """Get current memory load proxy (simplified).
@@ -229,14 +253,20 @@ class StatusPhasePerformanceOptimizer:
         if len(self._performance_history) > 100:
             self._performance_history = self._performance_history[-100:]
 
-    def get_performance_trends(self) -> dict[str, Any]:
+    def get_performance_trends(self) -> dict[str, float | int | bool]:
         """Get performance trends from historical data.
 
         Returns:
             Dictionary with performance trend analysis
         """
         if not self._performance_history:
-            return {"message": "No performance history available"}
+            # Provide default values when no history is available
+            return {
+                "average_execution_time_ms": 0.0,
+                "performance_degradation_detected": False,
+                "total_reports": 0,
+                "recent_reports_analyzed": 0,
+            }
 
         recent_reports = self._performance_history[-10:]  # Last 10 executions
 
@@ -263,12 +293,24 @@ class StatusPhasePerformanceOptimizer:
             "recent_reports_analyzed": len(recent_reports),
         }
 
+    def get_latest_report(self) -> StatusPhasePerformanceReport | None:
+        """Return the most recent performance report if available.
+
+        Returns:
+            Most recent performance report or None if no reports exist
+        """
+        if not self._performance_history:
+            return None
+        return self._performance_history[-1]
+
 
 class OptimizedStatusPhaseOrchestrator(StatusPhaseOrchestrator):
     """Performance-optimized version of StatusPhaseOrchestrator.
 
     Extends the base orchestrator with performance monitoring and optimization features.
     """
+
+    # Optimizer is guaranteed to be present in this optimized variant.
 
     def __init__(self, optimizer: StatusPhasePerformanceOptimizer | None = None):
         """Initialize the optimized orchestrator.
@@ -277,7 +319,11 @@ class OptimizedStatusPhaseOrchestrator(StatusPhaseOrchestrator):
             optimizer: Performance optimizer instance (creates default if None)
         """
         super().__init__()
-        self.optimizer = optimizer or StatusPhasePerformanceOptimizer()
+        # In the optimized orchestrator, the optimizer is always present.
+        # Narrow the type for static type checkers.
+        self.optimizer: PerformanceOptimizerProtocol = (
+            optimizer or StatusPhasePerformanceOptimizer()
+        )
 
     def execute_complete_status_phase(
         self, game_state: "GameState"
@@ -293,6 +339,7 @@ class OptimizedStatusPhaseOrchestrator(StatusPhaseOrchestrator):
         # Create performance report
         report = StatusPhasePerformanceReport(total_execution_time_ms=0.0)
 
+        overall_metrics: MetricsProtocol
         with self.optimizer.monitor_performance(
             "complete_status_phase"
         ) as overall_metrics:
@@ -308,7 +355,7 @@ class OptimizedStatusPhaseOrchestrator(StatusPhaseOrchestrator):
                 overall_metrics.error_message = result.error_message
 
         # Finalize report
-        report.overall_metrics = overall_metrics
+        report.overall_metrics = cast(PerformanceMetrics, overall_metrics)
         report.total_execution_time_ms = overall_metrics.execution_time_ms
 
         # Update result with actual timing
@@ -319,6 +366,11 @@ class OptimizedStatusPhaseOrchestrator(StatusPhaseOrchestrator):
 
         # Add to performance history
         self.optimizer.add_performance_report(report)
+
+        # Proactively trigger garbage collection when memory optimization is enabled
+        # to minimize transient object retention after execution.
+        if self.optimizer.enable_memory_optimization:
+            gc.collect()
 
         return result, final_state
 
@@ -367,6 +419,7 @@ class OptimizedStatusPhaseOrchestrator(StatusPhaseOrchestrator):
 
         # Execute each step with monitoring
         for step_num in range(1, 9):
+            step_metrics: MetricsProtocol
             with self.optimizer.monitor_performance(f"step_{step_num}") as step_metrics:
                 try:
                     step_result, current_state = self.execute_step(
@@ -398,7 +451,12 @@ class OptimizedStatusPhaseOrchestrator(StatusPhaseOrchestrator):
                         break
 
             # Add step metrics to report
-            report.add_step_metrics(step_num, step_metrics)
+            report.add_step_metrics(step_num, cast(PerformanceMetrics, step_metrics))
+
+            # Opportunistic garbage collection between steps when enabled to
+            # reduce transient allocations and keep object growth bounded.
+            if self.optimizer.enable_memory_optimization:
+                gc.collect()
 
         # Determine next phase and apply transition (mirror base orchestrator)
         transition_manager = RoundTransitionManager()
@@ -430,9 +488,8 @@ class OptimizedStatusPhaseOrchestrator(StatusPhaseOrchestrator):
         Returns:
             Most recent performance report, or None if no reports available
         """
-        if not self.optimizer._performance_history:
-            return None
-        return self.optimizer._performance_history[-1]
+        # Delegate to optimizer to provide latest report
+        return self.optimizer.get_latest_report()
 
     def get_optimizer_statistics(self) -> dict[str, Any]:
         """Get performance optimizer statistics.

@@ -276,3 +276,14 @@ Based on the comprehensive implementation status audit, this document identifies
 - **Red**: Major delays, quality issues, significant test failures
 
 This roadmap provides a clear path from the current state to a fully functional TI4 AI system with complete core gameplay mechanics. The focus on critical blockers ensures that the most impactful gaps are addressed first, enabling progressive gameplay functionality improvements.
+### Rule 27: Custodians Token – Remaining Gaps
+
+- Integration coverage: Verify that activating the agenda phase after token removal correctly affects subsequent rounds in the full game loop (GameController/GameStateMachine), including speaker order and phase transitions.
+- Multi-player sequencing: Ensure removal by one player correctly prevents others from attempting removal and that VP accounting remains consistent across multiple players in complex scenarios.
+- Interaction checks: Validate interactions with political/agenda-related strategy cards and status-phase behaviors once the agenda phase is active.
+- Robustness: Confirm error handling and rollback behavior if ground force placement fails in complex board states (currently non-fatal, but should be observable in logs/events).
+
+Action Items:
+1) Author integration tests covering round progression with agenda phase enabled post-removal.
+2) Add tests for competing removal attempts and confirm idempotency across players.
+3) Expand event logging around token removal and agenda activation for easier debugging.

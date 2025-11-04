@@ -14,8 +14,6 @@ USAGE:
 IMPORTANT: Never implement without user confirmation of specifications!
 """
 
-from typing import Optional
-
 from ti4.core.constants import (
     AbilityCondition,
     AbilityEffectType,
@@ -101,7 +99,7 @@ class NewTechnologyTemplate(PassiveTechnologyCard):
         return tuple(abilities_list)
 
     def can_use_ability(
-        self, ability_index: int = 0, context: Optional[dict] = None
+        self, ability_index: int = 0, context: dict | None = None
     ) -> bool:
         """
         Check if the specified ability can be used.
@@ -137,9 +135,7 @@ class NewTechnologyTemplate(PassiveTechnologyCard):
             print(f"Warning: Unimplemented condition in {self._specification.name}")
             return False
 
-    def use_ability(
-        self, ability_index: int = 0, context: Optional[dict] = None
-    ) -> bool:
+    def use_ability(self, ability_index: int = 0, context: dict | None = None) -> bool:
         """
         Use the specified ability.
 

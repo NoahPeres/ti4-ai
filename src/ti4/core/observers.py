@@ -6,6 +6,7 @@ from typing import Any
 
 from .events import (
     CombatStartedEvent,
+    CustodiansTokenRemovedEvent,
     GameEvent,
     GameEventBus,
     PhaseChangedEvent,
@@ -22,7 +23,11 @@ class EventObserver(ABC):
     @abstractmethod
     def handle_event(
         self,
-        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
+        event: GameEvent
+        | UnitMovedEvent
+        | CombatStartedEvent
+        | PhaseChangedEvent
+        | CustodiansTokenRemovedEvent,
     ) -> None:
         """Handle a game event."""
         pass
@@ -36,13 +41,14 @@ class EventObserver(ABC):
             EventConstants.UNIT_MOVED,
             EventConstants.COMBAT_STARTED,
             EventConstants.PHASE_CHANGED,
+            EventConstants.CUSTODIANS_TOKEN_REMOVED,
         ]
         for event_type in event_types:
             event_bus.subscribe(event_type, self.handle_event)
 
     def _extract_event_type_identifier(
         self,
-        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
+        event: GameEvent,
     ) -> str:
         """Extract the event type identifier from a game event object.
 
@@ -62,13 +68,42 @@ class EventObserver(ABC):
         else:
             return type(event).__name__
 
+    def _ensure_game_event(
+        self,
+        event: GameEvent
+        | UnitMovedEvent
+        | CombatStartedEvent
+        | PhaseChangedEvent
+        | CustodiansTokenRemovedEvent,
+    ) -> GameEvent:
+        """Normalize any event to a base GameEvent for consistent handling."""
+        if isinstance(event, GameEvent):
+            return event
+        # Convert known specialized events to GameEvent
+        if isinstance(event, UnitMovedEvent):
+            return event.to_game_event()
+        if isinstance(event, CombatStartedEvent):
+            return event.to_game_event()
+        if isinstance(event, PhaseChangedEvent):
+            return event.to_game_event()
+        if isinstance(event, CustodiansTokenRemovedEvent):
+            return event.to_game_event()
+        # Unexpected type: enforce strictness to catch integration issues early
+        raise TypeError(
+            f"Unsupported event type for normalization: {type(event).__name__}"
+        )
+
 
 class LoggingObserver(EventObserver):
     """Observer that logs game events."""
 
     def handle_event(
         self,
-        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
+        event: GameEvent
+        | UnitMovedEvent
+        | CombatStartedEvent
+        | PhaseChangedEvent
+        | CustodiansTokenRemovedEvent,
     ) -> None:
         """Log game events with appropriate detail level.
 
@@ -79,12 +114,13 @@ class LoggingObserver(EventObserver):
         Args:
             event: The game event to log
         """
-        event_type = self._extract_event_type_identifier(event)
-        self._log_event_by_type(event, event_type)
+        base_event = self._ensure_game_event(event)
+        event_type = self._extract_event_type_identifier(base_event)
+        self._log_event_by_type(base_event, event_type)
 
     def _log_event_by_type(
         self,
-        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
+        event: GameEvent,
         event_type: str,
     ) -> None:
         """Log an event with type-specific formatting.
@@ -101,12 +137,14 @@ class LoggingObserver(EventObserver):
             self._log_phase_changed_event(event)
         elif event_type == EventConstants.COMBAT_STARTED:
             self._log_combat_started_event(event)
+        elif event_type == EventConstants.CUSTODIANS_TOKEN_REMOVED:
+            self._log_custodians_token_removed_event(event)
         else:
             self._log_generic_event(event, event_type)
 
     def _log_unit_moved_event(
         self,
-        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
+        event: GameEvent,
     ) -> None:
         """Log a unit moved event with specific details.
 
@@ -121,7 +159,7 @@ class LoggingObserver(EventObserver):
 
     def _log_phase_changed_event(
         self,
-        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
+        event: GameEvent,
     ) -> None:
         """Log a phase changed event with specific details.
 
@@ -135,7 +173,7 @@ class LoggingObserver(EventObserver):
 
     def _log_combat_started_event(
         self,
-        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
+        event: GameEvent,
     ) -> None:
         """Log a combat started event with specific details.
 
@@ -149,7 +187,7 @@ class LoggingObserver(EventObserver):
 
     def _log_generic_event(
         self,
-        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
+        event: GameEvent,
         event_type: str,
     ) -> None:
         """Log a generic event with basic information.
@@ -159,6 +197,19 @@ class LoggingObserver(EventObserver):
             event_type: The type of the event
         """
         logger.info(f"Game event: {event_type} in game {event.game_id}")
+
+    def _log_custodians_token_removed_event(self, event: GameEvent) -> None:
+        """Log a custodians token removed event with specific details."""
+        data = event.data
+        logger.info(
+            "Custodians Token removed: player=%s, influence_spent=%s, system=%s, ground_force_id=%s, vp_awarded=%s, agenda_phase_activated=%s",
+            data.get("player_id"),
+            data.get("influence_spent"),
+            data.get("system_id"),
+            data.get("ground_force_id"),
+            data.get("victory_points_awarded"),
+            data.get("agenda_phase_activated"),
+        )
 
 
 class StatisticsCollector(EventObserver):
@@ -174,7 +225,11 @@ class StatisticsCollector(EventObserver):
 
     def handle_event(
         self,
-        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
+        event: GameEvent
+        | UnitMovedEvent
+        | CombatStartedEvent
+        | PhaseChangedEvent
+        | CustodiansTokenRemovedEvent,
     ) -> None:
         """Process game events and update statistical counters.
 
@@ -185,13 +240,14 @@ class StatisticsCollector(EventObserver):
         Args:
             event: The game event to process for statistics
         """
-        event_type = self._extract_event_type_identifier(event)
+        base_event = self._ensure_game_event(event)
+        event_type = self._extract_event_type_identifier(base_event)
 
         from .constants import EventConstants
 
         if event_type == EventConstants.UNIT_MOVED:
             self._statistics["unit_movements"] += 1
-            player_id = event.data.get("player_id")
+            player_id = base_event.data.get("player_id")
             if player_id and player_id not in self._statistics["player_actions"]:
                 self._statistics["player_actions"][player_id] = 0
             if player_id:
@@ -199,9 +255,16 @@ class StatisticsCollector(EventObserver):
 
         elif event_type == EventConstants.PHASE_CHANGED:
             self._statistics["phase_changes"] += 1
-            round_number = event.data.get("round_number")
+            round_number = base_event.data.get("round_number")
             if round_number:
                 self._statistics["current_round"] = round_number
+        elif event_type == EventConstants.CUSTODIANS_TOKEN_REMOVED:
+            # Track player action count and a simple counter for removals
+            player_id = base_event.data.get("player_id")
+            if player_id and player_id not in self._statistics["player_actions"]:
+                self._statistics["player_actions"][player_id] = 0
+            if player_id:
+                self._statistics["player_actions"][player_id] += 1
 
     def get_statistics(self) -> dict[str, Any]:
         """Get collected statistics."""
@@ -216,7 +279,11 @@ class AITrainingDataCollector(EventObserver):
 
     def handle_event(
         self,
-        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
+        event: GameEvent
+        | UnitMovedEvent
+        | CombatStartedEvent
+        | PhaseChangedEvent
+        | CustodiansTokenRemovedEvent,
     ) -> None:
         """Collect and structure game event data for AI training purposes.
 
@@ -228,15 +295,16 @@ class AITrainingDataCollector(EventObserver):
         Args:
             event: The game event to process for training data collection
         """
-        event_type = self._extract_event_type_identifier(event)
-        training_record = self._create_base_training_record(event, event_type)
-        self._enrich_training_record_with_event_data(training_record, event, event_type)
+        base_event = self._ensure_game_event(event)
+        event_type = self._extract_event_type_identifier(base_event)
+        training_record = self._create_base_training_record(base_event, event_type)
+        self._enrich_training_record_with_event_data(
+            training_record, base_event, event_type
+        )
         self._training_data.append(training_record)
 
     def _create_base_training_record(
-        self,
-        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
-        event_type: str,
+        self, event: GameEvent, event_type: str
     ) -> dict[str, Any]:
         """Create the base training record with common fields.
 
@@ -254,10 +322,7 @@ class AITrainingDataCollector(EventObserver):
         }
 
     def _enrich_training_record_with_event_data(
-        self,
-        training_record: dict[str, Any],
-        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
-        event_type: str,
+        self, training_record: dict[str, Any], event: GameEvent, event_type: str
     ) -> None:
         """Enrich the training record with event-specific data.
 
@@ -274,11 +339,11 @@ class AITrainingDataCollector(EventObserver):
             self._add_combat_started_data(training_record, event)
         elif event_type == EventConstants.PHASE_CHANGED:
             self._add_phase_changed_data(training_record, event)
+        elif event_type == EventConstants.CUSTODIANS_TOKEN_REMOVED:
+            self._add_custodians_token_removed_data(training_record, event)
 
     def _add_unit_moved_data(
-        self,
-        training_record: dict[str, Any],
-        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
+        self, training_record: dict[str, Any], event: GameEvent
     ) -> None:
         """Add unit movement specific data to training record.
 
@@ -289,9 +354,7 @@ class AITrainingDataCollector(EventObserver):
         training_record.update(event.data)
 
     def _add_combat_started_data(
-        self,
-        training_record: dict[str, Any],
-        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
+        self, training_record: dict[str, Any], event: GameEvent
     ) -> None:
         """Add combat started specific data to training record.
 
@@ -302,9 +365,7 @@ class AITrainingDataCollector(EventObserver):
         training_record.update(event.data)
 
     def _add_phase_changed_data(
-        self,
-        training_record: dict[str, Any],
-        event: GameEvent | UnitMovedEvent | CombatStartedEvent | PhaseChangedEvent,
+        self, training_record: dict[str, Any], event: GameEvent
     ) -> None:
         """Add phase changed specific data to training record.
 
@@ -321,3 +382,9 @@ class AITrainingDataCollector(EventObserver):
     def export_training_data(self) -> list[dict[str, Any]]:
         """Export training data (same as get_training_data for now)."""
         return self.get_training_data()
+
+    def _add_custodians_token_removed_data(
+        self, training_record: dict[str, Any], event: GameEvent
+    ) -> None:
+        """Add custodians token removed specific data to training record."""
+        training_record.update(event.data)

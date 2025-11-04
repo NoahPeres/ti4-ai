@@ -12,7 +12,6 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 
 @dataclass
@@ -41,7 +40,7 @@ class LRRAnalysisSummaryGenerator:
         self.analysis_dir = Path(analysis_dir)
         self.rules: list[RuleAnalysis] = []
 
-    def parse_rule_file(self, file_path: Path) -> Optional[RuleAnalysis]:
+    def parse_rule_file(self, file_path: Path) -> RuleAnalysis | None:
         """Parse an individual rule analysis file."""
         try:
             with open(file_path, encoding="utf-8") as f:
