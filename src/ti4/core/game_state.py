@@ -85,6 +85,10 @@ class GameState:
     public_objectives: list[ObjectiveCard] = field(
         default_factory=list, hash=False
     )  # List of public objectives
+    # Track revealed public objectives explicitly (Rule 61)
+    revealed_public_objectives: list[ObjectiveCard] = field(
+        default_factory=list, hash=False
+    )
     # player_influence field removed - incorrect implementation
     # Influence should be tracked on planets per Rules 47 and 75
 
@@ -217,6 +221,43 @@ class GameState:
             List of public objectives
         """
         return self.public_objectives.copy()
+
+    def get_unrevealed_public_objectives(self) -> list[ObjectiveCard]:
+        """Get public objectives that have not yet been revealed.
+
+        Returns:
+            A copy of the list of unrevealed public objectives.
+        """
+        # Unrevealed objectives are those in public_objectives not yet in revealed_public_objectives
+        unrevealed = [
+            obj
+            for obj in self.public_objectives
+            if obj not in self.revealed_public_objectives
+        ]
+        return unrevealed.copy()
+
+    def reveal_public_objective(self, objective: ObjectiveCard) -> GameState:
+        """Reveal a public objective, returning a new immutable GameState.
+
+        If the objective is already revealed, returns a new state unchanged for idempotency.
+
+        Args:
+            objective: The ObjectiveCard to reveal
+
+        Returns:
+            New GameState with the objective marked as revealed.
+
+        Raises:
+            ValueError: If objective is None
+        """
+        if objective is None:
+            raise ValueError("objective cannot be None")
+
+        new_revealed = list(self.revealed_public_objectives)
+        if objective not in new_revealed:
+            new_revealed.append(objective)
+
+        return self._create_new_state(revealed_public_objectives=new_revealed)
 
     def get_player_secret_objectives(self, player_id: str) -> list[Any]:
         """Get secret objectives for a specific player.
@@ -479,6 +520,10 @@ class GameState:
             ),
             secret_objective_deck=kwargs.get(
                 "secret_objective_deck", self.secret_objective_deck
+            ),
+            public_objectives=kwargs.get("public_objectives", self.public_objectives),
+            revealed_public_objectives=kwargs.get(
+                "revealed_public_objectives", self.revealed_public_objectives
             ),
             # player_influence parameter removed - incorrect implementation
             strategy_card_assignments=kwargs.get(

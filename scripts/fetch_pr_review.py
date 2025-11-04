@@ -21,7 +21,7 @@ import shutil
 import subprocess  # noqa: S404
 import sys
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
@@ -30,7 +30,7 @@ from urllib.request import Request, urlopen
 class GitHubPRReviewFetcher:
     """Fetches GitHub PR review content using the GitHub API."""
 
-    def __init__(self, repo: str, token: Optional[str] = None):
+    def __init__(self, repo: str, token: str | None = None):
         """
         Initialize the PR review fetcher.
 
@@ -164,7 +164,7 @@ class GitHubPRReviewFetcher:
         )
         return self._get_all_pages(url)
 
-    def _parse_timestamp(self, ts: Optional[str]) -> datetime:
+    def _parse_timestamp(self, ts: str | None) -> datetime:
         """Parse GitHub timestamp string to datetime object."""
         if not ts:
             return datetime.min
@@ -174,7 +174,7 @@ class GitHubPRReviewFetcher:
             # Fallback for different timestamp formats
             return datetime.min
 
-    def get_latest_review(self, pr_number: int) -> Optional[dict[str, Any]]:
+    def get_latest_review(self, pr_number: int) -> dict[str, Any] | None:
         """
         Get the most recent review for a PR.
 
@@ -274,7 +274,7 @@ class GitHubPRReviewFetcher:
         summary.append("=" * 60)
         return "\n".join(summary)
 
-    def _extract_pr_number_from_review(self, review: dict[str, Any]) -> Optional[int]:
+    def _extract_pr_number_from_review(self, review: dict[str, Any]) -> int | None:
         """Extract PR number from review object."""
         pull_request_url = review.get("pull_request_url", "")
         if pull_request_url:
@@ -285,7 +285,7 @@ class GitHubPRReviewFetcher:
         return None
 
 
-def detect_repo_from_git() -> Optional[str]:
+def detect_repo_from_git() -> str | None:
     """Try to detect the GitHub repository from git remote."""
     try:
         # Find git executable safely

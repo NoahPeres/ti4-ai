@@ -263,12 +263,28 @@ class StatusPhasePerformanceOptimizer:
             "recent_reports_analyzed": len(recent_reports),
         }
 
+    def get_latest_report(self) -> StatusPhasePerformanceReport | None:
+        """Return the most recent performance report if available.
+
+        Returns:
+            Most recent performance report or None if no reports exist
+        """
+        if not self._performance_history:
+            return None
+        return self._performance_history[-1]
+
 
 class OptimizedStatusPhaseOrchestrator(StatusPhaseOrchestrator):
     """Performance-optimized version of StatusPhaseOrchestrator.
 
     Extends the base orchestrator with performance monitoring and optimization features.
     """
+
+    # Override the base class attribute type: in this optimized variant, the optimizer
+    # is guaranteed to be present, so it is non-optional.
+    optimizer: StatusPhasePerformanceOptimizer
+
+    # Optimizer is non-optional in this optimized variant.
 
     def __init__(self, optimizer: StatusPhasePerformanceOptimizer | None = None):
         """Initialize the optimized orchestrator.
@@ -277,7 +293,11 @@ class OptimizedStatusPhaseOrchestrator(StatusPhaseOrchestrator):
             optimizer: Performance optimizer instance (creates default if None)
         """
         super().__init__()
-        self.optimizer = optimizer or StatusPhasePerformanceOptimizer()
+        # In the optimized orchestrator, the optimizer is always present.
+        # Narrow the type for static type checkers.
+        self.optimizer: StatusPhasePerformanceOptimizer = (
+            optimizer or StatusPhasePerformanceOptimizer()
+        )
 
     def execute_complete_status_phase(
         self, game_state: "GameState"
@@ -430,9 +450,8 @@ class OptimizedStatusPhaseOrchestrator(StatusPhaseOrchestrator):
         Returns:
             Most recent performance report, or None if no reports available
         """
-        if not self.optimizer._performance_history:
-            return None
-        return self.optimizer._performance_history[-1]
+        # Delegate to optimizer to provide latest report
+        return self.optimizer.get_latest_report()
 
     def get_optimizer_statistics(self) -> dict[str, Any]:
         """Get performance optimizer statistics.
