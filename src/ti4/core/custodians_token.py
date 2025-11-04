@@ -18,6 +18,10 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from .unit import Unit
 
+from .constants import SystemConstants
+from .events import create_custodians_token_removed_event
+from .logging import GameLogger
+from .resource_management import ResourceManager
 
 logger = logging.getLogger(__name__)
 
@@ -69,40 +73,15 @@ class CustodiansToken:
             return False
 
         # Check if player has sufficient influence (6 required)
-        try:
-            available_influence = game_state.get_player_available_influence(player_id)
-        except AttributeError:
-            # Fallback to ResourceManager if GameState wrapper is missing
-            from .resource_management import ResourceManager
-
-            resource_manager = ResourceManager(game_state)
-            available_influence = resource_manager.calculate_available_influence(
-                player_id, for_voting=False
-            )
+        available_influence = game_state.get_player_available_influence(player_id)
 
         if available_influence < 6:
             return False
 
         # Check if player has ships in Mecatol Rex system
-        try:
-            from .constants import SystemConstants
-
-            has_ships = game_state.player_has_ships_in_system(
-                player_id, SystemConstants.MECATOL_REX_ID
-            )
-        except AttributeError:
-            # Fallback: check directly via system state
-            from .constants import SystemConstants
-            from .ships import ShipManager
-
-            system = game_state.systems.get(SystemConstants.MECATOL_REX_ID)
-            if system is None:
-                return False
-            ship_manager = ShipManager()
-            has_ships = any(
-                unit.owner == player_id and ship_manager.is_ship(unit)
-                for unit in system.get_units_in_space()
-            )
+        has_ships = game_state.player_has_ships_in_system(
+            player_id, SystemConstants.MECATOL_REX_ID
+        )
 
         if not has_ships:
             return False
@@ -157,9 +136,6 @@ class CustodiansToken:
             )
 
         # Spend six influence using ResourceManager (planets and trade goods allowed)
-        from .constants import SystemConstants
-        from .resource_management import ResourceManager
-
         resource_manager = ResourceManager(game_state)
 
         # Create spending plan for 6 influence (not a voting context)
@@ -198,44 +174,28 @@ class CustodiansToken:
 
         # Place the committed ground force on Mecatol Rex (now allowed)
         system = game_state.systems.get(SystemConstants.MECATOL_REX_ID)
-        if system is not None:
-            try:
-                system.place_unit_on_planet(ground_force, "Mecatol Rex")
-            except Exception:
-                # Non-fatal: landing failure should not rollback token removal or VP
-                logger.exception(
-                    "Failed to place ground force on Mecatol Rex during custodians token removal"
-                )
+        if system is None:
+            raise KeyError("Mecatol Rex system not found in game_state.systems")
+        system.place_unit_on_planet(ground_force, "Mecatol Rex")
 
         # Award victory point (Rule 27.3) and activate agenda phase (Rule 27.4)
         new_state = game_state.award_victory_points(player_id, 1)
         new_state = new_state.activate_agenda_phase()
 
         # Create and log event for custodians token removal
-        try:
-            from .events import create_custodians_token_removed_event
-            from .logging import GameLogger
-
-            ground_force_id = getattr(ground_force, "id", None)
-            removal_event = create_custodians_token_removed_event(
-                game_id=new_state.game_id,
-                player_id=player_id,
-                influence_spent=6,
-                system_id=SystemConstants.MECATOL_REX_ID,
-                ground_force_id=str(ground_force_id) if ground_force_id else None,
-                victory_points_awarded=1,
-                agenda_phase_activated=True,
-            )
-            # Log via GameLogger. If an event bus is used by the controller,
-            # observers will also receive PHASE_CHANGED during round transition.
-            GameLogger(new_state.game_id).log_event(removal_event.to_game_event())
-        except (ImportError, AttributeError, ValueError) as e:
-            # Defensive: logging should not interfere with game flow
-            logger.warning(
-                "Failed to log CustodiansTokenRemovedEvent via GameLogger: %s: %s",
-                type(e).__name__,
-                e,
-            )
+        ground_force_id = getattr(ground_force, "id", None)
+        removal_event = create_custodians_token_removed_event(
+            game_id=new_state.game_id,
+            player_id=player_id,
+            influence_spent=6,
+            system_id=SystemConstants.MECATOL_REX_ID,
+            ground_force_id=str(ground_force_id) if ground_force_id else None,
+            victory_points_awarded=1,
+            agenda_phase_activated=True,
+        )
+        # Log via GameLogger. If an event bus is used by the controller,
+        # observers will also receive PHASE_CHANGED during round transition.
+        GameLogger(new_state.game_id).log_event(removal_event.to_game_event())
 
         return (
             TokenRemovalResult(

@@ -13,6 +13,7 @@ from .home_system_control_validator import HomeSystemControlValidator
 from .objective import HomeSystemControlError, ObjectiveCategory, ObjectiveType
 from .player import Player
 from .promissory_notes import PromissoryNoteManager
+from .resource_management import ResourceManager
 
 if TYPE_CHECKING:
     from .agenda_cards.law_manager import LawManager
@@ -1119,31 +1120,10 @@ class GameState:
         Uses ResourceManager to honor planet exhaustion and trade goods conversion.
         Not a voting context.
         """
-        try:
-            from .resource_management import ResourceManager
-
-            resource_manager = ResourceManager(self)
-            return resource_manager.calculate_available_influence(
-                player_id, for_voting=False
-            )
-        except (ImportError, AttributeError, ValueError) as e:
-            # Defensive fallback: sum influence from ready planets only, ignore trade goods
-            import logging
-
-            logging.getLogger(__name__).debug(
-                "Falling back to simple influence calculation for player %s: %s: %s",
-                player_id,
-                type(e).__name__,
-                e,
-            )
-            planets = self.player_planets.get(player_id, []) or []
-            return sum(
-                getattr(planet, "influence", 0)
-                for planet in planets
-                if planet is not None
-                and hasattr(planet, "can_spend_influence")
-                and planet.can_spend_influence()
-            )
+        resource_manager = ResourceManager(self)
+        return resource_manager.calculate_available_influence(
+            player_id, for_voting=False
+        )
 
     def player_has_ships_in_system(self, player_id: str, system_id: str) -> bool:
         """Check if a player has any ships (including fighters) in a system."""
