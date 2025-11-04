@@ -1902,7 +1902,12 @@ class StatusPhaseManager:
                     create_optimized_status_phase_orchestrator,
                 )
 
-                self.orchestrator = create_optimized_status_phase_orchestrator()
+                # Disable memory optimization by default to reduce monitoring overhead
+                # and improve timing reliability in CI environments. Can be enabled
+                # explicitly by callers that need memory tracking.
+                self.orchestrator = create_optimized_status_phase_orchestrator(
+                    enable_caching=True, enable_memory_optimization=False
+                )
             except ImportError:
                 # Fallback to standard orchestrator if performance module not available
                 self.orchestrator = StatusPhaseOrchestrator()
