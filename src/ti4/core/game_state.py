@@ -1126,13 +1126,14 @@ class GameState:
             return resource_manager.calculate_available_influence(
                 player_id, for_voting=False
             )
-        except Exception:
+        except (ImportError, AttributeError):
             # Defensive fallback: sum influence from ready planets only, ignore trade goods
-            planets = self.player_planets.get(player_id, [])
+            planets = self.player_planets.get(player_id, []) or []
             return sum(
                 getattr(planet, "influence", 0)
                 for planet in planets
-                if hasattr(planet, "can_spend_influence")
+                if planet is not None
+                and hasattr(planet, "can_spend_influence")
                 and planet.can_spend_influence()
             )
 
@@ -1150,10 +1151,19 @@ class GameState:
                 unit.owner == player_id and ship_manager.is_ship(unit)
                 for unit in system.get_units_in_space()
             )
-        except Exception:
-            # Fallback: assume any unit with 'unit_type' attribute is a ship
+        except (ImportError, AttributeError):
+            # Fallback: check unit_type membership against canonical ship types
+            try:
+                from .constants import GameConstants
+            except ImportError:
+                # If constants can't be imported for some reason, be conservative
+                return False
+
+            ship_types = GameConstants.SHIP_TYPES
             return any(
-                unit.owner == player_id and hasattr(unit, "unit_type")
+                getattr(unit, "owner", None) == player_id
+                and hasattr(unit, "unit_type")
+                and unit.unit_type in ship_types
                 for unit in system.get_units_in_space()
             )
 

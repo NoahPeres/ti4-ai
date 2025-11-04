@@ -167,12 +167,14 @@ class CustodiansToken:
             player_id=player_id, resource_amount=0, influence_amount=6, for_voting=False
         )
 
-        if spending_plan is None:
+        # Validate plan before attempting execution
+        if not getattr(spending_plan, "is_valid", False):
             return (
                 TokenRemovalResult(
                     success=False,
                     error_message=(
-                        "Insufficient influence to remove custodians token (need 6)"
+                        getattr(spending_plan, "error_message", None)
+                        or "Invalid spending plan: insufficient or unusable influence to remove custodians token (need 6)"
                     ),
                 ),
                 game_state,

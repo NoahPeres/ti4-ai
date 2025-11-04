@@ -544,7 +544,7 @@ The audit identified **4 critical rules that completely block core gameplay**:
 
 ## 🎯 Roadmap Timeline Visualization (Audit-Based Critical Path)
 
-```
+````
 Month 1: [████████████████████████████████] Rule 27: Custodians Token (CRITICAL BLOCKER)
 Month 2: [████████████████] Rule 92: Trade [████████████████] Rule 81: Status Phase
 Month 3: [████████████████████████████████] Rule 89: Tactical Action + Integration
