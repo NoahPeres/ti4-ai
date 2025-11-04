@@ -1126,8 +1126,16 @@ class GameState:
             return resource_manager.calculate_available_influence(
                 player_id, for_voting=False
             )
-        except (ImportError, AttributeError):
+        except (ImportError, AttributeError, ValueError) as e:
             # Defensive fallback: sum influence from ready planets only, ignore trade goods
+            import logging
+
+            logging.getLogger(__name__).debug(
+                "Falling back to simple influence calculation for player %s: %s: %s",
+                player_id,
+                type(e).__name__,
+                e,
+            )
             planets = self.player_planets.get(player_id, []) or []
             return sum(
                 getattr(planet, "influence", 0)

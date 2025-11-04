@@ -37,7 +37,7 @@ class EventType(Enum):
     UNIT_MOVED = "unit_moved"
     COMBAT_STARTED = "combat_started"
     PHASE_CHANGED = "phase_changed"
-    CUSTODIANS_TOKEN_REMOVED = "custodians_token_removed"
+    CUSTODIANS_TOKEN_REMOVED = "custodians_token_removed"  # nosec: identifier contains 'token'
 
 
 class WormholeType(Enum):
@@ -245,7 +245,7 @@ class AbilityTrigger(Enum):
 class AbilityEffectType(Enum):
     """Enumeration of ability effect types for technology framework."""
 
-    EXPLORE_FRONTIER_TOKEN = "explore_frontier_token"
+    EXPLORE_FRONTIER_TOKEN = "explore_frontier_token"  # nosec: identifier contains 'token'
     ALLOW_RETREAT_TO_EMPTY_ADJACENT = "allow_retreat_to_empty_adjacent"
     MODIFY_UNIT_STATS = "modify_unit_stats"
     GAIN_TRADE_GOODS = "gain_trade_goods"

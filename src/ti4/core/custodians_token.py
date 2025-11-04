@@ -229,9 +229,13 @@ class CustodiansToken:
             # Log via GameLogger. If an event bus is used by the controller,
             # observers will also receive PHASE_CHANGED during round transition.
             GameLogger(new_state.game_id).log_event(removal_event.to_game_event())
-        except Exception:
+        except (ImportError, AttributeError, ValueError) as e:
             # Defensive: logging should not interfere with game flow
-            logger.exception("Failed to log CustodiansTokenRemovedEvent via GameLogger")
+            logger.warning(
+                "Failed to log CustodiansTokenRemovedEvent via GameLogger: %s: %s",
+                type(e).__name__,
+                e,
+            )
 
         return (
             TokenRemovalResult(

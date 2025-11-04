@@ -1,7 +1,6 @@
 """Event observer implementations for TI4 game framework."""
 
 import logging
-import time
 from abc import ABC, abstractmethod
 from typing import Any
 
@@ -89,13 +88,9 @@ class EventObserver(ABC):
             return event.to_game_event()
         if isinstance(event, CustodiansTokenRemovedEvent):
             return event.to_game_event()
-        # Fallback: construct a GameEvent from available attributes
-        event_type = getattr(event, "event_type", type(event).__name__)
-        game_id = getattr(event, "game_id", "")
-        data = getattr(event, "data", {})
-        timestamp = getattr(event, "timestamp", time.time())
-        return GameEvent(
-            event_type=event_type, game_id=game_id, data=data, timestamp=timestamp
+        # Unexpected type: enforce strictness to catch integration issues early
+        raise TypeError(
+            f"Unsupported event type for normalization: {type(event).__name__}"
         )
 
 

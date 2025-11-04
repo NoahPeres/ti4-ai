@@ -224,6 +224,9 @@ def create_custodians_token_removed_event(
     validate_non_empty_string(game_id, "Game ID")
     validate_non_empty_string(player_id, "Player ID")
     validate_non_empty_string(system_id, "System ID")
+    # Validate optional ground force identifier when provided
+    if ground_force_id is not None:
+        validate_non_empty_string(ground_force_id, "Ground Force ID")
     from .validation import validate_positive_number
 
     validate_positive_number(influence_spent, "Influence Spent")
