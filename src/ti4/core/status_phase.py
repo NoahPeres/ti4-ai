@@ -10,7 +10,21 @@ LRR References:
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any
+from types import TracebackType
+from typing import (
+    TYPE_CHECKING,
+    Any,
+)
+
+from ti4.performance.optimizer_protocol import (
+    CMProtocol as _CMProtocol,
+)
+from ti4.performance.optimizer_protocol import (
+    MetricsProtocol as _MetricsProtocol,
+)
+from ti4.performance.optimizer_protocol import (
+    PerformanceOptimizerProtocol,
+)
 
 from .exceptions import TI4Error
 
@@ -453,10 +467,9 @@ class StatusPhaseOrchestrator:
 
     def __init__(self) -> None:
         """Initialize the status phase orchestrator."""
-        # Optional performance optimizer; set by optimized orchestrator implementation.
-        # Use Any here to avoid Optional attribute access issues in subclasses under mypy.
-        # The optimized orchestrator will narrow this to a concrete type.
-        self.optimizer: Any = None
+        # Non-optional optimizer via a Null-object implementation.
+        # This avoids Any and Optional, providing a safe default that satisfies the protocol.
+        self.optimizer: PerformanceOptimizerProtocol = _NullPerformanceOptimizer()
 
     def get_performance_report(self) -> "StatusPhasePerformanceReport | None":
         """Return a performance report if available.
@@ -477,17 +490,14 @@ class StatusPhaseOrchestrator:
         return None
 
     def clear_performance_cache(self) -> bool:
-        """Clear optimizer cache if optimizer is present.
+        """Clear optimizer cache.
 
         Returns:
-            True if the optimizer cache was cleared; False if no optimizer is present
-            or the clear operation failed.
+            True if the optimizer cache was cleared; False if the operation failed.
         """
         try:
-            if self.optimizer is not None and hasattr(self.optimizer, "clear_cache"):
-                self.optimizer.clear_cache()
-                return True
-            return False
+            self.optimizer.clear_cache()
+            return True
         except Exception:
             return False
 
@@ -1813,11 +1823,8 @@ class StatusPhaseManager:
                     create_optimized_status_phase_orchestrator,
                 )
 
-                # Disable memory optimization by default to reduce monitoring overhead
-                # and improve timing reliability in CI environments. Can be enabled
-                # explicitly by callers that need memory tracking.
                 self.orchestrator = create_optimized_status_phase_orchestrator(
-                    enable_caching=True, enable_memory_optimization=False
+                    enable_caching=True, enable_memory_optimization=True
                 )
             except ImportError:
                 # Fallback to standard orchestrator if performance module not available
@@ -2599,3 +2606,75 @@ class StatusPhaseValidator:
                 return False
 
         return True
+
+
+# Protocols imported from ti4.performance.optimizer_protocol to avoid duplication
+
+
+class _NullPerformanceOptimizer(PerformanceOptimizerProtocol):
+    """No-op optimizer implementation that satisfies the protocol.
+
+    This avoids the need for Optional or Any in the base orchestrator by
+    providing a safe default implementation.
+    """
+
+    enable_memory_optimization: bool = False
+    enable_caching: bool = False
+
+    class _NullMetrics:
+        success: bool
+        error_message: str | None
+        execution_time_ms: float
+
+        def __init__(self) -> None:
+            self.success = True
+            self.error_message = None
+            self.execution_time_ms = 0.0
+
+    def monitor_performance(self, operation_name: str) -> _CMProtocol:
+        metrics: _MetricsProtocol = self._NullMetrics()
+
+        class _NullCM:
+            def __init__(self, m: _MetricsProtocol) -> None:
+                self._metrics: _MetricsProtocol = m
+
+            def __enter__(self) -> _MetricsProtocol:
+                return self._metrics
+
+            def __exit__(
+                self,
+                exc_type: type[BaseException] | None,
+                exc: BaseException | None,
+                tb: TracebackType | None,
+            ) -> bool | None:
+                # Do not suppress exceptions; return None
+                return None
+
+        return _NullCM(metrics)
+
+    def optimize_for_large_game_states(self, game_state: "GameState") -> "GameState":
+        return game_state
+
+    def add_performance_report(self, report: "StatusPhasePerformanceReport") -> None:
+        # No-op
+        return None
+
+    def get_latest_report(self) -> "StatusPhasePerformanceReport | None":
+        return None
+
+    def get_performance_trends(self) -> dict[str, float | int | bool]:
+        return {}
+
+    def meets_performance_requirements(self) -> bool:
+        return True
+
+    def clear_cache(self) -> None:
+        # No-op for null optimizer
+        return None
+
+    def get_cache_statistics(self) -> dict[str, Any]:
+        return {
+            "cache_size": 0,
+            "cache_enabled": self.enable_caching,
+            "memory_optimization_enabled": self.enable_memory_optimization,
+        }
