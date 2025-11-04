@@ -37,6 +37,7 @@ class EventType(Enum):
     UNIT_MOVED = "unit_moved"
     COMBAT_STARTED = "combat_started"
     PHASE_CHANGED = "phase_changed"
+    CUSTODIANS_TOKEN_REMOVED = "custodians_token_removed"
 
 
 class WormholeType(Enum):
@@ -334,6 +335,7 @@ class EventConstants:
     UNIT_MOVED = EventType.UNIT_MOVED.value
     COMBAT_STARTED = EventType.COMBAT_STARTED.value
     PHASE_CHANGED = EventType.PHASE_CHANGED.value
+    CUSTODIANS_TOKEN_REMOVED = EventType.CUSTODIANS_TOKEN_REMOVED.value
 
 
 class PerformanceConstants:

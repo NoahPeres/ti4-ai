@@ -1112,6 +1112,51 @@ class GameState:
 
         return self._create_new_state(agenda_phase_active=True)
 
+    # ---- Rule 27 integration helpers ----
+    def get_player_available_influence(self, player_id: str) -> int:
+        """Calculate total influence available to a player (planets + trade goods).
+
+        Uses ResourceManager to honor planet exhaustion and trade goods conversion.
+        Not a voting context.
+        """
+        try:
+            from .resource_management import ResourceManager
+
+            resource_manager = ResourceManager(self)
+            return resource_manager.calculate_available_influence(
+                player_id, for_voting=False
+            )
+        except Exception:
+            # Defensive fallback: sum influence from ready planets only, ignore trade goods
+            planets = self.player_planets.get(player_id, [])
+            return sum(
+                getattr(planet, "influence", 0)
+                for planet in planets
+                if hasattr(planet, "can_spend_influence")
+                and planet.can_spend_influence()
+            )
+
+    def player_has_ships_in_system(self, player_id: str, system_id: str) -> bool:
+        """Check if a player has any ships (including fighters) in a system."""
+        system = self.systems.get(system_id)
+        if system is None:
+            return False
+
+        try:
+            from .ships import ShipManager
+
+            ship_manager = ShipManager()
+            return any(
+                unit.owner == player_id and ship_manager.is_ship(unit)
+                for unit in system.get_units_in_space()
+            )
+        except Exception:
+            # Fallback: assume any unit with 'unit_type' attribute is a ship
+            return any(
+                unit.owner == player_id and hasattr(unit, "unit_type")
+                for unit in system.get_units_in_space()
+            )
+
     def serialize_for_persistence(self) -> dict[str, Any]:
         """Serialize game state for persistence including agenda card data and players."""
         # Get active laws from law manager

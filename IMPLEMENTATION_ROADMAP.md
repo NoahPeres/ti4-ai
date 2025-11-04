@@ -601,3 +601,26 @@ Month 8: [███████████████████████�
 This audit-based roadmap will deliver a **fully functional TI4 AI system in 3 months** (basic gameplay) and **production-ready system in 8 months**, compared to 18+ months with the previous approach. The focus on critical path completion ensures maximum impact per development hour invested.
 
 **Key Success Metric**: Complete TI4 game playable from setup to victory by Month 3.
+## Rule 27: Custodians Token (LRR 27.0–27.4)
+
+Status: Implemented with unit tests; integration tests pending
+
+Acceptance Criteria implemented:
+- Cost: Spend 6 influence to remove the token
+- Ship presence: Player must have at least one ship in the Mecatol Rex system
+- Ground force commitment: Player must commit at least one ground force which lands on Mecatol Rex upon removal
+- VP award: Player gains 1 victory point on successful removal
+- Agenda phase activation: Agenda phase is activated thereafter
+- Landing restriction: Ground forces cannot land on Mecatol Rex while the token is present
+
+Code components:
+- Core logic: `src/ti4/core/custodians_token.py`
+- Helpers: `src/ti4/core/game_state.py` (influence and ship presence checks)
+- Planet restrictions: `src/ti4/core/planet.py` (landing restriction with token)
+
+Unit Tests:
+- File: `tests/test_rule_27_custodians_token.py`
+- Covered cases: prerequisites checks, successful removal flow (VP + agenda), landing with ground force, failure without ground force, landing restriction with token, insufficient influence, no ships present, idempotent removal (VP awarded once)
+
+Next Steps:
+- Add integration tests to validate that agenda phase is properly enabled in subsequent rounds and interacts correctly with phase transitions and other strategy cards.

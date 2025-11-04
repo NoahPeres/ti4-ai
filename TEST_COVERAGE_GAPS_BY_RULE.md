@@ -292,3 +292,17 @@ Based on the comprehensive implementation status audit, this document identifies
 - [ ] Tests are maintainable and readable
 
 This comprehensive test coverage enhancement will ensure robust validation of all implemented features and provide confidence in system reliability and correctness.
+## Rule 27: Custodians Token
+
+Covered by unit tests (`tests/test_rule_27_custodians_token.py`):
+- Requirement checks (influence, ships in system)
+- Successful removal flow (spend 6 influence, commit ground force, award 1 VP, activate agenda phase)
+- Landing restrictions while token present; landing allowed after removal
+- Failure path without committed ground force
+- Failure paths for insufficient influence and no ships present
+- Idempotency of removal (cannot remove twice; VP awarded once; agenda remains active)
+
+Remaining coverage gaps:
+- Integration tests for round progression with agenda phase enabled
+- Cross-player interactions (competing attempts, VP accounting across players)
+- Interactions with existing strategy cards and phase transition components
