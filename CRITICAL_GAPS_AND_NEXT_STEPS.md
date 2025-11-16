@@ -4,33 +4,17 @@ Based on the comprehensive implementation status audit, this document identifies
 
 ## CRITICAL BLOCKING GAPS
 
-### 1. Rule 27: Custodians Token - GAME FLOW BLOCKER
-**Impact**: Completely blocks agenda phase activation and political gameplay
-**Status**: Not Started (0% implementation)
-**Blocking Effects**:
-- Agenda phase cannot be activated
-- Political gameplay completely unavailable
-- Victory point progression blocked
-- Game flow incomplete
-
-**Immediate Next Steps**:
-1. **Week 1**: Implement `CustodiansToken` entity class
-   - Token placement on Mecatol Rex
-   - Ground force landing restriction mechanics
-   - Token removal validation system
-
-2. **Week 2**: Implement influence spending mechanics
-   - Influence cost calculation (6 influence)
-   - Mandatory ground force commitment
-   - Player choice validation
-
-3. **Week 3**: Implement victory point award and agenda phase trigger
-   - Victory point award upon removal
-   - Agenda phase activation integration
-   - Game state transition logic
-
-**Dependencies**: Requires agenda phase system (Rule 8) completion
-**Success Criteria**: Agenda phase can be activated through custodians token removal
+### 1. Rule 27: Custodians Token - ✅ COMPLETE
+**Impact**: Enables agenda phase activation via custodians token removal on Mecatol Rex
+**Status**: Production Ready (implemented via Merge PR #51)
+**Highlights**:
+- Custodians token mechanics implemented (placement, removal, VP award)
+- Influence spending validation (6 influence) with ground force commitment
+- Agenda phase activation integrated and validated
+- Event logging and observer instrumentation for custodians flow
+**Validation**:
+- Covered by tests: `tests/test_rule_27_custodians_token.py`, `tests/test_rule_27_integration.py` (11 passed locally)
+**Outcome**: Removes a major game flow blocker; political gameplay path is now available
 
 ### 2. Rule 92: Trade Strategy Card - ✅ COMPLETE
 **Impact**: Critical economic strategy option fully implemented
@@ -61,57 +45,50 @@ Based on the comprehensive implementation status audit, this document identifies
 **Dependencies**: ✅ Commodity system (Rule 21) - successfully integrated
 **Success Criteria Met**: ✅ Players can use Trade strategy card for complete economic gameplay
 
-### 3. Rule 81: Status Phase - ROUND MANAGEMENT GAP
-**Impact**: Incomplete round progression and game state management
-**Status**: Partially Implemented (~30% complete)
-**Blocking Effects**:
-- Incomplete round transitions
-- Objective scoring issues
-- Card management problems
-- Game state inconsistencies
-
-**Immediate Next Steps**:
-1. **Week 1**: Complete status phase orchestration
-   - Score objectives step
-   - Reveal public objectives step
-   - Draw action cards step
-
-2. **Week 2**: Implement resource management steps
-   - Remove command tokens step
-   - Gain and redistribute command tokens step
-   - Ready cards step
-
-3. **Week 3**: Complete cleanup and preparation steps
-   - Repair units step
-   - Return strategy cards step
-   - Round transition logic
-
-**Dependencies**: Requires objective system (Rule 61) and card systems
-**Success Criteria**: Complete round progression with all status phase steps
+### 3. Rule 81: Status Phase - ✅ COMPLETE
+**Impact**: Round progression enabled with complete status phase orchestration and round transition
+**Status**: Production Ready (validated by orchestrator and round transition tests)
+**Highlights**:
+- Complete status phase orchestration across all steps
+- Round transition logic via `RoundTransitionManager` (agenda vs strategy)
+- Error handling, rollback on critical failures, graceful degradation
+**Validation**:
+- Covered by orchestrator, transition, and integration tests across status-phase suite
+**Outcome**: Round management is complete and no longer a blocker
 
 ## HIGH PRIORITY SYSTEM GAPS
 
 ### 4. Rule 89: Tactical Action - CORE GAMEPLAY GAP
-**Impact**: Incomplete tactical gameplay workflow
-**Status**: Partially Implemented (~60% complete)
-**Blocking Effects**:
-- Tactical action sequence incomplete
-- Movement-combat-production integration issues
-- Active system management problems
+**Impact**: Core tactical gameplay workflow nearing completeness
+**Status**: Substantially Improved (~80% complete)
+**Recent Progress (Strict TDD)**:
+- Implemented coordinator integration: `TacticalActionCoordinator.validate_and_execute_tactical_action(...)`
+  - Validates movement plans via `TacticalActionValidator.validate_movement_plan` — LRR §89.2
+  - Executes movement with `MovementStep` from `MovementEngine` — LRR §89.2
+  - Recomputes space combat required flag — `requires_space_combat` — LRR §89.3
+  - Evaluates invasion eligibility (ground force commitment and bombardment) — `can_commit_ground_forces`, `can_use_bombardment` — LRR §89.4
+  - Determines production availability — `can_resolve_production_abilities` — LRR §89.5
+- New passing tests: `src/ti4/tests/test_rule_89_tactical_action_coordinator_execution.py` exercising LRR §§ 89.2–89.5
 
-**Next Steps**:
-1. **Week 1**: Complete tactical action workflow integration
-   - Movement step completion
-   - Combat step integration
-   - Production step finalization
+**Blocking Effects Remaining**:
+- Component action timing windows during tactical actions
+- Broader edge cases and law/technology modifiers across steps
+- Advanced rollback and error recovery across multi-step sequences
 
-2. **Week 2**: Implement component action integration
-   - Component actions during tactical actions
-   - Timing window management
-   - Action validation
+**Next Steps (TDD)**:
+1. Expand unit tests for edge cases:
+   - Wormholes, hostile adjacency, and space cannon defense interplay (LRR §§ 58, 89.3)
+   - Transport capacity and ground force commitment constraints (LRR §89.4)
+   - Law and technology modifiers affecting production (LRR §89.5)
+2. Implement component action integration:
+   - Timing window management and validation (LRR §3, cross-referenced with §89)
+   - Ensure no duplication across validator/engine/coordinator layers
+3. Strengthen integration and rollback:
+   - Transactional safety across movement, combat, invasion, production steps
+   - Detailed error reporting with recovery paths
 
-**Dependencies**: Requires movement (Rule 58), combat (Rule 18), production (Rule 67)
-**Success Criteria**: Complete tactical action workflow from activation to completion
+**Dependencies**: Movement (Rule 58), Combat (Rule 18), Production (Rule 67)
+**Success Criteria**: Complete tactical action workflow from activation to completion with component action timing windows and robust edge-case handling
 
 ### 5. Rule 28: Deals - DIPLOMATIC SYSTEM GAP
 **Impact**: Missing diplomatic framework entirely

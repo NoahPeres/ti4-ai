@@ -117,18 +117,19 @@ class Galaxy:
         """
         Check if two systems are adjacent via hyperlanes (Rule 6.4).
 
-        Systems are hyperlane-adjacent if they are connected by hyperlane tiles.
-        This implements LRR 6.4: "Systems that are connected by lines drawn
-        across one or more hyperlane tiles are adjacent for all purposes."
+        Systems are hyperlane-adjacent if they are connected by one or more
+        hyperlane links. This implements LRR 6.4: "Systems that are connected
+        by lines drawn across one or more hyperlane tiles are adjacent for all
+        purposes."
 
         Args:
             system_id1: ID of the first system
             system_id2: ID of the second system
 
         Returns:
-            True if systems are connected by hyperlanes, False otherwise
+            True if systems are connected by hyperlanes (directly), False otherwise
         """
-        # Check if there's a direct hyperlane connection
+        # Check if there's a direct hyperlane connection only
         connection1 = (system_id1, system_id2)
         connection2 = (system_id2, system_id1)
 

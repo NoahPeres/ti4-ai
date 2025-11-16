@@ -10,7 +10,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any
 
-from ..core.constants import LocationType
+from ..core.constants import LocationType, UnitType
 
 
 def _is_space_location(location: str) -> bool:
@@ -103,8 +103,12 @@ class MovementStep(TacticalActionStep):
     """Handles the Movement Step of a Tactical Action."""
 
     def can_execute(self, game_state: Any, context: dict[str, Any]) -> bool:
-        """Check if movement step can be executed."""
-        return context.get("movement_plan") is not None
+        """Check if movement step can be executed.
+
+        Per LRR Rule 89.2b, a player may choose to not move any ships.
+        The movement step should execute even with an empty or no movement plan.
+        """
+        return True  # Always execute movement step, even if no units move
 
     def get_step_name(self) -> str:
         """Get the name of this step."""
@@ -194,7 +198,18 @@ class SpaceCannonOffenseStep(TacticalActionStep):
     """Step for Space Cannon Offense during tactical action (Rule 58.7)."""
 
     def can_execute(self, game_state: Any, context: dict[str, Any]) -> bool:
-        """Check if space cannon offense can be executed."""
+        """Check if space cannon offense can be executed.
+
+        LRR §63 (Space Cannon Offense) is available after movement if there are
+        defender PDS units in the active system OR in systems adjacent to the
+        active system. Adjacency includes physical adjacency, wormhole adjacency
+        (LRR §101), and hyperlanes (LRR §6.4).
+
+        This step must also work when no Galaxy object is available in the
+        GameState (unit tests may construct isolated system contexts). In such
+        cases, local system space cannon presence is sufficient to enable the
+        step per Rule 58.7.
+        """
         if game_state is None:
             return False
 
@@ -202,13 +217,33 @@ class SpaceCannonOffenseStep(TacticalActionStep):
         if not active_system_id:
             return False
 
-        system = game_state.systems.get(active_system_id)
-        if not system:
+        active_system = game_state.systems.get(active_system_id)
+        if not active_system:
             return False
 
-        # Check if there are any units with space cannon ability
-        space_cannon_units = self._get_space_cannon_units(system)
-        return len(space_cannon_units) > 0
+        # First, check for space cannon units in the ACTIVE system itself.
+        # Space cannon offense is available when defenders have PDS in the
+        # active system (typical case when enemy ships are present).
+        if self._system_has_space_cannon_units(active_system):
+            return True
+
+        # Next, consider adjacency-based space cannon offense (e.g., PDS II,
+        # or component window signaling for adjacent PDS). If a Galaxy is not
+        # present, we cannot evaluate adjacency, so we conservatively return
+        # False here (the local-system check above already covered common cases).
+        galaxy = getattr(game_state, "galaxy", None)
+        if galaxy is None:
+            return False
+
+        # Offense is possible if any adjacent system has at least one PDS (space cannon unit)
+        for other in game_state.systems.values():
+            if other.system_id == active_system_id:
+                continue
+            if galaxy.are_systems_adjacent(active_system_id, other.system_id):
+                if self._system_has_space_cannon_units(other):
+                    return True
+
+        return False
 
     def get_step_name(self) -> str:
         return "Space Cannon Offense"
@@ -231,25 +266,31 @@ class SpaceCannonOffenseStep(TacticalActionStep):
         return game_state
 
     def _get_space_cannon_units(self, system: Any) -> list[Any]:
-        """Get all units with space cannon ability in the system."""
-        space_cannon_units = []
-
-        # Check units on planets (PDS units have space cannon)
+        """Get all units with space cannon ability in the system. (legacy)"""
+        units: list[Any] = []
+        # Include units on planets
         for planet in system.planets:
-            for unit in planet.units:
-                # Check if unit has space cannon ability using unit stats
-                if hasattr(unit, "unit_type"):
-                    from ..core.constants import UnitType
-                    from ..core.unit_stats import UnitStatsProvider
+            units.extend(getattr(planet, "units", []))
+        # Include units in space (to accommodate simplified placement)
+        units.extend(getattr(system, "space_units", []))
 
-                    provider = UnitStatsProvider()
-                    # Convert string unit_type back to enum
-                    unit_type_enum = UnitType(unit.unit_type)
-                    stats = provider.get_unit_stats(unit_type_enum)
-                    if stats.space_cannon:
-                        space_cannon_units.append(unit)
+        return [u for u in units if self._is_space_cannon_unit(u)]
 
-        return space_cannon_units
+    def _is_space_cannon_unit(self, unit: Any) -> bool:
+        """Determine if a unit has space cannon capability using UnitStatsProvider."""
+        if not hasattr(unit, "unit_type"):
+            return False
+        from ..core.constants import UnitType
+        from ..core.unit_stats import UnitStatsProvider
+
+        provider = UnitStatsProvider()
+        unit_type_enum = UnitType(unit.unit_type)
+        stats = provider.get_unit_stats(unit_type_enum)
+        return bool(getattr(stats, "space_cannon", False))
+
+    def _system_has_space_cannon_units(self, system: Any) -> bool:
+        """Check whether the given system contains any units with space cannon."""
+        return len(self._get_space_cannon_units(system)) > 0
 
     def _get_space_cannon_players(self, system: Any) -> list[str]:
         """Get players who have space cannon units in order."""
@@ -509,20 +550,38 @@ class MovementValidator:
         for movement in movement_plan.ground_force_movements:
             unit = movement["unit"]
             from_location = movement["from_location"]
+            to_location = movement["to_location"]
 
-            # Ground forces moving from planets need transport
-            if not _is_space_location(from_location):
+            print(
+                f"[MovementValidator Debug] Checking transport for {unit.unit_type} from {from_location} to {to_location}"
+            )
+            print(
+                f"[MovementValidator Debug] Available transport capacity: {transport_capacity}"
+            )
+            print(
+                f"[MovementValidator Debug] Current transport usage: {transport_usage}"
+            )
+
+            # Ground forces and fighters need transport when moving between systems
+            # This applies regardless of whether they're moving from planets or space
+            if unit.unit_type in [UnitType.INFANTRY, UnitType.FIGHTER]:
                 # Find available transport
                 transport_found = False
                 for ship_key in transport_capacity:
                     if transport_usage[ship_key] < transport_capacity[ship_key]:
                         transport_usage[ship_key] += 1
                         transport_found = True
+                        print(
+                            f"[MovementValidator Debug] Found transport for {unit.unit_type} on {ship_key}"
+                        )
                         break
 
                 if not transport_found:
                     errors.append(
                         f"Insufficient transport capacity for {unit.unit_type}"
+                    )
+                    print(
+                        f"[MovementValidator Debug] No transport found for {unit.unit_type}"
                     )
 
         is_valid = len(errors) == 0

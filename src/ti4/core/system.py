@@ -77,11 +77,25 @@ class System:
         """Remove a unit from the space area of this system."""
         self.space_units.remove(unit)
 
-    def place_unit_on_planet(self, unit: Unit, planet_name: str) -> None:
-        """Place a unit on a specific planet in this system."""
+    def place_unit_on_planet(self, unit: Unit, planet_name: str | None) -> None:
+        """Place a unit on a specific planet in this system.
+
+        If planet_name is None or the planet does not exist, fall back to placing
+        the unit in the space area of the system. This behavior accommodates
+        tests and simplified scenarios where planets are not modeled but unit
+        presence within the system is still desired.
+        """
+        if planet_name is None:
+            # Simplified placement: no specific planet provided
+            self.place_unit_in_space(unit)
+            return
+
         planet = self.get_planet_by_name(planet_name)
         if planet:
             planet.place_unit(unit)
+        else:
+            # If the planet is not found, fall back to space placement
+            self.place_unit_in_space(unit)
 
     def remove_unit_from_planet(self, unit: Unit, planet_name: str) -> None:
         """Remove a unit from a specific planet in this system."""

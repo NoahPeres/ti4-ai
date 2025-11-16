@@ -59,6 +59,15 @@
 - `get_system_roles()` - Clear documentation
 - `demonstrate_no_redundancy()` - Proof of separation
 
+**Rule 89 Integration Details (LRR §§ 89.1–89.5):**
+- Validates movement plans via `TacticalActionValidator.validate_movement_plan` — LRR §89.2
+- Executes movement with `MovementStep` from `MovementEngine` — LRR §89.2
+- Recomputes whether space combat is required — `requires_space_combat` — LRR §89.3
+- Evaluates invasion step eligibility (ground force commitment and bombardment) — `can_commit_ground_forces`, `can_use_bombardment` — LRR §89.4
+- Determines production availability after movement/invasion — `can_resolve_production_abilities` — LRR §89.5
+
+This orchestration references the LRR text at `ti4_ai/LRR/lrr.txt` and design notes in `.trae/lrr_analysis/rule89_*.md` to ensure alignment with the official five-step tactical action sequence.
+
 ### **🔧 Usage Guidelines**
 
 #### **When to Use Each System:**
@@ -97,6 +106,13 @@
 - ✅ Independent operation capability
 - ✅ Integration layer prevents confusion
 
+**Recent Progress (Rule 89 TDD):**
+- Added coordinator-level tests: `src/ti4/tests/test_rule_89_tactical_action_coordinator_execution.py`
+  - Validates movement plan execution and post-movement state (LRR §89.2)
+  - Verifies space combat required flag computation (LRR §89.3)
+  - Confirms invasion and production eligibility flags (LRR §§ 89.4–89.5)
+- Implemented `validate_and_execute_tactical_action(...)` to pass new tests and maintain separation of concerns.
+
 ### **🎯 Benefits Achieved**
 
 1. **No Code Duplication**: Each method exists in exactly one system
@@ -112,6 +128,8 @@
 - **MovementEngine**: 16 tests (22% coverage - complex system)
 - **Integration**: 7 tests (76% coverage)
 - **Total**: 41 tests proving no redundancy and clear separation
+
+Additional coordinator tests for Rule 89 have been added and pass, strengthening end-to-end validation of the tactical action sequence without introducing duplication across layers.
 
 ### **🚀 Future Development**
 

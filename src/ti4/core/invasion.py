@@ -231,6 +231,22 @@ class InvasionController:
 
         return "establish_control"
 
+    def resolve_ground_combat(self) -> dict[str, Any]:
+        """Compatibility wrapper used by coordinator tests.
+
+        Returns a summary indicating whether any ground combat was resolved
+        on invaded planets. This delegates to the ground combat step and
+        inspects `combat_results` populated during resolution.
+        """
+        # Execute the ground combat phase
+        _next = self.ground_combat_step()
+        # Determine if any combat occurred based on stored results
+        occurred = bool(self.combat_results)
+        return {
+            "combat_resolved": occurred,
+            "next_step": _next,
+        }
+
     def establish_control_step(self) -> str:
         """Execute establish control step (49.5)"""
         from .constants import UnitType
